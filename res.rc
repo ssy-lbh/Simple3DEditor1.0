@@ -1,0 +1,37 @@
+#include <windows.h>
+
+#include "res.h"
+
+IDI_ICON1 ICON              "res/app_icon.ico"
+
+IDC_MOVE CURSOR             "res/move.cur"
+
+IDC_MENU MENU
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "保存(S)",                       IDM_SAVE
+        MENUITEM SEPARATOR
+        MENUITEM "退出(&X)",                      IDM_EXIT
+    END
+    POPUP "关于(&H)"
+    BEGIN
+        MENUITEM "关于(&A) ...",                  IDM_ABOUT
+    END
+END
+
+IDC_MENU ACCELERATORS
+BEGIN
+    "/",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
+    "?",            IDM_ABOUT,              ASCII,  ALT, NOINVERT
+    "^S",           IDM_SAVE,               ASCII,  NOINVERT
+    VK_ESCAPE,      IDM_EXIT,               VIRTKEY, NOINVERT
+    "q",            IDM_ROTATE_CCW,         ASCII, NOINVERT
+    "e",            IDM_ROTATE_CW,          ASCII, NOINVERT
+    "p",            IDM_POINT,              ASCII, NOINVERT
+    "f",            IDM_TOPOLOGY,           ASCII, NOINVERT
+    "g",            IDM_MOVE,               ASCII, NOINVERT
+    "r",            IDM_ROTATE,             ASCII, NOINVERT
+    "s",            IDM_SIZE,               ASCII, NOINVERT
+    "c",            IDM_SELECT_COLOR,       ASCII, NOINVERT
+END
