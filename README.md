@@ -4,20 +4,25 @@
 一个简单的3D编辑器，简单到Hello World级别，使用C++编写，图形基于OpenGL
 
 #### 软件架构
-软件架构说明
-
+colorboard: 调色板窗口，用于选取颜色
+font: 管理字体及其绘制
+geodef: 几何元素结构体和函数定义
+gltools: 一些关于OpenGL的封装函数
+log: 日志管理
+main: 主窗口部分
+menu: 简易菜单
+mesh: 网格体类，管理几何图形元素
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  直接下载release或者下载源代码编译
+2.  确保mingw工具已经安装并配置路径
+3.  下载文件夹路径下执行make.exe
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  文档暂且没时间写，快捷键可以看.rc文件
+2.  可能出现一些bug
 
 #### 参与贡献
 

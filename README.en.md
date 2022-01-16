@@ -1,7 +1,9 @@
 # Simple3DEditor
 
 #### Description
-一个简单的3D编辑器，简单到Hello World级别，使用C++编写，图形基于OpenGL
+A simple 3D editor, just like printing "Hello World" in the console.
+programming language: C++
+graphics: OpenGL
 
 #### Software Architecture
 Software architecture description
