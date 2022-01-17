@@ -14,7 +14,7 @@ OUTPUT 		= main.exe
 PROGOBJ 	:= $(addprefix $(BUILD_PATH)\, $(PROGOBJ))
 RESOBJ		:= $(addprefix $(BUILD_PATH)\, $(RESOBJ))
 
-.PHONY:all build clean run rebuild reexec commit
+.PHONY:all build clean run rebuild reexec commit merge
 
 all: build
 
@@ -37,9 +37,17 @@ $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 	$(RES) -i $< -o $@
 
 commit:
+	git checkout develop
 	git add *
 	git commit -m "update"
-	git push
+	git push -u origin develop
+
+merge:
+	git checkout master
+	git pull origin master
+	git merge develop
+	git status
+	git push origin master
 
 clean:
 	$(RM) $(OUTPUT) $(PROGOBJ) $(RESOBJ)
