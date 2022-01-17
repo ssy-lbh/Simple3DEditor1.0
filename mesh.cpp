@@ -40,6 +40,8 @@ Vertex* Mesh::Find(Vector3 ori, Vector3 dir){
 Vertex* Mesh::AddVertex(Vector3 pos){
     Vertex* v = new Vertex();
     v->pos = pos;
+    v->edges.Clear();
+    v->faces.Clear();
     vertices.Add(v);
     return v;
 }
@@ -71,8 +73,10 @@ Edge* Mesh::AddEdge(Vertex* v1, Vertex* v2){
     Edge* e = new Edge();
     e->v1 = v1;
     e->v2 = v2;
-    v1->edges.Add(e);
-    v2->edges.Add(e);
+    e->f1 = NULL;
+    e->f2 = NULL;
+    v1->AddEdge(e);
+    v2->AddEdge(e);
     edges.Add(e);
     return e;
 }
@@ -84,16 +88,18 @@ Face* Mesh::AddTriFace(Vertex* v1, Vertex* v2, Vertex* v3){
     Edge* e3 = AddEdge(v3, v1);
     // TODO 面元去重未完成
     Face* f = new Face();
+    f->vertices.Clear();
     f->vertices.Add(v1);
     f->vertices.Add(v2);
     f->vertices.Add(v3);
+    f->edges.Clear();
     f->edges.Add(e1);
     f->edges.Add(e2);
     f->edges.Add(e3);
     f->normal = Vector3::Cross(v1->pos - v2->pos, v1->pos - v3->pos).Normal();
-    v1->faces.Add(f); v1->UpdateNormal();
-    v2->faces.Add(f); v2->UpdateNormal();
-    v3->faces.Add(f); v3->UpdateNormal();
+    v1->AddFace(f); v1->UpdateNormal();
+    v2->AddFace(f); v2->UpdateNormal();
+    v3->AddFace(f); v3->UpdateNormal();
     e1->AddFace(f);
     e2->AddFace(f);
     e3->AddFace(f);
@@ -110,17 +116,13 @@ void Mesh::DeleteVertex(Vertex* v){
     } pack;
     pack.m = this;
     pack.v = v;
-    DebugLog("a");
     v->faces.Foreach<decltype(pack)*>([](Face* f, decltype(pack)* p){
-        p->m->faces.Remove(f);
         p->f = f;
-        DebugLog("b");
         f->vertices.Foreach<decltype(pack)*>([](Vertex* v, decltype(pack)* p){
             if (p->v != v){
-                p->v->faces.Remove(p->f);
+                v->faces.Remove(p->f);
             }
         }, p);
-        DebugLog("c");
         f->edges.Foreach<Face*>([](Edge* e, Face* f){
             if (e->f1 == f){
                 e->f1 = NULL;
@@ -128,16 +130,19 @@ void Mesh::DeleteVertex(Vertex* v){
                 e->f2 = NULL;
             }
         }, f);
+        p->m->faces.Remove(f);
+        delete f;
     }, &pack);
-    DebugLog("d");
     v->edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* p){
-        p->m->edges.Remove(e);
         if(e->v1 && e->v1 != p->v) e->v1->edges.Remove(e);
         if(e->v2 && e->v2 != p->v) e->v2->edges.Remove(e);
         if(e->f1) e->f1->edges.Remove(e);
         if(e->f2) e->f2->edges.Remove(e);
+        p->m->edges.Remove(e);
+        delete e;
     }, &pack);
     vertices.Remove(v);
+    delete v;
 }
 
 void Mesh::DeleteEdge(Edge* e){
