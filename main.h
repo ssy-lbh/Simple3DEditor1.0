@@ -1,6 +1,8 @@
 #include <windows.h>
 #include <windowsx.h>
 
+//#include <gl/glew.h>
+
 #include <gl/gl.h>
 #include <gl/glu.h>
 
@@ -34,6 +36,7 @@ private:
     Menu* testMenu = new Menu();
 
     UIManager* uiMgr = new UIManager();
+    ViewportManager* viewportMgr = new ViewportManager();
     Mesh* mesh = new Mesh();
 
     List<Vertex*> selectedPoints;
@@ -77,11 +80,13 @@ private:
         Vector2 start;
         Vertex* target;
         Vector3 startPos;
+        bool x, y, z;
     public:
         MoveOperation();
         virtual ~MoveOperation() override;
         virtual void OnEnter() override;
         virtual void OnMove() override;
+        virtual void OnCommand(UINT id) override;
     };
 public:
     static Main* inst;

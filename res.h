@@ -18,3 +18,15 @@
 #define IDM_ROTATE 510
 #define IDM_SIZE 511
 #define IDM_SELECT_COLOR 512
+#define IDM_OP_X 513
+#define IDM_OP_Y 514
+#define IDM_OP_Z 515
+#define IDM_OP_PLANE_X 516
+#define IDM_OP_PLANE_Y 517
+#define IDM_OP_PLANE_Z 518
+#define IDM_DELETE 519
+
+#define SHADER 600
+
+#define IDS_BASIC_VERT 701
+#define IDS_BASIC_FRAG 702

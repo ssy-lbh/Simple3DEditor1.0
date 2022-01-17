@@ -17,12 +17,22 @@ public:
         return *this;
     }
 
+    T RemoveBack(){
+        T ret = data[data.size() - 1];
+        data.pop_back();
+        return ret;
+    }
+
     size_t Size(){
         return data.size();
     }
 
     T GetFront(){
         return data.front();
+    }
+
+    T GetBack(){
+        return data.back();
     }
 
     T GetItem(int index){
@@ -34,6 +44,15 @@ public:
 
     void Clear(){
         data.clear();
+    }
+
+    void Remove(T val){
+        for (decltype(data.begin()) i = data.begin(); i != data.end(); ++i){
+            if (*i == val){
+                data.erase(i);
+                return;
+            }
+        }
     }
 
     List<T>& Foreach(void(*func)(T)){

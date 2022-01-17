@@ -68,6 +68,7 @@ Main::MoveOperation::MoveOperation(){}
 Main::MoveOperation::~MoveOperation(){}
 
 void Main::MoveOperation::OnEnter(){
+    x = y = z = true;
     start = inst->cursorPos;
     if (inst->selectedPoints.Size() > 0){
         if (inst->selectedPoints.Size() > 1){
@@ -82,10 +83,23 @@ void Main::MoveOperation::OnEnter(){
 
 void Main::MoveOperation::OnMove(){
     Vector2 mov;
+    Vector3 delta;
     if (target){
         mov = (inst->cursorPos - start) * inst->camDis;
-        target->pos = startPos + inst->camRight * mov.x + inst->camUp * mov.y;
-        DebugLog("MoveOperation OnMove %f %f %f", target->pos.x, target->pos.y, target->pos.z);
+        delta = inst->camRight * mov.x + inst->camUp * mov.y;
+        target->pos = startPos + Vector3(delta.x * x, delta.y * y, delta.z * z);
+        DebugLog("MoveOperation OnMove %f %f %f", delta.x * x, delta.y * y, delta.z * z);
+    }
+}
+
+void Main::MoveOperation::OnCommand(UINT id){
+    switch (id){
+    case IDM_OP_X: x = true; y = z = false; break;
+    case IDM_OP_Y: y = true; z = x = false; break;
+    case IDM_OP_Z: z = true; x = y = false; break;
+    case IDM_OP_PLANE_X: x = false; y = z = true; break;
+    case IDM_OP_PLANE_Y: y = false; z = x = true; break;
+    case IDM_OP_PLANE_Z: z = false; x = y = true; break;
     }
 }
 
@@ -102,7 +116,7 @@ Main::~Main(){
 void Main::InitCamera(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(90.0, 1.0, 0.1, 100.0);
+    gluPerspective(90.0, viewportMgr->GetAspect(), 0.1, 100.0);
 
     Vector3 camPos = camLookat - camDir * Vector3::forward * camDis;
     Vector3 camUp = camDir * Vector3::up;
@@ -151,6 +165,8 @@ void Main::RenderFrame(HWND hWnd, HDC hDC){
     //glDisable(GL_FOG);
     //glDisable(GL_LOGIC_OP);
 
+    viewportMgr->Reset(hWnd);
+
     InitCamera();
 
     // xyz坐标轴
@@ -187,7 +203,7 @@ void Main::RenderFrame(HWND hWnd, HDC hDC){
     glDisable(GL_POINT_SMOOTH);
 
     // UI绘制
-    uiMgr->Render();
+    uiMgr->Render(viewportMgr->GetAspect());
 
     // 菜单绘制
     //glFlush();// 仅仅执行drawcall但不阻塞
@@ -358,7 +374,7 @@ LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             break;
         case IDM_SIZE:
             break;
-        case IDM_SELECT_COLOR:
+        case IDM_SELECT_COLOR:{
             if (colorBoard == NULL){
                 colorBoard = new ColorBoard();
             }
@@ -366,7 +382,18 @@ LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             selectedPoints.Foreach<Vector3*>([](Vertex* v, Vector3* c){
                 v->color = *c;
             }, &color);
+        }
             break;
+        case IDM_DELETE:
+            selectedPoints.Foreach<Mesh*>([](Vertex* v, Mesh* m){
+                m->DeleteVertex(v);
+            }, mesh);
+            selectedPoints.Clear();
+            break;
+        }
+        // 当前操作的命令
+        if (curOp){
+            curOp->OnCommand(LOWORD(wParam));
         }
         break;
     }
