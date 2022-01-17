@@ -20,6 +20,8 @@ public:
     List<Face*> faces;
 
     void UpdateNormal();
+    void AddEdge(Edge* e);
+    void AddFace(Face* f);
 };
 
 class Edge {

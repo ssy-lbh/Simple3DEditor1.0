@@ -230,6 +230,7 @@ void Main::UpdateWindowSize(HWND hWnd){
     cliSize.y = cliRect.bottom - cliRect.top;
     cliInvSize.x = 1.0f / cliSize.x;
     cliInvSize.y = 1.0f / cliSize.y;
+    aspect = (float)cliSize.x / cliSize.y;
     if (menu != NULL){
         menu->SetClientSize(cliSize);
     }
@@ -239,7 +240,7 @@ void Main::UpdateWindowSize(HWND hWnd){
 void Main::UpdateCursor(int x, int y){
     cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
     cursorPos.y = 1.0f - 2.0f * y / cliSize.y;
-    cursorDir = camForward + camRight * cursorPos.x + camUp * cursorPos.y;
+    cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
     if (menu != NULL){
         menu->CursorMove(cursorPos - menuPos);
         return;
@@ -259,7 +260,7 @@ void Main::UpdateRotation(){
     camUp = camDir * Vector3::up;
     camRight = camDir * Vector3::right;
     camPos = camLookat - camForward * camDis;
-    cursorDir = camForward + camRight * cursorPos.x + camUp * cursorPos.y;
+    cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
 }
 
 void Main::UpdateDistance(){
@@ -345,7 +346,7 @@ LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             UpdateRotation();
             break;
         case IDM_POINT:{
-            Vector3 pos = camLookat + (camUp * cursorPos.y + camRight * cursorPos.x) * camDis;
+            Vector3 pos = camLookat + (camUp * cursorPos.y + camRight * cursorPos.x * aspect) * camDis;
             mesh->AddVertex(pos);
             DebugLog("Point at %f %f %f", pos.x, pos.y, pos.z);
         }

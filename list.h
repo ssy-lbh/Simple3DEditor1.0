@@ -56,16 +56,16 @@ public:
     }
 
     List<T>& Foreach(void(*func)(T)){
-        for (decltype(data.begin()) i = data.begin(); i != data.end(); ++i){
-            func(*i);
+        for (size_t i = 0; i < data.size(); i++){
+            func(data[i]);
         }
         return *this;
     }
 
     template <typename Tp>
     List<T>& Foreach(void(*func)(T, Tp), Tp user){
-        for (decltype(data.begin()) i = data.begin(); i != data.end(); ++i){
-            func(*i, user);
+        for (size_t i = 0; i < data.size(); i++){
+            func(data[i], user);
         }
         return *this;
     }

@@ -20,6 +20,7 @@ public:
     Vector3 cursorDir = Vector3::zero;
     RECT cliRect;
     Vector2 cliSize, cliInvSize;
+    float aspect;
 
 private:
     Vector3 camLookat = Vector3::zero;
