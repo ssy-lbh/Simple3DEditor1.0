@@ -348,6 +348,26 @@ LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         break;
     case WM_COMMAND:
         switch (LOWORD(wParam)){
+        case IDM_SAVE:{
+            GetTextInput();
+            inputText[MAX_PATH] = '\0';
+            HANDLE hFile = CreateFile(
+                inputText,
+                FILE_GENERIC_READ | FILE_GENERIC_WRITE,
+                FILE_SHARE_READ | FILE_SHARE_WRITE,
+                NULL,
+                CREATE_NEW,
+                FILE_ATTRIBUTE_NORMAL,
+                NULL
+            );
+            if (hFile == INVALID_HANDLE_VALUE){
+                DebugError("OpenFile %s Error!", inputText);
+                break;
+            }
+            mesh->WriteToOBJ(hFile);
+            CloseHandle(hFile);
+        }
+            break;
         case IDM_EXIT:
             PostQuitMessage(0);
             break;

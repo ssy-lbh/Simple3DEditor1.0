@@ -1,7 +1,8 @@
 #ifndef __MESH__
 #define __MESH__
 
-#include<stddef.h>
+#include <stddef.h>
+#include <windef.h>
 
 #include "geodef.h"
 
@@ -23,6 +24,7 @@ public:
     void DeleteEdge(Edge* e);
     void DeleteTriFace(Face* f);
     void Render();
+    void WriteToOBJ(HANDLE hFile);
 };
 
 #endif

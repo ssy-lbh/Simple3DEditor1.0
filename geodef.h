@@ -18,6 +18,7 @@ public:
     Vector3 color = Vector3::one;
     List<Edge*> edges;
     List<Face*> faces;
+    size_t index;
 
     void UpdateNormal();
     void AddEdge(Edge* e);
