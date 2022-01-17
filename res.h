@@ -30,3 +30,5 @@
 
 #define IDS_BASIC_VERT 701
 #define IDS_BASIC_FRAG 702
+
+#define IDD_TEXT 801
