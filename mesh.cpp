@@ -2,6 +2,8 @@
 
 #include <gl/gl.h>
 
+#include <cstdio>
+
 #include "log.h"
 
 Mesh::Mesh(){}
@@ -193,4 +195,23 @@ void Mesh::Render(){
         glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
     });
     glEnd();
+}
+
+void Mesh::WriteToOBJ(HANDLE hFile){
+    size_t index = 0;
+    vertices.Foreach<size_t*>([](Vertex* v, size_t* i){
+        v->index = ++*i;
+    }, &index);
+    vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
+        char tmp[MAX_PATH + 1];
+        DWORD len;
+        len = snprintf(tmp, MAX_PATH, "v %f %f %f\n", v->pos.x, v->pos.y, v->pos.z);
+        WriteFile(hFile, tmp, len, &len, NULL);
+    }, hFile);
+    faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
+        char tmp[MAX_PATH + 1];
+        DWORD len;
+        len = snprintf(tmp, MAX_PATH, "f %d %d %d\n", f->vertices.GetItem(0)->index, f->vertices.GetItem(1)->index, f->vertices.GetItem(2)->index);
+        WriteFile(hFile, tmp, len, &len, NULL);
+    }, hFile);
 }
