@@ -1,3 +1,5 @@
+#define IDC_STATIC -1
+
 #define IDI_ICON1 101
 
 #define IDC_MENU 301
@@ -31,4 +33,8 @@
 #define IDS_BASIC_VERT 701
 #define IDS_BASIC_FRAG 702
 
-#define IDD_TEXT 801
+#define IDD_ABOUTBOX 801
+#define IDD_TEXT 802
+#define IDC_TEXT_EDIT 803
+
+#define IDR_MAINFRAME 901

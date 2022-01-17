@@ -267,6 +267,20 @@ void Main::UpdateDistance(){
     camPos = camLookat - camForward * camDis;
 }
 
+void Main::GetTextInput(){
+    DialogBox(hInst, MAKEINTRESOURCE(IDD_TEXT), hWnd, [](HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
+        switch (uMsg){
+        case WM_INITDIALOG:
+            return (INT_PTR)TRUE;
+        case WM_CLOSE:
+            GetDlgItemText(hDlg, IDC_TEXT_EDIT, inst->inputText, MAX_PATH);
+            EndDialog(hDlg, LOWORD(wParam));
+            break;
+        }
+        return (INT_PTR)FALSE;
+    });
+}
+
 LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     switch (uMsg){
     case WM_CREATE:
@@ -336,6 +350,21 @@ LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         switch (LOWORD(wParam)){
         case IDM_EXIT:
             PostQuitMessage(0);
+            break;
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, [](HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
+                switch (uMsg){
+                case WM_INITDIALOG:
+                    return (INT_PTR)TRUE;
+                case WM_COMMAND:
+                    if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL){
+                        EndDialog(hDlg, LOWORD(wParam));
+                        return (INT_PTR)TRUE;
+                    }
+                    break;
+                }
+                return (INT_PTR)FALSE;
+            });
             break;
         case IDM_ROTATE_CCW:
             camDir *= Quaternion::AxisAngle(Vector3::forward, -10.0f);
@@ -430,6 +459,8 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     HGLRC hRC;
     MSG Msg;
 
+    hInst = hInstance;
+
     RegClass(hInstance);
     ColorBoard::RegClass(hInstance);
 
@@ -445,6 +476,8 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
         hInstance,
         NULL
     );
+
+    this->hWnd = hWnd;
 
     ShowWindow(hWnd, SW_SHOW);
     UpdateWindow(hWnd);
