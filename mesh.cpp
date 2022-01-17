@@ -110,14 +110,17 @@ void Mesh::DeleteVertex(Vertex* v){
     } pack;
     pack.m = this;
     pack.v = v;
+    DebugLog("a");
     v->faces.Foreach<decltype(pack)*>([](Face* f, decltype(pack)* p){
         p->m->faces.Remove(f);
         p->f = f;
+        DebugLog("b");
         f->vertices.Foreach<decltype(pack)*>([](Vertex* v, decltype(pack)* p){
             if (p->v != v){
                 p->v->faces.Remove(p->f);
             }
         }, p);
+        DebugLog("c");
         f->edges.Foreach<Face*>([](Edge* e, Face* f){
             if (e->f1 == f){
                 e->f1 = NULL;
@@ -126,6 +129,7 @@ void Mesh::DeleteVertex(Vertex* v){
             }
         }, f);
     }, &pack);
+    DebugLog("d");
     v->edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* p){
         p->m->edges.Remove(e);
         if(e->v1 && e->v1 != p->v) e->v1->edges.Remove(e);
