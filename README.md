@@ -42,6 +42,10 @@ mesh: 网格体类，管理几何图形元素
 12. "X"(shift + x)：YZ平面操作
 13. "Y"(shift + y)：ZX平面操作
 14. "Z"(shift + z)：XY平面操作
+15. delete：删除顶点
+16. ESC：退出
+17. Ctrl+S：保存
+18. Alt+/ Alt+?：软件信息
 
 ## 参与贡献
 
