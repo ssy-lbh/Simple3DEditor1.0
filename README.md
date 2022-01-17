@@ -6,14 +6,14 @@
 
 ## 软件架构
 
-colorboard: 调色板窗口，用于选取颜色
-font: 管理字体及其绘制
-geodef: 几何元素结构体和函数定义
-gltools: 一些关于OpenGL的封装函数
-log: 日志管理
-main: 主窗口部分
-menu: 简易菜单
-mesh: 网格体类，管理几何图形元素
+1. colorboard: 调色板窗口，用于选取颜色
+2. font: 管理字体及其绘制
+3. geodef: 几何元素结构体和函数定义
+4. gltools: 一些关于OpenGL的封装函数
+5. log: 日志管理
+6. main: 主窗口部分
+7. menu: 简易菜单
+8. mesh: 网格体类，管理几何图形元素
 
 ## 安装教程
 
