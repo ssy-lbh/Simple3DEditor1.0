@@ -22,6 +22,9 @@ public:
     Vector2 cliSize, cliInvSize;
     float aspect;
 
+    HINSTANCE hInst;
+    HWND hWnd;
+
 private:
     Vector3 camLookat = Vector3::zero;
     Quaternion camDir = Quaternion::one;
@@ -45,6 +48,8 @@ private:
     IOperation* curOp = NULL;
 
     ColorBoard* colorBoard = NULL;
+
+    char inputText[MAX_PATH + 1];
 
     class MoveButton : public IButton {
     private:
@@ -107,4 +112,5 @@ public:
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     ATOM RegClass(HINSTANCE hInstance);
     int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
+    void GetTextInput();
 };
