@@ -103,14 +103,45 @@ Face* Mesh::AddTriFace(Vertex* v1, Vertex* v2, Vertex* v3){
 
 void Mesh::DeleteVertex(Vertex* v){
     DebugLog("Mesh::DeleteVertex %p", v);
+    struct {
+        Mesh* m;
+        Vertex* v;
+        Face* f;
+    } pack;
+    pack.m = this;
+    pack.v = v;
+    v->faces.Foreach<decltype(pack)*>([](Face* f, decltype(pack)* p){
+        p->m->faces.Remove(f);
+        p->f = f;
+        f->vertices.Foreach<decltype(pack)*>([](Vertex* v, decltype(pack)* p){
+            if (p->v != v){
+                p->v->faces.Remove(p->f);
+            }
+        }, p);
+        f->edges.Foreach<Face*>([](Edge* e, Face* f){
+            if (e->f1 == f){
+                e->f1 = NULL;
+            }else{
+                e->f2 = NULL;
+            }
+        }, f);
+    }, &pack);
+    v->edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* p){
+        p->m->edges.Remove(e);
+        if(e->v1 && e->v1 != p->v) e->v1->edges.Remove(e);
+        if(e->v2 && e->v2 != p->v) e->v2->edges.Remove(e);
+        if(e->f1) e->f1->edges.Remove(e);
+        if(e->f2) e->f2->edges.Remove(e);
+    }, &pack);
+    vertices.Remove(v);
 }
 
 void Mesh::DeleteEdge(Edge* e){
-    DebugLog("Mesh::DeleteEdge %p", e);
+    DebugLog("Mesh::DeleteEdge %p [Unimplemented]", e);
 }
 
 void Mesh::DeleteTriFace(Face* f){
-    DebugLog("Mesh::DeleteTriFace %p", f);
+    DebugLog("Mesh::DeleteTriFace %p [Unimplemented]", f);
 }
 
 void Mesh::Render(){

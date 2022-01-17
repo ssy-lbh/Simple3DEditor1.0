@@ -1,5 +1,8 @@
 #include "uimgr.h"
 
+#include <windows.h>
+#include <windowsx.h>
+
 #include <gl/gl.h>
 
 UIManager::UIManager(){}
@@ -30,12 +33,14 @@ void UIManager::CursorMove(Vector2 pos){
     }, this);
 }
 
-void UIManager::Render(){
+void UIManager::Render(float aspect){
+    aspect = 1.0f / aspect;
+
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
+    glOrtho(-aspect, aspect, -1.0, 1.0, 0.0, 100.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -79,3 +84,43 @@ void IOperation::OnUndo(){}
 void IOperation::OnRightDown(){}
 void IOperation::OnRightUp(){}
 void IOperation::OnMove(){}
+void IOperation::OnCommand(UINT id){}
+
+ViewportManager::ViewportManager(){}
+
+ViewportManager::~ViewportManager(){}
+
+void ViewportManager::Reset(HWND hWnd){
+    RECT cliRect;
+    LONG tmp;
+    rects.Clear();
+    GetClientRect(hWnd, &cliRect);
+    tmp = cliRect.bottom; cliRect.bottom = cliRect.top; cliRect.top = tmp;
+    rects.Add(cliRect);
+    curRect = cliRect;
+    glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
+}
+
+void ViewportManager::PushViewport(RECT rect){
+    rects.Add(rect);
+    curRect = rect;
+    glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
+}
+
+void ViewportManager::PopViewport(){
+    rects.RemoveBack();
+    curRect = rects.GetBack();
+    glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
+}
+
+LONG ViewportManager::GetCurrentWidth(){
+    return curRect.right - curRect.left;
+}
+
+LONG ViewportManager::GetCurrentHeight(){
+    return curRect.top - curRect.bottom;
+}
+
+float ViewportManager::GetAspect(){
+    return (float)(curRect.right - curRect.left) / (curRect.top - curRect.bottom);
+}

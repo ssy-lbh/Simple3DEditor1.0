@@ -2,11 +2,13 @@
 #define __UIMGR__
 
 #include <stddef.h>
+#include <windef.h>
 
 #include "list.h"
 #include "vecmath.h"
 
 class UIManager;
+class ViewportManager;
 
 class IButton;
 class IOperation;
@@ -26,9 +28,24 @@ public:
     ~UIManager();
     void CursorMove(Vector2 pos);
     void AddButton(IButton* btn);
-    void Render();
+    void Render(float aspect);
     bool LeftDown();
     bool LeftUp();
+};
+
+class ViewportManager {
+private:
+    List<RECT> rects;
+    RECT curRect;
+public:
+    ViewportManager();
+    ~ViewportManager();
+    void Reset(HWND hWnd);
+    void PushViewport(RECT rect);
+    void PopViewport();
+    LONG GetCurrentWidth();
+    LONG GetCurrentHeight();
+    float GetAspect();
 };
 
 //TODO 按钮在触发按下后持续生效到停止
@@ -56,6 +73,7 @@ public:
     virtual void OnRightDown();
     virtual void OnRightUp();
     virtual void OnMove();
+    virtual void OnCommand(UINT id);
 };
 
 #endif
