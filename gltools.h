@@ -11,6 +11,7 @@ public:
     static void DrawCorner(float x, float y, float start, float end, float radius, float step);
     static void EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC);
     static void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC);
+    static RECT MakeRect(LONG left, LONG right, LONG bottom, LONG top);
 };
 
 class GLTexture2D {

@@ -6,6 +6,8 @@
 #include "vecmath.h"
 #include "list.h"
 
+#define MENUITEM_LAMBDA_TRANS(t) (void(*)(void*))(void(*)(t*))
+
 class TopMenu;
 class Menu;
 class MenuItem;
@@ -27,6 +29,8 @@ public:
 
     MenuItem();
     MenuItem(const wchar_t* name);
+    MenuItem(const wchar_t* name, void(*click)(void*));
+    MenuItem(const wchar_t* name, void(*click)(void*), void* userData);
     MenuItem(Menu* menu);
     ~MenuItem();
 };

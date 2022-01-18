@@ -43,9 +43,12 @@ public:
     void Reset(HWND hWnd);
     void PushViewport(RECT rect);
     void PopViewport();
+    RECT GetCurrentRect();
     LONG GetCurrentWidth();
     LONG GetCurrentHeight();
     float GetAspect();
+    void EnableScissor();
+    void DisableScissor();
 };
 
 //TODO 按钮在触发按下后持续生效到停止
