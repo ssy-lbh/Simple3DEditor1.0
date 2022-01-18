@@ -44,6 +44,13 @@ void GLUtils::DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC){
     ReleaseDC(hWnd, hDC);
 }
 
+RECT GLUtils::MakeRect(LONG left, LONG right, LONG bottom, LONG top){
+    RECT ret;
+    ret.left = left; ret.right = right;
+    ret.bottom = bottom; ret.top = top;
+    return ret;
+}
+
 GLTexture2D::GLTexture2D(const char* path){
     int x, y, channel;
     stbi_uc* image;

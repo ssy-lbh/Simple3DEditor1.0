@@ -24,6 +24,8 @@ public:
 
     HINSTANCE hInst;
     HWND hWnd;
+    HDC hDC;
+    HGLRC hRC;
 
 private:
     Vector3 camLookat = Vector3::zero;
@@ -35,10 +37,15 @@ private:
     Vector3 camForward = Vector3::forward;
     float camRange = 100.0f;
 
+    RECT modelViewRect;
+    RECT toolBarRect;
+    RECT dataBarRect;
+    RECT tipsBarRect;
+
     Menu* menu = NULL;
     Vector2 menuPos = Vector2::zero;
 
-    Menu* testMenu = new Menu();
+    Menu* basicMenu = new Menu();
 
     UIManager* uiMgr = new UIManager();
     ViewportManager* viewportMgr = new ViewportManager();
@@ -51,6 +58,7 @@ private:
     ColorBoard* colorBoard = NULL;
 
     char inputText[MAX_PATH + 1];
+    bool inputConfirm;
 
     class MoveButton : public IButton {
     private:
@@ -102,7 +110,11 @@ public:
     ~Main();
     void InitCamera();
     void InitLight0();
-    void RenderFrame(HWND hWnd, HDC hDC);
+    void RenderFrame();
+    void RenderToolBar();
+    void RenderModelView();
+    void RenderDataBar();
+    void RenderTipsBar();
     void SetMenu(Menu* m);
     void UpdateWindowSize(HWND hWnd);
     void UpdateCursor(int x, int y);
@@ -114,4 +126,8 @@ public:
     ATOM RegClass(HINSTANCE hInstance);
     int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
     void GetTextInput();
+    void AddPoint();
+    void DeletePoint();
+    bool SaveMesh(Mesh* mesh);
+    void AboutBox();
 };

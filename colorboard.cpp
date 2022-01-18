@@ -5,11 +5,12 @@
 
 ColorBoard::ColorBoard(){
     DebugLog("ColorBoard Created %p", this);
+    //TODO 添加属性WS_POPUP时SetProp失效
     hWnd = CreateWindowExA(
         0,
         "ModelView.ColorBoard",
         "ColorBoard",
-        WS_CAPTION | WS_POPUPWINDOW,
+        WS_CAPTION,
         CW_USEDEFAULT, CW_USEDEFAULT,
         300, 230,
         NULL,
@@ -18,7 +19,7 @@ ColorBoard::ColorBoard(){
         NULL
     );
     GLUtils::EnableOpenGL(hWnd, &hDC, &hRC);
-    SetProp(hWnd, "this", (HANDLE)this);
+    SetProp(hWnd, "PROP_THIS", (HANDLE)this);
 }
 
 ColorBoard::~ColorBoard(){
@@ -46,7 +47,11 @@ ATOM ColorBoard::RegClass(HINSTANCE hInstance){
 }
 
 LRESULT CALLBACK ColorBoard::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    ColorBoard* board = (ColorBoard*)GetProp(hWnd, "this");
+    ColorBoard* board = (ColorBoard*)GetProp(hWnd, "PROP_THIS");
+    if (board == NULL){
+        DebugError("ColorBoard::NullPointerException");
+        return DefWindowProc(hWnd, uMsg, wParam, lParam);
+    }
     return board->LocalWndProc(hWnd, uMsg, wParam, lParam);
 }
 

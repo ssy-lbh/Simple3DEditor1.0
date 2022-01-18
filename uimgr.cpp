@@ -36,7 +36,8 @@ void UIManager::CursorMove(Vector2 pos){
 void UIManager::Render(float aspect){
     aspect = 1.0f / aspect;
 
-    glDisable(GL_BLEND);
+    glEnable(GL_ALPHA_TEST);
+    glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
@@ -99,18 +100,25 @@ void ViewportManager::Reset(HWND hWnd){
     rects.Add(cliRect);
     curRect = cliRect;
     glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
+    glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
 }
 
 void ViewportManager::PushViewport(RECT rect){
     rects.Add(rect);
     curRect = rect;
     glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
+    glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
 }
 
 void ViewportManager::PopViewport(){
     rects.RemoveBack();
     curRect = rects.GetBack();
     glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
+    glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
+}
+
+RECT ViewportManager::GetCurrentRect(){
+    return curRect;
 }
 
 LONG ViewportManager::GetCurrentWidth(){
@@ -123,4 +131,13 @@ LONG ViewportManager::GetCurrentHeight(){
 
 float ViewportManager::GetAspect(){
     return (float)(curRect.right - curRect.left) / (curRect.top - curRect.bottom);
+}
+
+void ViewportManager::EnableScissor(){
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
+}
+
+void ViewportManager::DisableScissor(){
+    glDisable(GL_SCISSOR_TEST);
 }

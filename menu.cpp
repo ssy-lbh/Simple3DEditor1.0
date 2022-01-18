@@ -7,6 +7,10 @@ MenuItem::MenuItem() : type(ItemType::SEPERATOR) {}
 
 MenuItem::MenuItem(const wchar_t* name) : type(ItemType::DEFAULT), name(name) {}
 
+MenuItem::MenuItem(const wchar_t* name, void(*click)(void*)) : type(ItemType::DEFAULT), name(name), click(click) {}
+
+MenuItem::MenuItem(const wchar_t* name, void(*click)(void*), void* userData) : type(ItemType::DEFAULT), name(name), click(click), userData(userData) {}
+
 MenuItem::MenuItem(Menu* menu) : type(ItemType::GROUP), menu(menu) {}
 
 MenuItem::~MenuItem(){}
@@ -36,7 +40,7 @@ bool Menu::InMenu(Vector2 relaPos){
 
 void Menu::CursorMove(Vector2 relaPos){
     if (InMenu(relaPos)){
-        selected = (int)((-15.0f * cliInvSize.y - relaPos.y) / (30.0f * cliInvSize.y));
+        selected = (int)((-10.0f * cliInvSize.y - relaPos.y) / (30.0f * cliInvSize.y));
     }else{
         selected = -1;
     }

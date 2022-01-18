@@ -106,7 +106,7 @@ void Main::MoveOperation::OnCommand(UINT id){
 Main::Main(){}
 
 Main::~Main(){
-    if(testMenu) delete testMenu;
+    if(basicMenu) delete basicMenu;
     if(uiMgr) delete uiMgr;
     if(mesh) delete mesh;
     if(curOp) delete curOp;
@@ -147,7 +147,11 @@ void Main::InitLight0(){
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 }
 
-void Main::RenderFrame(HWND hWnd, HDC hDC){
+void Main::RenderToolBar(){
+
+}
+
+void Main::RenderModelView(){
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClearDepth(1.0);
 
@@ -166,8 +170,6 @@ void Main::RenderFrame(HWND hWnd, HDC hDC){
     //glDisable(GL_LOGIC_OP);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    viewportMgr->Reset(hWnd);
 
     InitCamera();
 
@@ -223,6 +225,27 @@ void Main::RenderFrame(HWND hWnd, HDC hDC){
     if (menu != NULL){
         menu->Render(menuPos.x, menuPos.y);
     }
+}
+
+void Main::RenderDataBar(){
+
+}
+
+void Main::RenderTipsBar(){
+
+}
+
+void Main::RenderFrame(){
+    RECT rc;
+
+    viewportMgr->Reset(hWnd);
+    viewportMgr->EnableScissor();
+    rc = viewportMgr->GetCurrentRect();
+    
+    //TODO 做好Container组件，实现UI尺寸坐标管理
+    //viewportMgr->PushViewport(modelViewRect);
+    RenderModelView();
+    //viewportMgr->PopViewport();
 
     SwapBuffers(hDC);
 }
@@ -246,6 +269,7 @@ void Main::UpdateWindowSize(HWND hWnd){
     if (menu != NULL){
         menu->SetClientSize(cliSize);
     }
+    modelViewRect = GLUtils::MakeRect(cliRect.left + 100, cliRect.right, cliRect.bottom, cliRect.top);
 }
 
 //TODO 添加一些UI范围检测
@@ -276,6 +300,7 @@ void Main::UpdateRotation(){
 }
 
 void Main::UpdateDistance(){
+    DebugLog("Camera Distance %f", camDis);
     camPos = camLookat - camForward * camDis;
     if (camRange < camDis * 20.0f){
         camRange *= 2.0f;
@@ -290,8 +315,74 @@ void Main::GetTextInput(){
         case WM_INITDIALOG:
             return (INT_PTR)TRUE;
         case WM_CLOSE:
-            GetDlgItemText(hDlg, IDC_TEXT_EDIT, inst->inputText, MAX_PATH);
+            inst->inputConfirm = false;
             EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        case WM_COMMAND:
+            switch (LOWORD(wParam)){
+            case IDOK:
+                inst->inputConfirm = true;
+                GetDlgItemText(hDlg, IDC_TEXT_EDIT, inst->inputText, MAX_PATH);
+                EndDialog(hDlg, LOWORD(wParam));
+                break;
+            case IDCANCEL:
+                inst->inputConfirm = false;
+                EndDialog(hDlg, LOWORD(wParam));
+                break;
+            }
+            return (INT_PTR)TRUE;
+        }
+        return (INT_PTR)FALSE;
+    });
+    if (inputConfirm == false){
+        *inputText = '\0';
+    }
+}
+
+void Main::AddPoint(){
+    Vector3 pos = camLookat + (camUp * cursorPos.y + camRight * cursorPos.x * aspect) * camDis;
+    mesh->AddVertex(pos);
+    DebugLog("Point at %f %f %f", pos.x, pos.y, pos.z);
+}
+
+void Main::DeletePoint(){
+    selectedPoints.Foreach<Mesh*>([](Vertex* v, Mesh* m){
+        m->DeleteVertex(v);
+    }, mesh);
+    selectedPoints.Clear();
+}
+
+bool Main::SaveMesh(Mesh* mesh){
+    GetTextInput();
+    inputText[MAX_PATH] = '\0';
+    HANDLE hFile = CreateFile(
+        inputText,
+        FILE_GENERIC_READ | FILE_GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL,
+        CREATE_NEW,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+    if (hFile == INVALID_HANDLE_VALUE){
+        DebugError("OpenFile %s Error!", inputText);
+        return false;
+    }
+    mesh->WriteToOBJ(hFile);
+    CloseHandle(hFile);
+    return true;
+}
+
+void Main::AboutBox(){
+    DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, [](HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
+        switch (uMsg){
+        case WM_INITDIALOG:
+            return (INT_PTR)TRUE;
+        case WM_COMMAND:
+            if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL){
+                EndDialog(hDlg, LOWORD(wParam));
+                return (INT_PTR)TRUE;
+            }
             break;
         }
         return (INT_PTR)FALSE;
@@ -316,7 +407,7 @@ LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         UpdateCursor(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_MOUSEWHEEL:
-        camDis *= Pow(0.998f, GET_WHEEL_DELTA_WPARAM(wParam));
+        camDis *= Pow(0.999f, GET_WHEEL_DELTA_WPARAM(wParam));
         UpdateDistance();
         break;
     case WM_MOUSELEAVE:
@@ -362,47 +453,18 @@ LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         uiMgr->LeftUp();
         break;
     case WM_RBUTTONDOWN:
-        SetMenu(testMenu);
+        SetMenu(basicMenu);
         break;
     case WM_COMMAND:
         switch (LOWORD(wParam)){
-        case IDM_SAVE:{
-            GetTextInput();
-            inputText[MAX_PATH] = '\0';
-            HANDLE hFile = CreateFile(
-                inputText,
-                FILE_GENERIC_READ | FILE_GENERIC_WRITE,
-                FILE_SHARE_READ | FILE_SHARE_WRITE,
-                NULL,
-                CREATE_NEW,
-                FILE_ATTRIBUTE_NORMAL,
-                NULL
-            );
-            if (hFile == INVALID_HANDLE_VALUE){
-                DebugError("OpenFile %s Error!", inputText);
-                break;
-            }
-            mesh->WriteToOBJ(hFile);
-            CloseHandle(hFile);
-        }
+        case IDM_SAVE:
+            SaveMesh(mesh);
             break;
         case IDM_EXIT:
             PostQuitMessage(0);
             break;
         case IDM_ABOUT:
-            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, [](HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
-                switch (uMsg){
-                case WM_INITDIALOG:
-                    return (INT_PTR)TRUE;
-                case WM_COMMAND:
-                    if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL){
-                        EndDialog(hDlg, LOWORD(wParam));
-                        return (INT_PTR)TRUE;
-                    }
-                    break;
-                }
-                return (INT_PTR)FALSE;
-            });
+            AboutBox();
             break;
         case IDM_ROTATE_CCW:
             camDir *= Quaternion::AxisAngle(Vector3::forward, -10.0f);
@@ -412,11 +474,8 @@ LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             camDir *= Quaternion::AxisAngle(Vector3::forward, 10.0f);
             UpdateRotation();
             break;
-        case IDM_POINT:{
-            Vector3 pos = camLookat + (camUp * cursorPos.y + camRight * cursorPos.x * aspect) * camDis;
-            mesh->AddVertex(pos);
-            DebugLog("Point at %f %f %f", pos.x, pos.y, pos.z);
-        }
+        case IDM_POINT:
+            AddPoint();
             break;
         case IDM_TOPOLOGY:
             switch (selectedPoints.Size()){
@@ -453,10 +512,7 @@ LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         }
             break;
         case IDM_DELETE:
-            selectedPoints.Foreach<Mesh*>([](Vertex* v, Mesh* m){
-                m->DeleteVertex(v);
-            }, mesh);
-            selectedPoints.Clear();
+            DeletePoint();
             break;
         }
         // 当前操作的命令
@@ -524,6 +580,9 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     GLUtils::EnableOpenGL(hWnd, &hDC, &hRC);
 
+    this->hDC = hDC;
+    this->hRC = hRC;
+
     DebugLog("OpenGL Enabled");
     DebugLog("OpenGL Version %s", glGetString(GL_VERSION));
     DebugLog("OpenGL Vendor %s", glGetString(GL_VENDOR));
@@ -533,11 +592,18 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     DebugLog("OpenGL Use Font %s", "GB2312");
 
-    testMenu->AddItem(new MenuItem(L"你好"));
-    testMenu->AddItem(new MenuItem(L"这是"));
-    testMenu->AddItem(new MenuItem(L"一个"));
-    testMenu->AddItem(new MenuItem(L"测试用"));
-    testMenu->AddItem(new MenuItem(L"右键菜单"));
+    basicMenu->AddItem(new MenuItem(L"添加顶点", MENUITEM_LAMBDA_TRANS(Main)[](Main* main){
+        main->AddPoint();
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"删除顶点", MENUITEM_LAMBDA_TRANS(Main)[](Main* main){
+        main->DeletePoint();
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"保存", MENUITEM_LAMBDA_TRANS(Main)[](Main* main){
+        main->SaveMesh(main->mesh);
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"关于", MENUITEM_LAMBDA_TRANS(Main)[](Main* main){
+        main->AboutBox();
+    }, this));
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MENU));
 
@@ -549,7 +615,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
                 TranslateMessage(&Msg);
                 DispatchMessageA(&Msg);
                 wglMakeCurrent(hDC, hRC);
-                RenderFrame(hWnd, hDC);
+                RenderFrame();
             }
         }
     }
