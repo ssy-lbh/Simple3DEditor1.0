@@ -2,6 +2,7 @@
 
 #include "font.h"
 #include "gltools.h"
+#include "log.h"
 
 MenuItem::MenuItem() : type(ItemType::SEPERATOR) {}
 
@@ -11,9 +12,11 @@ MenuItem::MenuItem(const wchar_t* name, void(*click)(void*)) : type(ItemType::DE
 
 MenuItem::MenuItem(const wchar_t* name, void(*click)(void*), void* userData) : type(ItemType::DEFAULT), name(name), click(click), userData(userData) {}
 
-MenuItem::MenuItem(Menu* menu) : type(ItemType::GROUP), menu(menu) {}
+MenuItem::MenuItem(const wchar_t* name, Menu* menu) : type(ItemType::GROUP), name(name), menu(menu) {}
 
-MenuItem::~MenuItem(){}
+MenuItem::~MenuItem(){
+    if (menu) delete menu;
+}
 
 Menu::Menu(){}
 
@@ -38,12 +41,18 @@ bool Menu::InMenu(Vector2 relaPos){
     return relaPos.x >= 0.0f && relaPos.x <= x && relaPos.y <= 0.0f && relaPos.y >= -y;
 }
 
+bool Menu::InChainMenu(Vector2 relaPos){
+    if (curMenu && curMenu->InChainMenu(relaPos - menuPos)){
+        return true;
+    }
+    return InMenu(relaPos);
+}
+
 void Menu::CursorMove(Vector2 relaPos){
     if (InMenu(relaPos)){
         selected = (int)((-10.0f * cliInvSize.y - relaPos.y) / (30.0f * cliInvSize.y));
-    }else{
-        selected = -1;
     }
+    cursorPos = relaPos;
 }
 
 void Menu::Click(){
@@ -68,13 +77,46 @@ void Menu::RenderItem(MenuItem* item){
             glEnd();
         }
         glColor3f(1.0f, 0.5f, 0.0f);
-        glRasterPos2f(minPos.x, minPos.y + 6.0f * cliInvSize.y);
+        glRasterPos2f(minPos.x + 5.0f * cliInvSize.y, minPos.y + 6.0f * cliInvSize.y);
         glDrawCNString(item->name);
     }
         break;
     case MenuItem::ItemType::SEPERATOR:
+        glColor3f(0.5f, 0.5f, 0.5f);
+        glLineWidth(3.0f);
+        glBegin(GL_LINES);
+        glVertex2f(minPos.x, minPos.y + 15.0f * cliInvSize.y);
+        glVertex2f(minPos.x + 250.0f * cliInvSize.y, minPos.y + 15.0f * cliInvSize.y);
+        glEnd();
         break;
-    case MenuItem::ItemType::GROUP:
+    case MenuItem::ItemType::GROUP:{
+        float height = 30.0f * cliInvSize.y, width = 250.0f * cliInvSize.y;
+        if (drawCounter == selected){
+            glColor3f(0.1f, 0.4f, 1.0f);
+            glBegin(GL_TRIANGLES);
+            glVertex2f(minPos.x, minPos.y); glVertex2f(minPos.x + width, minPos.y); glVertex2f(minPos.x + width, minPos.y + height);
+            glVertex2f(minPos.x, minPos.y); glVertex2f(minPos.x, minPos.y + height); glVertex2f(minPos.x + width, minPos.y + height);
+            glEnd();
+            if (item->menu == NULL){
+                DebugError("Menu::RenderItem %p NullPointerException", item);
+            }else{
+                item->menu->SetClientSize(cliSize);
+                item->menu->CursorMove(Vector2(cursorPos.x - width - 10.0f * cliInvSize.y, cursorPos.y + drawCounter * 30.0f * cliInvSize.y + 10.0f * cliInvSize.y));
+                item->menu->Render(minPos.x + width + 10.0f * cliInvSize.y, minPos.y + 40.0f * cliInvSize.y);
+                curMenu = item->menu;
+                menuPos = Vector2(width + 10.0f * cliInvSize.y, -drawCounter * 30.0f * cliInvSize.y - 10.0f * cliInvSize.y);
+            }
+        }
+        glColor3f(1.0f, 0.5f, 0.0f);
+        glRasterPos2f(minPos.x + 5.0f * cliInvSize.y, minPos.y + 6.0f * cliInvSize.y);
+        glDrawCNString(item->name);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBegin(GL_TRIANGLES);
+        glVertex2f(minPos.x + width * 0.9f, minPos.y + height * 0.2f);
+        glVertex2f(minPos.x + width * 0.95f, minPos.y + height * 0.5f);
+        glVertex2f(minPos.x + width * 0.9f, minPos.y + height * 0.8f);
+        glEnd();
+    }
         break;
     }    
     drawCounter++;
@@ -85,13 +127,7 @@ void Menu::Render(float x, float y){
     float xmin = x + cornWidth, xmax = x + cornWidth + 250.0f * cliInvSize.y;
     float ymax = y - cornWidth, ymin = y - cornWidth - items.Size() * 30.0f * cliInvSize.y;
 
-    glDisable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glMatrixMode(GL_PROJECTION);
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    //DebugLog("Menu::Render %p %f %f", this, x, y);
 
     glColor3f(0.1f, 0.1f, 0.1f);
     GLUtils::DrawCorner(xmin, ymax, 90.0f, 180.0f, cornWidth, 0.05f);
@@ -114,4 +150,8 @@ void Menu::Render(float x, float y){
     items.Foreach<Menu*>([](MenuItem* item, Menu* menu){
         menu->RenderItem(item);
     }, this);
+}
+
+void Menu::ResetSelect(){
+    selected = -1;
 }
