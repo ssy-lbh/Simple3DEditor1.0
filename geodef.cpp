@@ -11,12 +11,12 @@ void Vertex::UpdateNormal(){
 }
 
 void Vertex::AddEdge(Edge* e){
-    DebugLog("Vertex::AddEdge %p", e);
+    //DebugLog("Vertex::AddEdge %p", e);
     edges.Add(e);
 }
 
 void Vertex::AddFace(Face* f){
-    DebugLog("Vertex::AddFace %p", f);
+    //DebugLog("Vertex::AddFace %p", f);
     faces.Add(f);
 }
 
