@@ -155,34 +155,46 @@ void Main::RenderFrame(HWND hWnd, HDC hDC){
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_AUTO_NORMAL);
-    glDisable(GL_BLEND);
+    glEnable(GL_BLEND);
     glDisable(GL_SCISSOR_TEST);
     glDisable(GL_STENCIL_TEST);
-    glDisable(GL_ALPHA_TEST);
+    glEnable(GL_ALPHA_TEST);
     glDisable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
     //glDisable(GL_DITHER); 这几个就一直不用
     //glDisable(GL_FOG);
     //glDisable(GL_LOGIC_OP);
 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     viewportMgr->Reset(hWnd);
 
     InitCamera();
+
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     // xyz坐标轴
     glDisable(GL_LIGHTING);
     glEnable(GL_LINE_SMOOTH);
     glDisable(GL_LINE_STIPPLE);
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glBegin(GL_LINES);
     glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex3f(-100.0f, 0.0f, 0.0f); glVertex3f(100.0f, 0.0f, 0.0f);
+    glVertex3f(-camRange, 0.0f, 0.0f); glVertex3f(camRange, 0.0f, 0.0f);
     glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex3f(0.0f, -100.0f, 0.0f); glVertex3f(0.0f, 100.0f, 0.0f);
+    glVertex3f(0.0f, -camRange, 0.0f); glVertex3f(0.0f, camRange, 0.0f);
     glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(0.0f, 0.0f, -100.0f); glVertex3f(0.0f, 0.0f, 100.0f);
+    glVertex3f(0.0f, 0.0f, -camRange); glVertex3f(0.0f, 0.0f, camRange);
     glEnd();
     glDisable(GL_LINE_SMOOTH);
+    glBegin(GL_LINES);
+    glColor4f(1.0f, 1.0f, 1.0f, 0.2f);
+    for (float i = 0.02f; i < 1.0f; i += 0.02f){
+        glVertex3f(-camRange, i * camRange, 0.0f); glVertex3f(camRange, i * camRange, 0.0f);
+        glVertex3f(-camRange, -i * camRange, 0.0f); glVertex3f(camRange, -i * camRange, 0.0f);
+        glVertex3f(i * camRange, -camRange, 0.0f); glVertex3f(i * camRange, camRange, 0.0f);
+        glVertex3f(-i * camRange, -camRange, 0.0f); glVertex3f(-i * camRange, camRange, 0.0f);
+    }
+    glEnd();
 
     InitLight0(); //TODO 后续光照设置法线
     glEnable(GL_LIGHTING);     //开启光照系统
@@ -265,6 +277,11 @@ void Main::UpdateRotation(){
 
 void Main::UpdateDistance(){
     camPos = camLookat - camForward * camDis;
+    if (camRange < camDis * 20.0f){
+        camRange *= 2.0f;
+    }else if (camRange > camDis * 40.0f){
+        camRange *= 0.5f;
+    }
 }
 
 void Main::GetTextInput(){
@@ -300,6 +317,7 @@ LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         break;
     case WM_MOUSEWHEEL:
         camDis *= Pow(0.998f, GET_WHEEL_DELTA_WPARAM(wParam));
+        UpdateDistance();
         break;
     case WM_MOUSELEAVE:
         break;

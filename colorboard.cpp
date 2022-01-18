@@ -4,11 +4,12 @@
 #include "log.h"
 
 ColorBoard::ColorBoard(){
+    DebugLog("ColorBoard Created %p", this);
     hWnd = CreateWindowExA(
         0,
         "ModelView.ColorBoard",
         "ColorBoard",
-        WS_CAPTION,
+        WS_CAPTION | WS_POPUPWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
         300, 230,
         NULL,
@@ -45,7 +46,8 @@ ATOM ColorBoard::RegClass(HINSTANCE hInstance){
 }
 
 LRESULT CALLBACK ColorBoard::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    return ((ColorBoard*)GetProp(hWnd, "this"))->LocalWndProc(hWnd, uMsg, wParam, lParam);
+    ColorBoard* board = (ColorBoard*)GetProp(hWnd, "this");
+    return board->LocalWndProc(hWnd, uMsg, wParam, lParam);
 }
 
 LRESULT CALLBACK ColorBoard::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
