@@ -33,6 +33,7 @@ private:
     Vector3 camRight = Vector3::right;
     Vector3 camUp = Vector3::up;
     Vector3 camForward = Vector3::forward;
+    float camRange = 100.0f;
 
     Menu* menu = NULL;
     Vector2 menuPos = Vector2::zero;
