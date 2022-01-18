@@ -25,7 +25,7 @@ void Main::MoveButton::Click(){
 }
 
 void Main::MoveButton::Drag(Vector2 dir){
-    DebugLog("MoveButton Drag %f %f", dir.x, dir.y);
+    //DebugLog("MoveButton Drag %f %f", dir.x, dir.y);
     inst->camLookat = start - (inst->camRight * dir.x + inst->camUp * dir.y) * inst->camDis;
     inst->UpdateLookAtLocation();
 }
@@ -49,7 +49,7 @@ void Main::RotateButton::Click(){
 }
 
 void Main::RotateButton::Drag(Vector2 dir){
-    DebugLog("RotateButton Drag %f %f", dir.x, dir.y);
+    //DebugLog("RotateButton Drag %f %f", dir.x, dir.y);
     inst->camDir = Quaternion::AxisAngle(inst->camUp, -dir.x * 100.0f) *
                             Quaternion::AxisAngle(inst->camRight, dir.y * 100.0f) * start;
     dragged = true;
@@ -179,6 +179,7 @@ void Main::RenderModelView(){
     glDisable(GL_LIGHTING);
     glEnable(GL_LINE_SMOOTH);
     glDisable(GL_LINE_STIPPLE);
+    glLineWidth(1.0f);
     glBegin(GL_LINES);
     glColor3f(1.0f, 0.0f, 0.0f);
     glVertex3f(-camRange, 0.0f, 0.0f); glVertex3f(camRange, 0.0f, 0.0f);
@@ -188,6 +189,8 @@ void Main::RenderModelView(){
     glVertex3f(0.0f, 0.0f, -camRange); glVertex3f(0.0f, 0.0f, camRange);
     glEnd();
     glDisable(GL_LINE_SMOOTH);
+
+    glLineWidth(1.0f);
     glBegin(GL_LINES);
     glColor4f(1.0f, 1.0f, 1.0f, 0.2f);
     for (float i = 0.02f; i < 1.0f; i += 0.02f){
@@ -223,6 +226,13 @@ void Main::RenderModelView(){
     //glFlush();// 仅仅执行drawcall但不阻塞
     //glFinish();// 执行drawcall且阻塞直到执行完毕
     if (menu != NULL){
+        glDisable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_LIGHTING);
+        glMatrixMode(GL_PROJECTION);
+        glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
         menu->Render(menuPos.x, menuPos.y);
     }
 }
@@ -251,6 +261,9 @@ void Main::RenderFrame(){
 }
 
 void Main::SetMenu(Menu* m){
+    if (menu){
+        menu->ResetSelect();
+    }
     menu = m;
     if (menu != NULL){
         menu->SetClientSize(cliSize);
@@ -598,12 +611,18 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     basicMenu->AddItem(new MenuItem(L"删除顶点", MENUITEM_LAMBDA_TRANS(Main)[](Main* main){
         main->DeletePoint();
     }, this));
+    basicMenu->AddItem(new MenuItem());
     basicMenu->AddItem(new MenuItem(L"保存", MENUITEM_LAMBDA_TRANS(Main)[](Main* main){
         main->SaveMesh(main->mesh);
     }, this));
+    basicMenu->AddItem(new MenuItem());
     basicMenu->AddItem(new MenuItem(L"关于", MENUITEM_LAMBDA_TRANS(Main)[](Main* main){
         main->AboutBox();
     }, this));
+    basicMenu->AddItem(new MenuItem());
+    Menu* subMenu = new Menu();
+    subMenu->AddItem(new MenuItem(L"Hello World!"));
+    basicMenu->AddItem(new MenuItem(L"测试", subMenu));
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MENU));
 

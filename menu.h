@@ -31,7 +31,7 @@ public:
     MenuItem(const wchar_t* name);
     MenuItem(const wchar_t* name, void(*click)(void*));
     MenuItem(const wchar_t* name, void(*click)(void*), void* userData);
-    MenuItem(Menu* menu);
+    MenuItem(const wchar_t* name, Menu* menu);
     ~MenuItem();
 };
 
@@ -45,16 +45,22 @@ private:
     size_t selected = -1;
 
     Vector2 cliSize, cliInvSize;
+    Vector2 cursorPos;
+
+    Menu* curMenu = NULL;
+    Vector2 menuPos;
 public:
     Menu();
     ~Menu();
     void AddItem(MenuItem* item);
     void SetClientSize(Vector2 size);
     bool InMenu(Vector2 relaPos);
+    bool InChainMenu(Vector2 relaPos);
     void CursorMove(Vector2 relaPos);
     void Click();
     void RenderItem(MenuItem* item);
     void Render(float x, float y);
+    void ResetSelect();
 };
 
 #endif
