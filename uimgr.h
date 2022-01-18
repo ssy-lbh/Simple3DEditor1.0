@@ -12,6 +12,7 @@ class ViewportManager;
 
 class IButton;
 class IOperation;
+class ITool;
 
 //class IContainer;
 //TODO 此接口期望集成选择夹、拆分窗口、属性窗口等容器
@@ -77,6 +78,21 @@ public:
     virtual void OnRightUp();
     virtual void OnMove();
     virtual void OnCommand(UINT id);
+};
+
+class ITool {
+public:
+    ITool();
+    virtual ~ITool();
+
+    virtual void OnSelect();
+    virtual void OnUnselect();
+    virtual void OnLeftDown();
+    virtual void OnLeftUp();
+    virtual void OnRightDown();
+    virtual void OnRightUp();
+    virtual void OnMove();
+    virtual void OnRender();
 };
 
 #endif

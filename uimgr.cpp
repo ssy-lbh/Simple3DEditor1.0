@@ -141,3 +141,14 @@ void ViewportManager::EnableScissor(){
 void ViewportManager::DisableScissor(){
     glDisable(GL_SCISSOR_TEST);
 }
+
+ITool::ITool(){}
+ITool::~ITool(){}
+void ITool::OnSelect(){}
+void ITool::OnUnselect(){}
+void ITool::OnLeftDown(){}
+void ITool::OnLeftUp(){}
+void ITool::OnRightDown(){}
+void ITool::OnRightUp(){}
+void ITool::OnMove(){}
+void ITool::OnRender(){}
