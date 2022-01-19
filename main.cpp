@@ -6,93 +6,93 @@
 #include "font.h"
 #include "gltools.h"
 
-Main::MoveButton::MoveButton(Vector2 center, float radius) : center(center), radius(radius) {}
+MainWindow::MoveButton::MoveButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
 
-Main::MoveButton::~MoveButton(){}
+MainWindow::MoveButton::~MoveButton(){}
 
-bool Main::MoveButton::Trigger(Vector2 pos){
+bool MainWindow::MoveButton::Trigger(Vector2 pos){
     return (pos - center).SqrMagnitude() <= radius * radius;
 }
 
-void Main::MoveButton::Render(){
+void MainWindow::MoveButton::Render(){
     glColor3f(0.3f, 0.3f, 0.3f);
     GLUtils::DrawCorner(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
 }
 
-void Main::MoveButton::Click(){
+void MainWindow::MoveButton::Click(){
     DebugLog("MoveButton Click");
-    start = inst->camLookat;
+    start = main->camLookat;
 }
 
-void Main::MoveButton::Drag(Vector2 dir){
+void MainWindow::MoveButton::Drag(Vector2 dir){
     //DebugLog("MoveButton Drag %f %f", dir.x, dir.y);
-    inst->camLookat = start - (inst->camRight * dir.x + inst->camUp * dir.y) * inst->camDis;
-    inst->UpdateLookAtLocation();
+    main->camLookat = start - (main->camRight * dir.x + main->camUp * dir.y) * main->camDis;
+    main->UpdateLookAtLocation();
 }
 
-Main::RotateButton::RotateButton(Vector2 center, float radius) : center(center), radius(radius) {}
+MainWindow::RotateButton::RotateButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
 
-Main::RotateButton::~RotateButton(){}
+MainWindow::RotateButton::~RotateButton(){}
 
-bool Main::RotateButton::Trigger(Vector2 pos){
+bool MainWindow::RotateButton::Trigger(Vector2 pos){
     return (pos - center).SqrMagnitude() <= radius * radius;
 }
 
-void Main::RotateButton::Render(){
+void MainWindow::RotateButton::Render(){
     glColor3f(0.3f, 0.3f, 0.3f);
     GLUtils::DrawCorner(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
 }
 
-void Main::RotateButton::Click(){
+void MainWindow::RotateButton::Click(){
     DebugLog("RotateButton Click");
-    start = inst->camDir;
+    start = main->camDir;
 }
 
-void Main::RotateButton::Drag(Vector2 dir){
+void MainWindow::RotateButton::Drag(Vector2 dir){
     //DebugLog("RotateButton Drag %f %f", dir.x, dir.y);
-    inst->camDir = Quaternion::AxisAngle(inst->camUp, -dir.x * 100.0f) *
-                            Quaternion::AxisAngle(inst->camRight, dir.y * 100.0f) * start;
+    main->camDir = Quaternion::AxisAngle(main->camUp, -dir.x * 100.0f) *
+                            Quaternion::AxisAngle(main->camRight, dir.y * 100.0f) * start;
     dragged = true;
 }
 
-void Main::RotateButton::Leave(){
+void MainWindow::RotateButton::Leave(){
     if (dragged){
         DebugLog("RotateButton Leave");
         dragged = false;
-        inst->UpdateRotation();
+        main->UpdateRotation();
     }
 }
 
-Main::MoveOperation::MoveOperation(){}
+MainWindow::MoveOperation::MoveOperation(MainWindow* main) : main(main) {}
 
-Main::MoveOperation::~MoveOperation(){}
+MainWindow::MoveOperation::~MoveOperation(){}
 
-void Main::MoveOperation::OnEnter(){
+void MainWindow::MoveOperation::OnEnter(){
     x = y = z = true;
-    start = inst->cursorPos;
-    if (inst->selectedPoints.Size() > 0){
-        if (inst->selectedPoints.Size() > 1){
+    start = main->cursorPos;
+    if (main->selectedPoints.Size() > 0){
+        if (main->selectedPoints.Size() > 1){
             DebugLog("MoveOperation OnEnter [Warning]: Selected Multiple Points");
         }
-        target = inst->selectedPoints.GetFront();
+        target = main->selectedPoints.GetFront();
         startPos = target->pos;
     }else{
         target = NULL;
     }
 }
 
-void Main::MoveOperation::OnMove(){
+void MainWindow::MoveOperation::OnMove(){
     Vector2 mov;
     Vector3 delta;
     if (target){
-        mov = (inst->cursorPos - start) * inst->camDis;
-        delta = inst->camRight * mov.x + inst->camUp * mov.y;
+        mov = (main->cursorPos - start) * main->camDis;
+        delta = main->camRight * mov.x + main->camUp * mov.y;
         target->pos = startPos + Vector3(delta.x * x, delta.y * y, delta.z * z);
         DebugLog("MoveOperation OnMove %f %f %f", delta.x * x, delta.y * y, delta.z * z);
     }
 }
 
-void Main::MoveOperation::OnCommand(UINT id){
+void MainWindow::MoveOperation::OnCommand(UINT id){
     switch (id){
     case IDM_OP_X: x = true; y = z = false; break;
     case IDM_OP_Y: y = true; z = x = false; break;
@@ -103,9 +103,32 @@ void Main::MoveOperation::OnCommand(UINT id){
     }
 }
 
-Main::Main(){}
+MainWindow::MainWindow(HINSTANCE hInstance) : hInst(hInstance) {
+    uiMgr = new UIManager();
+    mesh = new Mesh();
 
-Main::~Main(){
+    basicMenu = new Menu();
+    basicMenu->AddItem(new MenuItem(L"添加顶点", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* MainWindow){
+        MainWindow->AddPoint();
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"删除顶点", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* MainWindow){
+        MainWindow->DeletePoint();
+    }, this));
+    basicMenu->AddItem(new MenuItem());
+    basicMenu->AddItem(new MenuItem(L"保存", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* MainWindow){
+        MainWindow->OnInsSave();
+    }, this));
+    basicMenu->AddItem(new MenuItem());
+    basicMenu->AddItem(new MenuItem(L"关于", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* MainWindow){
+        MainWindow->AboutBox();
+    }, this));
+    basicMenu->AddItem(new MenuItem());
+    Menu* subMenu = new Menu();
+    subMenu->AddItem(new MenuItem(L"Hello World!"));
+    basicMenu->AddItem(new MenuItem(L"测试", subMenu));
+}
+
+MainWindow::~MainWindow(){
     if(basicMenu) delete basicMenu;
     if(uiMgr) delete uiMgr;
     if(mesh) delete mesh;
@@ -113,10 +136,10 @@ Main::~Main(){
     if(colorBoard) delete colorBoard;
 }
 
-void Main::InitCamera(){
+void MainWindow::InitCamera(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(90.0, viewportMgr->GetAspect(), 0.1, 100.0);
+    gluPerspective(90.0, ViewportManager::inst->GetAspect(), 0.1, 100.0);
 
     Vector3 camPos = camLookat - camDir * Vector3::forward * camDis;
     Vector3 camUp = camDir * Vector3::up;
@@ -128,7 +151,7 @@ void Main::InitCamera(){
             camUp.x, camUp.y, camUp.z);
 }
 
-void Main::InitLight0(){
+void MainWindow::InitLight0(){
     GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat mat_shininess[] = { 50.0 };
 
@@ -147,11 +170,7 @@ void Main::InitLight0(){
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 }
 
-void Main::RenderToolBar(){
-
-}
-
-void Main::RenderModelView(){
+void MainWindow::RenderModelView(){
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClearDepth(1.0);
 
@@ -220,7 +239,7 @@ void Main::RenderModelView(){
     glDisable(GL_POINT_SMOOTH);
 
     // UI绘制
-    uiMgr->Render(viewportMgr->GetAspect());
+    uiMgr->Render(ViewportManager::inst->GetAspect());
 
     // 菜单绘制
     //glFlush();// 仅仅执行drawcall但不阻塞
@@ -237,30 +256,14 @@ void Main::RenderModelView(){
     }
 }
 
-void Main::RenderDataBar(){
-
-}
-
-void Main::RenderTipsBar(){
-
-}
-
-void Main::RenderFrame(){
-    RECT rc;
-
-    viewportMgr->Reset(hWnd);
-    viewportMgr->EnableScissor();
-    rc = viewportMgr->GetCurrentRect();
-    
+void MainWindow::OnRender(){
     //TODO 做好Container组件，实现UI尺寸坐标管理
-    //viewportMgr->PushViewport(modelViewRect);
     RenderModelView();
-    //viewportMgr->PopViewport();
 
-    SwapBuffers(hDC);
+    SwapBuffers(wglGetCurrentDC());
 }
 
-void Main::SetMenu(Menu* m){
+void MainWindow::SetMenu(Menu* m){
     if (menu){
         menu->ResetSelect();
     }
@@ -272,8 +275,11 @@ void Main::SetMenu(Menu* m){
     }
 }
 
-void Main::UpdateWindowSize(HWND hWnd){
-    GetClientRect(hWnd, &cliRect);
+void MainWindow::UpdateWindowSize(int x, int y){
+    cliRect.left = 0;
+    cliRect.right = x;
+    cliRect.top = 0;
+    cliRect.bottom = y;
     cliSize.x = cliRect.right - cliRect.left;
     cliSize.y = cliRect.bottom - cliRect.top;
     cliInvSize.x = 1.0f / cliSize.x;
@@ -282,11 +288,10 @@ void Main::UpdateWindowSize(HWND hWnd){
     if (menu != NULL){
         menu->SetClientSize(cliSize);
     }
-    modelViewRect = GLUtils::MakeRect(cliRect.left + 100, cliRect.right, cliRect.bottom, cliRect.top);
 }
 
 //TODO 添加一些UI范围检测
-void Main::UpdateCursor(int x, int y){
+void MainWindow::UpdateCursor(int x, int y){
     cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
     cursorPos.y = 1.0f - 2.0f * y / cliSize.y;
     cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
@@ -300,11 +305,11 @@ void Main::UpdateCursor(int x, int y){
     }
 }
 
-void Main::UpdateLookAtLocation(){
+void MainWindow::UpdateLookAtLocation(){
     camPos = camLookat - camForward * camDis;
 }
 
-void Main::UpdateRotation(){
+void MainWindow::UpdateRotation(){
     camForward = camDir * Vector3::forward;
     camUp = camDir * Vector3::up;
     camRight = camDir * Vector3::right;
@@ -312,7 +317,7 @@ void Main::UpdateRotation(){
     cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
 }
 
-void Main::UpdateDistance(){
+void MainWindow::UpdateDistance(){
     DebugLog("Camera Distance %f", camDis);
     camPos = camLookat - camForward * camDis;
     if (camRange < camDis * 20.0f){
@@ -322,24 +327,27 @@ void Main::UpdateDistance(){
     }
 }
 
-void Main::GetTextInput(){
+/** synchronized **/
+void MainWindow::GetTextInput(){
+    static MainWindow* window;
+    window = this;
     DialogBox(hInst, MAKEINTRESOURCE(IDD_TEXT), hWnd, [](HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
         switch (uMsg){
         case WM_INITDIALOG:
             return (INT_PTR)TRUE;
         case WM_CLOSE:
-            inst->inputConfirm = false;
+            window->inputConfirm = false;
             EndDialog(hDlg, LOWORD(wParam));
             return (INT_PTR)TRUE;
         case WM_COMMAND:
             switch (LOWORD(wParam)){
             case IDOK:
-                inst->inputConfirm = true;
-                GetDlgItemText(hDlg, IDC_TEXT_EDIT, inst->inputText, MAX_PATH);
+                window->inputConfirm = true;
+                GetDlgItemText(hDlg, IDC_TEXT_EDIT, window->inputText, MAX_PATH);
                 EndDialog(hDlg, LOWORD(wParam));
                 break;
             case IDCANCEL:
-                inst->inputConfirm = false;
+                window->inputConfirm = false;
                 EndDialog(hDlg, LOWORD(wParam));
                 break;
             }
@@ -352,20 +360,20 @@ void Main::GetTextInput(){
     }
 }
 
-void Main::AddPoint(){
+void MainWindow::AddPoint(){
     Vector3 pos = camLookat + (camUp * cursorPos.y + camRight * cursorPos.x * aspect) * camDis;
     mesh->AddVertex(pos);
     DebugLog("Point at %f %f %f", pos.x, pos.y, pos.z);
 }
 
-void Main::DeletePoint(){
+void MainWindow::DeletePoint(){
     selectedPoints.Foreach<Mesh*>([](Vertex* v, Mesh* m){
         m->DeleteVertex(v);
     }, mesh);
     selectedPoints.Clear();
 }
 
-bool Main::SaveMesh(Mesh* mesh){
+bool MainWindow::SaveMesh(Mesh* mesh){
     GetTextInput();
     inputText[MAX_PATH] = '\0';
     HANDLE hFile = CreateFile(
@@ -386,7 +394,7 @@ bool Main::SaveMesh(Mesh* mesh){
     return true;
 }
 
-void Main::AboutBox(){
+void MainWindow::AboutBox(){
     DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, [](HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
         switch (uMsg){
         case WM_INITDIALOG:
@@ -402,135 +410,300 @@ void Main::AboutBox(){
     });
 }
 
-LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    switch (uMsg){
-    case WM_CREATE:
-        UpdateWindowSize(hWnd);
-        uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f));
-        uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f));
+void MainWindow::OnCreate(){
+    uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
+    uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
+}
+
+void MainWindow::OnClose(){
+    PostQuitMessage(0);
+}
+
+void MainWindow::OnResize(int x, int y){
+    UpdateWindowSize(x, y);
+    UpdateCursor(x, y);
+}
+
+void MainWindow::OnMouseMove(int x, int y){
+    UpdateCursor(x, y);
+}
+
+void MainWindow::OnRightDown(int x, int y){
+    SetMenu(basicMenu);
+}
+
+void MainWindow::OnRightUp(int x, int y){}
+
+void MainWindow::OnInsSave(){
+    SaveMesh(mesh);
+}
+
+void MainWindow::OnInsMove(){
+    curOp = new MoveOperation(this);
+    curOp->OnEnter();
+}
+
+void MainWindow::OnInsSelectColor(){
+    if (colorBoard == NULL){
+        colorBoard = new ColorBoard();
+    }
+    Vector3 color = colorBoard->RunAndGetColor();
+    selectedPoints.Foreach<Vector3*>([](Vertex* v, Vector3* c){
+        v->color = *c;
+    }, &color);
+}
+
+void MainWindow::OnInsTopology(){
+    switch (selectedPoints.Size()){
+    case 0:
         break;
-    case WM_CLOSE:
+    case 1:
+        break;
+    case 2:
+        mesh->AddEdge(selectedPoints.GetItem(0), selectedPoints.GetItem(1));
+        break;
+    case 3:
+        mesh->AddTriFace(selectedPoints.GetItem(0), selectedPoints.GetItem(1), selectedPoints.GetItem(2));
+        break;
+    default:
+        break;
+    }
+}
+
+void MainWindow::OnLeftDown(int x, int y){
+    // 菜单消失
+    if (menu){
+        if (menu->InMenu(cursorPos - menuPos)){
+            menu->Click();
+        }
+        SetMenu(NULL);
+        return;
+    }
+    // UI交互
+    if (uiMgr->LeftDown()){
+        return;
+    }
+    // 操作
+    if (curOp){
+        curOp->OnConfirm();
+        delete curOp;
+        curOp = NULL;
+        return;
+    }
+    // 选择点
+    Vertex* v = mesh->Find(camPos, cursorDir);
+    if (v == NULL){
+        selectedPoints.Clear();
+        DebugLog("No Point Selected");
+    }else{
+        selectedPoints.Add(v);
+        DebugLog("Select Point %f %f %f", v->pos.x, v->pos.y, v->pos.z);
+    }
+}
+
+void MainWindow::OnLeftUp(int x, int y){
+    uiMgr->LeftUp();
+}
+
+void MainWindow::OnMouseWheel(int delta){
+    camDis *= Pow(0.999f, delta);
+    UpdateDistance();
+}
+
+void MainWindow::OnMenuAccel(int id, bool accel){
+    switch (id){
+    case IDM_SAVE:
+        OnInsSave();
+        break;
+    case IDM_EXIT:
         PostQuitMessage(0);
         break;
+    case IDM_ABOUT:
+        AboutBox();
+        break;
+    case IDM_ROTATE_CCW:
+        camDir *= Quaternion::AxisAngle(Vector3::forward, -10.0f);
+        UpdateRotation();
+        break;
+    case IDM_ROTATE_CW:
+        camDir *= Quaternion::AxisAngle(Vector3::forward, 10.0f);
+        UpdateRotation();
+        break;
+    case IDM_POINT:
+        AddPoint();
+        break;
+    case IDM_TOPOLOGY:
+        OnInsTopology();
+        break;
+    case IDM_MOVE:
+        OnInsMove();
+        break;
+    case IDM_ROTATE:
+        break;
+    case IDM_SIZE:
+        break;
+    case IDM_SELECT_COLOR:
+        OnInsSelectColor();
+        break;
+    case IDM_DELETE:
+        DeletePoint();
+        break;
+    }
+    // 当前操作的命令
+    if (curOp){
+        curOp->OnCommand(id);
+    }
+}
+
+void MainWindow::OnControl(int inform, int id, HWND hctl){}
+
+void MainWindow::SetFrame(HWND hWnd){
+    this->hWnd = hWnd;
+}
+
+LRESULT CALLBACK MainWindow::OnMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
+    switch (uMsg){
+    case WM_CREATE:
+        OnCreate();
+        break;
+    case WM_CLOSE:
+        OnClose();
+        break;
     case WM_SIZE:
-        UpdateWindowSize(hWnd);
-        UpdateCursor(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        OnResize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_MOUSEMOVE:
-        UpdateCursor(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_MOUSEWHEEL:
-        camDis *= Pow(0.999f, GET_WHEEL_DELTA_WPARAM(wParam));
-        UpdateDistance();
+        OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
         break;
     case WM_MOUSELEAVE:
+        OnMouseLeave();
         break;
     case WM_MOUSEHOVER:
+        OnMouseHover(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_SETFOCUS:
+        OnFocus((HWND)(DWORD_PTR)wParam);
         break;
     case WM_KILLFOCUS:
+        OnKillFocus((HWND)(DWORD_PTR)wParam);
         break;
-    case WM_LBUTTONDOWN:{
-        // 菜单消失
-        if (menu){
-            if (menu->InMenu(cursorPos - menuPos)){
-                menu->Click();
-            }
-            SetMenu(NULL);
-            break;
-        }
-        // UI交互
-        if (uiMgr->LeftDown()){
-            break;
-        }
-        // 操作
-        if (curOp){
-            curOp->OnConfirm();
-            delete curOp;
-            curOp = NULL;
-            break;
-        }
-        // 选择点
-        Vertex* v = mesh->Find(camPos, cursorDir);
-        if (v == NULL){
-            selectedPoints.Clear();
-            DebugLog("No Point Selected");
-        }else{
-            selectedPoints.Add(v);
-            DebugLog("Select Point %f %f %f", v->pos.x, v->pos.y, v->pos.z);
-        }
-    }
+    case WM_LBUTTONDOWN:
+        OnLeftDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_LBUTTONUP:
-        uiMgr->LeftUp();
+        OnLeftUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_RBUTTONDOWN:
-        SetMenu(basicMenu);
+        OnRightDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        break;
+    case WM_RBUTTONUP:
+        OnRightUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_COMMAND:
-        switch (LOWORD(wParam)){
-        case IDM_SAVE:
-            SaveMesh(mesh);
-            break;
-        case IDM_EXIT:
-            PostQuitMessage(0);
-            break;
-        case IDM_ABOUT:
-            AboutBox();
-            break;
-        case IDM_ROTATE_CCW:
-            camDir *= Quaternion::AxisAngle(Vector3::forward, -10.0f);
-            UpdateRotation();
-            break;
-        case IDM_ROTATE_CW:
-            camDir *= Quaternion::AxisAngle(Vector3::forward, 10.0f);
-            UpdateRotation();
-            break;
-        case IDM_POINT:
-            AddPoint();
-            break;
-        case IDM_TOPOLOGY:
-            switch (selectedPoints.Size()){
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                mesh->AddEdge(selectedPoints.GetItem(0), selectedPoints.GetItem(1));
-                break;
-            case 3:
-                mesh->AddTriFace(selectedPoints.GetItem(0), selectedPoints.GetItem(1), selectedPoints.GetItem(2));
-                break;
-            default:
-                break;
-            }
-            break;
-        case IDM_MOVE:
-            curOp = new MoveOperation();
-            curOp->OnEnter();
-            break;
-        case IDM_ROTATE:
-            break;
-        case IDM_SIZE:
-            break;
-        case IDM_SELECT_COLOR:{
-            if (colorBoard == NULL){
-                colorBoard = new ColorBoard();
-            }
-            Vector3 color = colorBoard->RunAndGetColor();
-            selectedPoints.Foreach<Vector3*>([](Vertex* v, Vector3* c){
-                v->color = *c;
-            }, &color);
+        switch (HIWORD(wParam)){
+        case 0:
+            OnMenuAccel(LOWORD(wParam), false);
+        case 1:
+            OnMenuAccel(LOWORD(wParam), true);
+        default:
+            OnControl(HIWORD(wParam), LOWORD(wParam), (HWND)(DWORD_PTR)lParam);
         }
-            break;
-        case IDM_DELETE:
-            DeletePoint();
-            break;
-        }
-        // 当前操作的命令
-        if (curOp){
-            curOp->OnCommand(LOWORD(wParam));
+        break;
+    }
+    return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+Main::Main(){}
+
+Main::~Main(){}
+
+ATOM Main::RegClass(){
+    WNDCLASSEXA wc;
+
+    wc.cbSize = sizeof(WNDCLASSEXA);
+    wc.cbClsExtra = 0;
+    wc.cbWndExtra = 0;
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
+    wc.hIconSm = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
+    wc.hInstance = hInst;
+    wc.lpfnWndProc = WndProc;
+    wc.lpszClassName = "ModelView.MainWindow";
+    wc.lpszMenuName = "";
+    wc.style = 0;
+
+    return RegisterClassExA(&wc);
+}
+
+void Main::CreateWnd(){
+    hWnd = CreateWindowExA(
+        0,
+        "ModelView.MainWindow",
+        "ModelView",
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT,
+        750, 750,
+        NULL,
+        LoadMenu(hInst, MAKEINTRESOURCE(IDC_MENU)),
+        hInst,
+        NULL
+    );
+}
+
+LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
+    switch (uMsg){
+    case WM_CREATE:
+        mainWnd->SetFrame(hWnd);
+        mainWnd->OnCreate();
+        break;
+    case WM_CLOSE:
+        mainWnd->OnClose();
+        break;
+    case WM_SIZE:
+        OnResize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        break;
+    case WM_MOUSEMOVE:
+        mainWnd->OnMouseMove(GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+        break;
+    case WM_MOUSEWHEEL:
+        mainWnd->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
+        break;
+    case WM_MOUSELEAVE:
+        mainWnd->OnMouseLeave();
+        break;
+    case WM_MOUSEHOVER:
+        mainWnd->OnMouseHover(wParam, GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+        break;
+    case WM_SETFOCUS:
+        mainWnd->OnFocus((HWND)(DWORD_PTR)wParam);
+        break;
+    case WM_KILLFOCUS:
+        mainWnd->OnKillFocus((HWND)(DWORD_PTR)wParam);
+        break;
+    case WM_LBUTTONDOWN:
+        mainWnd->OnLeftDown(GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+        break;
+    case WM_LBUTTONUP:
+        mainWnd->OnLeftUp(GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+        break;
+    case WM_RBUTTONDOWN:
+        mainWnd->OnRightDown(GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+        break;
+    case WM_RBUTTONUP:
+        mainWnd->OnRightUp(GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+        break;
+    case WM_COMMAND:
+        switch (HIWORD(wParam)){
+        case 0:
+            mainWnd->OnMenuAccel(LOWORD(wParam), false);
+        case 1:
+            mainWnd->OnMenuAccel(LOWORD(wParam), true);
+        default:
+            mainWnd->OnControl(HIWORD(wParam), LOWORD(wParam), (HWND)(DWORD_PTR)lParam);
         }
         break;
     }
@@ -538,63 +711,44 @@ LRESULT CALLBACK Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 }
 
 LRESULT CALLBACK Main::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    return inst->LocalWndProc(hWnd, uMsg, wParam, lParam);
+    return Main::inst->LocalWndProc(hWnd, uMsg, wParam, lParam);
 }
 
-ATOM Main::RegClass(HINSTANCE hInstance){
-    WNDCLASSEXA wc;
+void Main::OnResize(int x, int y){
+    //TODO 这里做子窗口大小管理
+    mainRect.left = 0;
+    mainRect.right = x;
+    mainRect.bottom = 0;
+    mainRect.top = y;
+    mainWnd->OnResize(mainRect.right - mainRect.left, mainRect.top - mainRect.bottom);
+}
 
-    wc.cbSize = sizeof(WNDCLASSEXA);
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.hCursor = LoadCursorA(NULL, IDC_ARROW);
-    wc.hIcon = LoadIconA(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-    wc.hIconSm = LoadIconA(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-    wc.hInstance = hInstance;
-    wc.lpfnWndProc = WndProc;
-    wc.lpszClassName = "ModelView";
-    wc.lpszMenuName = "";
-    wc.style = 0;
-
-    return RegisterClassExA(&wc);
+void Main::OnRender(){
+    ViewportManager::inst->Reset(hWnd);
+    ViewportManager::inst->PushViewport(mainRect);
+    mainWnd->OnRender();
+    ViewportManager::inst->PopViewport();
 }
 
 int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
-    HWND hWnd;
-    HDC hDC;
-    HGLRC hRC;
     MSG Msg;
 
     hInst = hInstance;
 
-    RegClass(hInstance);
+    mainWnd = new MainWindow(hInst);
+
+    RegClass();
     ColorBoard::RegClass(hInstance);
 
-    hWnd = CreateWindowExA(
-        0,
-        "ModelView",
-        "ModelView",
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        750, 750,
-        NULL,
-        LoadMenu(hInstance, MAKEINTRESOURCE(IDC_MENU)),
-        hInstance,
-        NULL
-    );
+    CreateWnd();
 
-    this->hWnd = hWnd;
-
+    //TODO 更改消息循环位置，使主视口成为组件
     ShowWindow(hWnd, SW_SHOW);
     UpdateWindow(hWnd);
 
     DebugLog("Main Window Created");
 
     GLUtils::EnableOpenGL(hWnd, &hDC, &hRC);
-
-    this->hDC = hDC;
-    this->hRC = hRC;
 
     DebugLog("OpenGL Enabled");
     DebugLog("OpenGL Version %s", glGetString(GL_VERSION));
@@ -605,36 +759,17 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     DebugLog("OpenGL Use Font %s", "GB2312");
 
-    basicMenu->AddItem(new MenuItem(L"添加顶点", MENUITEM_LAMBDA_TRANS(Main)[](Main* main){
-        main->AddPoint();
-    }, this));
-    basicMenu->AddItem(new MenuItem(L"删除顶点", MENUITEM_LAMBDA_TRANS(Main)[](Main* main){
-        main->DeletePoint();
-    }, this));
-    basicMenu->AddItem(new MenuItem());
-    basicMenu->AddItem(new MenuItem(L"保存", MENUITEM_LAMBDA_TRANS(Main)[](Main* main){
-        main->SaveMesh(main->mesh);
-    }, this));
-    basicMenu->AddItem(new MenuItem());
-    basicMenu->AddItem(new MenuItem(L"关于", MENUITEM_LAMBDA_TRANS(Main)[](Main* main){
-        main->AboutBox();
-    }, this));
-    basicMenu->AddItem(new MenuItem());
-    Menu* subMenu = new Menu();
-    subMenu->AddItem(new MenuItem(L"Hello World!"));
-    basicMenu->AddItem(new MenuItem(L"测试", subMenu));
+    HACCEL hAccelTable = LoadAccelerators(hInst, MAKEINTRESOURCE(IDC_MENU));
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MENU));
-
-    while (GetMessageA(&Msg, NULL, 0, 0)){
+    while (GetMessage(&Msg, NULL, 0, 0)){
         if (!TranslateAccelerator(Msg.hwnd, hAccelTable, &Msg)){
             if (Msg.message == WM_QUIT){
                 break;
             } else {
                 TranslateMessage(&Msg);
-                DispatchMessageA(&Msg);
+                DispatchMessage(&Msg);
                 wglMakeCurrent(hDC, hRC);
-                RenderFrame();
+                OnRender();
             }
         }
     }
@@ -646,9 +781,14 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     return Msg.wParam;
 }
 
-Main* Main::inst = new Main();
+HINSTANCE Main::hInst;
+Main* Main::inst;
+HWND Main::hWnd;
+HDC Main::hDC;
+HGLRC Main::hRC;
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
+    Main::inst = new Main();
     int ret = Main::inst->WinMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
     delete Main::inst;
     return ret;

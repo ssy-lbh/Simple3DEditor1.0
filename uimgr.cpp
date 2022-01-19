@@ -87,6 +87,8 @@ void IOperation::OnRightUp(){}
 void IOperation::OnMove(){}
 void IOperation::OnCommand(UINT id){}
 
+ViewportManager* ViewportManager::inst = new ViewportManager();
+
 ViewportManager::ViewportManager(){}
 
 ViewportManager::~ViewportManager(){}
@@ -142,6 +144,10 @@ void ViewportManager::DisableScissor(){
     glDisable(GL_SCISSOR_TEST);
 }
 
+Vector2 ViewportManager::GetClientSize(){
+    return Vector2(curRect.right - curRect.left, curRect.top - curRect.bottom);
+}
+
 ITool::ITool(){}
 ITool::~ITool(){}
 void ITool::OnSelect(){}
@@ -152,3 +158,24 @@ void ITool::OnRightDown(){}
 void ITool::OnRightUp(){}
 void ITool::OnMove(){}
 void ITool::OnRender(){}
+
+IWindow::IWindow(){}
+IWindow::~IWindow(){}
+void IWindow::SetFrame(HWND hWnd){}
+LRESULT IWindow::OnMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){ return DefWindowProc(hWnd, uMsg, wParam, lParam); }
+void IWindow::OnRender(){}
+void IWindow::OnCreate(){}
+void IWindow::OnClose(){}
+void IWindow::OnResize(int x, int y){}
+void IWindow::OnMouseMove(int x, int y){}
+void IWindow::OnLeftDown(int x, int y){}
+void IWindow::OnLeftUp(int x, int y){}
+void IWindow::OnRightDown(int x, int y){}
+void IWindow::OnRightUp(int x, int y){}
+void IWindow::OnMouseHover(int key, int x, int y){}
+void IWindow::OnMouseLeave(){}
+void IWindow::OnFocus(HWND hLost){}
+void IWindow::OnKillFocus(HWND hFocus){}
+void IWindow::OnMouseWheel(int delta){}
+void IWindow::OnMenuAccel(int id, bool accel){}
+void IWindow::OnControl(int inform, int id, HWND hctl){}

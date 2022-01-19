@@ -14,6 +14,7 @@ class IButton;
 class IOperation;
 class ITool;
 
+class IWindow;
 //class IContainer;
 //TODO 此接口期望集成选择夹、拆分窗口、属性窗口等容器
 
@@ -39,6 +40,8 @@ private:
     List<RECT> rects;
     RECT curRect;
 public:
+    static ViewportManager* inst;
+
     ViewportManager();
     ~ViewportManager();
     void Reset(HWND hWnd);
@@ -50,6 +53,7 @@ public:
     float GetAspect();
     void EnableScissor();
     void DisableScissor();
+    Vector2 GetClientSize();
 };
 
 //TODO 按钮在触发按下后持续生效到停止
@@ -93,6 +97,32 @@ public:
     virtual void OnRightUp();
     virtual void OnMove();
     virtual void OnRender();
+};
+
+class IWindow {
+public:
+    IWindow();
+    virtual ~IWindow();
+
+    virtual void SetFrame(HWND hWnd);
+
+    virtual LRESULT OnMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    virtual void OnRender();
+    virtual void OnCreate();
+    virtual void OnClose();
+    virtual void OnResize(int x, int y);
+    virtual void OnMouseMove(int x, int y);
+    virtual void OnLeftDown(int x, int y);
+    virtual void OnLeftUp(int x, int y);
+    virtual void OnRightDown(int x, int y);
+    virtual void OnRightUp(int x, int y);
+    virtual void OnMouseHover(int key, int x, int y);
+    virtual void OnMouseLeave();
+    virtual void OnFocus(HWND hLost);
+    virtual void OnKillFocus(HWND hFocus);
+    virtual void OnMouseWheel(int delta);
+    virtual void OnMenuAccel(int id, bool accel);
+    virtual void OnControl(int inform, int id, HWND hctl);
 };
 
 #endif
