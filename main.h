@@ -1,4 +1,7 @@
 #include <windows.h>
+#ifndef __MAIN__
+#define __MAIN__
+
 #include <windowsx.h>
 
 //#include <gl/glew.h>
@@ -12,9 +15,10 @@
 #include "uimgr.h"
 #include "colorboard.h"
 
+class MainWindow;
 class Main;
 
-class Main {
+class MainWindow : public IWindow {
 public:
     Vector2 cursorPos = Vector2::zero;
     Vector3 cursorDir = Vector3::zero;
@@ -22,10 +26,8 @@ public:
     Vector2 cliSize, cliInvSize;
     float aspect;
 
-    HINSTANCE hInst;
     HWND hWnd;
-    HDC hDC;
-    HGLRC hRC;
+    HINSTANCE hInst;
 
 private:
     Vector3 camLookat = Vector3::zero;
@@ -37,19 +39,13 @@ private:
     Vector3 camForward = Vector3::forward;
     float camRange = 100.0f;
 
-    RECT modelViewRect;
-    RECT toolBarRect;
-    RECT dataBarRect;
-    RECT tipsBarRect;
-
     Menu* menu = NULL;
     Vector2 menuPos = Vector2::zero;
 
-    Menu* basicMenu = new Menu();
+    Menu* basicMenu;
 
-    UIManager* uiMgr = new UIManager();
-    ViewportManager* viewportMgr = new ViewportManager();
-    Mesh* mesh = new Mesh();
+    UIManager* uiMgr;
+    Mesh* mesh;
 
     List<Vertex*> selectedPoints;
 
@@ -65,8 +61,9 @@ private:
         Vector2 center;
         float radius;
         Vector3 start;
+        MainWindow* main;
     public:
-        MoveButton(Vector2 center, float radius);
+        MoveButton(Vector2 center, float radius, MainWindow* main);
         virtual ~MoveButton() override;
         virtual bool Trigger(Vector2 pos) override;
         virtual void Render() override;
@@ -80,8 +77,9 @@ private:
         float radius;
         Quaternion start;
         bool dragged;
+        MainWindow* main;
     public:
-        RotateButton(Vector2 center, float radius);
+        RotateButton(Vector2 center, float radius, MainWindow* main);
         virtual ~RotateButton() override;
         virtual bool Trigger(Vector2 pos) override;
         virtual void Render() override;
@@ -96,38 +94,82 @@ private:
         Vertex* target;
         Vector3 startPos;
         bool x, y, z;
+        MainWindow* main;
     public:
-        MoveOperation();
+        MoveOperation(MainWindow* main);
         virtual ~MoveOperation() override;
         virtual void OnEnter() override;
         virtual void OnMove() override;
         virtual void OnCommand(UINT id) override;
     };
 public:
-    static Main* inst;
+    MainWindow(HINSTANCE hInstance);
+    virtual ~MainWindow() override;
 
-    Main();
-    ~Main();
+    virtual void SetFrame(HWND hWnd) override;
+
     void InitCamera();
     void InitLight0();
-    void RenderFrame();
-    void RenderToolBar();
+
     void RenderModelView();
-    void RenderDataBar();
-    void RenderTipsBar();
+
     void SetMenu(Menu* m);
-    void UpdateWindowSize(HWND hWnd);
+
+    void UpdateWindowSize(int x, int y);
     void UpdateCursor(int x, int y);
     void UpdateLookAtLocation();
     void UpdateRotation();
     void UpdateDistance();
-    LRESULT CALLBACK LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    ATOM RegClass(HINSTANCE hInstance);
-    int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
+
+    virtual LRESULT CALLBACK OnMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+
+    virtual void OnRender() override;
+    virtual void OnCreate() override;
+    virtual void OnClose() override;
+    virtual void OnResize(int x, int y) override;
+    virtual void OnMouseMove(int x, int y) override;
+    virtual void OnLeftDown(int x, int y) override;
+    virtual void OnLeftUp(int x, int y) override;
+    virtual void OnRightDown(int x, int y) override;
+    virtual void OnRightUp(int x, int y) override;
+    virtual void OnMouseWheel(int delta) override;
+    virtual void OnMenuAccel(int id, bool accel) override;
+    virtual void OnControl(int inform, int id, HWND hctl) override;
+
+    void OnInsSave();
+    void OnInsMove();
+    void OnInsTopology();
+    void OnInsSelectColor();
+
     void GetTextInput();
     void AddPoint();
     void DeletePoint();
     bool SaveMesh(Mesh* mesh);
     void AboutBox();
 };
+
+class Main {
+public:
+    static HINSTANCE hInst;
+    static HWND hWnd;
+    static HDC hDC;
+    static HGLRC hRC;
+    static Main* inst;
+
+    IWindow* mainWnd;
+    RECT mainRect;
+
+    Main();
+    ~Main();
+    ATOM RegClass();
+    void CreateWnd();
+    static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+    void OnResize(int x, int y);
+    void OnRender();
+
+    int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
+};
+
+#endif

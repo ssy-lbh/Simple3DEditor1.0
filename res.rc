@@ -46,13 +46,25 @@ IDC_MENU MENU
 BEGIN
     POPUP "文件(&F)"
     BEGIN
-        MENUITEM "保存(S)",                       IDM_SAVE
+        MENUITEM "保存(S)",                         IDM_SAVE
+        MENUITEM "载入(L)",                         IDM_LOAD
         MENUITEM SEPARATOR
-        MENUITEM "退出(&X)",                      IDM_EXIT
+        MENUITEM "退出(&X)",                        IDM_EXIT
     END
-    POPUP "关于(&H)"
+    POPUP "网格体(M)"
     BEGIN
-        MENUITEM "关于(&A) ...",                  IDM_ABOUT
+        POPUP "基本"
+        BEGIN
+            MENUITEM "平面",                        IDM_MESH_BASIC_PLANE
+            MENUITEM "方块",                        IDM_MESH_BASIC_BLOCK
+            MENUITEM "球体",                        IDM_MESH_BASIC_SPHERE
+            MENUITEM "圆柱体",                      IDM_MESH_BASIC_CYLINDER
+            MENUITEM "胶囊体",                      IDM_MESH_BASIC_CAPSULE
+        END
+    END
+    POPUP "版本(&H)"
+    BEGIN
+        MENUITEM "关于(&A) ...",                    IDM_ABOUT
     END
 END
 
