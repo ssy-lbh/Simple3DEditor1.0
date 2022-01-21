@@ -51,6 +51,10 @@ RECT GLUtils::MakeRect(LONG left, LONG right, LONG bottom, LONG top){
     return ret;
 }
 
+bool GLUtils::InRect(int x, int y, RECT rect){
+    return x >= rect.left && x < rect.right && y >= rect.bottom && y < rect.top;
+}
+
 GLTexture2D::GLTexture2D(const char* path){
     int x, y, channel;
     stbi_uc* image;

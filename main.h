@@ -22,7 +22,6 @@ class MainWindow : public IWindow {
 public:
     Vector2 cursorPos = Vector2::zero;
     Vector3 cursorDir = Vector3::zero;
-    RECT cliRect;
     Vector2 cliSize, cliInvSize;
     float aspect;
 
@@ -121,8 +120,6 @@ public:
     void UpdateRotation();
     void UpdateDistance();
 
-    virtual LRESULT CALLBACK OnMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
     virtual void OnRender() override;
     virtual void OnCreate() override;
     virtual void OnClose() override;
@@ -158,13 +155,17 @@ public:
 
     IWindow* mainWnd;
     RECT mainRect;
+    // 测试一下面向对象的结果，成功实现双屏
+    // IWindow* mainWnd2;
+    // RECT mainRect2;
 
     Main();
     ~Main();
     ATOM RegClass();
-    void CreateWnd();
+    HWND CreateWnd();
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     void OnResize(int x, int y);
     void OnRender();

@@ -46,13 +46,14 @@ public:
         data.clear();
     }
 
-    void Remove(T val){
+    bool Remove(T val){
         for (decltype(data.begin()) i = data.begin(); i != data.end(); ++i){
             if (*i == val){
                 data.erase(i);
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     List<T>& Foreach(void(*func)(T)){
@@ -68,6 +69,15 @@ public:
             func(data[i], user);
         }
         return *this;
+    }
+
+    bool HasValue(T val){
+        for (decltype(data.begin()) i = data.begin(); i != data.end(); ++i){
+            if (*i == val){
+                return true;
+            }
+        }
+        return false;
     }
 };
 

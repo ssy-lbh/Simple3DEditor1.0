@@ -18,6 +18,7 @@ public:
     ~Mesh();
     Vertex* Find(Vector3 ori, Vector3 dir);
     Vertex* AddVertex(Vector3 pos);
+    Vertex* AddVertex(Vertex* v);
     Edge* AddEdge(Vertex* v1, Vertex* v2);
     Face* AddTriFace(Vertex* v1, Vertex* v2, Vertex* v3);
     void DeleteVertex(Vertex* v);
