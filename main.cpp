@@ -601,6 +601,18 @@ void MainWindow::SetFrame(HWND hWnd){
     this->hWnd = hWnd;
 }
 
+bool MainWindow::IsFocus(){
+    return focus;
+}
+
+void MainWindow::OnFocus(){
+    focus = true;
+}
+
+void MainWindow::OnKillFocus(){
+    focus = false;
+}
+
 Main::Main(){}
 
 Main::~Main(){}
@@ -657,13 +669,13 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
         break;
     case WM_MOUSEMOVE:{
         bool inRect = GLUtils::InRect(x, y, rect);
-        if (inRect){
+        if (inRect)
             window->OnMouseMove(x - rect.left, y - rect.bottom);
-        }
     }
         break;
     case WM_MOUSEWHEEL:
-        window->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
+        if (window->IsFocus())
+            window->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
         break;
     case WM_MOUSELEAVE:
         window->OnMouseLeave();
@@ -672,10 +684,10 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
         window->OnMouseHover(wParam, x - rect.left, y - rect.bottom);
         break;
     case WM_SETFOCUS:
-        window->OnFocus();
         break;
     case WM_KILLFOCUS:
-        window->OnKillFocus();
+        if (window->IsFocus())
+            window->OnKillFocus();
         break;
     case WM_LBUTTONDOWN:{
         bool inRect = GLUtils::InRect(x, y, rect);
@@ -684,13 +696,13 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
         }else if (!inRect && window->IsFocus()){
             window->OnKillFocus();
         }
-        if (window->IsFocus()){
+        if (window->IsFocus())
             window->OnLeftDown(x - rect.left, y - rect.bottom);
-        }
     }
         break;
     case WM_LBUTTONUP:
-        window->OnLeftUp(x - rect.left, y - rect.bottom);
+        if (window->IsFocus())
+            window->OnLeftUp(x - rect.left, y - rect.bottom);
         break;
     case WM_RBUTTONDOWN:{
         bool inRect = GLUtils::InRect(x, y, rect);
@@ -699,20 +711,22 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
         }else if (!inRect && window->IsFocus()){
             window->OnKillFocus();
         }
-        if (window->IsFocus()){
+        if (window->IsFocus())
             window->OnRightDown(x - rect.left, y - rect.bottom);
-        }
     }
         break;
     case WM_RBUTTONUP:
-        window->OnRightUp(x - rect.left, y - rect.bottom);
+        if(window->IsFocus())
+            window->OnRightUp(x - rect.left, y - rect.bottom);
         break;
     case WM_COMMAND:
         switch (HIWORD(wParam)){
         case 0:
-            window->OnMenuAccel(LOWORD(wParam), false);
+            if (window->IsFocus())
+                window->OnMenuAccel(LOWORD(wParam), false);
         case 1:
-            window->OnMenuAccel(LOWORD(wParam), true);
+            if (window->IsFocus())
+                window->OnMenuAccel(LOWORD(wParam), true);
         default:
             window->OnControl(HIWORD(wParam), LOWORD(wParam), (HWND)(DWORD_PTR)lParam);
         }
@@ -722,6 +736,7 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
 
 LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     FireEvent(mainWnd, mainRect, hWnd, uMsg, wParam, lParam);
+    FireEvent(mainWnd2, mainRect2, hWnd, uMsg, wParam, lParam);
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
@@ -732,15 +747,16 @@ LRESULT CALLBACK Main::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 void Main::OnResize(int x, int y){
     //TODO 这里做子窗口大小管理
     mainRect.left = 0;
-    mainRect.right = x;
+    mainRect.right = x >> 1;
     mainRect.bottom = 0;
     mainRect.top = y;
     mainWnd->OnResize(mainRect.right - mainRect.left, mainRect.top - mainRect.bottom);
-    // mainRect2.left = x >> 1;
-    // mainRect2.right = x;
-    // mainRect2.bottom = 0;
-    // mainRect2.top = y;
-    // mainWnd2->OnResize(mainRect2.right - mainRect2.left, mainRect2.top - mainRect2.bottom);
+
+    mainRect2.left = x >> 1;
+    mainRect2.right = x;
+    mainRect2.bottom = 0;
+    mainRect2.top = y;
+    mainWnd2->OnResize(mainRect2.right - mainRect2.left, mainRect2.top - mainRect2.bottom);
 }
 
 void Main::OnRender(){
@@ -749,9 +765,10 @@ void Main::OnRender(){
     ViewportManager::inst->PushViewport(mainRect);
     mainWnd->OnRender();
     ViewportManager::inst->PopViewport();
-    // ViewportManager::inst->PushViewport(mainRect2);
-    // mainWnd2->OnRender();
-    // ViewportManager::inst->PopViewport();
+
+    ViewportManager::inst->PushViewport(mainRect2);
+    mainWnd2->OnRender();
+    ViewportManager::inst->PopViewport();
 }
 
 int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
@@ -760,7 +777,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     hInst = hInstance;
 
     mainWnd = new MainWindow(hInst);
-    //mainWnd2 = new MainWindow(hInst);
+    mainWnd2 = new MainWindow(hInst);
 
     RegClass();
     ColorBoard::RegClass(hInstance);
