@@ -28,6 +28,8 @@ public:
     HWND hWnd;
     HINSTANCE hInst;
 
+    bool focus = true;
+
 private:
     Vector3 camLookat = Vector3::zero;
     Quaternion camDir = Quaternion::one;
@@ -120,6 +122,7 @@ public:
     void UpdateRotation();
     void UpdateDistance();
 
+    virtual bool IsFocus() override;
     virtual void OnRender() override;
     virtual void OnCreate() override;
     virtual void OnClose() override;
@@ -130,6 +133,8 @@ public:
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
     virtual void OnMouseWheel(int delta) override;
+    virtual void OnFocus() override;
+    virtual void OnKillFocus() override;
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnControl(int inform, int id, HWND hctl) override;
 
@@ -156,8 +161,8 @@ public:
     IWindow* mainWnd;
     RECT mainRect;
     // 测试一下面向对象的结果，成功实现双屏
-    // IWindow* mainWnd2;
-    // RECT mainRect2;
+    IWindow* mainWnd2;
+    RECT mainRect2;
 
     Main();
     ~Main();

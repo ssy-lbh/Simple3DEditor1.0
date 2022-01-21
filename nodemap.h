@@ -6,6 +6,9 @@
 class NodeMapWindow;
 
 class NodeMapWindow : IWindow {
+private:
+    bool focus;
+    
 public:
     NodeMapWindow();
     virtual ~NodeMapWindow() override;
