@@ -40,10 +40,12 @@ Vertex* Mesh::Find(Vector3 ori, Vector3 dir){
 }
 
 Vertex* Mesh::AddVertex(Vector3 pos){
-    Vertex* v = new Vertex();
-    v->pos = pos;
-    v->edges.Clear();
-    v->faces.Clear();
+    Vertex* v = new Vertex(pos);
+    vertices.Add(v);
+    return v;
+}
+
+Vertex* Mesh::AddVertex(Vertex* v){
     vertices.Add(v);
     return v;
 }
@@ -72,13 +74,7 @@ Edge* Mesh::AddEdge(Vertex* v1, Vertex* v2){
     if (pack.has){
         return pack.e;
     }
-    Edge* e = new Edge();
-    e->v1 = v1;
-    e->v2 = v2;
-    e->f1 = NULL;
-    e->f2 = NULL;
-    v1->AddEdge(e);
-    v2->AddEdge(e);
+    Edge* e = new Edge(v1, v2);
     edges.Add(e);
     return e;
 }
@@ -88,8 +84,11 @@ Face* Mesh::AddTriFace(Vertex* v1, Vertex* v2, Vertex* v3){
     Edge* e1 = AddEdge(v1, v2);
     Edge* e2 = AddEdge(v2, v3);
     Edge* e3 = AddEdge(v3, v1);
-    // TODO 面元去重未完成
-    Face* f = new Face();
+    Face* f = e1->FaceRelateTo(v3);
+    if (f){
+        return f;
+    }
+    f = new Face();
     f->vertices.Clear();
     f->vertices.Add(v1);
     f->vertices.Add(v2);
@@ -114,32 +113,16 @@ void Mesh::DeleteVertex(Vertex* v){
     struct {
         Mesh* m;
         Vertex* v;
-        Face* f;
     } pack;
     pack.m = this;
     pack.v = v;
     v->faces.Foreach<decltype(pack)*>([](Face* f, decltype(pack)* p){
-        p->f = f;
-        f->vertices.Foreach<decltype(pack)*>([](Vertex* v, decltype(pack)* p){
-            if (p->v != v){
-                v->faces.Remove(p->f);
-            }
-        }, p);
-        f->edges.Foreach<Face*>([](Edge* e, Face* f){
-            if (e->f1 == f){
-                e->f1 = NULL;
-            }else{
-                e->f2 = NULL;
-            }
-        }, f);
+        f->DeleteSelfReferenceExcept(p->v);
         p->m->faces.Remove(f);
         delete f;
     }, &pack);
     v->edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* p){
-        if(e->v1 && e->v1 != p->v) e->v1->edges.Remove(e);
-        if(e->v2 && e->v2 != p->v) e->v2->edges.Remove(e);
-        if(e->f1) e->f1->edges.Remove(e);
-        if(e->f2) e->f2->edges.Remove(e);
+        e->DeleteSelfReferenceExcept(p->v);
         p->m->edges.Remove(e);
         delete e;
     }, &pack);

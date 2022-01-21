@@ -12,6 +12,7 @@ public:
     static void EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC);
     static void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC);
     static RECT MakeRect(LONG left, LONG right, LONG bottom, LONG top);
+    static bool InRect(int x, int y, RECT rect);
 };
 
 class GLTexture2D {

@@ -105,8 +105,7 @@ public:
     virtual ~IWindow();
 
     virtual void SetFrame(HWND hWnd);
-
-    virtual LRESULT OnMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    virtual bool IsFocus();
     virtual void OnRender();
     virtual void OnCreate();
     virtual void OnClose();
@@ -118,8 +117,8 @@ public:
     virtual void OnRightUp(int x, int y);
     virtual void OnMouseHover(int key, int x, int y);
     virtual void OnMouseLeave();
-    virtual void OnFocus(HWND hLost);
-    virtual void OnKillFocus(HWND hFocus);
+    virtual void OnFocus();
+    virtual void OnKillFocus();
     virtual void OnMouseWheel(int delta);
     virtual void OnMenuAccel(int id, bool accel);
     virtual void OnControl(int inform, int id, HWND hctl);

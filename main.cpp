@@ -179,7 +179,6 @@ void MainWindow::RenderModelView(){
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_AUTO_NORMAL);
     glEnable(GL_BLEND);
-    glDisable(GL_SCISSOR_TEST);
     glDisable(GL_STENCIL_TEST);
     glEnable(GL_ALPHA_TEST);
     glDisable(GL_LIGHTING);
@@ -259,8 +258,6 @@ void MainWindow::RenderModelView(){
 void MainWindow::OnRender(){
     //TODO 做好Container组件，实现UI尺寸坐标管理
     RenderModelView();
-
-    SwapBuffers(wglGetCurrentDC());
 }
 
 void MainWindow::SetMenu(Menu* m){
@@ -276,12 +273,8 @@ void MainWindow::SetMenu(Menu* m){
 }
 
 void MainWindow::UpdateWindowSize(int x, int y){
-    cliRect.left = 0;
-    cliRect.right = x;
-    cliRect.top = 0;
-    cliRect.bottom = y;
-    cliSize.x = cliRect.right - cliRect.left;
-    cliSize.y = cliRect.bottom - cliRect.top;
+    cliSize.x = x;
+    cliSize.y = y;
     cliInvSize.x = 1.0f / cliSize.x;
     cliInvSize.y = 1.0f / cliSize.y;
     aspect = (float)cliSize.x / cliSize.y;
@@ -293,7 +286,7 @@ void MainWindow::UpdateWindowSize(int x, int y){
 //TODO 添加一些UI范围检测
 void MainWindow::UpdateCursor(int x, int y){
     cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
-    cursorPos.y = 1.0f - 2.0f * y / cliSize.y;
+    cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
     cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
     if (menu != NULL){
         menu->CursorMove(cursorPos - menuPos);
@@ -548,6 +541,53 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     case IDM_DELETE:
         DeletePoint();
         break;
+    case IDM_MESH_BASIC_PLANE:{
+        Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, 0.0f));
+        Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, 0.0f));
+        Vertex* v3 = new Vertex(Vector3(-1.0f,  1.0f, 0.0f));
+        Vertex* v4 = new Vertex(Vector3( 1.0f,  1.0f, 0.0f));
+        mesh->AddVertex(v1);
+        mesh->AddVertex(v2);
+        mesh->AddVertex(v3);
+        mesh->AddVertex(v4);
+        mesh->AddTriFace(v1, v2, v4);
+        mesh->AddTriFace(v1, v3, v4);
+    }
+        break;
+    case IDM_MESH_BASIC_BLOCK:{
+        Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, -1.0f));
+        Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, -1.0f));
+        Vertex* v3 = new Vertex(Vector3(-1.0f,  1.0f, -1.0f));
+        Vertex* v4 = new Vertex(Vector3( 1.0f,  1.0f, -1.0f));
+        Vertex* v5 = new Vertex(Vector3(-1.0f, -1.0f,  1.0f));
+        Vertex* v6 = new Vertex(Vector3( 1.0f, -1.0f,  1.0f));
+        Vertex* v7 = new Vertex(Vector3(-1.0f,  1.0f,  1.0f));
+        Vertex* v8 = new Vertex(Vector3( 1.0f,  1.0f,  1.0f));
+        mesh->AddVertex(v1);
+        mesh->AddVertex(v2);
+        mesh->AddVertex(v3);
+        mesh->AddVertex(v4);
+        mesh->AddVertex(v5);
+        mesh->AddVertex(v6);
+        mesh->AddVertex(v7);
+        mesh->AddVertex(v8);
+        // XY对角
+        mesh->AddTriFace(v1, v2, v4);
+        mesh->AddTriFace(v1, v3, v4);
+        mesh->AddTriFace(v5, v6, v8);
+        mesh->AddTriFace(v5, v7, v8);
+        // XZ对角
+        mesh->AddTriFace(v1, v2, v6);
+        mesh->AddTriFace(v1, v5, v6);
+        mesh->AddTriFace(v3, v4, v8);
+        mesh->AddTriFace(v3, v7, v8);
+        // YZ对角
+        mesh->AddTriFace(v1, v3, v7);
+        mesh->AddTriFace(v1, v5, v7);
+        mesh->AddTriFace(v2, v4, v8);
+        mesh->AddTriFace(v2, v6, v8);
+    }
+        break;
     }
     // 当前操作的命令
     if (curOp){
@@ -559,61 +599,6 @@ void MainWindow::OnControl(int inform, int id, HWND hctl){}
 
 void MainWindow::SetFrame(HWND hWnd){
     this->hWnd = hWnd;
-}
-
-LRESULT CALLBACK MainWindow::OnMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    switch (uMsg){
-    case WM_CREATE:
-        OnCreate();
-        break;
-    case WM_CLOSE:
-        OnClose();
-        break;
-    case WM_SIZE:
-        OnResize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_MOUSEMOVE:
-        OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_MOUSEWHEEL:
-        OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
-        break;
-    case WM_MOUSELEAVE:
-        OnMouseLeave();
-        break;
-    case WM_MOUSEHOVER:
-        OnMouseHover(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_SETFOCUS:
-        OnFocus((HWND)(DWORD_PTR)wParam);
-        break;
-    case WM_KILLFOCUS:
-        OnKillFocus((HWND)(DWORD_PTR)wParam);
-        break;
-    case WM_LBUTTONDOWN:
-        OnLeftDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_LBUTTONUP:
-        OnLeftUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_RBUTTONDOWN:
-        OnRightDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_RBUTTONUP:
-        OnRightUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_COMMAND:
-        switch (HIWORD(wParam)){
-        case 0:
-            OnMenuAccel(LOWORD(wParam), false);
-        case 1:
-            OnMenuAccel(LOWORD(wParam), true);
-        default:
-            OnControl(HIWORD(wParam), LOWORD(wParam), (HWND)(DWORD_PTR)lParam);
-        }
-        break;
-    }
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
 Main::Main(){}
@@ -639,8 +624,8 @@ ATOM Main::RegClass(){
     return RegisterClassExA(&wc);
 }
 
-void Main::CreateWnd(){
-    hWnd = CreateWindowExA(
+HWND Main::CreateWnd(){
+    return CreateWindowExA(
         0,
         "ModelView.MainWindow",
         "ModelView",
@@ -654,59 +639,89 @@ void Main::CreateWnd(){
     );
 }
 
-LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
+void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
+    RECT cliRect;
+    GetClientRect(hWnd, &cliRect);
+    // 事件中鼠标坐标上下需反转
+    int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
     switch (uMsg){
     case WM_CREATE:
-        mainWnd->SetFrame(hWnd);
-        mainWnd->OnCreate();
+        window->SetFrame(hWnd);
+        window->OnCreate();
         break;
     case WM_CLOSE:
-        mainWnd->OnClose();
+        window->OnClose();
         break;
     case WM_SIZE:
         OnResize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
-    case WM_MOUSEMOVE:
-        mainWnd->OnMouseMove(GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+    case WM_MOUSEMOVE:{
+        bool inRect = GLUtils::InRect(x, y, rect);
+        if (inRect){
+            window->OnMouseMove(x - rect.left, y - rect.bottom);
+        }
+    }
         break;
     case WM_MOUSEWHEEL:
-        mainWnd->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
+        window->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
         break;
     case WM_MOUSELEAVE:
-        mainWnd->OnMouseLeave();
+        window->OnMouseLeave();
         break;
     case WM_MOUSEHOVER:
-        mainWnd->OnMouseHover(wParam, GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+        window->OnMouseHover(wParam, x - rect.left, y - rect.bottom);
         break;
     case WM_SETFOCUS:
-        mainWnd->OnFocus((HWND)(DWORD_PTR)wParam);
+        window->OnFocus();
         break;
     case WM_KILLFOCUS:
-        mainWnd->OnKillFocus((HWND)(DWORD_PTR)wParam);
+        window->OnKillFocus();
         break;
-    case WM_LBUTTONDOWN:
-        mainWnd->OnLeftDown(GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+    case WM_LBUTTONDOWN:{
+        bool inRect = GLUtils::InRect(x, y, rect);
+        if (inRect && !window->IsFocus()){
+            window->OnFocus();
+        }else if (!inRect && window->IsFocus()){
+            window->OnKillFocus();
+        }
+        if (window->IsFocus()){
+            window->OnLeftDown(x - rect.left, y - rect.bottom);
+        }
+    }
         break;
     case WM_LBUTTONUP:
-        mainWnd->OnLeftUp(GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+        window->OnLeftUp(x - rect.left, y - rect.bottom);
         break;
-    case WM_RBUTTONDOWN:
-        mainWnd->OnRightDown(GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+    case WM_RBUTTONDOWN:{
+        bool inRect = GLUtils::InRect(x, y, rect);
+        if (inRect && !window->IsFocus()){
+            window->OnFocus();
+        }else if (!inRect && window->IsFocus()){
+            window->OnKillFocus();
+        }
+        if (window->IsFocus()){
+            window->OnRightDown(x - rect.left, y - rect.bottom);
+        }
+    }
         break;
     case WM_RBUTTONUP:
-        mainWnd->OnRightUp(GET_X_LPARAM(lParam) - mainRect.left, GET_Y_LPARAM(lParam));
+        window->OnRightUp(x - rect.left, y - rect.bottom);
         break;
     case WM_COMMAND:
         switch (HIWORD(wParam)){
         case 0:
-            mainWnd->OnMenuAccel(LOWORD(wParam), false);
+            window->OnMenuAccel(LOWORD(wParam), false);
         case 1:
-            mainWnd->OnMenuAccel(LOWORD(wParam), true);
+            window->OnMenuAccel(LOWORD(wParam), true);
         default:
-            mainWnd->OnControl(HIWORD(wParam), LOWORD(wParam), (HWND)(DWORD_PTR)lParam);
+            window->OnControl(HIWORD(wParam), LOWORD(wParam), (HWND)(DWORD_PTR)lParam);
         }
         break;
     }
+}
+
+LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
+    FireEvent(mainWnd, mainRect, hWnd, uMsg, wParam, lParam);
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
@@ -721,13 +736,22 @@ void Main::OnResize(int x, int y){
     mainRect.bottom = 0;
     mainRect.top = y;
     mainWnd->OnResize(mainRect.right - mainRect.left, mainRect.top - mainRect.bottom);
+    // mainRect2.left = x >> 1;
+    // mainRect2.right = x;
+    // mainRect2.bottom = 0;
+    // mainRect2.top = y;
+    // mainWnd2->OnResize(mainRect2.right - mainRect2.left, mainRect2.top - mainRect2.bottom);
 }
 
 void Main::OnRender(){
     ViewportManager::inst->Reset(hWnd);
+    ViewportManager::inst->EnableScissor();
     ViewportManager::inst->PushViewport(mainRect);
     mainWnd->OnRender();
     ViewportManager::inst->PopViewport();
+    // ViewportManager::inst->PushViewport(mainRect2);
+    // mainWnd2->OnRender();
+    // ViewportManager::inst->PopViewport();
 }
 
 int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
@@ -736,11 +760,12 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     hInst = hInstance;
 
     mainWnd = new MainWindow(hInst);
+    //mainWnd2 = new MainWindow(hInst);
 
     RegClass();
     ColorBoard::RegClass(hInstance);
 
-    CreateWnd();
+    hWnd = CreateWnd();
 
     //TODO 更改消息循环位置，使主视口成为组件
     ShowWindow(hWnd, SW_SHOW);
@@ -770,6 +795,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
                 DispatchMessage(&Msg);
                 wglMakeCurrent(hDC, hRC);
                 OnRender();
+                SwapBuffers(hDC);
             }
         }
     }

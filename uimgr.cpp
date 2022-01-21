@@ -162,7 +162,7 @@ void ITool::OnRender(){}
 IWindow::IWindow(){}
 IWindow::~IWindow(){}
 void IWindow::SetFrame(HWND hWnd){}
-LRESULT IWindow::OnMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){ return DefWindowProc(hWnd, uMsg, wParam, lParam); }
+bool IWindow::IsFocus(){ return true; }
 void IWindow::OnRender(){}
 void IWindow::OnCreate(){}
 void IWindow::OnClose(){}
@@ -174,8 +174,8 @@ void IWindow::OnRightDown(int x, int y){}
 void IWindow::OnRightUp(int x, int y){}
 void IWindow::OnMouseHover(int key, int x, int y){}
 void IWindow::OnMouseLeave(){}
-void IWindow::OnFocus(HWND hLost){}
-void IWindow::OnKillFocus(HWND hFocus){}
+void IWindow::OnFocus(){}
+void IWindow::OnKillFocus(){}
 void IWindow::OnMouseWheel(int delta){}
 void IWindow::OnMenuAccel(int id, bool accel){}
 void IWindow::OnControl(int inform, int id, HWND hctl){}
