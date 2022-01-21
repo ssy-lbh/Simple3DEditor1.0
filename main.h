@@ -161,8 +161,8 @@ public:
     IWindow* mainWnd;
     RECT mainRect;
     // 测试一下面向对象的结果，成功实现双屏
-    IWindow* mainWnd2;
-    RECT mainRect2;
+    // IWindow* mainWnd2;
+    // RECT mainRect2;
 
     Main();
     ~Main();
