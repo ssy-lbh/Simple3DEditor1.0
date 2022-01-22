@@ -31,6 +31,7 @@ public:
     void CursorMove(Vector2 pos);
     void AddButton(IButton* btn);
     void Render(float aspect);
+    void Render();
     bool LeftDown();
     bool LeftUp();
 };
@@ -45,6 +46,7 @@ public:
     ViewportManager();
     ~ViewportManager();
     void Reset(HWND hWnd);
+    void SetViewport(RECT rect);
     void PushViewport(RECT rect);
     void PopViewport();
     RECT GetCurrentRect();

@@ -50,6 +50,21 @@ void UIManager::Render(float aspect){
     });
 }
 
+void UIManager::Render(){
+    glEnable(GL_ALPHA_TEST);
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glMatrixMode(GL_PROJECTION);
+    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    buttons.Foreach([](IButton* btn){
+        btn->Render();
+    });
+}
+
 bool UIManager::LeftDown(){
     if (cur != NULL){
         leftDown = true;
@@ -115,6 +130,12 @@ void ViewportManager::PushViewport(RECT rect){
 void ViewportManager::PopViewport(){
     rects.RemoveBack();
     curRect = rects.GetBack();
+    glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
+    glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
+}
+
+void ViewportManager::SetViewport(RECT rect){
+    curRect = rect;
     glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
     glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
 }

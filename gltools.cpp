@@ -2,8 +2,9 @@
 
 #include "vecmath.h"
 
-#define STB_IMAGE_IMPLEMENTATION
+#ifdef STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#endif
 
 void GLUtils::DrawCorner(float x, float y, float start, float end, float radius, float step){
     start = ToRadian(start);
@@ -55,6 +56,75 @@ bool GLUtils::InRect(int x, int y, RECT rect){
     return x >= rect.left && x < rect.right && y >= rect.bottom && y < rect.top;
 }
 
+void GLUtils::DrawBezier(Vector2 p1, Vector2 p2, Vector2 p3, float step){
+    glBegin(GL_LINE_STRIP);
+    glVertex2f(p1.x, p1.y);
+    for (float i = step; i < 1.0f; i += step){
+        float j = 1.0f - i;
+        Vector2 pos = p1 * j * j + p2 * 2.0f * i * j + p3 * i * i;
+        glVertex2f(pos.x, pos.y);
+    }
+    glVertex2f(p3.x, p3.y);
+    glEnd();
+}
+
+void GLUtils::DrawBezier(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float step){
+    glBegin(GL_LINE_STRIP);
+    glVertex2f(p1.x, p1.y);
+    for (float i = step; i < 1.0f; i += step){
+        float j = 1.0f - i;
+        Vector2 pos = p1 * j * j * j + p2 * 3.0f * i * j * j + p3 * 3.0f * i * i * j + p4 * i * i * i;
+        glVertex2f(pos.x, pos.y);
+    }
+    glVertex2f(p4.x, p4.y);
+    glEnd();
+}
+
+void GLUtils::DrawBezier(Vector3 p1, Vector3 p2, Vector3 p3, float step){
+    glBegin(GL_LINE_STRIP);
+    glVertex3f(p1.x, p1.y, p1.z);
+    for (float i = step; i < 1.0f; i += step){
+        float j = 1.0f - i;
+        Vector3 pos = p1 * j * j + p2 * 2.0f * i * j + p3 * i * i;
+        glVertex3f(pos.x, pos.y, pos.z);
+    }
+    glVertex3f(p3.x, p3.y, p3.z);
+    glEnd();
+}
+
+void GLUtils::DrawBezier(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, float step){
+    glBegin(GL_LINE_STRIP);
+    glVertex3f(p1.x, p1.y, p1.z);
+    for (float i = step; i < 1.0f; i += step){
+        float j = 1.0f - i;
+        Vector3 pos = p1 * j * j * j + p2 * 3.0f * i * j * j + p3 * 3.0f * i * i * j + p4 * i * i * i;
+        glVertex3f(pos.x, pos.y, pos.z);
+    }
+    glVertex3f(p4.x, p4.y, p4.z);
+    glEnd();
+}
+
+void GLUtils::DrawRoundRect(float x, float y, float width, float height, float radius, float step){
+    float xmin = x + radius, xmax = x + width - radius;
+    float ymax = y + height - radius, ymin = y + radius;
+    float xr = x + width, yr = y + height;
+
+    GLUtils::DrawCorner(xmin, ymax, 90.0f, 180.0f, radius, 0.05f);
+    GLUtils::DrawCorner(xmax, ymax, 0.0f, 90.0f, radius, 0.05f);
+    GLUtils::DrawCorner(xmin, ymin, 180.0f, 270.0f, radius, 0.05f);
+    GLUtils::DrawCorner(xmax, ymin, 270.0f, 360.0f, radius, 0.05f);
+
+    glBegin(GL_TRIANGLES);
+    glVertex2f(xmin, yr); glVertex2f(xmin, y); glVertex2f(xmax, y);
+    glVertex2f(xmin, yr); glVertex2f(xmax, yr); glVertex2f(xmax, y);
+    glVertex2f(x, ymax); glVertex2f(xmin, ymax); glVertex2f(xmin, ymin);
+    glVertex2f(x, ymax); glVertex2f(x, ymin); glVertex2f(xmin, ymin);
+    glVertex2f(xmax, ymax); glVertex2f(xr, ymax); glVertex2f(xr, ymin);
+    glVertex2f(xmax, ymax); glVertex2f(xmax, ymin); glVertex2f(xr, ymin);
+    glEnd();
+}
+
+#ifdef STB_IMAGE_IMPLEMENTATION
 GLTexture2D::GLTexture2D(const char* path){
     int x, y, channel;
     stbi_uc* image;
@@ -77,6 +147,7 @@ GLTexture2D::GLTexture2D(const char* path){
     
     stbi_image_free(image);
 }
+#endif
 
 GLTexture2D::GLTexture2D(int resid){
     HBITMAP hBitmap;

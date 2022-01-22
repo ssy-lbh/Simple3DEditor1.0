@@ -124,26 +124,23 @@ void Menu::RenderItem(MenuItem* item){
 
 void Menu::Render(float x, float y){
     float cornWidth = 10.0f * cliInvSize.y;
-    float xmin = x + cornWidth, xmax = x + cornWidth + 250.0f * cliInvSize.y;
-    float ymax = y - cornWidth, ymin = y - cornWidth - items.Size() * 30.0f * cliInvSize.y;
 
-    //DebugLog("Menu::Render %p %f %f", this, x, y);
+    float xmin = x + cornWidth;
+    float ymax = y - cornWidth;
 
+    float width = cornWidth * 2.0f + 250.0f * cliInvSize.y;
+    float height = cornWidth * 2.0f + items.Size() * 30.0f * cliInvSize.y;
+    
     glColor3f(0.1f, 0.1f, 0.1f);
-    GLUtils::DrawCorner(xmin, ymax, 90.0f, 180.0f, cornWidth, 0.05f);
-    GLUtils::DrawCorner(xmax, ymax, 0.0f, 90.0f, cornWidth, 0.05f);
-    GLUtils::DrawCorner(xmin, ymin, 180.0f, 270.0f, cornWidth, 0.05f);
-    GLUtils::DrawCorner(xmax, ymin, 270.0f, 360.0f, cornWidth, 0.05f);
-
-    glBegin(GL_TRIANGLES);
-    glVertex2f(xmin, ymax + cornWidth); glVertex2f(xmin, ymin - cornWidth); glVertex2f(xmax, ymin - cornWidth);
-    glVertex2f(xmin, ymax + cornWidth); glVertex2f(xmax, ymax + cornWidth); glVertex2f(xmax, ymin - cornWidth);
-    glVertex2f(xmin - cornWidth, ymax); glVertex2f(xmin, ymax); glVertex2f(xmin, ymin);
-    glVertex2f(xmin - cornWidth, ymax); glVertex2f(xmin - cornWidth, ymin); glVertex2f(xmin, ymin);
-    glVertex2f(xmax, ymax); glVertex2f(xmax + cornWidth, ymax); glVertex2f(xmax + cornWidth, ymin);
-    glVertex2f(xmax, ymax); glVertex2f(xmax, ymin); glVertex2f(xmax + cornWidth, ymin);
-    glEnd();
-
+    GLUtils::DrawRoundRect(
+        x,
+        y - height,
+        width,
+        height,
+        cornWidth,
+        0.05f
+    );
+    
     minPos = Vector2(xmin, ymax);
     drawCounter = 0;
 

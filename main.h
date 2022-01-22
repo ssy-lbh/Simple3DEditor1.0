@@ -31,10 +31,10 @@ public:
     bool focus = true;
 
 private:
-    Vector3 camLookat = Vector3::zero;
+    Vector3 camLookat = Vector3::up;
     Quaternion camDir = Quaternion::one;
     float camDis = 5.0f;
-    Vector3 camPos = Vector3::back * 5.0f;
+    Vector3 camPos = Vector3::back * 5.0f + Vector3::up;
     Vector3 camRight = Vector3::right;
     Vector3 camUp = Vector3::up;
     Vector3 camForward = Vector3::forward;
@@ -113,6 +113,7 @@ public:
     void InitLight0();
 
     void RenderModelView();
+    void RenderMenu();
 
     void SetMenu(Menu* m);
 
@@ -161,8 +162,8 @@ public:
     IWindow* mainWnd;
     RECT mainRect;
     // 测试一下面向对象的结果，成功实现双屏
-    // IWindow* mainWnd2;
-    // RECT mainRect2;
+    IWindow* mainWnd2;
+    RECT mainRect2;
 
     Main();
     ~Main();
