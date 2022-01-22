@@ -5,6 +5,7 @@
 #include "log.h"
 #include "font.h"
 #include "gltools.h"
+#include "nodemap.h"
 
 MainWindow::MoveButton::MoveButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
 
@@ -126,6 +127,9 @@ MainWindow::MainWindow(HINSTANCE hInstance) : hInst(hInstance) {
     Menu* subMenu = new Menu();
     subMenu->AddItem(new MenuItem(L"Hello World!"));
     basicMenu->AddItem(new MenuItem(L"测试", subMenu));
+
+    uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
+    uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
 }
 
 MainWindow::~MainWindow(){
@@ -236,10 +240,9 @@ void MainWindow::RenderModelView(){
     });
     glEnd();
     glDisable(GL_POINT_SMOOTH);
+}
 
-    // UI绘制
-    uiMgr->Render(ViewportManager::inst->GetAspect());
-
+void MainWindow::RenderMenu(){
     // 菜单绘制
     //glFlush();// 仅仅执行drawcall但不阻塞
     //glFinish();// 执行drawcall且阻塞直到执行完毕
@@ -258,6 +261,12 @@ void MainWindow::RenderModelView(){
 void MainWindow::OnRender(){
     //TODO 做好Container组件，实现UI尺寸坐标管理
     RenderModelView();
+
+    // UI绘制
+    // 在之前进行3D渲染使用投影变换后，需要参数aspect
+    uiMgr->Render(ViewportManager::inst->GetAspect());
+
+    RenderMenu();
 }
 
 void MainWindow::SetMenu(Menu* m){
@@ -403,14 +412,9 @@ void MainWindow::AboutBox(){
     });
 }
 
-void MainWindow::OnCreate(){
-    uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
-    uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
-}
+void MainWindow::OnCreate(){}
 
-void MainWindow::OnClose(){
-    PostQuitMessage(0);
-}
+void MainWindow::OnClose(){}
 
 void MainWindow::OnResize(int x, int y){
     UpdateWindowSize(x, y);
@@ -474,6 +478,7 @@ void MainWindow::OnLeftDown(int x, int y){
     }
     // UI交互
     if (uiMgr->LeftDown()){
+        UpdateCursor(x, y);
         return;
     }
     // 操作
@@ -496,6 +501,7 @@ void MainWindow::OnLeftDown(int x, int y){
 
 void MainWindow::OnLeftUp(int x, int y){
     uiMgr->LeftUp();
+    UpdateCursor(x, y);
 }
 
 void MainWindow::OnMouseWheel(int delta){
@@ -643,7 +649,7 @@ HWND Main::CreateWnd(){
         "ModelView",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT,
-        750, 750,
+        1250, 750,
         NULL,
         LoadMenu(hInst, MAKEINTRESOURCE(IDC_MENU)),
         hInst,
@@ -736,7 +742,14 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
 
 LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     FireEvent(mainWnd, mainRect, hWnd, uMsg, wParam, lParam);
-    //FireEvent(mainWnd2, mainRect2, hWnd, uMsg, wParam, lParam);
+    FireEvent(mainWnd2, mainRect2, hWnd, uMsg, wParam, lParam);
+
+    switch (uMsg){
+    case WM_CLOSE:
+        PostQuitMessage(0);
+        break;
+    }
+
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
@@ -747,28 +760,29 @@ LRESULT CALLBACK Main::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 void Main::OnResize(int x, int y){
     //TODO 这里做子窗口大小管理
     mainRect.left = 0;
-    mainRect.right = x;
+    mainRect.right = x >> 1;
     mainRect.bottom = 0;
     mainRect.top = y;
     mainWnd->OnResize(mainRect.right - mainRect.left, mainRect.top - mainRect.bottom);
 
-    // mainRect2.left = x >> 1;
-    // mainRect2.right = x;
-    // mainRect2.bottom = 0;
-    // mainRect2.top = y;
-    // mainWnd2->OnResize(mainRect2.right - mainRect2.left, mainRect2.top - mainRect2.bottom);
+    mainRect2.left = x >> 1;
+    mainRect2.right = x;
+    mainRect2.bottom = 0;
+    mainRect2.top = y;
+    mainWnd2->OnResize(mainRect2.right - mainRect2.left, mainRect2.top - mainRect2.bottom);
 }
 
 void Main::OnRender(){
     ViewportManager::inst->Reset(hWnd);
     ViewportManager::inst->EnableScissor();
-    ViewportManager::inst->PushViewport(mainRect);
-    mainWnd->OnRender();
-    ViewportManager::inst->PopViewport();
 
-    // ViewportManager::inst->PushViewport(mainRect2);
-    // mainWnd2->OnRender();
-    // ViewportManager::inst->PopViewport();
+    ViewportManager::inst->SetViewport(mainRect);
+    //DebugLog("%d %d %d %d", mainRect.left, mainRect.right, mainRect.bottom, mainRect.top);
+    mainWnd->OnRender();
+
+    ViewportManager::inst->SetViewport(mainRect2);
+    //DebugLog("%d %d %d %d", mainRect2.left, mainRect2.right, mainRect2.bottom, mainRect2.top);
+    mainWnd2->OnRender();
 }
 
 int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
@@ -777,7 +791,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     hInst = hInstance;
 
     mainWnd = new MainWindow(hInst);
-    //mainWnd2 = new MainWindow(hInst);
+    mainWnd2 = new NodeMapWindow();
 
     RegClass();
     ColorBoard::RegClass(hInstance);
@@ -794,7 +808,9 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     DebugLog("OpenGL Enabled");
     DebugLog("OpenGL Version %s", glGetString(GL_VERSION));
+    DebugLog("OpenGL Renderer %s", glGetString(GL_RENDERER));
     DebugLog("OpenGL Vendor %s", glGetString(GL_VENDOR));
+    //DebugLog("OpenGL Extensions %s", glGetString(GL_EXTENSIONS));
 
     glInitASCIIFont();
     glSelectFont(12, GB2312_CHARSET, "楷体_GB2312");
