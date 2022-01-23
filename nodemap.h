@@ -2,6 +2,7 @@
 #define __NODEMAP__
 
 #include "uimgr.h"
+#include "menu.h"
 
 class NodeMapWindow;
 
@@ -11,11 +12,17 @@ private:
     bool focus;
 
     Vector2 cliSize;
+    float aspect;
     Vector2 cursorPos;
     Vector2 viewPos;
 
     UIManager* uiMgr;
     UIManager* nodeMgr;
+
+    Menu* basicMenu;
+
+    Menu* menu;
+    Vector2 menuPos;
 
     class MoveButton : public IButton {
     private:
@@ -41,11 +48,14 @@ private:
         Vector2 offset;
     public:
         Node(NodeMapWindow* window);
+        Node(Vector2 pos, NodeMapWindow* window);
         virtual ~Node() override;
         virtual bool Trigger(Vector2 pos) override;
         virtual void Render() override;
         virtual void Click() override;
         virtual void Drag(Vector2 dir) override;
+        void Connect(Node* node);
+        void Connect(Node* node, Vector2 offset);
     };
     
 public:
@@ -72,6 +82,8 @@ public:
     virtual void OnControl(int inform, int id, HWND hctl) override;
 
     void UpdateCursor(int x, int y);
+    void UpdateWindowSize(int x, int y);
+    void SetMenu(Menu* m);
 };
 
 #endif

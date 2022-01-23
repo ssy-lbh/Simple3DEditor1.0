@@ -70,6 +70,7 @@ private:
         virtual void Render() override;
         virtual void Click() override;
         virtual void Drag(Vector2 dir) override;
+        virtual void ClickEnd() override;
     };
 
     class RotateButton : public IButton {
@@ -77,7 +78,6 @@ private:
         Vector2 center;
         float radius;
         Quaternion start;
-        bool dragged;
         MainWindow* main;
     public:
         RotateButton(Vector2 center, float radius, MainWindow* main);
@@ -86,14 +86,18 @@ private:
         virtual void Render() override;
         virtual void Click() override;
         virtual void Drag(Vector2 dir) override;
-        virtual void Leave() override;
+        virtual void ClickEnd() override;
     };
 
     class MoveOperation : public IOperation {
     private:
+        struct MoveInfo {
+            Vertex* vert;
+            Vector3 pos;
+        };
+
         Vector2 start;
-        Vertex* target;
-        Vector3 startPos;
+        List<MoveInfo> moveInfo;
         bool x, y, z;
         MainWindow* main;
     public:
@@ -102,6 +106,8 @@ private:
         virtual void OnEnter() override;
         virtual void OnMove() override;
         virtual void OnCommand(UINT id) override;
+        virtual void OnConfirm() override;
+        virtual void OnUndo() override;
     };
 public:
     MainWindow(HINSTANCE hInstance);
@@ -113,8 +119,6 @@ public:
     void InitLight0();
 
     void RenderModelView();
-    void RenderMenu();
-
     void SetMenu(Menu* m);
 
     void UpdateWindowSize(int x, int y);
@@ -164,6 +168,8 @@ public:
     // 测试一下面向对象的结果，成功实现双屏
     IWindow* mainWnd2;
     RECT mainRect2;
+
+    IWindow* focus = NULL;
 
     Main();
     ~Main();
