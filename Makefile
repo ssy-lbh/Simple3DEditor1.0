@@ -2,7 +2,7 @@
 
 GCC			= g++.exe
 RM			= del
-CFLAGS 		= -I"C:\VulkanSDK\stb-master" -I"C:\Program Files (x86)\OpenGL glew-2.2.0\include"
+CFLAGS 		= 
 LIB			= -lopengl32 -lglu32 -lgdi32
 RES  		= windres.exe
 
@@ -39,7 +39,7 @@ $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 commit:
 	git checkout develop
 	git add *
-	git commit -m "update"
+	git commit -m "bugfix"
 	git push -u origin develop
 
 merge:
