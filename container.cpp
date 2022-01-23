@@ -1,6 +1,7 @@
 #include "container.h"
 
 #include "gltools.h"
+#include "log.h"
 
 LRContainer::LRContainer(IWindow* lWindow, IWindow* rWindow) : lWindow(lWindow), rWindow(rWindow) {}
 
