@@ -7,8 +7,9 @@
 #include "gltools.h"
 #include "nodemap.h"
 
-MainWindow::MoveButton::MoveButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
+#include "shell.h"
 
+MainWindow::MoveButton::MoveButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
 MainWindow::MoveButton::~MoveButton(){}
 
 bool MainWindow::MoveButton::Trigger(Vector2 pos){
@@ -37,7 +38,6 @@ void MainWindow::MoveButton::ClickEnd(){
 }
 
 MainWindow::RotateButton::RotateButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
-
 MainWindow::RotateButton::~RotateButton(){}
 
 bool MainWindow::RotateButton::Trigger(Vector2 pos){
@@ -66,7 +66,6 @@ void MainWindow::RotateButton::ClickEnd(){
 }
 
 MainWindow::MoveOperation::MoveOperation(MainWindow* main) : main(main) {}
-
 MainWindow::MoveOperation::~MoveOperation(){}
 
 void MainWindow::MoveOperation::OnEnter(){
@@ -116,9 +115,49 @@ void MainWindow::MoveOperation::OnCommand(UINT id){
     }
 }
 
+MainWindow::EmptyTool::EmptyTool(MainWindow* window) : window(window) {}
+MainWindow::EmptyTool::~EmptyTool(){}
+
+void MainWindow::EmptyTool::OnLeftDown(){
+    Vertex* v = window->mesh->Find(window->camPos, window->cursorDir);
+    if (v == NULL){
+        window->selectedPoints.Clear();
+        DebugLog("No Point Selected");
+    }else{
+        window->selectedPoints.Add(v);
+        DebugLog("Select Point %f %f %f", v->pos.x, v->pos.y, v->pos.z);
+    }
+}
+
+MainWindow::SelectTool::SelectTool(MainWindow* window) : window(window) {}
+MainWindow::SelectTool::~SelectTool(){}
+
+void MainWindow::SelectTool::OnLeftDown(){
+    start = window->cursorPos;
+    end = window->cursorPos;
+    leftDown = true;
+}
+
+void MainWindow::SelectTool::OnLeftUp(){
+    leftDown = false;
+    //TODO 等待实现范围框选
+}
+
+void MainWindow::SelectTool::OnMove(){
+    end = window->cursorPos;
+}
+
+void MainWindow::SelectTool::OnRender(){
+    if (leftDown){
+        glColor4f(1.0f, 1.0f, 0.0f, 0.1f);
+        GLUtils::DrawRect(start, end);
+    }
+}
+
 MainWindow::MainWindow(HINSTANCE hInstance) : hInst(hInstance) {
     uiMgr = new UIManager();
     mesh = new Mesh();
+    SetTool(new EmptyTool(this));
 
     basicMenu = new Menu();
     basicMenu->AddItem(new MenuItem(L"添加顶点", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
@@ -250,7 +289,7 @@ void MainWindow::RenderModelView(){
     // 已选择点绘制
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
-    glPointSize(6.0f);
+    glPointSize(8.0f);
     glColor3f(1.0f, 1.0f, 0.0f);
     glBegin(GL_POINTS);
     selectedPoints.Foreach([](Vertex* p){
@@ -258,6 +297,18 @@ void MainWindow::RenderModelView(){
     });
     glEnd();
     glDisable(GL_POINT_SMOOTH);
+
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glEnable(GL_ALPHA_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glMatrixMode(GL_PROJECTION);
+    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    if (curTool)
+        curTool->OnRender();
 }
 
 void MainWindow::OnRender(){
@@ -284,13 +335,22 @@ void MainWindow::SetMenu(Menu* m){
     }
 }
 
+void MainWindow::SetTool(ITool* tool){
+    if (curTool){
+        curTool->OnUnselect();
+        delete curTool;
+    }
+    curTool = tool;
+    tool->OnSelect();
+}
+
 void MainWindow::UpdateWindowSize(int x, int y){
     cliSize.x = x;
     cliSize.y = y;
     cliInvSize.x = 1.0f / cliSize.x;
     cliInvSize.y = 1.0f / cliSize.y;
     aspect = (float)cliSize.x / cliSize.y;
-    if (menu != NULL){
+    if (menu){
         menu->SetClientSize(cliSize);
     }
 }
@@ -300,13 +360,16 @@ void MainWindow::UpdateCursor(int x, int y){
     cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
     cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
     cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
-    if (menu != NULL){
+    if (menu){
         menu->CursorMove(cursorPos - menuPos);
         return;
     }
     uiMgr->CursorMove(cursorPos);
     if (curOp){
         curOp->OnMove();
+    }
+    if (curTool){
+        curTool->OnMove();
     }
 }
 
@@ -383,10 +446,10 @@ bool MainWindow::SaveMesh(Mesh* mesh){
     inputText[MAX_PATH] = '\0';
     HANDLE hFile = CreateFile(
         inputText,
-        FILE_GENERIC_READ | FILE_GENERIC_WRITE,
+        GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL,
-        CREATE_NEW,
+        CREATE_ALWAYS,
         FILE_ATTRIBUTE_NORMAL,
         NULL
     );
@@ -415,8 +478,6 @@ void MainWindow::AboutBox(){
     });
 }
 
-void MainWindow::OnCreate(){}
-
 void MainWindow::OnClose(){}
 
 void MainWindow::OnResize(int x, int y){
@@ -435,10 +496,18 @@ void MainWindow::OnRightDown(int x, int y){
         curOp = NULL;
         return;
     }
+    // 工具
+    if (curTool){
+        curTool->OnRightDown();
+    }
     SetMenu(basicMenu);
 }
 
-void MainWindow::OnRightUp(int x, int y){}
+void MainWindow::OnRightUp(int x, int y){
+    if (curTool){
+        curTool->OnRightUp();
+    }
+}
 
 void MainWindow::OnInsSave(){
     SaveMesh(mesh);
@@ -497,20 +566,18 @@ void MainWindow::OnLeftDown(int x, int y){
         curOp = NULL;
         return;
     }
-    // 选择点
-    Vertex* v = mesh->Find(camPos, cursorDir);
-    if (v == NULL){
-        selectedPoints.Clear();
-        DebugLog("No Point Selected");
-    }else{
-        selectedPoints.Add(v);
-        DebugLog("Select Point %f %f %f", v->pos.x, v->pos.y, v->pos.z);
+    // 工具
+    if (curTool){
+        curTool->OnLeftDown();
     }
 }
 
 void MainWindow::OnLeftUp(int x, int y){
     uiMgr->LeftUp();
     UpdateCursor(x, y);
+    if (curTool){
+        curTool->OnLeftUp();
+    }
 }
 
 void MainWindow::OnMouseWheel(int delta){
@@ -519,6 +586,7 @@ void MainWindow::OnMouseWheel(int delta){
 }
 
 void MainWindow::OnMenuAccel(int id, bool accel){
+    DebugLog("MainWindow::OnMenuAccel %d %s", id, accel ? "true" : "false");
     switch (id){
     case IDM_SAVE:
         OnInsSave();
@@ -606,6 +674,12 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     case IDM_MENU_BASIC:
         SetMenu(basicMenu);
         break;
+    case IDM_TOOL_EMPTY:
+        SetTool(new EmptyTool(this));
+        break;
+    case IDM_TOOL_SELECTBOX:
+        SetTool(new SelectTool(this));
+        break;
     }
     // 当前操作的命令
     if (curOp){
@@ -613,9 +687,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void MainWindow::OnControl(int inform, int id, HWND hctl){}
-
-void MainWindow::SetFrame(HWND hWnd){
+void MainWindow::OnCreate(HWND hWnd){
     this->hWnd = hWnd;
 }
 
@@ -633,7 +705,6 @@ void MainWindow::OnKillFocus(){
 }
 
 Main::Main(){}
-
 Main::~Main(){}
 
 ATOM Main::RegClass(){
@@ -677,8 +748,7 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
     int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
     switch (uMsg){
     case WM_CREATE:
-        window->SetFrame(hWnd);
-        window->OnCreate();
+        window->OnCreate(hWnd);
         break;
     case WM_CLOSE:
         window->OnClose();
@@ -713,7 +783,6 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
         if (inRect && !window->IsFocus()){
             window->OnFocus();
             window->OnMouseMove(x - rect.left, y - rect.bottom);
-            focus = window;
         }else if (!inRect && window->IsFocus()){
             window->OnKillFocus();
         }
@@ -730,7 +799,6 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
         if (inRect && !window->IsFocus()){
             window->OnFocus();
             window->OnMouseMove(x - rect.left, y - rect.bottom);
-            focus = window;
         }else if (!inRect && window->IsFocus()){
             window->OnKillFocus();
         }
@@ -747,19 +815,83 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
         case 0:
             if (window->IsFocus())
                 window->OnMenuAccel(LOWORD(wParam), false);
+            break;
         case 1:
             if (window->IsFocus())
                 window->OnMenuAccel(LOWORD(wParam), true);
+            break;
         default:
-            window->OnControl(HIWORD(wParam), LOWORD(wParam), (HWND)(DWORD_PTR)lParam);
+            //因为组件模型不同，此接口可能弃用
+            //window->OnControl(HIWORD(wParam), LOWORD(wParam), (HWND)(DWORD_PTR)lParam);
+            break;
+        }
+        break;
+    }
+}
+
+void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
+    RECT cliRect;
+    GetClientRect(hWnd, &cliRect);
+    // 事件中鼠标坐标上下需反转
+    int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
+    switch (uMsg){
+    case WM_CREATE:
+        window->OnCreate(hWnd);
+        break;
+    case WM_CLOSE:
+        window->OnClose();
+        break;
+    case WM_SIZE:
+        window->OnResize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        break;
+    case WM_MOUSEMOVE:
+        window->OnMouseMove(x, y);
+        break;
+    case WM_MOUSEWHEEL:
+        window->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
+        break;
+    case WM_MOUSELEAVE:
+        window->OnMouseLeave();
+        break;
+    case WM_MOUSEHOVER:
+        window->OnMouseHover(wParam, x, y);
+        break;
+    case WM_SETFOCUS:
+        window->OnFocus();
+        break;
+    case WM_KILLFOCUS:
+        window->OnKillFocus();
+        break;
+    case WM_LBUTTONDOWN:
+        window->OnLeftDown(x, y);
+        break;
+    case WM_LBUTTONUP:
+        window->OnLeftUp(x, y);
+        break;
+    case WM_RBUTTONDOWN:
+        window->OnRightDown(x, y);
+        break;
+    case WM_RBUTTONUP:
+        window->OnRightUp(x, y);
+        break;
+    case WM_COMMAND:
+        switch (HIWORD(wParam)){
+        case 0:
+            window->OnMenuAccel(LOWORD(wParam), false);
+            break;
+        case 1:
+            window->OnMenuAccel(LOWORD(wParam), true);
+            break;
         }
         break;
     }
 }
 
 LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    FireEvent(mainWnd, mainRect, hWnd, uMsg, wParam, lParam);
-    FireEvent(mainWnd2, mainRect2, hWnd, uMsg, wParam, lParam);
+    //FireEvent(mainWnd, mainRect, hWnd, uMsg, wParam, lParam);
+    //FireEvent(mainWnd2, mainRect2, hWnd, uMsg, wParam, lParam);
+
+    FireEvent(container, hWnd, uMsg, wParam, lParam);
 
     switch (uMsg){
     case WM_CLOSE:
@@ -770,9 +902,6 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
         break;
     case WM_LBUTTONUP:
         ReleaseCapture();
-        break;
-    case WM_KILLFOCUS:
-        focus = NULL;
         break;
     }
 
@@ -785,30 +914,31 @@ LRESULT CALLBACK Main::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 void Main::OnResize(int x, int y){
     //TODO 这里做子窗口大小管理
-    mainRect.left = 0;
-    mainRect.right = x >> 1;
-    mainRect.bottom = 0;
-    mainRect.top = y;
-    mainWnd->OnResize(mainRect.right - mainRect.left, mainRect.top - mainRect.bottom);
+    // mainRect.left = 0;
+    // mainRect.right = x >> 1;
+    // mainRect.bottom = 0;
+    // mainRect.top = y;
+    // mainWnd->OnResize(mainRect.right - mainRect.left, mainRect.top - mainRect.bottom);
 
-    mainRect2.left = x >> 1;
-    mainRect2.right = x;
-    mainRect2.bottom = 0;
-    mainRect2.top = y;
-    mainWnd2->OnResize(mainRect2.right - mainRect2.left, mainRect2.top - mainRect2.bottom);
+    // mainRect2.left = x >> 1;
+    // mainRect2.right = x;
+    // mainRect2.bottom = 0;
+    // mainRect2.top = y;
+    // mainWnd2->OnResize(mainRect2.right - mainRect2.left, mainRect2.top - mainRect2.bottom);
+    container->OnResize(x, y);
 }
 
 void Main::OnRender(){
     ViewportManager::inst->Reset(hWnd);
     ViewportManager::inst->EnableScissor();
 
-    ViewportManager::inst->SetViewport(mainRect);
-    //DebugLog("%d %d %d %d", mainRect.left, mainRect.right, mainRect.bottom, mainRect.top);
-    mainWnd->OnRender();
+    // ViewportManager::inst->SetViewport(mainRect);
+    // mainWnd->OnRender();
 
-    ViewportManager::inst->SetViewport(mainRect2);
-    //DebugLog("%d %d %d %d", mainRect2.left, mainRect2.right, mainRect2.bottom, mainRect2.top);
-    mainWnd2->OnRender();
+    // ViewportManager::inst->SetViewport(mainRect2);
+    // mainWnd2->OnRender();
+
+    container->OnRender();
 }
 
 int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
@@ -819,12 +949,13 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     mainWnd = new MainWindow(hInst);
     mainWnd2 = new NodeMapWindow();
 
+    container = new LRContainer(mainWnd, mainWnd2);
+
     RegClass();
     ColorBoard::RegClass(hInstance);
 
     hWnd = CreateWnd();
 
-    //TODO 更改消息循环位置，使主视口成为组件
     ShowWindow(hWnd, SW_SHOW);
     UpdateWindow(hWnd);
 
@@ -873,6 +1004,17 @@ HDC Main::hDC;
 HGLRC Main::hRC;
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
+    // InputAttribute a[4];
+    // a[0].type = InputAttribute::Type::INT;
+    // a[0].intValue = 53;
+    // a[1].type = InputAttribute::Type::FLOAT;
+    // a[1].floatValue = 0.8f;
+    // a[2].type = InputAttribute::Type::STRING;
+    // a[2].strValue = "Hello World";
+    // a[3].type = InputAttribute::Type::FLOAT;
+    // a[3].floatValue = 125.0f;
+    // DebugLog("%d", ShellEInputWindow(a, 4));
+
     Main::inst = new Main();
     int ret = Main::inst->WinMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
     delete Main::inst;

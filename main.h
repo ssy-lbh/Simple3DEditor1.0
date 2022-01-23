@@ -2,9 +2,10 @@
 #ifndef __MAIN__
 #define __MAIN__
 
-#include <windowsx.h>
+#include "define.h"
 
-//#include <gl/glew.h>
+#include <windows.h>
+#include <windowsx.h>
 
 #include <gl/gl.h>
 #include <gl/glu.h>
@@ -12,7 +13,7 @@
 #include "geodef.h"
 #include "menu.h"
 #include "mesh.h"
-#include "uimgr.h"
+#include "container.h"
 #include "colorboard.h"
 
 class MainWindow;
@@ -53,6 +54,8 @@ private:
     IOperation* curOp = NULL;
 
     ColorBoard* colorBoard = NULL;
+
+    ITool* curTool = NULL;
 
     char inputText[MAX_PATH + 1];
     bool inputConfirm;
@@ -109,17 +112,43 @@ private:
         virtual void OnConfirm() override;
         virtual void OnUndo() override;
     };
+
+    class EmptyTool : public ITool {
+    private:
+        MainWindow* window;
+
+    public:
+        EmptyTool(MainWindow* window);
+        ~EmptyTool() override;
+        virtual void OnLeftDown() override;
+    };
+
+    class SelectTool : public ITool {
+    private:
+        MainWindow* window;
+        Vector2 start;
+        Vector2 end;
+        bool leftDown;
+        
+    public:
+        SelectTool(MainWindow* window);
+        virtual ~SelectTool() override;
+        virtual void OnLeftDown() override;
+        virtual void OnLeftUp() override;
+        virtual void OnMove() override;
+        virtual void OnRender() override;
+    };
+
 public:
     MainWindow(HINSTANCE hInstance);
     virtual ~MainWindow() override;
-
-    virtual void SetFrame(HWND hWnd) override;
 
     void InitCamera();
     void InitLight0();
 
     void RenderModelView();
     void SetMenu(Menu* m);
+    void SetTool(ITool* tool);
 
     void UpdateWindowSize(int x, int y);
     void UpdateCursor(int x, int y);
@@ -129,7 +158,7 @@ public:
 
     virtual bool IsFocus() override;
     virtual void OnRender() override;
-    virtual void OnCreate() override;
+    virtual void OnCreate(HWND hWnd) override;
     virtual void OnClose() override;
     virtual void OnResize(int x, int y) override;
     virtual void OnMouseMove(int x, int y) override;
@@ -141,7 +170,6 @@ public:
     virtual void OnFocus() override;
     virtual void OnKillFocus() override;
     virtual void OnMenuAccel(int id, bool accel) override;
-    virtual void OnControl(int inform, int id, HWND hctl) override;
 
     void OnInsSave();
     void OnInsMove();
@@ -169,7 +197,7 @@ public:
     IWindow* mainWnd2;
     RECT mainRect2;
 
-    IWindow* focus = NULL;
+    LRContainer* container;
 
     Main();
     ~Main();
@@ -178,6 +206,7 @@ public:
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     void FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     void OnResize(int x, int y);
     void OnRender();

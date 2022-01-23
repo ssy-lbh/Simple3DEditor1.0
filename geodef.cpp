@@ -48,7 +48,7 @@ Edge* Vertex::EdgeRelateTo(Vertex* v){
         Edge* res;
     } pack;
     pack.v = v;
-    pack.res = NULL;
+    pack.res = __null;
     edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* p){
         if (e->v1 == p->v || e->v2 == p->v){
             p->res = e;
@@ -104,7 +104,7 @@ Face* Edge::FaceRelateTo(Vertex* v){
         Face* res;
     } pack;
     pack.v = v;
-    pack.res = NULL;
+    pack.res = __null;
     faces.Foreach<decltype(pack)*>([](Face* f, decltype(pack)* p){
         if (f->FindVertex(p->v)){
             p->res = f;

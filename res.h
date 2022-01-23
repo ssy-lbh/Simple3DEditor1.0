@@ -34,6 +34,8 @@
 #define IDM_OP_PLANE_Z 518
 #define IDM_DELETE 519
 #define IDM_MENU_BASIC 520
+#define IDM_TOOL_EMPTY 550
+#define IDM_TOOL_SELECTBOX 551
 
 #define SHADER 600
 

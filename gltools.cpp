@@ -124,6 +124,25 @@ void GLUtils::DrawRoundRect(float x, float y, float width, float height, float r
     glEnd();
 }
 
+float GLUtils::Clamp(float x, float a, float b){
+    if (x <= a){
+        return a;
+    }
+    if (x >= b){
+        return b;
+    }
+    return x;
+}
+
+void GLUtils::DrawRect(Vector2 p1, Vector2 p2){
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(p1.x, p1.y);
+    glVertex2f(p1.x, p2.y);
+    glVertex2f(p2.x, p2.y);
+    glVertex2f(p2.x, p1.y);
+    glEnd();
+}
+
 #ifdef STB_IMAGE_IMPLEMENTATION
 GLTexture2D::GLTexture2D(const char* path){
     int x, y, channel;

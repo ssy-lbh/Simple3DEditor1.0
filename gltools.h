@@ -22,6 +22,8 @@ public:
     static void DrawBezier(Vector3 p1, Vector3 p2, Vector3 p3, float step);
     static void DrawBezier(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, float step);
     static void DrawRoundRect(float x, float y, float width, float height, float radius, float step);
+    static float Clamp(float x, float a, float b);
+    static void DrawRect(Vector2 p1, Vector2 p2);
 };
 
 class GLTexture2D {

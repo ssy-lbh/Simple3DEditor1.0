@@ -1,8 +1,7 @@
 #ifndef __GEODEF__
 #define __GEODEF__
 
-#include <stddef.h>
-
+#include "define.h"
 #include "vecmath.h"
 #include "list.h"
 

@@ -56,16 +56,19 @@ private:
         virtual void Drag(Vector2 dir) override;
         void Connect(Node* node);
         void Connect(Node* node, Vector2 offset);
+        void Disconnect();
+        void Disconnect(Node* node);
     };
+
+    List<Node*> selectedNodes;
     
 public:
     NodeMapWindow();
     virtual ~NodeMapWindow() override;
 
-    virtual void SetFrame(HWND hWnd) override;
     virtual bool IsFocus() override;
     virtual void OnRender() override;
-    virtual void OnCreate() override;
+    virtual void OnCreate(HWND hWnd) override;
     virtual void OnClose() override;
     virtual void OnResize(int x, int y) override;
     virtual void OnMouseMove(int x, int y) override;
@@ -79,11 +82,11 @@ public:
     virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
-    virtual void OnControl(int inform, int id, HWND hctl) override;
 
     void UpdateCursor(int x, int y);
     void UpdateWindowSize(int x, int y);
     void SetMenu(Menu* m);
+    void AddNode();
 };
 
 #endif

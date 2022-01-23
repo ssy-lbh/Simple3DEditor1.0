@@ -1,7 +1,8 @@
 #ifndef __UIMGR__
 #define __UIMGR__
 
-#include <stddef.h>
+#include "define.h"
+
 #include <windef.h>
 
 #include "list.h"
@@ -15,8 +16,6 @@ class IOperation;
 class ITool;
 
 class IWindow;
-//class IContainer;
-//TODO 此接口期望集成选择夹、拆分窗口、属性窗口等容器
 
 class UIManager {
 private:
@@ -38,6 +37,8 @@ public:
     void RenderTransform();
     bool LeftDown();
     bool LeftUp();
+    void Foreach(void(*func)(IButton*));
+    void Foreach(void(*func)(IButton*, void*), void* user);
 };
 
 class ViewportManager {
@@ -111,10 +112,9 @@ public:
     IWindow();
     virtual ~IWindow();
 
-    virtual void SetFrame(HWND hWnd);
     virtual bool IsFocus();
     virtual void OnRender();
-    virtual void OnCreate();
+    virtual void OnCreate(HWND hWnd);
     virtual void OnClose();
     virtual void OnResize(int x, int y);
     virtual void OnMouseMove(int x, int y);
@@ -128,7 +128,6 @@ public:
     virtual void OnKillFocus();
     virtual void OnMouseWheel(int delta);
     virtual void OnMenuAccel(int id, bool accel);
-    virtual void OnControl(int inform, int id, HWND hctl);
 };
 
 #endif

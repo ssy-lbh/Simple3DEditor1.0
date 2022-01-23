@@ -1,55 +1,150 @@
 #ifndef __LIST__
 #define __LIST__
 
-#include <vector>
+#include "define.h"
+
+#include "log.h"
 
 template <typename T>
 class List {
 private:
-    std::vector<T> data;
+    T* data;
+    unsigned long long size;
+    unsigned long long ptr;
+
+    void Check(size_t reserve){
+        if (ptr + reserve < size){
+            return;
+        }
+        //DebugLog("List Size Increased");
+        while (ptr + reserve >= size){
+            size <<= 1;
+        }
+        T* newData = new T[size];
+        for (size_t i = 0; i < ptr; i++){
+            newData[i] = data[i];
+        }
+        delete[] data;
+        data = newData;
+    }
 
 public:
-    List(){}
-    ~List(){}
+    List(){
+        //DebugLog("List()");
+        size = 32;
+        data = new T[size];
+        ptr = 0;
+    }
+
+    List(List&& list){
+        //DebugLog("List(List&& list)");
+        size = list.size;
+        data = new T[size];
+        ptr = list.ptr;
+        for (size_t i = 0; i < ptr; i++){
+            data[i] = list.data[i];
+        }
+    }
+
+    List(const List& list){
+        //DebugLog("List(const List& list)");
+        size = list.size;
+        data = new T[size];
+        ptr = list.ptr;
+        for (size_t i = 0; i < ptr; i++){
+            data[i] = list.data[i];
+        }
+    }
+
+    List& operator=(List&& list){
+        //DebugLog("List& operator=(List&& list)");
+        size = list.size;
+        data = new T[size];
+        ptr = list.ptr;
+        for (size_t i = 0; i < ptr; i++){
+            data[i] = list.data[i];
+        }
+    }
+
+    List& operator=(const List& list){
+        //DebugLog("List& operator=(const List& list)");
+        size = list.size;
+        data = new T[size];
+        ptr = list.ptr;
+        for (size_t i = 0; i < ptr; i++){
+            data[i] = list.data[i];
+        }
+    }
+
+    ~List(){
+        //DebugLog("~List()");
+        if (data == NULL){
+            DebugError("Critical: List<T>::~List Data Pointer Is NULL");
+        }
+        delete[] data;
+    }
 
     List<T>& Add(T val){
-        data.push_back(val);
+        //DebugLog("Add");
+        Check(1);
+        data[ptr++] = val;
         return *this;
     }
 
     T RemoveBack(){
-        T ret = data[data.size() - 1];
-        data.pop_back();
-        return ret;
+        //DebugLog("Clear");
+        if (ptr == 0){
+            DebugError("Critical: List<T>::RemoveBack When Size Is 0");
+        }
+        return data[--ptr];
     }
 
     size_t Size(){
-        return data.size();
+        return ptr;
     }
 
-    T GetFront(){
-        return data.front();
+    T& GetFront(){
+        //DebugLog("GetFront");
+        if (ptr == 0){
+            DebugError("Critical: List<T>::GetFront When Size Is 0");
+        }
+        return *data;
     }
 
-    T GetBack(){
-        return data.back();
+    T& GetBack(){
+        //DebugLog("GetBack");
+        if (ptr == 0){
+            DebugError("Critical: List<T>::GetBack When Size Is 0");
+        }
+        return data[ptr - 1];
     }
 
-    T GetItem(int index){
-        if (index >= data.size() || index < 0){
-            return NULL;
+    T& GetItem(size_t index){
+        //DebugLog("GetItem %d", index);
+        if (index >= ptr){
+            DebugError("Critical: List<T>::GetItem When Index Overflow");
         }
         return data[index];
     }
 
     void Clear(){
-        data.clear();
+        //DebugLog("Clear");
+        delete data;
+        size = 32;
+        data = new T[size];
+        ptr = 0;
+        if (data == NULL){
+            DebugError("Critical: List<T>::Clear Allocate Memory Failed");
+        }
     }
 
     bool Remove(T val){
-        for (decltype(data.begin()) i = data.begin(); i != data.end(); ++i){
-            if (*i == val){
-                data.erase(i);
+        //DebugLog("Remove");
+        for (size_t i = 0; i < ptr; ++i){
+            if (data[i] == val){
+                ptr--;
+                for (size_t j = i; j < ptr; ++j)
+                    data[j] = data[j + 1];
                 return true;
             }
         }
@@ -57,7 +152,8 @@ public:
     }
 
     List<T>& Foreach(void(*func)(T)){
-        for (size_t i = 0; i < data.size(); i++){
+        //DebugLog("Foreach");
+        for (size_t i = 0; i < ptr; i++){
             func(data[i]);
         }
         return *this;
@@ -65,15 +161,16 @@ public:
 
     template <typename Tp>
     List<T>& Foreach(void(*func)(T, Tp), Tp user){
-        for (size_t i = 0; i < data.size(); i++){
+        //DebugLog("Foreach");
+        for (size_t i = 0; i < ptr; i++){
             func(data[i], user);
         }
         return *this;
     }
 
     bool HasValue(T val){
-        for (decltype(data.begin()) i = data.begin(); i != data.end(); ++i){
-            if (*i == val){
+        for (size_t i = 0; i < ptr; ++i){
+            if (data[i] == val){
                 return true;
             }
         }
