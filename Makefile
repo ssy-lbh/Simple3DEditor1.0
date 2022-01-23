@@ -39,7 +39,7 @@ $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 commit:
 	git checkout develop
 	git add *
-	git commit -m "bugfix"
+	git commit -m "update"
 	git push -u origin develop
 
 merge:
