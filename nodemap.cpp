@@ -48,15 +48,20 @@ void NodeMapWindow::Node::Render(){
         0.05f
     );
     if (connNode){
+        glDisable(GL_LINE_STIPPLE);
         glColor3f(1.0f, 1.0f, 0.2f);
+        glLineWidth(1.0f);
         Vector2 begin = Vector2(position.x + 0.3f, position.y + 0.15f);
+        //DebugLog("access %p", connNode);
         Vector2 end = connNode->position + offset;
-        GLUtils::DrawBezier(begin, begin + Vector2(0.5f, 0.0f), end - Vector2(0.5f, 0.0f), end, 0.01f);
+        GLUtils::DrawBezier(begin, begin + Vector2(0.3f, 0.0f), end - Vector2(0.3f, 0.0f), end, 0.01f);
     }
 }
 
 void NodeMapWindow::Node::Click(){
     start = position;
+    if (!window->selectedNodes.HasValue(this))
+        window->selectedNodes.Add(this);
 }
 
 void NodeMapWindow::Node::Drag(Vector2 dir){
@@ -73,6 +78,17 @@ void NodeMapWindow::Node::Connect(Node* node, Vector2 offset){
     this->offset = offset;
 }
 
+void NodeMapWindow::Node::Disconnect(){
+    connNode = NULL;
+}
+
+void NodeMapWindow::Node::Disconnect(Node* node){
+    DebugLog("NodeMapWindow::Node::Disconnect %p %p", this, node);
+    if (connNode == node){
+        connNode = NULL;
+    }
+}
+
 NodeMapWindow::NodeMapWindow(){
     uiMgr = new UIManager();
     nodeMgr = new UIManager();
@@ -87,7 +103,38 @@ NodeMapWindow::NodeMapWindow(){
 
     basicMenu = new Menu();
     basicMenu->AddItem(new MenuItem(L"添加节点", MENUITEM_LAMBDA_TRANS(NodeMapWindow)[](NodeMapWindow* window){
-        //TODO 等待添加实现
+        window->AddNode();
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"删除节点", MENUITEM_LAMBDA_TRANS(NodeMapWindow)[](NodeMapWindow* window){
+        if (window->selectedNodes.Size() == 1){
+            Node* node = window->selectedNodes.GetItem(0);
+            window->nodeMgr->DeleteButton(node);
+            window->nodeMgr->Foreach([](IButton* btn, void* node){
+                if (btn){
+                    ((Node*)btn)->Disconnect((Node*)node);
+                }else{
+                    DebugError("NodeMapWindow::nodeMgr has NULL button");
+                }
+            }, node);
+            window->selectedNodes.Clear();
+            //DebugLog("delete %p", node);
+            delete node;
+        }
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"链接节点", MENUITEM_LAMBDA_TRANS(NodeMapWindow)[](NodeMapWindow* window){
+        if (window->selectedNodes.Size() == 2){
+            Node* n1 = window->selectedNodes.GetItem(0);
+            Node* n2 = window->selectedNodes.GetItem(1);
+            n1->Connect(n2);
+            window->selectedNodes.Clear();
+        }
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"断开节点", MENUITEM_LAMBDA_TRANS(NodeMapWindow)[](NodeMapWindow* window){
+        if (window->selectedNodes.Size() == 1){
+            Node* node = window->selectedNodes.GetItem(0);
+            node->Disconnect();
+            window->selectedNodes.Clear();
+        }
     }, this));
 }
 
@@ -95,10 +142,6 @@ NodeMapWindow::~NodeMapWindow(){
     if(uiMgr) delete uiMgr;
     if(nodeMgr) delete nodeMgr;
     if(basicMenu) delete basicMenu;
-}
-
-void NodeMapWindow::SetFrame(HWND hWnd){
-    this->hWnd = hWnd;
 }
 
 bool NodeMapWindow::IsFocus(){
@@ -137,7 +180,9 @@ void NodeMapWindow::OnRender(){
         menu->Render(menuPos.x, menuPos.y);
 }
 
-void NodeMapWindow::OnCreate(){}
+void NodeMapWindow::OnCreate(HWND hWnd){
+    this->hWnd = hWnd;
+}
 
 void NodeMapWindow::OnClose(){}
 
@@ -150,6 +195,8 @@ void NodeMapWindow::UpdateCursor(int x, int y){
     cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
     uiMgr->CursorMove(cursorPos);
     nodeMgr->CursorMove(cursorPos);
+    if (menu)
+        menu->CursorMove(cursorPos - menuPos);
 }
 
 void NodeMapWindow::UpdateWindowSize(int x, int y){
@@ -171,6 +218,11 @@ void NodeMapWindow::SetMenu(Menu* m){
         menu->CursorMove(cursorPos);
         menuPos = cursorPos;
     }
+}
+
+void NodeMapWindow::AddNode(){
+    Node* node = new Node(cursorPos, this);
+    nodeMgr->AddButton(node);
 }
 
 void NodeMapWindow::OnMouseMove(int x, int y){
@@ -195,6 +247,8 @@ void NodeMapWindow::OnLeftDown(int x, int y){
     if (nodeMgr->LeftDown()){
         UpdateCursor(x, y);
         return;
+    }else{
+        selectedNodes.Clear();
     }
 }
 
@@ -226,5 +280,3 @@ void NodeMapWindow::OnKillFocus(){
 void NodeMapWindow::OnMouseWheel(int delta){}
 
 void NodeMapWindow::OnMenuAccel(int id, bool accel){}
-
-void NodeMapWindow::OnControl(int inform, int id, HWND hctl){}

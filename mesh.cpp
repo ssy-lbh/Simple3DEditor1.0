@@ -2,8 +2,6 @@
 
 #include <gl/gl.h>
 
-#include <cstdio>
-
 #include "log.h"
 
 Mesh::Mesh(){}
@@ -46,12 +44,15 @@ Vertex* Mesh::AddVertex(Vector3 pos){
 }
 
 Vertex* Mesh::AddVertex(Vertex* v){
+    if (vertices.HasValue(v)){
+        return v;
+    }
     vertices.Add(v);
     return v;
 }
 
 Edge* Mesh::AddEdge(Vertex* v1, Vertex* v2){
-    DebugLog("Mesh::AddEdge %p %p", v1, v2);
+    //DebugLog("Mesh::AddEdge %p %p", v1, v2);
     // 边去重
     struct {
         bool has;
@@ -74,13 +75,15 @@ Edge* Mesh::AddEdge(Vertex* v1, Vertex* v2){
     if (pack.has){
         return pack.e;
     }
+    AddVertex(v1);
+    AddVertex(v2);
     Edge* e = new Edge(v1, v2);
     edges.Add(e);
     return e;
 }
 
 Face* Mesh::AddTriFace(Vertex* v1, Vertex* v2, Vertex* v3){
-    DebugLog("Mesh::AddTriFace %p %p %p", v1, v2, v3);
+    //DebugLog("Mesh::AddTriFace %p %p %p", v1, v2, v3);
     Edge* e1 = AddEdge(v1, v2);
     Edge* e2 = AddEdge(v2, v3);
     Edge* e3 = AddEdge(v3, v1);
@@ -188,13 +191,13 @@ void Mesh::WriteToOBJ(HANDLE hFile){
     vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
         char tmp[MAX_PATH + 1];
         DWORD len;
-        len = snprintf(tmp, MAX_PATH, "v %f %f %f\n", v->pos.x, v->pos.y, v->pos.z);
+        len = __builtin_snprintf(tmp, MAX_PATH, "v %f %f %f\n", v->pos.x, v->pos.y, v->pos.z);
         WriteFile(hFile, tmp, len, &len, NULL);
     }, hFile);
     faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
         char tmp[MAX_PATH + 1];
         DWORD len;
-        len = snprintf(tmp, MAX_PATH, "f %d %d %d\n", f->vertices.GetItem(0)->index, f->vertices.GetItem(1)->index, f->vertices.GetItem(2)->index);
+        len = __builtin_snprintf(tmp, MAX_PATH, "f %d %d %d\n", f->vertices.GetItem(0)->index, f->vertices.GetItem(1)->index, f->vertices.GetItem(2)->index);
         WriteFile(hFile, tmp, len, &len, NULL);
     }, hFile);
 }

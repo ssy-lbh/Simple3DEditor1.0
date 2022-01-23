@@ -16,7 +16,12 @@ void UIManager::AddButton(IButton* btn){
 }
 
 void UIManager::DeleteButton(IButton* btn){
-    buttons.Remove(btn);
+    if (cur == btn){
+        cur = NULL;
+    }
+    if (!buttons.Remove(btn)){
+        DebugLog("UIManager::DeleteButton Failed");
+    }
 }
 
 void UIManager::CursorMove(Vector2 pos){
@@ -120,6 +125,14 @@ bool UIManager::LeftUp(){
     return false;
 }
 
+void UIManager::Foreach(void(*func)(IButton*)){
+    buttons.Foreach(func);
+}
+
+void UIManager::Foreach(void(*func)(IButton*, void*), void* user){
+    buttons.Foreach(func, user);
+}
+
 IButton::IButton(){}
 IButton::~IButton(){}
 bool IButton::Trigger(Vector2 pos){ return false; }
@@ -220,10 +233,9 @@ void ITool::OnRender(){}
 
 IWindow::IWindow(){}
 IWindow::~IWindow(){}
-void IWindow::SetFrame(HWND hWnd){}
 bool IWindow::IsFocus(){ return true; }
 void IWindow::OnRender(){}
-void IWindow::OnCreate(){}
+void IWindow::OnCreate(HWND hWnd){}
 void IWindow::OnClose(){}
 void IWindow::OnResize(int x, int y){}
 void IWindow::OnMouseMove(int x, int y){}
@@ -237,4 +249,3 @@ void IWindow::OnFocus(){}
 void IWindow::OnKillFocus(){}
 void IWindow::OnMouseWheel(int delta){}
 void IWindow::OnMenuAccel(int id, bool accel){}
-void IWindow::OnControl(int inform, int id, HWND hctl){}

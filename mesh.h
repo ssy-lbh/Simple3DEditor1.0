@@ -1,7 +1,6 @@
 #ifndef __MESH__
 #define __MESH__
 
-#include <stddef.h>
 #include <windef.h>
 
 #include "geodef.h"
