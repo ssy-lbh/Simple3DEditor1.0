@@ -33,6 +33,7 @@
 #define IDM_OP_PLANE_Y 517
 #define IDM_OP_PLANE_Z 518
 #define IDM_DELETE 519
+#define IDM_MENU_BASIC 520
 
 #define SHADER 600
 

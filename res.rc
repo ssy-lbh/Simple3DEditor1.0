@@ -89,6 +89,7 @@ BEGIN
     "Y",            IDM_OP_PLANE_Y,         ASCII, NOINVERT
     "Z",            IDM_OP_PLANE_Z,         ASCII, NOINVERT
     VK_DELETE,      IDM_DELETE,             VIRTKEY, NOINVERT
+    "A",            IDM_MENU_BASIC,         ASCII, NOINVERT
 END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62

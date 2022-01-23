@@ -30,8 +30,12 @@ public:
     ~UIManager();
     void CursorMove(Vector2 pos);
     void AddButton(IButton* btn);
+    void DeleteButton(IButton* btn);
     void Render(float aspect);
     void Render();
+    void RenderRaw();
+    void RenderTransform(float aspect);
+    void RenderTransform();
     bool LeftDown();
     bool LeftUp();
 };
@@ -68,6 +72,7 @@ public:
     virtual void Hover();
     virtual void Click();
     virtual void Drag(Vector2 dir);
+    virtual void ClickEnd();
     virtual void Leave();
     virtual void Render();
 };

@@ -28,10 +28,12 @@ void NodeMapWindow::MoveButton::Drag(Vector2 dir){
 
 NodeMapWindow::Node::Node(NodeMapWindow* window) : window(window) {}
 
+NodeMapWindow::Node::Node(Vector2 pos, NodeMapWindow* window) : position(pos), window(window) {}
+
 NodeMapWindow::Node::~Node(){}
 
 bool NodeMapWindow::Node::Trigger(Vector2 pos){
-    Vector2 rela = pos - position;
+    Vector2 rela = pos - position + window->viewPos;
     return rela.x >= 0.0f && rela.x <= 0.3f && rela.y >= 0.0f && rela.y <= 0.3f;
 }
 
@@ -45,9 +47,12 @@ void NodeMapWindow::Node::Render(){
         0.05f,
         0.05f
     );
-    glColor3f(1.0f, 1.0f, 0.2f);
-    Vector2 begin = Vector2(position.x + 0.3f, position.y + 0.15f);
-    GLUtils::DrawBezier(begin, begin + Vector2(0.5f, 0.0f), Vector2(0.5f, 0.0f), Vector2(1.0f, 0.0f), 0.01f);
+    if (connNode){
+        glColor3f(1.0f, 1.0f, 0.2f);
+        Vector2 begin = Vector2(position.x + 0.3f, position.y + 0.15f);
+        Vector2 end = connNode->position + offset;
+        GLUtils::DrawBezier(begin, begin + Vector2(0.5f, 0.0f), end - Vector2(0.5f, 0.0f), end, 0.01f);
+    }
 }
 
 void NodeMapWindow::Node::Click(){
@@ -58,18 +63,38 @@ void NodeMapWindow::Node::Drag(Vector2 dir){
     position = start + dir;
 }
 
+void NodeMapWindow::Node::Connect(Node* node){
+    connNode = node;
+    offset = Vector2(0.0f, 0.15f);
+}
+
+void NodeMapWindow::Node::Connect(Node* node, Vector2 offset){
+    connNode = node;
+    this->offset = offset;
+}
+
 NodeMapWindow::NodeMapWindow(){
     uiMgr = new UIManager();
     nodeMgr = new UIManager();
 
     uiMgr->AddButton(new MoveButton(Vector2(0.85f, 0.85f), 0.12f, this));
 
-    nodeMgr->AddButton(new Node(this));
+    Node* n1 = new Node(Vector2(-0.5f, 0.5f), this);
+    Node* n2 = new Node(Vector2(-0.5f, -0.5f), this);
+    nodeMgr->AddButton(n1);
+    nodeMgr->AddButton(n2);
+    n1->Connect(n2);
+
+    basicMenu = new Menu();
+    basicMenu->AddItem(new MenuItem(L"添加节点", MENUITEM_LAMBDA_TRANS(NodeMapWindow)[](NodeMapWindow* window){
+        //TODO 等待添加实现
+    }, this));
 }
 
 NodeMapWindow::~NodeMapWindow(){
     if(uiMgr) delete uiMgr;
     if(nodeMgr) delete nodeMgr;
+    if(basicMenu) delete basicMenu;
 }
 
 void NodeMapWindow::SetFrame(HWND hWnd){
@@ -98,12 +123,18 @@ void NodeMapWindow::OnRender(){
 
     // UI绘制
     uiMgr->Render();
-    nodeMgr->Render();
 
-    glDisable(GL_LINE_STIPPLE);
-    glLineWidth(1.0f);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    GLUtils::DrawBezier(Vector2(-1.0f, -1.0f), Vector2(0.0f, -1.0f), Vector2(0.0f, 1.0f), Vector2(1.0f, 1.0f), 0.01f);
+    nodeMgr->RenderTransform();
+
+    glPushMatrix();
+    glTranslatef(-viewPos.x, -viewPos.y, 0.0f);
+
+    nodeMgr->RenderRaw();
+
+    glPopMatrix();
+
+    if (menu)
+        menu->Render(menuPos.x, menuPos.y);
 }
 
 void NodeMapWindow::OnCreate(){}
@@ -111,8 +142,7 @@ void NodeMapWindow::OnCreate(){}
 void NodeMapWindow::OnClose(){}
 
 void NodeMapWindow::OnResize(int x, int y){
-    cliSize.x = x;
-    cliSize.y = y;
+    UpdateWindowSize(x, y);
 }
 
 void NodeMapWindow::UpdateCursor(int x, int y){
@@ -122,14 +152,50 @@ void NodeMapWindow::UpdateCursor(int x, int y){
     nodeMgr->CursorMove(cursorPos);
 }
 
+void NodeMapWindow::UpdateWindowSize(int x, int y){
+    cliSize.x = x;
+    cliSize.y = y;
+    aspect = (float)cliSize.x / cliSize.y;
+    if (menu != NULL){
+        menu->SetClientSize(cliSize);
+    }
+}
+
+void NodeMapWindow::SetMenu(Menu* m){
+    if (menu){
+        menu->ResetSelect();
+    }
+    menu = m;
+    if (menu != NULL){
+        menu->SetClientSize(cliSize);
+        menu->CursorMove(cursorPos);
+        menuPos = cursorPos;
+    }
+}
+
 void NodeMapWindow::OnMouseMove(int x, int y){
     UpdateCursor(x, y);
 }
 
 void NodeMapWindow::OnLeftDown(int x, int y){
-    uiMgr->LeftDown();
-    nodeMgr->LeftDown();
-    UpdateCursor(x, y);
+    // 菜单消失
+    if (menu){
+        if (menu->InChainMenu(cursorPos - menuPos)){
+            menu->Click();
+        }
+        SetMenu(NULL);
+        return;
+    }
+    // UI交互
+    if (uiMgr->LeftDown()){
+        UpdateCursor(x, y);
+        return;
+    }
+    // 节点交互
+    if (nodeMgr->LeftDown()){
+        UpdateCursor(x, y);
+        return;
+    }
 }
 
 void NodeMapWindow::OnLeftUp(int x, int y){
@@ -138,7 +204,9 @@ void NodeMapWindow::OnLeftUp(int x, int y){
     UpdateCursor(x, y);
 }
 
-void NodeMapWindow::OnRightDown(int x, int y){}
+void NodeMapWindow::OnRightDown(int x, int y){
+    SetMenu(basicMenu);
+}
 
 void NodeMapWindow::OnRightUp(int x, int y){}
 
@@ -152,6 +220,7 @@ void NodeMapWindow::OnFocus(){
 
 void NodeMapWindow::OnKillFocus(){
     focus = false;
+    SetMenu(NULL);
 }
 
 void NodeMapWindow::OnMouseWheel(int delta){}

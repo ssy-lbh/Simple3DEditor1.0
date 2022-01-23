@@ -15,6 +15,10 @@ void UIManager::AddButton(IButton* btn){
     buttons.Add(btn);
 }
 
+void UIManager::DeleteButton(IButton* btn){
+    buttons.Remove(btn);
+}
+
 void UIManager::CursorMove(Vector2 pos){
     cursorPos = pos;
     if (leftDown && cur != NULL){
@@ -65,8 +69,38 @@ void UIManager::Render(){
     });
 }
 
+void UIManager::RenderRaw(){
+    buttons.Foreach([](IButton* btn){
+        btn->Render();
+    });
+}
+
+void UIManager::RenderTransform(float aspect){
+    aspect = 1.0f / aspect;
+
+    glEnable(GL_ALPHA_TEST);
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glMatrixMode(GL_PROJECTION);
+    glOrtho(-aspect, aspect, -1.0, 1.0, 0.0, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
+void UIManager::RenderTransform(){
+    glEnable(GL_ALPHA_TEST);
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glMatrixMode(GL_PROJECTION);
+    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
 bool UIManager::LeftDown(){
-    if (cur != NULL){
+    if (cur){
         leftDown = true;
         cur->Click();
         return true;
@@ -75,7 +109,10 @@ bool UIManager::LeftDown(){
 }
 
 bool UIManager::LeftUp(){
-    cur = NULL;
+    if (cur){
+        cur->ClickEnd();
+        cur = NULL;
+    }
     if (leftDown){
         leftDown = false;
         return true;
@@ -89,6 +126,7 @@ bool IButton::Trigger(Vector2 pos){ return false; }
 void IButton::Hover(){}
 void IButton::Click(){}
 void IButton::Drag(Vector2 dir){}
+void IButton::ClickEnd(){}
 void IButton::Leave(){}
 void IButton::Render(){}
 
