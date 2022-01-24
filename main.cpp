@@ -144,12 +144,12 @@ void MainWindow::SelectTool::OnLeftUp(){
         window->selectedPoints.Clear();
         return;
     }
-    //TODO 等待实现范围框�?
+    //TODO 等待实现范围框选
     window->mesh->FindScreenRect(
         window->camPos,
         window->camDir,
-        0.1f,
-        100.0f,
+        window->camDis * 0.02,
+        window->camDis * 20.0,
         start.x * window->aspect,
         end.x * window->aspect,
         start.y,
@@ -224,7 +224,7 @@ MainWindow::~MainWindow(){
 void MainWindow::InitCamera(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(90.0, ViewportManager::inst->GetAspect(), 0.1, 100.0);
+    gluPerspective(90.0, ViewportManager::inst->GetAspect(), camDis * 0.02, camDis * 20.0);
 
     Vector3 camPos = camLookat - camDir * Vector3::forward * camDis;
     Vector3 camUp = camDir * Vector3::up;
@@ -240,7 +240,7 @@ void MainWindow::InitLight0(){
     GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat mat_shininess[] = { 50.0 };
 
-    GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };  //最后一�?参数�?0表示该光源是directional�?
+    GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };  //最后一个参数为0表示该光源是directional的
 
     GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -263,7 +263,7 @@ void MainWindow::RenderModelView(){
     glEnable(GL_ALPHA_TEST);
     glDisable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
-    //glDisable(GL_DITHER); 这几�?就一直不�?
+    //glDisable(GL_DITHER);
     //glDisable(GL_FOG);
     //glDisable(GL_LOGIC_OP);
 
@@ -273,7 +273,7 @@ void MainWindow::RenderModelView(){
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-    // xyz坐标�?
+    // xyz坐标线
     glDisable(GL_LIGHTING);
     glEnable(GL_LINE_SMOOTH);
     glDisable(GL_LINE_STIPPLE);
@@ -300,12 +300,12 @@ void MainWindow::RenderModelView(){
     glEnd();
 
     InitLight0(); //TODO 后续光照设置法线
-    glEnable(GL_LIGHTING);     //开�?光照系统
+    glEnable(GL_LIGHTING);     //开启光照系统
     glEnable(GL_LIGHT0);       //开启GL_LIGHT0光源
 
     mesh->Render();
 
-    // 已选择点绘�?
+    // 已选择点绘制
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
     glPointSize(8.0f);
@@ -324,7 +324,7 @@ void MainWindow::OnRender(){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //TODO 做好Container组件，实现UI尺�?�坐标�?�理
+    //TODO 做好Container组件，实现UI尺寸坐标管理
     RenderModelView();
 
     // 工具绘制
@@ -498,12 +498,16 @@ bool MainWindow::LoadMesh(Mesh* mesh){
         return false;
     }
     inputText[MAX_PATH] = '\0';
+    return LoadMesh(mesh, inputText);
+}
+
+bool MainWindow::LoadMesh(Mesh* mesh, const wchar_t* path){
     BY_HANDLE_FILE_INFORMATION fileInfo;
     char* fileData;
     size_t fileLen, filePtr = 0;
     List<Vertex*> vert;
     HANDLE hFile = CreateFileW(
-        inputText,
+        path,
         GENERIC_READ,
         FILE_SHARE_READ,
         NULL,
@@ -531,7 +535,7 @@ bool MainWindow::LoadMesh(Mesh* mesh){
                 DebugLog("Object Annotation %s", fileData + filePtr + 1);
             }else if (__builtin_sscanf(fileData + filePtr, "v %f %f %f", &pos.x, &pos.y, &pos.z)){
                 //DebugLog("Vertex %f %f %f", pos.x, pos.y, pos.z);
-                vert.Add(mesh->AddVertex(pos));
+                vert.Add(mesh->AddVertex(pos + camLookat));
             }else if (__builtin_sscanf(fileData + filePtr, "f %d %d %d", &v1, &v2, &v3)){
                 //DebugLog("Fragment %d %d %d", v1, v2, v3);
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
@@ -887,6 +891,10 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
+void MainWindow::OnDropFile(const wchar_t* path){
+    LoadMesh(mesh, path);
+}
+
 void MainWindow::OnCreate(HWND hWnd){
     this->hWnd = hWnd;
 }
@@ -1025,10 +1033,22 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
                 window->OnMenuAccel(LOWORD(wParam), true);
             break;
         default:
-            //因为组件模型不同，�?�接口可能弃�?
+            //因为组件模型不同，该接口可能弃用
             //window->OnControl(HIWORD(wParam), LOWORD(wParam), (HWND)(DWORD_PTR)lParam);
             break;
         }
+        break;
+    case WM_DROPFILES:{
+        UINT cnt;
+        wchar_t path[MAX_PATH];
+
+        cnt = DragQueryFileW((HDROP)wParam, 0xFFFFFFFF, NULL, 0);
+        for (UINT i = 0; i < cnt; i++){
+            DragQueryFileW((HDROP)wParam, i, path, MAX_PATH);
+            window->OnDropFile(path);
+        }
+        DragFinish((HDROP)wParam);
+    }
         break;
     }
 }
@@ -1036,7 +1056,7 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
 void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     RECT cliRect;
     GetClientRect(hWnd, &cliRect);
-    // 事件�?鼠标坐标上下需反转
+    // 事件中鼠标坐标上下需反转
     int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
     switch (uMsg){
     case WM_CREATE:
@@ -1088,6 +1108,18 @@ void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
             break;
         }
         break;
+    case WM_DROPFILES:{
+        UINT cnt;
+        wchar_t path[MAX_PATH];
+
+        cnt = DragQueryFileW((HDROP)wParam, 0xFFFFFFFF, NULL, 0);
+        for (UINT i = 0; i < cnt; i++){
+            DragQueryFileW((HDROP)wParam, i, path, MAX_PATH);
+            window->OnDropFile(path);
+        }
+        DragFinish((HDROP)wParam);
+    }
+        break;
     }
 }
 
@@ -1095,10 +1127,13 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     //FireEvent(mainWnd, mainRect, hWnd, uMsg, wParam, lParam);
     //FireEvent(mainWnd2, mainRect2, hWnd, uMsg, wParam, lParam);
 
-    //将事件发送至对应整个窗口的组件�?�器
+    //将事件发送至对应整个窗口的组件容器
     FireEvent(container, hWnd, uMsg, wParam, lParam);
 
     switch (uMsg){
+    case WM_CREATE:
+        DragAcceptFiles(hWnd, TRUE);
+        break;
     case WM_CLOSE:
         PostQuitMessage(0);
         break;
@@ -1119,29 +1154,12 @@ LRESULT CALLBACK Main::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 void Main::OnResize(int x, int y){
     //TODO 这里做子窗口大小管理
-    // mainRect.left = 0;
-    // mainRect.right = x >> 1;
-    // mainRect.bottom = 0;
-    // mainRect.top = y;
-    // mainWnd->OnResize(mainRect.right - mainRect.left, mainRect.top - mainRect.bottom);
-
-    // mainRect2.left = x >> 1;
-    // mainRect2.right = x;
-    // mainRect2.bottom = 0;
-    // mainRect2.top = y;
-    // mainWnd2->OnResize(mainRect2.right - mainRect2.left, mainRect2.top - mainRect2.bottom);
     container->OnResize(x, y);
 }
 
 void Main::OnRender(){
     ViewportManager::inst->Reset(hWnd);
     ViewportManager::inst->EnableScissor();
-
-    // ViewportManager::inst->SetViewport(mainRect);
-    // mainWnd->OnRender();
-
-    // ViewportManager::inst->SetViewport(mainRect2);
-    // mainWnd2->OnRender();
 
     container->OnRender();
 }
@@ -1175,7 +1193,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     //DebugLog("OpenGL Extensions %s", glGetString(GL_EXTENSIONS));
 
     glInitASCIIFont();
-    glSelectFont(12, GB2312_CHARSET, "�?�?雅黑");
+    glSelectFont(12, GB2312_CHARSET, "微软雅黑");
     // 楷体_GB2312
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
