@@ -37,6 +37,9 @@ void LRContainer::OnClose(){
 }
 
 void LRContainer::OnResize(int x, int y){
+    if (x == 0 && y == 0){
+        return;
+    }
     size.x = x;
     size.y = y;
     dis = GLUtils::Clamp(dis, 0.0f, size.x);
@@ -204,6 +207,9 @@ void UDContainer::OnClose(){
 }
 
 void UDContainer::OnResize(int x, int y){
+    if (x == 0 && y == 0){
+        return;
+    }
     size.x = x;
     size.y = y;
     dis = GLUtils::Clamp(dis, 0.0f, size.y);

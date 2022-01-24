@@ -57,7 +57,7 @@ private:
 
     ITool* curTool = NULL;
 
-    char inputText[MAX_PATH + 1];
+    wchar_t inputText[MAX_PATH + 1];
     bool inputConfirm;
 
     class MoveButton : public IButton {
@@ -172,6 +172,7 @@ public:
     virtual void OnMenuAccel(int id, bool accel) override;
 
     void OnInsSave();
+    void OnInsLoad();
     void OnInsMove();
     void OnInsTopology();
     void OnInsSelectColor();
@@ -180,7 +181,9 @@ public:
     void AddPoint();
     void DeletePoint();
     bool SaveMesh(Mesh* mesh);
+    bool LoadMesh(Mesh* mesh);
     void AboutBox();
+    Vector3 GetLookPosition(Vector3 pos);
 };
 
 class Main {

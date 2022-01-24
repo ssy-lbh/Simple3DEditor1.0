@@ -185,6 +185,8 @@ void Mesh::Render(){
 
 void Mesh::WriteToOBJ(HANDLE hFile){
     size_t index = 0;
+    WriteFile(hFile, "# StereoVision 3D Editor\n", 25, NULL, NULL);
+    WriteFile(hFile, "# Author: lin-boheng@gitee.com\n", 31, NULL, NULL);
     vertices.Foreach<size_t*>([](Vertex* v, size_t* i){
         v->index = ++*i;
     }, &index);
@@ -194,10 +196,69 @@ void Mesh::WriteToOBJ(HANDLE hFile){
         len = __builtin_snprintf(tmp, MAX_PATH, "v %f %f %f\n", v->pos.x, v->pos.y, v->pos.z);
         WriteFile(hFile, tmp, len, &len, NULL);
     }, hFile);
+    // 纹理UV坐标
+    // vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
+    //     char tmp[MAX_PATH + 1];
+    //     DWORD len;
+    //     len = __builtin_snprintf(tmp, MAX_PATH, "vt %f %f %f\n", v->uv.x, v->uv.y, v->uv.z);
+    //     WriteFile(hFile, tmp, len, &len, NULL);
+    // }, hFile);
+    // 顶点法线
+    // vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
+    //     char tmp[MAX_PATH + 1];
+    //     DWORD len;
+    //     len = __builtin_snprintf(tmp, MAX_PATH, "vn %f %f %f\n", v->normal.x, v->normal.y, v->normal.z);
+    //     WriteFile(hFile, tmp, len, &len, NULL);
+    // }, hFile);
     faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
         char tmp[MAX_PATH + 1];
         DWORD len;
         len = __builtin_snprintf(tmp, MAX_PATH, "f %d %d %d\n", f->vertices.GetItem(0)->index, f->vertices.GetItem(1)->index, f->vertices.GetItem(2)->index);
         WriteFile(hFile, tmp, len, &len, NULL);
     }, hFile);
+}
+
+size_t Mesh::FindScreenRect(Vector3 camPos, Quaternion camDir, float zNear, float zFar, float x1, float x2, float y1, float y2, List<Vertex*>& result){
+    struct {
+        size_t cnt;
+        Vector3 camPos;
+        Quaternion camDir;
+        float zNear;
+        float zFar;
+        float x1, x2, y1, y2;
+        List<Vertex*>* list;
+    }pack;
+    pack.cnt = 0;
+    pack.camPos = camPos;
+    pack.camDir = camDir;
+    pack.zNear = zNear;
+    pack.zFar = zFar;
+    if (x1 < x2){
+        pack.x1 = x1;
+        pack.x2 = x2;
+    }else{
+        pack.x1 = x2;
+        pack.x2 = x1;
+    }
+    if (y1 < y2){
+        pack.y1 = y1;
+        pack.y2 = y2;
+    }else{
+        pack.y1 = y2;
+        pack.y2 = y1;
+    }
+    pack.list = &result;
+    vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
+        Vector3 lookPos = (-m->camDir) * (p->pos - m->camPos);
+        if (lookPos.y < m->zNear || lookPos.y > m->zFar){
+            return;
+        }
+        float x = lookPos.x / lookPos.y;
+        float z = lookPos.z / lookPos.y;
+        if (x >= m->x1 && x <= m->x2 && z >= m->y1 && z <= m->y2){
+            m->cnt++;
+            m->list->Add(p);
+        }
+    }, &pack);
+    return pack.cnt;
 }

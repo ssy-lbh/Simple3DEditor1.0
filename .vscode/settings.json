@@ -7,5 +7,6 @@
     ],
     "C_Cpp.default.includePath": [
         "C:\\Program Files (x86)\\OpenGL glew-2.2.0\\include"
-    ]
+    ],
+    "git.ignoreLimitWarning": true
 }

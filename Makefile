@@ -3,7 +3,7 @@
 GCC			= g++.exe
 RM			= del
 CFLAGS 		= 
-LIB			= -lopengl32 -lglu32 -lgdi32
+LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32
 RES  		= windres.exe
 MKDIR   	= mkdir
 

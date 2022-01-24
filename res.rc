@@ -35,7 +35,7 @@ BEGIN
     END
 END
 
-IDI_ICON1 ICON              "res/icon/app_icon.ico"
+IDI_ICON1 ICON              "res/icon/app_icon2.ico"
 
 IDC_MOVE CURSOR             "res/cursor/move.cur"
 
@@ -78,10 +78,9 @@ BEGIN
     "/",            IDM_ABOUT,              ASCII, ALT, NOINVERT
     "?",            IDM_ABOUT,              ASCII, ALT, NOINVERT
     "^S",           IDM_SAVE,               ASCII, NOINVERT
+    "^L",           IDM_LOAD,               ASCII, NOINVERT
     VK_ESCAPE,      IDM_EXIT,               VIRTKEY, NOINVERT
-    
-    "q",            IDM_ROTATE_CCW,         ASCII, NOINVERT
-    "e",            IDM_ROTATE_CW,          ASCII, NOINVERT
+
     "p",            IDM_POINT,              ASCII, NOINVERT
     "f",            IDM_TOPOLOGY,           ASCII, NOINVERT
     "g",            IDM_MOVE,               ASCII, NOINVERT
@@ -97,6 +96,7 @@ BEGIN
     "Z",            IDM_OP_PLANE_Z,         ASCII, NOINVERT
 
     VK_DELETE,      IDM_DELETE,             VIRTKEY, NOINVERT
+    "e",            IDM_EXCLUDE,            ASCII, NOINVERT
 
     "A",            IDM_MENU_BASIC,         ASCII, NOINVERT
 
