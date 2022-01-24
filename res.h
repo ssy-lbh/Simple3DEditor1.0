@@ -2,6 +2,8 @@
 
 #define IDI_ICON1 101
 
+#define IDC_MOVE 201
+
 #define IDC_MENU 301
 
 #define IDM_SAVE 401
