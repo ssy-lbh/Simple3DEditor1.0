@@ -21,12 +21,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "lin-boheng@gitee.com"
             VALUE "FileDescription", "3D±à¼­Æ÷"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "FileVersion", "1.0.3"
             VALUE "InternalName", "StereoVision.exe"
-            VALUE "LegalCopyright", "Copyright (C) 2021"
+            VALUE "LegalCopyright", "Copyright (C) lin-boheng@gitee.com 2021"
             VALUE "OriginalFilename", "main.exe"
             VALUE "ProductName", "StereoVision"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductVersion", "1.0.3"
         END
     END
     BLOCK "VarFileInfo"

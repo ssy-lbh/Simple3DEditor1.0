@@ -425,7 +425,7 @@ void MainWindow::UpdateDistance(){
 void MainWindow::GetTextInput(){
     static MainWindow* window;
     window = this;
-    DialogBox(hInst, MAKEINTRESOURCE(IDD_TEXT), hWnd, [](HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
+    DialogBox(hInst, MAKEINTRESOURCE(IDD_TEXT), hWnd, (DLGPROC)[]__attribute__((__stdcall__))(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
         switch (uMsg){
         case WM_INITDIALOG:
             return (INT_PTR)TRUE;
@@ -517,7 +517,8 @@ bool MainWindow::LoadMesh(Mesh* mesh){
     }
     DebugLog("Loading Object");
     GetFileInformationByHandle(hFile, &fileInfo);
-    fileLen = ((size_t)fileInfo.nFileSizeHigh << 32) | fileInfo.nFileSizeLow;
+    //fileLen = ((size_t)fileInfo.nFileSizeHigh << 32) | fileInfo.nFileSizeLow;
+    fileLen = fileInfo.nFileSizeLow;
     fileData = new char[fileLen + 1];
     fileData[fileLen] = '\0';
     ReadFile(hFile, fileData, fileLen, NULL, NULL);
@@ -546,7 +547,7 @@ bool MainWindow::LoadMesh(Mesh* mesh){
 }
 
 void MainWindow::AboutBox(){
-    DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, [](HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
+    DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, []__attribute__((__stdcall__))(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
         switch (uMsg){
         case WM_INITDIALOG:
             return (INT_PTR)TRUE;
@@ -743,17 +744,17 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         mesh->AddVertex(v6);
         mesh->AddVertex(v7);
         mesh->AddVertex(v8);
-        // XY对�??
+        // XY对角
         mesh->AddTriFace(v1, v2, v4);
         mesh->AddTriFace(v1, v3, v4);
         mesh->AddTriFace(v5, v6, v8);
         mesh->AddTriFace(v5, v7, v8);
-        // XZ对�??
+        // XZ对角
         mesh->AddTriFace(v1, v2, v6);
         mesh->AddTriFace(v1, v5, v6);
         mesh->AddTriFace(v3, v4, v8);
         mesh->AddTriFace(v3, v7, v8);
-        // YZ对�??
+        // YZ对角
         mesh->AddTriFace(v1, v3, v7);
         mesh->AddTriFace(v1, v5, v7);
         mesh->AddTriFace(v2, v4, v8);
@@ -880,7 +881,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         SetTool(new SelectTool(this));
         break;
     }
-    // 当前操作的命�?
+    // 当前操作的命令
     if (curOp){
         curOp->OnCommand(id);
     }
