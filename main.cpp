@@ -891,6 +891,7 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     //FireEvent(mainWnd, mainRect, hWnd, uMsg, wParam, lParam);
     //FireEvent(mainWnd2, mainRect2, hWnd, uMsg, wParam, lParam);
 
+    //将事件发送至对应整个窗口的组件容器
     FireEvent(container, hWnd, uMsg, wParam, lParam);
 
     switch (uMsg){
