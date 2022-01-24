@@ -15,6 +15,7 @@ private:
     Vector2 size;
     Vector2 cursorPos;
     bool adjustPos = false;
+    bool dragEnable = true;
 
 public:
     LRContainer(IWindow* lWindow, IWindow* rWindow);
@@ -41,6 +42,9 @@ public:
     void FreeWindow();
     IWindow* GetLeftWindow();
     IWindow* GetRightWindow();
+    void EnableDrag();
+    void DisableDrag();
+    bool DragEnabled();
 };
 
 class UDContainer : public IWindow {
@@ -53,6 +57,7 @@ private:
     Vector2 size;
     Vector2 cursorPos;
     bool adjustPos = false;
+    bool dragEnable = true;
 
 public:
     UDContainer(IWindow* uWindow, IWindow* dWindow);
@@ -79,6 +84,9 @@ public:
     void FreeWindow();
     IWindow* GetUpWindow();
     IWindow* GetDownWindow();
+    void EnableDrag();
+    void DisableDrag();
+    bool DragEnabled();
 };
 
 #endif

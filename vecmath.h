@@ -14,6 +14,7 @@
 #define Ceil(x) (__builtin_ceil(x))
 #define Round(x) (__builtin_round(x))
 #define SinCos(x, y, z) (__builtin_sincos(x, y, z))
+#define SinCosf(x, y, z) (__builtin_sincosf(x, y, z))
 #define Asin(x) (__builtin_asin(x))
 #define Acos(x) (__builtin_acos(x))
 #define Atan(x) (__builtin_atan(x))

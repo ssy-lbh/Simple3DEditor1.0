@@ -183,6 +183,15 @@ MainWindow::MainWindow(HINSTANCE hInstance) : hInst(hInstance) {
     subMenu->AddItem(new MenuItem(L"平面", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
         window->OnMenuAccel(IDM_MESH_BASIC_PLANE, false);
     }, this));
+    subMenu->AddItem(new MenuItem(L"圆柱体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        window->OnMenuAccel(IDM_MESH_BASIC_CYLINDER, false);
+    }, this));
+    subMenu->AddItem(new MenuItem(L"球体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        window->OnMenuAccel(IDM_MESH_BASIC_SPHERE, false);
+    }, this));
+    subMenu->AddItem(new MenuItem(L"胶囊体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        window->OnMenuAccel(IDM_MESH_BASIC_CAPSULE, false);
+    }, this));
     basicMenu->AddItem(new MenuItem(L"添加", subMenu));
 
     uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
@@ -232,11 +241,6 @@ void MainWindow::InitLight0(){
 }
 
 void MainWindow::RenderModelView(){
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClearDepth(1.0);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_AUTO_NORMAL);
     glEnable(GL_BLEND);
@@ -297,27 +301,34 @@ void MainWindow::RenderModelView(){
     });
     glEnd();
     glDisable(GL_POINT_SMOOTH);
+}
 
+void MainWindow::OnRender(){
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearDepth(1.0);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //TODO 做好Container组件，实现UI尺寸坐标管理
+    RenderModelView();
+
+    // 工具绘制
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glEnable(GL_ALPHA_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
     glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     if (curTool)
         curTool->OnRender();
-}
-
-void MainWindow::OnRender(){
-    //TODO 做好Container组件，实现UI尺寸坐标管理
-    RenderModelView();
 
     // UI绘制
     // 在之前进行3D渲染使用投影变换后，需要参数aspect
-    uiMgr->Render(ViewportManager::inst->GetAspect());
+    uiMgr->Render();
 
     if (menu)
         menu->Render(menuPos.x, menuPos.y);
@@ -669,6 +680,116 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         mesh->AddTriFace(v1, v5, v7);
         mesh->AddTriFace(v2, v4, v8);
         mesh->AddTriFace(v2, v6, v8);
+    }
+        break;
+    case IDM_MESH_BASIC_CYLINDER:{
+        const int loops = 2;
+        const int round = 30;
+        Vertex** vert = new Vertex*[loops * round];
+        Vertex* ceil;
+        Vertex* floor;
+        ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 1.0f) + camLookat);
+        floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -1.0f) + camLookat);
+        for (int i = 0; i < loops; i++){
+            for (int j = 0; j < round; j++){
+                float vsin, vcos;
+                SinCosf(2.0f * PI * j / round, &vsin, &vcos);
+                vert[i * round + j] = mesh->AddVertex(Vector3(vcos, vsin, 2.0f * i / (loops - 1) - 1.0f) + camLookat);
+            }
+        }
+        for (int i = 0; i < loops - 1; i++){
+            for (int j = 0; j < round; j++){
+                int k = (j == round - 1 ? 0 : j + 1);
+                mesh->AddTriFace(vert[i * round + j], vert[i * round + k], vert[(i + 1) * round + k]);
+                mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
+            }
+        }
+        for (int i = 0; i < round; i++){
+            int j = (i == round - 1 ? 0 : i + 1);
+            mesh->AddTriFace(floor, vert[i], vert[j]);
+            mesh->AddTriFace(ceil, vert[(loops - 1) * round + i], vert[(loops - 1) * round + j]);
+        }
+    }
+        break;
+    case IDM_MESH_BASIC_SPHERE:{
+        const int loops = 10;
+        const int round = 10;
+        Vertex** vert = new Vertex*[loops * round];
+        Vertex* ceil;
+        Vertex* floor;
+        ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 1.0f) + camLookat);
+        floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -1.0f) + camLookat);
+        for (int i = 0; i < loops; i++){
+            for (int j = 0; j < round; j++){
+                float height, radius;
+                float vsin, vcos;
+                SinCosf(PI * (i + 1) / (loops + 1) - 0.5f * PI, &height, &radius);
+                SinCosf(2.0f * PI * j / round, &vsin, &vcos);
+                vert[i * round + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height) + camLookat);
+            }
+        }
+        for (int i = 0; i < loops - 1; i++){
+            for (int j = 0; j < round; j++){
+                int k = (j == round - 1 ? 0 : j + 1);
+                mesh->AddTriFace(vert[i * round + j], vert[i * round + k], vert[(i + 1) * round + k]);
+                mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
+            }
+        }
+        for (int i = 0; i < round; i++){
+            int j = (i == round - 1 ? 0 : i + 1);
+            mesh->AddTriFace(floor, vert[i], vert[j]);
+            mesh->AddTriFace(ceil, vert[(loops - 1) * round + i], vert[(loops - 1) * round + j]);
+        }
+    }
+        break;
+    case IDM_MESH_BASIC_CAPSULE:{
+        const int ballLoops = 5;
+        const int cylinderLoops = 10;
+        const int loops = 2 * ballLoops + cylinderLoops;
+        const int round = 10;
+        Vertex** vert = new Vertex*[loops * round];
+        Vertex* ceil;
+        Vertex* floor;
+        ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 2.0f) + camLookat);
+        floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -2.0f) + camLookat);
+        for (int i = 0; i < loops; i++){
+            if (i >= ballLoops && i < loops - ballLoops){
+                int loopCnt = i - ballLoops;
+                for (int j = 0; j < round; j++){
+                    float vsin, vcos;
+                    SinCosf(2.0f * PI * j / round, &vsin, &vcos);
+                    vert[i * round + j] = mesh->AddVertex(Vector3(vcos, vsin, 2.0f * loopCnt / (cylinderLoops - 1) - 1.0f) + camLookat);
+                }
+            }else if (i < ballLoops){
+                for (int j = 0; j < round; j++){
+                    float height, radius;
+                    float vsin, vcos;
+                    SinCosf(-0.5f * PI * (ballLoops - i - 1) / ballLoops, &height, &radius);
+                    SinCosf(2.0f * PI * j / round, &vsin, &vcos);
+                    vert[i * round + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height - 1.0f) + camLookat);
+                }
+            }else{
+                for (int j = 0; j < round; j++){
+                    float height, radius;
+                    float vsin, vcos;
+                    SinCosf(0.5f * PI * (i - ballLoops - cylinderLoops) / ballLoops, &height, &radius);
+                    SinCosf(2.0f * PI * j / round, &vsin, &vcos);
+                    vert[i * round + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height + 1.0f) + camLookat);
+                }
+            }
+        }
+        for (int i = 0; i < loops - 1; i++){
+            for (int j = 0; j < round; j++){
+                int k = (j == round - 1 ? 0 : j + 1);
+                mesh->AddTriFace(vert[i * round + j], vert[i * round + k], vert[(i + 1) * round + k]);
+                mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
+            }
+        }
+        for (int i = 0; i < round; i++){
+            int j = (i == round - 1 ? 0 : i + 1);
+            mesh->AddTriFace(floor, vert[i], vert[j]);
+            mesh->AddTriFace(ceil, vert[(loops - 1) * round + i], vert[(loops - 1) * round + j]);
+        }
     }
         break;
     case IDM_MENU_BASIC:
