@@ -128,6 +128,7 @@ public:
     virtual void OnKillFocus();
     virtual void OnMouseWheel(int delta);
     virtual void OnMenuAccel(int id, bool accel);
+    virtual void OnDropFile(const wchar_t* path);
 };
 
 #endif

@@ -4,7 +4,6 @@
 #include "uimgr.h"
 
 //TODO 容器期望集成选择夹、拆分窗口、属性窗口等容器
-
 class LRContainer : public IWindow {
 private:
     IWindow* lWindow;
@@ -37,6 +36,7 @@ public:
     virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
+    virtual void OnDropFile(const wchar_t* path) override;
 
     void UpdateFocus();
     void FreeWindow();
@@ -79,6 +79,7 @@ public:
     virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
+    virtual void OnDropFile(const wchar_t* path) override;
 
     void UpdateFocus();
     void FreeWindow();

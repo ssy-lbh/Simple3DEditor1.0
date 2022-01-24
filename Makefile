@@ -69,7 +69,8 @@ merge:
 # git reset --hard HEAD^ 回退到上一版本
 # git reset --hard id (id 在 git reflog 里，用于撤销)
 
-#$(SIGNTOOL) sign /f $(CERT) /p $(PASSWORD) $(OUTPUT)
+# $(SIGNTOOL) sign /f $(CERT) /p $(PASSWORD) $(OUTPUT)
+# signtool.exe sign /f "D:\code\.Certificate\lin-boheng.pfx" /p ... main.exe
 sign: $(OUTPUT)
 	$(SIGNTOOL) timestamp /t $(TIMESTAMP) $(OUTPUT)
 

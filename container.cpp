@@ -126,6 +126,11 @@ void LRContainer::OnMenuAccel(int id, bool accel){
         focus->OnMenuAccel(id, accel);
 }
 
+void LRContainer::OnDropFile(const wchar_t* path){
+    if (focus)
+        focus->OnDropFile(path);
+}
+
 void LRContainer::UpdateFocus(){
     if (cursorPos.x < dis){
         if (focus != lWindow){
@@ -295,6 +300,11 @@ void UDContainer::OnMouseWheel(int delta){
 void UDContainer::OnMenuAccel(int id, bool accel){
     if (focus)
         focus->OnMenuAccel(id, accel);
+}
+
+void UDContainer::OnDropFile(const wchar_t* path){
+    if (focus)
+        focus->OnDropFile(path);
 }
 
 void UDContainer::UpdateFocus(){

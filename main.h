@@ -170,6 +170,7 @@ public:
     virtual void OnFocus() override;
     virtual void OnKillFocus() override;
     virtual void OnMenuAccel(int id, bool accel) override;
+    virtual void OnDropFile(const wchar_t* path) override;
 
     void OnInsSave();
     void OnInsLoad();
@@ -182,6 +183,7 @@ public:
     void DeletePoint();
     bool SaveMesh(Mesh* mesh);
     bool LoadMesh(Mesh* mesh);
+    bool LoadMesh(Mesh* mesh, const wchar_t* path);
     void AboutBox();
     Vector3 GetLookPosition(Vector3 pos);
 };
