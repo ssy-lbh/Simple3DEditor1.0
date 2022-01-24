@@ -4,7 +4,6 @@
 #include "log.h"
 
 LRContainer::LRContainer(IWindow* lWindow, IWindow* rWindow) : lWindow(lWindow), rWindow(rWindow) {}
-
 LRContainer::~LRContainer(){}
 
 bool LRContainer::IsFocus(){
@@ -152,3 +151,69 @@ IWindow* LRContainer::GetLeftWindow(){
 IWindow* LRContainer::GetRightWindow(){
     return rWindow;
 }
+
+UDContainer::UDContainer(IWindow* uWindow, IWindow* dWindow) : uWindow(uWindow), dWindow(dWindow) {}
+UDContainer::~UDContainer(){}
+
+bool IsFocus(){
+    return focus != NULL;
+}
+
+void OnRender(){
+    RECT tmp;
+
+    tmp = ViewportManager::inst->GetCurrentRect();
+    tmp.bottom = tmp.bottom + dis;
+    ViewportManager::inst->PushViewport(tmp);
+    uWindow->OnRender();
+    ViewportManager::inst->PopViewport();
+
+    tmp = ViewportManager::inst->GetCurrentRect();
+    tmp.top = tmp.bottom + dis;
+    ViewportManager::inst->PushViewport(tmp);
+    dWindow->OnRender();
+    ViewportManager::inst->PopViewport();
+}
+
+void OnCreate(HWND hWnd){
+    uWindow->OnCreate(hWnd);
+    dWindow->OnCreate(hWnd);
+}
+
+void OnClose(){
+    uWindow->OnClose();
+    dWindow->OnClose();
+}
+
+void OnResize(int x, int y){
+    size.x = x;
+    size.y = y;
+    dis = GLUtils::Clamp(dis, 0.0f, size.y);
+    uWindow->OnResize(x, y - dis);
+    dWindow->OnResize(x, dis);
+}
+
+void OnMouseMove(int x, int y){
+    cursorPos.x = x;
+    cursorPos.y = y;
+    if (adjustPos){
+        SetCursor(LoadCursor(NULL, IDC_SIZENS));
+        dis = x;
+        lWindow->OnResize(dis, size.y);
+        rWindow->OnResize(size.x - dis, size.y);
+        return;
+    }
+    if (focus)
+        focus->OnMouseMove(right ? x - dis : x, y);
+}
+
+void OnLeftDown(int x, int y){}
+void OnLeftUp(int x, int y){}
+void OnRightDown(int x, int y){}
+void OnRightUp(int x, int y){}
+void OnMouseHover(int key, int x, int y){}
+void OnMouseLeave(){}
+void OnFocus(){}
+void OnKillFocus(){}
+void OnMouseWheel(int delta){}
+void OnMenuAccel(int id, bool accel){}
