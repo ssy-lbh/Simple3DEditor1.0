@@ -970,9 +970,10 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     //DebugLog("OpenGL Extensions %s", glGetString(GL_EXTENSIONS));
 
     glInitASCIIFont();
-    glSelectFont(12, GB2312_CHARSET, "楷体_GB2312");
+    glSelectFont(12, GB2312_CHARSET, "微软雅黑");
+    // 楷体_GB2312
 
-    DebugLog("OpenGL Use Font %s", "GB2312");
+    DebugLog("OpenGL Use Encoding %s", "GB2312");
 
     HACCEL hAccelTable = LoadAccelerators(hInst, MAKEINTRESOURCE(IDC_MENU));
 
