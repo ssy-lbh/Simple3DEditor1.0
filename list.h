@@ -119,6 +119,13 @@ public:
         return data[ptr - 1];
     }
 
+    T& operator[](size_t index){
+        if (index >= ptr){
+            DebugError("Critical: List<T>::operator[] When Index Overflow");
+        }
+        return data[index];
+    }
+
     T& GetItem(size_t index){
         //DebugLog("GetItem %d", index);
         if (index >= ptr){

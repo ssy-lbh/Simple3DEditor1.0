@@ -18,8 +18,8 @@
 // #define IDM_RIGHT 502
 // #define IDM_UP 503
 // #define IDM_DOWN 504
-#define IDM_ROTATE_CCW 505
-#define IDM_ROTATE_CW 506
+// #define IDM_ROTATE_CCW 505
+// #define IDM_ROTATE_CW 506
 #define IDM_POINT 507
 #define IDM_TOPOLOGY 508
 #define IDM_MOVE 509
@@ -33,7 +33,8 @@
 #define IDM_OP_PLANE_Y 517
 #define IDM_OP_PLANE_Z 518
 #define IDM_DELETE 519
-#define IDM_MENU_BASIC 520
+#define IDM_EXCLUDE 520
+#define IDM_MENU_BASIC 521
 #define IDM_TOOL_EMPTY 550
 #define IDM_TOOL_SELECTBOX 551
 

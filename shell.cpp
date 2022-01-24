@@ -53,7 +53,30 @@ bool ShellEInputWindow(InputAttribute* attrs, int cnt){
     WaitForSingleObject(psInfo.hProcess, INFINITE);
     CloseHandle(psInfo.hProcess);
     CloseHandle(psInfo.hThread);
-    //TODO 宸ュ叿绋嬪簭淇ソ鍐嶅啓杈撳嚭瑙ｆ瀽
+    //TODO 工具程序修好再写输出解析
     CloseHandle(hAttr);
+    return true;
+}
+
+bool ShellFileSelectWindow(HWND hWnd, wchar_t* buffer, size_t len, const wchar_t* lpstrFilter, DWORD flags){
+    OPENFILENAMEW ofn;
+
+    RtlZeroMemory(&ofn, sizeof(OPENFILENAME));
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    ofn.hwndOwner = hWnd;
+    // 结尾为两个'\0'，每两个字符串构成描述、过滤对，增加过滤模板可用';'分隔多个模板
+    ofn.lpstrFilter = lpstrFilter;
+    ofn.lpstrInitialDir = L"./";
+    ofn.lpstrFile = buffer;
+    ofn.nMaxFile = len;
+    ofn.nFilterIndex = 0;
+    //标志如果是多选要加上OFN_ALLOWMULTISELECT 
+    ofn.Flags = flags;
+    if (!GetOpenFileNameW(&ofn)){
+        return false;
+    }
+    if (*buffer == '\0'){
+        return false;
+    }
     return true;
 }

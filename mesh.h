@@ -16,6 +16,7 @@ public:
     Mesh();
     ~Mesh();
     Vertex* Find(Vector3 ori, Vector3 dir);
+    size_t FindScreenRect(Vector3 camPos, Quaternion camDir, float zNear, float zFar, float x1, float x2, float y1, float y2, List<Vertex*>& result);
     Vertex* AddVertex(Vector3 pos);
     Vertex* AddVertex(Vertex* v);
     Edge* AddEdge(Vertex* v1, Vertex* v2);

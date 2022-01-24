@@ -140,7 +140,22 @@ void MainWindow::SelectTool::OnLeftDown(){
 
 void MainWindow::SelectTool::OnLeftUp(){
     leftDown = false;
-    //TODO 等待实现范围框选
+    if (start.x == end.x && start.y == end.y){
+        window->selectedPoints.Clear();
+        return;
+    }
+    //TODO 等待实现范围框�?
+    window->mesh->FindScreenRect(
+        window->camPos,
+        window->camDir,
+        0.1f,
+        100.0f,
+        start.x * window->aspect,
+        end.x * window->aspect,
+        start.y,
+        end.y,
+        window->selectedPoints
+    );
 }
 
 void MainWindow::SelectTool::OnMove(){
@@ -225,7 +240,7 @@ void MainWindow::InitLight0(){
     GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat mat_shininess[] = { 50.0 };
 
-    GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };  //最后一个参数为0表示该光源是directional的
+    GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };  //最后一�?参数�?0表示该光源是directional�?
 
     GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -248,7 +263,7 @@ void MainWindow::RenderModelView(){
     glEnable(GL_ALPHA_TEST);
     glDisable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
-    //glDisable(GL_DITHER); 这几个就一直不用
+    //glDisable(GL_DITHER); 这几�?就一直不�?
     //glDisable(GL_FOG);
     //glDisable(GL_LOGIC_OP);
 
@@ -258,7 +273,7 @@ void MainWindow::RenderModelView(){
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-    // xyz坐标轴
+    // xyz坐标�?
     glDisable(GL_LIGHTING);
     glEnable(GL_LINE_SMOOTH);
     glDisable(GL_LINE_STIPPLE);
@@ -285,12 +300,12 @@ void MainWindow::RenderModelView(){
     glEnd();
 
     InitLight0(); //TODO 后续光照设置法线
-    glEnable(GL_LIGHTING);     //开启光照系统
+    glEnable(GL_LIGHTING);     //开�?光照系统
     glEnable(GL_LIGHT0);       //开启GL_LIGHT0光源
 
     mesh->Render();
 
-    // 已选择点绘制
+    // 已选择点绘�?
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
     glPointSize(8.0f);
@@ -309,7 +324,7 @@ void MainWindow::OnRender(){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //TODO 做好Container组件，实现UI尺寸坐标管理
+    //TODO 做好Container组件，实现UI尺�?�坐标�?�理
     RenderModelView();
 
     // 工具绘制
@@ -422,7 +437,7 @@ void MainWindow::GetTextInput(){
             switch (LOWORD(wParam)){
             case IDOK:
                 window->inputConfirm = true;
-                GetDlgItemText(hDlg, IDC_TEXT_EDIT, window->inputText, MAX_PATH);
+                GetDlgItemTextW(hDlg, IDC_TEXT_EDIT, window->inputText, MAX_PATH);
                 EndDialog(hDlg, LOWORD(wParam));
                 break;
             case IDCANCEL:
@@ -435,7 +450,7 @@ void MainWindow::GetTextInput(){
         return (INT_PTR)FALSE;
     });
     if (inputConfirm == false){
-        *inputText = '\0';
+        *inputText = L'\0';
     }
 }
 
@@ -453,9 +468,12 @@ void MainWindow::DeletePoint(){
 }
 
 bool MainWindow::SaveMesh(Mesh* mesh){
-    GetTextInput();
+    if (!ShellFileSelectWindow(hWnd, inputText, MAX_PATH, L"3D对象(*.obj)\0*.obj\0", OFN_PATHMUSTEXIST | OFN_EXPLORER)){
+        DebugError("Stop Saving");
+        return false;
+    }
     inputText[MAX_PATH] = '\0';
-    HANDLE hFile = CreateFile(
+    HANDLE hFile = CreateFileW(
         inputText,
         GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -465,10 +483,64 @@ bool MainWindow::SaveMesh(Mesh* mesh){
         NULL
     );
     if (hFile == INVALID_HANDLE_VALUE){
-        DebugError("OpenFile %s Error!", inputText);
+        DebugError("OpenFile Error!");
         return false;
     }
+    DebugLog("Saving Object");
     mesh->WriteToOBJ(hFile);
+    CloseHandle(hFile);
+    return true;
+}
+
+bool MainWindow::LoadMesh(Mesh* mesh){
+    if (!ShellFileSelectWindow(hWnd, inputText, MAX_PATH, L"3D对象(*.obj)\0*.obj\0", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER)){
+        DebugLog("Stop Loading");
+        return false;
+    }
+    inputText[MAX_PATH] = '\0';
+    BY_HANDLE_FILE_INFORMATION fileInfo;
+    char* fileData;
+    size_t fileLen, filePtr = 0;
+    List<Vertex*> vert;
+    HANDLE hFile = CreateFileW(
+        inputText,
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+    if (hFile == INVALID_HANDLE_VALUE){
+        DebugError("OpenFile Error!");
+        return false;
+    }
+    DebugLog("Loading Object");
+    GetFileInformationByHandle(hFile, &fileInfo);
+    fileLen = ((size_t)fileInfo.nFileSizeHigh << 32) | fileInfo.nFileSizeLow;
+    fileData = new char[fileLen + 1];
+    fileData[fileLen] = '\0';
+    ReadFile(hFile, fileData, fileLen, NULL, NULL);
+    for (size_t i = 0; i < fileLen; i++){
+        Vector3 pos;
+        int v1, v2, v3;
+        if (fileData[i] == '\n' || i == fileLen){
+            fileData[i] = '\0';
+            if (fileData[filePtr] == '#'){
+                DebugLog("Object Annotation %s", fileData + filePtr + 1);
+            }else if (__builtin_sscanf(fileData + filePtr, "v %f %f %f", &pos.x, &pos.y, &pos.z)){
+                //DebugLog("Vertex %f %f %f", pos.x, pos.y, pos.z);
+                vert.Add(mesh->AddVertex(pos));
+            }else if (__builtin_sscanf(fileData + filePtr, "f %d %d %d", &v1, &v2, &v3)){
+                //DebugLog("Fragment %d %d %d", v1, v2, v3);
+                mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
+            }else{
+                DebugLog("Object File Unknown Line %s", fileData + filePtr);
+            }
+            filePtr = i + 1;
+        }
+    }
+    delete[] fileData;
     CloseHandle(hFile);
     return true;
 }
@@ -524,6 +596,10 @@ void MainWindow::OnInsSave(){
     SaveMesh(mesh);
 }
 
+void MainWindow::OnInsLoad(){
+    LoadMesh(mesh);
+}
+
 void MainWindow::OnInsMove(){
     curOp = new MoveOperation(this);
     curOp->OnEnter();
@@ -546,10 +622,10 @@ void MainWindow::OnInsTopology(){
     case 1:
         break;
     case 2:
-        mesh->AddEdge(selectedPoints.GetItem(0), selectedPoints.GetItem(1));
+        mesh->AddEdge(selectedPoints[0], selectedPoints[1]);
         break;
     case 3:
-        mesh->AddTriFace(selectedPoints.GetItem(0), selectedPoints.GetItem(1), selectedPoints.GetItem(2));
+        mesh->AddTriFace(selectedPoints[0], selectedPoints[1], selectedPoints[2]);
         break;
     default:
         break;
@@ -602,19 +678,14 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     case IDM_SAVE:
         OnInsSave();
         break;
+    case IDM_LOAD:
+        OnInsLoad();
+        break;
     case IDM_EXIT:
         PostQuitMessage(0);
         break;
     case IDM_ABOUT:
         AboutBox();
-        break;
-    case IDM_ROTATE_CCW:
-        camDir *= Quaternion::AxisAngle(Vector3::forward, -10.0f);
-        UpdateRotation();
-        break;
-    case IDM_ROTATE_CW:
-        camDir *= Quaternion::AxisAngle(Vector3::forward, 10.0f);
-        UpdateRotation();
         break;
     case IDM_POINT:
         AddPoint();
@@ -635,6 +706,13 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     case IDM_DELETE:
         DeletePoint();
         break;
+    case IDM_EXCLUDE:{
+        for (size_t i = 0; i < selectedPoints.Size(); i++){
+            selectedPoints[i] = mesh->AddVertex(selectedPoints[i]->pos);
+        }
+        OnInsMove();
+        break;
+    }
     case IDM_MESH_BASIC_PLANE:{
         Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, 0.0f) + camLookat);
         Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, 0.0f) + camLookat);
@@ -665,17 +743,17 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         mesh->AddVertex(v6);
         mesh->AddVertex(v7);
         mesh->AddVertex(v8);
-        // XY对角
+        // XY对�??
         mesh->AddTriFace(v1, v2, v4);
         mesh->AddTriFace(v1, v3, v4);
         mesh->AddTriFace(v5, v6, v8);
         mesh->AddTriFace(v5, v7, v8);
-        // XZ对角
+        // XZ对�??
         mesh->AddTriFace(v1, v2, v6);
         mesh->AddTriFace(v1, v5, v6);
         mesh->AddTriFace(v3, v4, v8);
         mesh->AddTriFace(v3, v7, v8);
-        // YZ对角
+        // YZ对�??
         mesh->AddTriFace(v1, v3, v7);
         mesh->AddTriFace(v1, v5, v7);
         mesh->AddTriFace(v2, v4, v8);
@@ -802,7 +880,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         SetTool(new SelectTool(this));
         break;
     }
-    // 当前操作的命令
+    // 当前操作的命�?
     if (curOp){
         curOp->OnCommand(id);
     }
@@ -823,6 +901,10 @@ void MainWindow::OnFocus(){
 void MainWindow::OnKillFocus(){
     focus = false;
     SetMenu(NULL);
+}
+
+Vector3 MainWindow::GetLookPosition(Vector3 pos){
+    return (-camDir) * (pos - camPos);
 }
 
 Main::Main(){}
@@ -865,7 +947,7 @@ HWND Main::CreateWnd(){
 void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     RECT cliRect;
     GetClientRect(hWnd, &cliRect);
-    // 事件中鼠标坐标上下需反转
+    // 事件�?鼠标坐标上下需反转
     int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
     switch (uMsg){
     case WM_CREATE:
@@ -942,7 +1024,7 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
                 window->OnMenuAccel(LOWORD(wParam), true);
             break;
         default:
-            //因为组件模型不同，此接口可能弃用
+            //因为组件模型不同，�?�接口可能弃�?
             //window->OnControl(HIWORD(wParam), LOWORD(wParam), (HWND)(DWORD_PTR)lParam);
             break;
         }
@@ -953,7 +1035,7 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
 void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     RECT cliRect;
     GetClientRect(hWnd, &cliRect);
-    // 事件中鼠标坐标上下需反转
+    // 事件�?鼠标坐标上下需反转
     int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
     switch (uMsg){
     case WM_CREATE:
@@ -1012,7 +1094,7 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     //FireEvent(mainWnd, mainRect, hWnd, uMsg, wParam, lParam);
     //FireEvent(mainWnd2, mainRect2, hWnd, uMsg, wParam, lParam);
 
-    //将事件发送至对应整个窗口的组件容器
+    //将事件发送至对应整个窗口的组件�?�器
     FireEvent(container, hWnd, uMsg, wParam, lParam);
 
     switch (uMsg){
@@ -1092,7 +1174,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     //DebugLog("OpenGL Extensions %s", glGetString(GL_EXTENSIONS));
 
     glInitASCIIFont();
-    glSelectFont(12, GB2312_CHARSET, "微软雅黑");
+    glSelectFont(12, GB2312_CHARSET, "�?�?雅黑");
     // 楷体_GB2312
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
