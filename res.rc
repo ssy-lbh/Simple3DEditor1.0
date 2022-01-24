@@ -79,6 +79,7 @@ BEGIN
     "?",            IDM_ABOUT,              ASCII, ALT, NOINVERT
     "^S",           IDM_SAVE,               ASCII, NOINVERT
     VK_ESCAPE,      IDM_EXIT,               VIRTKEY, NOINVERT
+    
     "q",            IDM_ROTATE_CCW,         ASCII, NOINVERT
     "e",            IDM_ROTATE_CW,          ASCII, NOINVERT
     "p",            IDM_POINT,              ASCII, NOINVERT
@@ -87,14 +88,20 @@ BEGIN
     "r",            IDM_ROTATE,             ASCII, NOINVERT
     "s",            IDM_SIZE,               ASCII, NOINVERT
     "c",            IDM_SELECT_COLOR,       ASCII, NOINVERT
+
     "x",            IDM_OP_X,               ASCII, NOINVERT
     "y",            IDM_OP_Y,               ASCII, NOINVERT
     "z",            IDM_OP_Z,               ASCII, NOINVERT
     "X",            IDM_OP_PLANE_X,         ASCII, NOINVERT
     "Y",            IDM_OP_PLANE_Y,         ASCII, NOINVERT
     "Z",            IDM_OP_PLANE_Z,         ASCII, NOINVERT
+
     VK_DELETE,      IDM_DELETE,             VIRTKEY, NOINVERT
+
     "A",            IDM_MENU_BASIC,         ASCII, NOINVERT
+
+    "1",            IDM_TOOL_EMPTY,         ASCII, ALT, NOINVERT
+    "2",            IDM_TOOL_SELECTBOX,     ASCII, ALT, NOINVERT
 END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62

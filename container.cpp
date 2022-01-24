@@ -61,7 +61,7 @@ void LRContainer::OnMouseMove(int x, int y){
 void LRContainer::OnLeftDown(int x, int y){
     cursorPos.x = x;
     cursorPos.y = y;
-    if (Abs(x - dis) < 4.0f){
+    if (dragEnable && Abs(x - dis) < 4.0f){
         adjustPos = true;
         SetCursor(LoadCursor(NULL, IDC_SIZEWE));
         return;
@@ -73,9 +73,7 @@ void LRContainer::OnLeftDown(int x, int y){
 void LRContainer::OnLeftUp(int x, int y){
     cursorPos.x = x;
     cursorPos.y = y;
-    if (adjustPos){
-        adjustPos = false;
-    }
+    adjustPos = false;
     if (focus)
         focus->OnLeftUp(right ? x - dis : x, y);
 }
@@ -128,17 +126,17 @@ void LRContainer::OnMenuAccel(int id, bool accel){
 void LRContainer::UpdateFocus(){
     if (cursorPos.x < dis){
         if (focus != lWindow){
-            lWindow->OnFocus();
             if (focus)
                 focus->OnKillFocus();
+            lWindow->OnFocus();
         }
         focus = lWindow;
         right = false;
     }else{
         if (focus != rWindow){
-            rWindow->OnFocus();
             if (focus)
                 focus->OnKillFocus();
+            rWindow->OnFocus();
         }
         focus = rWindow;
         right = true;
@@ -158,6 +156,18 @@ IWindow* LRContainer::GetLeftWindow(){
 
 IWindow* LRContainer::GetRightWindow(){
     return rWindow;
+}
+
+void LRContainer::EnableDrag(){
+    dragEnable = true;
+}
+
+void LRContainer::DisableDrag(){
+    dragEnable = false;
+}
+
+bool LRContainer::DragEnabled(){
+    return dragEnable;
 }
 
 UDContainer::UDContainer(IWindow* uWindow, IWindow* dWindow) : uWindow(uWindow), dWindow(dWindow) {}
@@ -216,21 +226,36 @@ void UDContainer::OnMouseMove(int x, int y){
 }
 
 void UDContainer::OnLeftDown(int x, int y){
+    cursorPos.x = x;
+    cursorPos.y = y;
+    if (dragEnable && Abs(y - dis) < 4.0f){
+        adjustPos = true;
+        SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+        return;
+    }
+    UpdateFocus();
     if (focus)
         focus->OnLeftDown(x, up ? y - dis : y);
 }
 
 void UDContainer::OnLeftUp(int x, int y){
+    cursorPos.x = x;
+    cursorPos.y = y;
+    adjustPos = false;
     if (focus)
         focus->OnLeftUp(x, up ? y - dis : y);
 }
 
 void UDContainer::OnRightDown(int x, int y){
+    cursorPos.x = x;
+    cursorPos.y = y;
     if (focus)
         focus->OnRightDown(x, up ? y - dis : y);
 }
 
 void UDContainer::OnRightUp(int x, int y){
+    cursorPos.x = x;
+    cursorPos.y = y;
     if (focus)
         focus->OnRightUp(x, up ? y - dis : y);
 }
@@ -269,17 +294,17 @@ void UDContainer::OnMenuAccel(int id, bool accel){
 void UDContainer::UpdateFocus(){
     if (cursorPos.y < dis){
         if (focus != dWindow){
-            dWindow->OnFocus();
             if (focus)
                 focus->OnKillFocus();
+            dWindow->OnFocus();
         }
         focus = dWindow;
         up = false;
     }else{
         if (focus != uWindow){
-            uWindow->OnFocus();
             if (focus)
                 focus->OnKillFocus();
+            uWindow->OnFocus();
         }
         focus = uWindow;
         up = true;
@@ -299,4 +324,16 @@ IWindow* UDContainer::GetUpWindow(){
 
 IWindow* UDContainer::GetDownWindow(){
     return dWindow;
+}
+
+void UDContainer::EnableDrag(){
+    dragEnable = true;
+}
+
+void UDContainer::DisableDrag(){
+    dragEnable = false;
+}
+
+bool UDContainer::DragEnabled(){
+    return dragEnable;
 }

@@ -152,6 +152,7 @@ void Menu::Render(float x, float y){
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
     glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
