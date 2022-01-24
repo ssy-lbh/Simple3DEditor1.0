@@ -49,7 +49,7 @@ private:
     IWindow* dWindow;
     LONG dis;
     IWindow* focus = NULL;
-    bool right = false;
+    bool up = false;
     Vector2 size;
     Vector2 cursorPos;
     bool adjustPos = false;
@@ -78,7 +78,7 @@ public:
     void UpdateFocus();
     void FreeWindow();
     IWindow* GetUpWindow();
-    IWindow* GetRightWindow();
+    IWindow* GetDownWindow();
 };
 
 #endif
