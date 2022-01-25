@@ -113,6 +113,56 @@ private:
         virtual void OnUndo() override;
     };
 
+    class RotateOperation : public IOperation {
+    private:
+        struct RotateInfo {
+            Vertex* vert;
+            Vector3 pos;
+        };
+
+        Vector2 start;
+        List<RotateInfo> rotateInfo;
+        bool x, y, z;
+        MainWindow* main;
+        Vector3 center;
+        Vector2 screenCenter;
+        float dis;
+        Quaternion rotate;
+    public:
+        RotateOperation(MainWindow* main);
+        virtual ~RotateOperation() override;
+        virtual void OnEnter() override;
+        virtual void OnMove() override;
+        virtual void OnCommand(UINT id) override;
+        virtual void OnConfirm() override;
+        virtual void OnUndo() override;
+    };
+
+    class SizeOperation : public IOperation {
+    private:
+        struct SizeInfo {
+            Vertex* vert;
+            Vector3 pos;
+        };
+
+        Vector3 center;
+        Vector2 start;
+        List<SizeInfo> sizeInfo;
+        bool x, y, z;
+        MainWindow* main;
+        Vector2 screenCenter;
+        float startSize;
+        float scale;
+    public:
+        SizeOperation(MainWindow* main);
+        virtual ~SizeOperation() override;
+        virtual void OnEnter() override;
+        virtual void OnMove() override;
+        virtual void OnCommand(UINT id) override;
+        virtual void OnConfirm() override;
+        virtual void OnUndo() override;
+    };
+
     class EmptyTool : public ITool {
     private:
         MainWindow* window;
@@ -148,6 +198,7 @@ public:
 
     void RenderModelView();
     void SetMenu(Menu* m);
+    void SetOperation(IOperation* op);
     void SetTool(ITool* tool);
 
     void UpdateWindowSize(int x, int y);
@@ -174,7 +225,6 @@ public:
 
     void OnInsSave();
     void OnInsLoad();
-    void OnInsMove();
     void OnInsTopology();
     void OnInsSelectColor();
 
@@ -186,6 +236,7 @@ public:
     bool LoadMesh(Mesh* mesh, const wchar_t* path);
     void AboutBox();
     Vector3 GetLookPosition(Vector3 pos);
+    Vector2 GetScreenPosition(Vector3 pos);
 };
 
 class Main {

@@ -85,11 +85,11 @@ void MainWindow::MoveOperation::OnMove(){
     if (moveInfo.Size() > 0){
         mov = (main->cursorPos - start) * main->camDis;
         delta = main->camRight * mov.x + main->camUp * mov.y;
-        delta = Vector3(delta.x * x, delta.y * y, delta.z * z);
+        delta = Vector3(x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
         moveInfo.Foreach<Vector3*>([](MoveInfo info, Vector3* offset){
             info.vert->pos = info.pos + *offset;
         }, &delta);
-        DebugLog("MoveOperation OnMove %f %f %f", delta.x * x, delta.y * y, delta.z * z);
+        DebugLog("MoveOperation OnMove %f %f %f", x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
     }
 }
 
@@ -105,6 +105,119 @@ void MainWindow::MoveOperation::OnUndo(){
 }
 
 void MainWindow::MoveOperation::OnCommand(UINT id){
+    switch (id){
+    case IDM_OP_X: x = true; y = z = false; break;
+    case IDM_OP_Y: y = true; z = x = false; break;
+    case IDM_OP_Z: z = true; x = y = false; break;
+    case IDM_OP_PLANE_X: x = false; y = z = true; break;
+    case IDM_OP_PLANE_Y: y = false; z = x = true; break;
+    case IDM_OP_PLANE_Z: z = false; x = y = true; break;
+    }
+}
+
+MainWindow::RotateOperation::RotateOperation(MainWindow* main) : main(main) {}
+MainWindow::RotateOperation::~RotateOperation(){}
+
+void MainWindow::RotateOperation::OnEnter(){
+    DebugLog("RotateOperation OnEnter");
+    x = y = z = true;
+    start = main->cursorPos;
+    center = Vector3::zero;
+    if (main->selectedPoints.Size() > 0){
+        main->selectedPoints.Foreach<RotateOperation*>([](Vertex* v, RotateOperation* op){
+            op->rotateInfo.Add({v, v->pos});
+            op->center += v->pos;
+        }, this);
+        center /= main->selectedPoints.Size();
+        screenCenter = main->GetScreenPosition(center);
+        dis = (main->cursorPos - screenCenter).Magnitude();
+    }
+}
+
+void MainWindow::RotateOperation::OnMove(){
+    if (rotateInfo.Size() > 0){
+        Vector3 rotateVec = main->camForward * ((main->cursorPos - screenCenter).Magnitude() - dis);
+        rotateVec = Vector3(x ? rotateVec.x : 0.0f, y ? rotateVec.y : 0.0f, z ? rotateVec.z : 0.0f);
+        if (rotateVec.SqrMagnitude() > 0.0f){
+            rotate = Quaternion::AxisAngle(rotateVec.Normal(), rotateVec.Magnitude() * 360.0f);
+        }else{
+            rotate = Quaternion::one;
+        }
+        rotateInfo.Foreach<RotateOperation*>([](RotateInfo info, RotateOperation* op){
+            info.vert->pos = op->center + op->rotate * (info.pos - op->center);
+        }, this);
+        DebugLog("RotateOperation Rotate %f %f %f", x ? rotateVec.x : 0.0f, y ? rotateVec.y : 0.0f, z ? rotateVec.z : 0.0f);
+    }
+}
+
+void MainWindow::RotateOperation::OnConfirm(){
+    DebugLog("RotateOperation OnConfirm");
+}
+
+void MainWindow::RotateOperation::OnUndo(){
+    DebugLog("RotateOperation OnUndo");
+    rotateInfo.Foreach([](RotateInfo info){
+        info.vert->pos = info.pos;
+    });
+}
+
+void MainWindow::RotateOperation::OnCommand(UINT id){
+    switch (id){
+    case IDM_OP_X: x = true; y = z = false; break;
+    case IDM_OP_Y: y = true; z = x = false; break;
+    case IDM_OP_Z: z = true; x = y = false; break;
+    case IDM_OP_PLANE_X: x = false; y = z = true; break;
+    case IDM_OP_PLANE_Y: y = false; z = x = true; break;
+    case IDM_OP_PLANE_Z: z = false; x = y = true; break;
+    }
+}
+
+MainWindow::SizeOperation::SizeOperation(MainWindow* main) : main(main) {}
+MainWindow::SizeOperation::~SizeOperation(){}
+
+void MainWindow::SizeOperation::OnEnter(){
+    DebugLog("SizeOperation OnEnter");
+    x = y = z = true;
+    start = main->cursorPos;
+    center = Vector3::zero;
+    if (main->selectedPoints.Size() > 0){
+        main->selectedPoints.Foreach<SizeOperation*>([](Vertex* v, SizeOperation* op){
+            op->sizeInfo.Add({v, v->pos});
+            op->center += v->pos;
+        }, this);
+        center /= main->selectedPoints.Size();
+        screenCenter = main->GetScreenPosition(center);
+        startSize = (main->cursorPos - screenCenter).Magnitude();
+    }
+}
+
+void MainWindow::SizeOperation::OnMove(){
+    if (sizeInfo.Size() > 0){
+        scale = (main->cursorPos - screenCenter).Magnitude() / startSize;
+        sizeInfo.Foreach<SizeOperation*>([](SizeInfo info, SizeOperation* op){
+            Vector3 res = op->center + (info.pos - op->center) * op->scale;
+            info.vert->pos = Vector3(
+                op->x ? res.x : info.pos.x,
+                op->y ? res.y : info.pos.y,
+                op->z ? res.z : info.pos.z
+            );
+        }, this);
+        DebugLog("SizeOperation Scale %f", scale);
+    }
+}
+
+void MainWindow::SizeOperation::OnConfirm(){
+    DebugLog("SizeOperation OnConfirm");
+}
+
+void MainWindow::SizeOperation::OnUndo(){
+    DebugLog("SizeOperation OnUndo");
+    sizeInfo.Foreach([](SizeInfo info){
+        info.vert->pos = info.pos;
+    });
+}
+
+void MainWindow::SizeOperation::OnCommand(UINT id){
     switch (id){
     case IDM_OP_X: x = true; y = z = false; break;
     case IDM_OP_Y: y = true; z = x = false; break;
@@ -361,6 +474,16 @@ void MainWindow::SetMenu(Menu* m){
     }
 }
 
+void MainWindow::SetOperation(IOperation* op){
+    if (curOp){
+        DebugLog("MainWindow::SetOperation delete curOp");
+        curOp->OnConfirm();
+        delete curOp;
+    }
+    curOp = op;
+    curOp->OnEnter();
+}
+
 void MainWindow::SetTool(ITool* tool){
     if (curTool){
         curTool->OnUnselect();
@@ -425,29 +548,34 @@ void MainWindow::UpdateDistance(){
 void MainWindow::GetTextInput(){
     static MainWindow* window;
     window = this;
-    DialogBox(hInst, MAKEINTRESOURCE(IDD_TEXT), hWnd, (DLGPROC)[]__attribute__((__stdcall__))(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
-        switch (uMsg){
-        case WM_INITDIALOG:
-            return (INT_PTR)TRUE;
-        case WM_CLOSE:
-            window->inputConfirm = false;
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        case WM_COMMAND:
-            switch (LOWORD(wParam)){
-            case IDOK:
-                window->inputConfirm = true;
-                GetDlgItemTextW(hDlg, IDC_TEXT_EDIT, window->inputText, MAX_PATH);
-                EndDialog(hDlg, LOWORD(wParam));
-                break;
-            case IDCANCEL:
+    DialogBox(hInst, MAKEINTRESOURCE(IDD_TEXT), hWnd,
+        (DLGPROC)[]
+#ifndef _WIN64
+        __attribute__((__stdcall__))
+#endif
+        (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
+            switch (uMsg){
+            case WM_INITDIALOG:
+                return (INT_PTR)TRUE;
+            case WM_CLOSE:
                 window->inputConfirm = false;
                 EndDialog(hDlg, LOWORD(wParam));
-                break;
+                return (INT_PTR)TRUE;
+            case WM_COMMAND:
+                switch (LOWORD(wParam)){
+                case IDOK:
+                    window->inputConfirm = true;
+                    GetDlgItemTextW(hDlg, IDC_TEXT_EDIT, window->inputText, MAX_PATH);
+                    EndDialog(hDlg, LOWORD(wParam));
+                    break;
+                case IDCANCEL:
+                    window->inputConfirm = false;
+                    EndDialog(hDlg, LOWORD(wParam));
+                    break;
+                }
+                return (INT_PTR)TRUE;
             }
-            return (INT_PTR)TRUE;
-        }
-        return (INT_PTR)FALSE;
+            return (INT_PTR)FALSE;
     });
     if (inputConfirm == false){
         *inputText = L'\0';
@@ -506,6 +634,7 @@ bool MainWindow::LoadMesh(Mesh* mesh, const wchar_t* path){
     char* fileData;
     size_t fileLen, filePtr = 0;
     List<Vertex*> vert;
+
     HANDLE hFile = CreateFileW(
         path,
         GENERIC_READ,
@@ -525,20 +654,28 @@ bool MainWindow::LoadMesh(Mesh* mesh, const wchar_t* path){
     fileLen = fileInfo.nFileSizeLow;
     fileData = new char[fileLen + 1];
     fileData[fileLen] = '\0';
+
     ReadFile(hFile, fileData, fileLen, NULL, NULL);
+
     for (size_t i = 0; i < fileLen; i++){
-        Vector3 pos;
+        Vector3 vec;
         int v1, v2, v3;
+        int v_idx = 0, t_idx = 0, n_idx = 0;
         if (fileData[i] == '\n' || i == fileLen){
             fileData[i] = '\0';
             if (fileData[filePtr] == '#'){
                 DebugLog("Object Annotation %s", fileData + filePtr + 1);
-            }else if (__builtin_sscanf(fileData + filePtr, "v %f %f %f", &pos.x, &pos.y, &pos.z)){
+            }else if (__builtin_sscanf(fileData + filePtr, "v %f %f %f", &vec.x, &vec.y, &vec.z)){
                 //DebugLog("Vertex %f %f %f", pos.x, pos.y, pos.z);
-                vert.Add(mesh->AddVertex(pos + camLookat));
+                vert.Add(mesh->AddVertex(vec + camLookat));
+                v_idx++;
             }else if (__builtin_sscanf(fileData + filePtr, "f %d %d %d", &v1, &v2, &v3)){
                 //DebugLog("Fragment %d %d %d", v1, v2, v3);
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
+            }else if (__builtin_sscanf(fileData + filePtr, "vt %f %f %f", &vec.x, &vec.y, &vec.z)){
+                vert[++t_idx]->uv = vec;
+            }else if (__builtin_sscanf(fileData + filePtr, "vn %f %f %f", &vec.x, &vec.y, &vec.z)){
+                vert[++n_idx]->normal = vec;
             }else{
                 DebugLog("Object File Unknown Line %s", fileData + filePtr);
             }
@@ -546,23 +683,30 @@ bool MainWindow::LoadMesh(Mesh* mesh, const wchar_t* path){
         }
     }
     delete[] fileData;
+
     CloseHandle(hFile);
+
     return true;
 }
 
 void MainWindow::AboutBox(){
-    DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, []__attribute__((__stdcall__))(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
-        switch (uMsg){
-        case WM_INITDIALOG:
-            return (INT_PTR)TRUE;
-        case WM_COMMAND:
-            if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL){
-                EndDialog(hDlg, LOWORD(wParam));
+    DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd,
+        (DLGPROC)[]
+#ifndef _WIN64
+        __attribute__((__stdcall__))
+#endif
+        (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
+            switch (uMsg){
+            case WM_INITDIALOG:
                 return (INT_PTR)TRUE;
+            case WM_COMMAND:
+                if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL){
+                    EndDialog(hDlg, LOWORD(wParam));
+                    return (INT_PTR)TRUE;
+                }
+                break;
             }
-            break;
-        }
-        return (INT_PTR)FALSE;
+            return (INT_PTR)FALSE;
     });
 }
 
@@ -603,11 +747,6 @@ void MainWindow::OnInsSave(){
 
 void MainWindow::OnInsLoad(){
     LoadMesh(mesh);
-}
-
-void MainWindow::OnInsMove(){
-    curOp = new MoveOperation(this);
-    curOp->OnEnter();
 }
 
 void MainWindow::OnInsSelectColor(){
@@ -699,11 +838,13 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         OnInsTopology();
         break;
     case IDM_MOVE:
-        OnInsMove();
+        SetOperation(new MoveOperation(this));
         break;
     case IDM_ROTATE:
+        SetOperation(new RotateOperation(this));
         break;
     case IDM_SIZE:
+        SetOperation(new SizeOperation(this));
         break;
     case IDM_SELECT_COLOR:
         OnInsSelectColor();
@@ -715,7 +856,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         for (size_t i = 0; i < selectedPoints.Size(); i++){
             selectedPoints[i] = mesh->AddVertex(selectedPoints[i]->pos);
         }
-        OnInsMove();
+        SetOperation(new MoveOperation(this));
         break;
     }
     case IDM_MESH_BASIC_PLANE:{
@@ -914,6 +1055,11 @@ void MainWindow::OnKillFocus(){
 
 Vector3 MainWindow::GetLookPosition(Vector3 pos){
     return (-camDir) * (pos - camPos);
+}
+
+Vector2 MainWindow::GetScreenPosition(Vector3 pos){
+    Vector3 lookPos = (-camDir) * (pos - camPos);
+    return Vector2((lookPos.x / lookPos.y) / aspect, lookPos.z / lookPos.y);
 }
 
 Main::Main(){}
