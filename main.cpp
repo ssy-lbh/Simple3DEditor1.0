@@ -853,7 +853,8 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         DeletePoint();
         break;
     case IDM_EXCLUDE:{
-        for (size_t i = 0; i < selectedPoints.Size(); i++){
+        size_t cnt = selectedPoints.Size();
+        for (size_t i = 0; i < cnt; i++){
             selectedPoints[i] = mesh->AddVertex(selectedPoints[i]->pos);
         }
         SetOperation(new MoveOperation(this));

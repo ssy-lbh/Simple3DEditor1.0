@@ -143,6 +143,15 @@ void GLUtils::DrawRect(Vector2 p1, Vector2 p2){
     glEnd();
 }
 
+void GLUtils::DrawRect(float x1, float y1, float x2, float y2){
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(x1, y1);
+    glVertex2f(x1, y2);
+    glVertex2f(x2, y2);
+    glVertex2f(x2, y1);
+    glEnd();
+}
+
 #ifdef STB_IMAGE_IMPLEMENTATION
 GLTexture2D::GLTexture2D(const char* path){
     int x, y, channel;

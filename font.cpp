@@ -31,7 +31,8 @@ void glDrawString(const char* text){
     }
 }
 
-void glDrawCNString(const char* text){ //TODO 暂时不可用
+//TODO 暂时不可用，需要修改
+void glDrawCNString(const char* text){
     size_t wlen = 0;
     wchar_t* wstr;
 
