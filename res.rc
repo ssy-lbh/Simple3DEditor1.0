@@ -35,7 +35,7 @@ BEGIN
     END
 END
 
-IDI_ICON1 ICON              "res/icon/app_icon2.ico"
+IDI_ICON1 ICON              "res/icon/app_icon3.ico"
 
 IDC_MOVE CURSOR             "res/cursor/move.cur"
 
