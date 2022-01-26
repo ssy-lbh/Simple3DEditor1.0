@@ -1375,17 +1375,6 @@ HDC Main::hDC;
 HGLRC Main::hRC;
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
-    // InputAttribute a[4];
-    // a[0].type = InputAttribute::Type::INT;
-    // a[0].intValue = 53;
-    // a[1].type = InputAttribute::Type::FLOAT;
-    // a[1].floatValue = 0.8f;
-    // a[2].type = InputAttribute::Type::STRING;
-    // a[2].strValue = "Hello World";
-    // a[3].type = InputAttribute::Type::FLOAT;
-    // a[3].floatValue = 125.0f;
-    // DebugLog("%d", ShellEInputWindow(a, 4));
-
     Main::inst = new Main();
     int ret = Main::inst->WinMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
     delete Main::inst;

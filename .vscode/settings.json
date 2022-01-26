@@ -3,10 +3,12 @@
     "C_Cpp.default.intelliSenseMode": "windows-gcc-x64",
     "C_Cpp.default.cppStandard": "c++11",
     "C_Cpp.default.browse.path": [
-        "C:\\Program Files (x86)\\OpenGL glew-2.2.0\\include"
+        "C:\\Program Files (x86)\\OpenGL glew-2.2.0\\include",
+        "C:\\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\\include"
     ],
     "C_Cpp.default.includePath": [
-        "C:\\Program Files (x86)\\OpenGL glew-2.2.0\\include"
+        "C:\\Program Files (x86)\\OpenGL glew-2.2.0\\include",
+        "C:\\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\\include"
     ],
     "git.ignoreLimitWarning": true
 }

@@ -1,14 +1,32 @@
 # OpenGL Program Makefile
 
+# 依赖库:
+# OpenGL
+# 可能加入的依赖库:
+# OpenAL ffmpeg stb_image glfw glm glew
+
 GCC			= g++.exe
 RM			= del
-CFLAGS 		= -m64
-LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32
+CFLAGS 		= -m64\
+				-I"C:\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\include"\
+				-I"C:\Program Files (x86)\OpenGL glew-2.2.0\include"
+OFLAGS		= -m64 -s
+LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32\
+				"C:\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\lib\avcodec.lib"\
+				"C:\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\lib\avformat.lib"\
+				"C:\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\lib\avutil.lib"\
+				"C:\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\lib\swscale.lib"\
+				"C:\Program Files (x86)\OpenGL glew-2.2.0\lib\Release\x64\glew32.lib"
 RES  		= windres.exe
 MKDIR   	= mkdir
 
 BUILD_PATH	= build
-PROGOBJ		= main.o log.o vecmath.o font.o menu.o gltools.o uimgr.o mesh.o geodef.o colorboard.o nodemap.o shell.o container.o attrtable.o
+PROGOBJ		= main.o log.o vecmath.o font.o menu.o gltools.o uimgr.o mesh.o\
+				geodef.o colorboard.o nodemap.o shell.o container.o attrtable.o\
+				soundtouch\SoundTouch.o soundtouch\TDStretch.o soundtouch\RateTransposer.o\
+				soundtouch\AAFilter.o soundtouch\FIRFilter.o soundtouch\FIFOSampleBuffer.o\
+				soundtouch\PeakFinder.o soundtouch\BPMDetect.o
+EXTRAOBJ	= soundtouch\mmx_optimized.o soundtouch\sse_optimized.o soundtouch\cpu_detect_x86.o
 RESOBJ		= res.o
 OUTPUT 		= main.exe
 
@@ -27,6 +45,7 @@ TIMESTAMP 	= "http://timestamp.digicert.com"
 #TIMESTAMP 	= "http://tsa.swisssign.net"
 
 PROGOBJ 	:= $(addprefix $(BUILD_PATH)\, $(PROGOBJ))
+EXTRAOBJ 	:= $(addprefix $(BUILD_PATH)\, $(EXTRAOBJ))
 RESOBJ		:= $(addprefix $(BUILD_PATH)\, $(RESOBJ))
 
 .PHONY:all build clean run rebuild reexec commit merge sign
@@ -42,11 +61,14 @@ rebuild: clean build
 
 reexec: clean run
 
-$(OUTPUT): $(PROGOBJ) $(RESOBJ)
-	$(GCC) $(PROGOBJ) $(RESOBJ) -o $(OUTPUT) $(LIB)
+$(OUTPUT): $(PROGOBJ) $(RESOBJ) $(EXTRAOBJ)
+	$(GCC) $(PROGOBJ) $(RESOBJ) $(EXTRAOBJ) -o $(OUTPUT) $(LIB) $(OFLAGS)
 
 $(PROGOBJ): $(BUILD_PATH)\\%.o: %.cpp %.h
-	$(GCC) -c $< -o $@ $(LIB) $(CFLAGS)
+	$(GCC) -c $< -o $@ $(CFLAGS)
+
+$(EXTRAOBJ): $(BUILD_PATH)\\%.o: %.cpp
+	$(GCC) -c $< -o $@ $(CFLAGS)
 
 $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 	$(RES) -i $< -o $@
@@ -75,5 +97,5 @@ sign: $(OUTPUT)
 	$(SIGNTOOL) timestamp /t $(TIMESTAMP) $(OUTPUT)
 
 clean:
-	$(RM) $(OUTPUT) $(PROGOBJ) $(RESOBJ)
+	$(RM) $(OUTPUT) $(PROGOBJ) $(RESOBJ) $(EXTRAOBJ)
 	-$(MKDIR) build
