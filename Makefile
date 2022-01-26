@@ -7,16 +7,11 @@
 
 GCC			= g++.exe
 RM			= del
-CFLAGS 		= -m64\
-				-I"C:\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\include"\
-				-I"C:\Program Files (x86)\OpenGL glew-2.2.0\include"
+CFLAGS 		= -I"stb_image\" -I"ffmpeg\" -I"glew\" -I"openal\" -I"opengl\" -m64
 OFLAGS		= -m64 -s
 LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32\
-				"C:\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\lib\avcodec.lib"\
-				"C:\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\lib\avformat.lib"\
-				"C:\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\lib\avutil.lib"\
-				"C:\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\lib\swscale.lib"\
-				"C:\Program Files (x86)\OpenGL glew-2.2.0\lib\Release\x64\glew32.lib"
+				"ffmpeg\avcodec.lib" "ffmpeg\avformat.lib" "ffmpeg\avutil.lib" "ffmpeg\swscale.lib"\
+				"glew\glew32.lib" "openal\OpenAL32.lib"
 RES  		= windres.exe
 MKDIR   	= mkdir
 
