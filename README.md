@@ -1,14 +1,14 @@
-# Forest Eagine
+# Forest Engine
 
-## Introduct
+## Introduction
 
-An simple&elegent Open-GL based open-code 3D game template written in C++;
+An simple&elegant Open-GL based open-code 3D game template written in C++;
 
 ## Architecture
 
 1. colorboard: windowed colorboard for selecting a color
 2. font: font manager
-3. geodef: functioin definer for basic geo-elements.
+3. geodef: function definer for basic geo-elements.
 4. gltools: The CORE
 5. log: log moudle
 6. main: main window
@@ -33,7 +33,7 @@ Bugs are expected fot this project is still under development.
 ## Default hotkeys
 
 1. "q"：rotate（deprecated）
-2. "e"：counterrotate（deprecated）
+2. "e"：reverse-rotate（deprecated）
 3. "p"：add a new point
 4. "f"：add lines or planes（make point selection first!）
 5. "g"：move
