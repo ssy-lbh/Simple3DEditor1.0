@@ -3,6 +3,7 @@
 
 #include "uimgr.h"
 #include "menu.h"
+#include "gltools.h"
 
 class NodeMapWindow;
 
@@ -23,6 +24,8 @@ private:
 
     Menu* menu;
     Vector2 menuPos;
+
+    GLTexture2D* bktex;
 
     class MoveButton : public IButton {
     private:
@@ -46,6 +49,9 @@ private:
         Vector2 position;
         Node* connNode = NULL;
         Vector2 offset;
+
+        const wchar_t* name = L"node";
+
     public:
         Node(NodeMapWindow* window);
         Node(Vector2 pos, NodeMapWindow* window);

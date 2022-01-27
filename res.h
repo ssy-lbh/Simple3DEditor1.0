@@ -2,7 +2,8 @@
 
 #define IDI_ICON1 101
 
-#define IDC_MOVE 201
+#define IDC_NORMAL 201
+#define IDC_CLICKED 202
 
 #define IDC_MENU 301
 
@@ -50,3 +51,5 @@
 #define IDC_TEXT_EDIT 803
 
 #define IDR_MAINFRAME 901
+
+#define IDB_EARTH_WATER 1001

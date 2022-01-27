@@ -1,6 +1,7 @@
 #include "gltools.h"
 
 #include "vecmath.h"
+#include "log.h"
 
 #ifdef STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -143,6 +144,15 @@ void GLUtils::DrawRect(Vector2 p1, Vector2 p2){
     glEnd();
 }
 
+void GLUtils::DrawRect(float x1, float y1, float x2, float y2){
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(x1, y1);
+    glVertex2f(x1, y2);
+    glVertex2f(x2, y2);
+    glVertex2f(x2, y1);
+    glEnd();
+}
+
 #ifdef STB_IMAGE_IMPLEMENTATION
 GLTexture2D::GLTexture2D(const char* path){
     int x, y, channel;
@@ -185,7 +195,7 @@ GLTexture2D::GLTexture2D(int resid){
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
 
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); //支持4字节对齐
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4); //支持4字节对齐
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);      //S方向上贴图
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);      //T方向上贴图
@@ -193,7 +203,7 @@ GLTexture2D::GLTexture2D(int resid){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       //缩小纹理过滤方式
 	
     glTexImage2D(GL_TEXTURE_2D, 0, channel, bitmap.bmWidth, bitmap.bmHeight, 0,
-                (channel == 4 ? GL_RGBA : (channel == 3 ? GL_RGB : GL_R))
+                (channel == 4 ? GL_BGRA_EXT : (channel == 3 ? GL_BGR_EXT : GL_R))
                 , GL_UNSIGNED_BYTE, pBits);
     
     delete[] pBits;

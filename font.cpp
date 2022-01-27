@@ -26,12 +26,12 @@ void glInitASCIIFont(){
 }
 
 void glDrawString(const char* text){
-    for (; *text != '\0'; text++){
-        glCallList(font + *text);
-    }
+    glListBase(font);
+    glCallLists(strlen(text), GL_UNSIGNED_BYTE, text);
 }
 
-void glDrawCNString(const char* text){ //TODO 暂时不可用
+//TODO 暂时不可用，需要修改
+void glDrawCNString(const char* text){
     size_t wlen = 0;
     wchar_t* wstr;
 
@@ -63,4 +63,14 @@ void glDrawCNString(const wchar_t* text){
     }
 
     glDeleteLists(font, 1);
+}
+
+int glGetCNStringWidth(const wchar_t* text){
+    HDC hDC = wglGetCurrentDC();
+    size_t len = wcslen(text);
+    SIZE size;
+    
+    GetTextExtentPoint32W(hDC, text, len, &size);
+
+    return size.cx;
 }

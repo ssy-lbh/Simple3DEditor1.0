@@ -8,7 +8,7 @@ RES  		= windres.exe
 MKDIR   	= mkdir
 
 BUILD_PATH	= build
-PROGOBJ		= main.o log.o vecmath.o font.o menu.o gltools.o uimgr.o mesh.o geodef.o colorboard.o nodemap.o shell.o container.o
+PROGOBJ		= main.o log.o vecmath.o font.o menu.o gltools.o uimgr.o mesh.o geodef.o colorboard.o nodemap.o shell.o container.o attrtable.o
 RESOBJ		= res.o
 OUTPUT 		= main.exe
 
@@ -75,5 +75,5 @@ sign: $(OUTPUT)
 	$(SIGNTOOL) timestamp /t $(TIMESTAMP) $(OUTPUT)
 
 clean:
-	$(RM) $(OUTPUT) $(PROGOBJ) $(RESOBJ)
+	-$(RM) $(OUTPUT) $(PROGOBJ) $(RESOBJ)
 	-$(MKDIR) build

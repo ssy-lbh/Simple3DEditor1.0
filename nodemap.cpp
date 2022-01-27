@@ -2,8 +2,9 @@
 
 #include <gl/gl.h>
 
-#include "gltools.h"
 #include "log.h"
+#include "font.h"
+#include "res.h"
 
 NodeMapWindow::MoveButton::MoveButton(Vector2 center, float radius, NodeMapWindow* window) : center(center), radius(radius), window(window) {}
 
@@ -34,14 +35,14 @@ NodeMapWindow::Node::~Node(){}
 
 bool NodeMapWindow::Node::Trigger(Vector2 pos){
     Vector2 rela = pos - position + window->viewPos;
-    return rela.x >= 0.0f && rela.x <= 0.3f && rela.y >= 0.0f && rela.y <= 0.3f;
+    return rela.x >= 0.0f && rela.x <= 0.3f && rela.y >= -0.3f && rela.y <= 0.0f;
 }
 
 void NodeMapWindow::Node::Render(){
     glColor3f(0.05f, 0.05f, 0.05f);
     GLUtils::DrawRoundRect(
         position.x,
-        position.y,
+        position.y - 0.3f,
         0.3f,
         0.3f,
         0.05f,
@@ -51,11 +52,14 @@ void NodeMapWindow::Node::Render(){
         glDisable(GL_LINE_STIPPLE);
         glColor3f(1.0f, 1.0f, 0.2f);
         glLineWidth(1.0f);
-        Vector2 begin = Vector2(position.x + 0.3f, position.y + 0.15f);
+        Vector2 begin = Vector2(position.x + 0.3f, position.y - 0.15f);
         //DebugLog("access %p", connNode);
         Vector2 end = connNode->position + offset;
         GLUtils::DrawBezier(begin, begin + Vector2(0.3f, 0.0f), end - Vector2(0.3f, 0.0f), end, 0.01f);
     }
+    glColor3f(1.0f, 0.5f, 0.0f);
+    glRasterPos2f(position.x, position.y);
+    glDrawCNString(name);
 }
 
 void NodeMapWindow::Node::Click(){
@@ -70,7 +74,7 @@ void NodeMapWindow::Node::Drag(Vector2 dir){
 
 void NodeMapWindow::Node::Connect(Node* node){
     connNode = node;
-    offset = Vector2(0.0f, 0.15f);
+    offset = Vector2(0.0f, -0.15f);
 }
 
 void NodeMapWindow::Node::Connect(Node* node, Vector2 offset){
@@ -142,6 +146,7 @@ NodeMapWindow::~NodeMapWindow(){
     if(uiMgr) delete uiMgr;
     if(nodeMgr) delete nodeMgr;
     if(basicMenu) delete basicMenu;
+    if(bktex) delete bktex;
 }
 
 bool NodeMapWindow::IsFocus(){
@@ -163,6 +168,18 @@ void NodeMapWindow::OnRender(){
     glDisable(GL_CULL_FACE);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    if (!bktex){
+        bktex = new GLTexture2D(IDB_EARTH_WATER);
+    }
+    bktex->Enable();
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.0f, 0.0f); glVertex2f(-1.0f, -1.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, -1.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex2f(-1.0f, 1.0f);
+    glEnd();
+    bktex->Disable();
 
     // UI绘制
     uiMgr->Render();

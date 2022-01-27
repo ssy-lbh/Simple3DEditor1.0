@@ -6,5 +6,6 @@ void glInitASCIIFont();
 void glDrawString(const char* text);
 void glDrawCNString(const char* text);
 void glDrawCNString(const wchar_t* text);
+int glGetCNStringWidth(const wchar_t* text);
 
 #endif
