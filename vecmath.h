@@ -172,4 +172,9 @@ public:
     Vector3 GetAxis() const;
 };
 
+float Lerp(float a, float b, float t);
+Vector2 Lerp(Vector2 a, Vector2 b, float t);
+Vector3 Lerp(Vector3 a, Vector3 b, float t);
+Quaternion Slerp(Quaternion a, Quaternion b, float t);
+
 #endif

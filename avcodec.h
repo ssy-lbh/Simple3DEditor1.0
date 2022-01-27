@@ -25,8 +25,12 @@ public:
 
     bool Open(const char* path);
     void Close();
-    bool Decode(AVCodecID id, void(*onFrame)(AVFrame*));
     char* GetError();
+    const char* GetSuffix(const char* file);
+    AVCodecID GetDecoderId(const char* file);
+    AVCodecID GetWAVDecoderId(const char* file);
+    bool Decode(AVCodecID id, void(*onFrame)(AVFrame*));
+    bool Decode(AVCodecID id, void(*onFrame)(AVFrame*, void*), void* user);
 };
 
 #endif

@@ -1,6 +1,6 @@
 #include "nodemap.h"
 
-#include <gl/gl.h>
+#include "opengl/gl/gl.h"
 
 #include "gltools.h"
 #include "log.h"

@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <windowsx.h>
 
-#include <gl/gl.h>
+#include "opengl/gl/gl.h"
 
 UIManager::UIManager(){}
 
@@ -249,4 +249,5 @@ void IWindow::OnFocus(){}
 void IWindow::OnKillFocus(){}
 void IWindow::OnMouseWheel(int delta){}
 void IWindow::OnMenuAccel(int id, bool accel){}
-void IWindow::OnDropFile(const wchar_t* path){}
+void IWindow::OnDropFileA(const char* path){}
+void IWindow::OnDropFileW(const wchar_t* path){}

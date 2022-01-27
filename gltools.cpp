@@ -2,9 +2,7 @@
 
 #include "vecmath.h"
 
-#ifdef STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-#endif
+#include "stb_image/stb_image.h"
 
 void GLUtils::DrawCorner(float x, float y, float start, float end, float radius, float step){
     start = ToRadian(start);
@@ -152,7 +150,6 @@ void GLUtils::DrawRect(float x1, float y1, float x2, float y2){
     glEnd();
 }
 
-#ifdef STB_IMAGE_IMPLEMENTATION
 GLTexture2D::GLTexture2D(const char* path){
     int x, y, channel;
     stbi_uc* image;
@@ -175,7 +172,6 @@ GLTexture2D::GLTexture2D(const char* path){
     
     stbi_image_free(image);
 }
-#endif
 
 GLTexture2D::GLTexture2D(int resid){
     HBITMAP hBitmap;

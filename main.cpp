@@ -6,6 +6,7 @@
 #include "font.h"
 #include "gltools.h"
 #include "nodemap.h"
+#include "audio.h"
 
 #include "shell.h"
 
@@ -601,6 +602,9 @@ bool MainWindow::SaveMesh(Mesh* mesh){
         return false;
     }
     inputText[MAX_PATH] = '\0';
+    if (wcsncmp(inputText + wcslen(inputText) - 4, L".obj", 4)){
+        wcsncat_s(inputText, MAX_PATH, L".obj", 4);
+    }
     HANDLE hFile = CreateFileW(
         inputText,
         GENERIC_READ | GENERIC_WRITE,
@@ -626,28 +630,18 @@ bool MainWindow::LoadMesh(Mesh* mesh){
         return false;
     }
     inputText[MAX_PATH] = '\0';
-    return LoadMesh(mesh, inputText);
+    if (wcsncmp(inputText + wcslen(inputText) - 4, L".obj", 4)){
+        wcsncat_s(inputText, MAX_PATH, L".obj", 4);
+    }
+    return LoadMeshW(mesh, inputText);
 }
 
-bool MainWindow::LoadMesh(Mesh* mesh, const wchar_t* path){
+bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
     BY_HANDLE_FILE_INFORMATION fileInfo;
     char* fileData;
     size_t fileLen, filePtr = 0;
     List<Vertex*> vert;
 
-    HANDLE hFile = CreateFileW(
-        path,
-        GENERIC_READ,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
-    if (hFile == INVALID_HANDLE_VALUE){
-        DebugError("OpenFile Error!");
-        return false;
-    }
     DebugLog("Loading Object");
     GetFileInformationByHandle(hFile, &fileInfo);
     //fileLen = ((size_t)fileInfo.nFileSizeHigh << 32) | fileInfo.nFileSizeLow;
@@ -657,10 +651,10 @@ bool MainWindow::LoadMesh(Mesh* mesh, const wchar_t* path){
 
     ReadFile(hFile, fileData, fileLen, NULL, NULL);
 
+    int v_idx = 0, t_idx = 0, n_idx = 0;
     for (size_t i = 0; i < fileLen; i++){
         Vector3 vec;
         int v1, v2, v3;
-        int v_idx = 0, t_idx = 0, n_idx = 0;
         if (fileData[i] == '\n' || i == fileLen){
             fileData[i] = '\0';
             if (fileData[filePtr] == '#'){
@@ -683,10 +677,59 @@ bool MainWindow::LoadMesh(Mesh* mesh, const wchar_t* path){
         }
     }
     delete[] fileData;
+    return true;
+}
+
+bool MainWindow::LoadMeshA(Mesh* mesh, const char* path){
+    BY_HANDLE_FILE_INFORMATION fileInfo;
+    char* fileData;
+    size_t fileLen, filePtr = 0;
+    List<Vertex*> vert;
+
+    HANDLE hFile = CreateFileA(
+        path,
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+    if (hFile == INVALID_HANDLE_VALUE){
+        DebugError("OpenFile Error!");
+        return false;
+    }
+    bool res = LoadMesh(mesh, hFile);
 
     CloseHandle(hFile);
 
-    return true;
+    return res;
+}
+
+bool MainWindow::LoadMeshW(Mesh* mesh, const wchar_t* path){
+    BY_HANDLE_FILE_INFORMATION fileInfo;
+    char* fileData;
+    size_t fileLen, filePtr = 0;
+    List<Vertex*> vert;
+
+    HANDLE hFile = CreateFileW(
+        path,
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+    if (hFile == INVALID_HANDLE_VALUE){
+        DebugError("OpenFile Error!");
+        return false;
+    }
+    bool res = LoadMesh(mesh, hFile);
+
+    CloseHandle(hFile);
+
+    return res;
 }
 
 void MainWindow::AboutBox(){
@@ -1033,8 +1076,8 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void MainWindow::OnDropFile(const wchar_t* path){
-    LoadMesh(mesh, path);
+void MainWindow::OnDropFileA(const char* path){
+    LoadMeshA(mesh, path);
 }
 
 void MainWindow::OnCreate(HWND hWnd){
@@ -1086,7 +1129,7 @@ ATOM Main::RegClass(){
 }
 
 HWND Main::CreateWnd(){
-    return CreateWindowExA(
+    return CreateWindowEx(
         0,
         "ModelView.MainWindow",
         "ModelView",
@@ -1103,7 +1146,7 @@ HWND Main::CreateWnd(){
 void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     RECT cliRect;
     GetClientRect(hWnd, &cliRect);
-    // 事件�?鼠标坐标上下需反转
+    // 事件鼠标坐标上下需反转
     int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
     switch (uMsg){
     case WM_CREATE:
@@ -1187,12 +1230,15 @@ void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wP
         break;
     case WM_DROPFILES:{
         UINT cnt;
-        wchar_t path[MAX_PATH];
+        char path[MAX_PATH];
+        wchar_t wpath[MAX_PATH];
 
-        cnt = DragQueryFileW((HDROP)wParam, 0xFFFFFFFF, NULL, 0);
+        cnt = DragQueryFile((HDROP)wParam, 0xFFFFFFFF, NULL, 0);
         for (UINT i = 0; i < cnt; i++){
-            DragQueryFileW((HDROP)wParam, i, path, MAX_PATH);
-            window->OnDropFile(path);
+            DragQueryFileA((HDROP)wParam, i, path, MAX_PATH);
+            window->OnDropFileA(path);
+            DragQueryFileW((HDROP)wParam, i, wpath, MAX_PATH);
+            window->OnDropFileW(wpath);
         }
         DragFinish((HDROP)wParam);
     }
@@ -1257,12 +1303,15 @@ void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
         break;
     case WM_DROPFILES:{
         UINT cnt;
-        wchar_t path[MAX_PATH];
+        char path[MAX_PATH];
+        wchar_t wpath[MAX_PATH];
 
-        cnt = DragQueryFileW((HDROP)wParam, 0xFFFFFFFF, NULL, 0);
+        cnt = DragQueryFile((HDROP)wParam, 0xFFFFFFFF, NULL, 0);
         for (UINT i = 0; i < cnt; i++){
-            DragQueryFileW((HDROP)wParam, i, path, MAX_PATH);
-            window->OnDropFile(path);
+            DragQueryFileA((HDROP)wParam, i, path, MAX_PATH);
+            window->OnDropFileA(path);
+            DragQueryFileW((HDROP)wParam, i, wpath, MAX_PATH);
+            window->OnDropFileW(wpath);
         }
         DragFinish((HDROP)wParam);
     }
@@ -1317,7 +1366,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     hInst = hInstance;
 
     mainWnd = new MainWindow(hInst);
-    mainWnd2 = new NodeMapWindow();
+    mainWnd2 = new AudioPlayerWindow();
 
     container = new LRContainer(mainWnd, mainWnd2);
 

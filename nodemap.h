@@ -9,7 +9,7 @@ class NodeMapWindow;
 class NodeMapWindow : public IWindow {
 private:
     HWND hWnd;
-    bool focus;
+    bool focus = false;
 
     Vector2 cliSize;
     float aspect;

@@ -5,7 +5,7 @@
 
 #include "vecmath.h"
 
-//#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
 
 class GLUtils;
 class GLTexture2D;
@@ -31,9 +31,7 @@ class GLTexture2D {
 private:
     GLuint tex;
 public:
-#ifdef STB_IMAGE_IMPLEMENTATION
     GLTexture2D(const char* path);
-#endif
     GLTexture2D(int resid);
     ~GLTexture2D();
     void Enable();

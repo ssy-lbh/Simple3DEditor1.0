@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-#include <gl/gl.h>
+#include "opengl/gl/gl.h"
 
 #include "log.h"
 

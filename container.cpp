@@ -126,9 +126,14 @@ void LRContainer::OnMenuAccel(int id, bool accel){
         focus->OnMenuAccel(id, accel);
 }
 
-void LRContainer::OnDropFile(const wchar_t* path){
+void LRContainer::OnDropFileA(const char* path){
     if (focus)
-        focus->OnDropFile(path);
+        focus->OnDropFileA(path);
+}
+
+void LRContainer::OnDropFileW(const wchar_t* path){
+    if (focus)
+        focus->OnDropFileW(path);
 }
 
 void LRContainer::UpdateFocus(){
@@ -302,9 +307,14 @@ void UDContainer::OnMenuAccel(int id, bool accel){
         focus->OnMenuAccel(id, accel);
 }
 
-void UDContainer::OnDropFile(const wchar_t* path){
+void UDContainer::OnDropFileA(const char* path){
     if (focus)
-        focus->OnDropFile(path);
+        focus->OnDropFileA(path);
+}
+
+void UDContainer::OnDropFileW(const wchar_t* path){
+    if (focus)
+        focus->OnDropFileW(path);
 }
 
 void UDContainer::UpdateFocus(){

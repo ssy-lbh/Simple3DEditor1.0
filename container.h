@@ -36,7 +36,8 @@ public:
     virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
-    virtual void OnDropFile(const wchar_t* path) override;
+    virtual void OnDropFileA(const char* path) override;
+    virtual void OnDropFileW(const wchar_t* path) override;
 
     void UpdateFocus();
     void FreeWindow();
@@ -79,7 +80,8 @@ public:
     virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
-    virtual void OnDropFile(const wchar_t* path) override;
+    virtual void OnDropFileA(const char* path) override;
+    virtual void OnDropFileW(const wchar_t* path) override;
 
     void UpdateFocus();
     void FreeWindow();

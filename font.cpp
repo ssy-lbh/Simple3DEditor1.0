@@ -1,6 +1,6 @@
 #include "font.h"
 
-#include <gl/gl.h>
+#include "opengl/gl/gl.h"
 
 #define MAX_CHARS 128
 

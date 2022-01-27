@@ -10,5 +10,6 @@
         "C:\\Program Files (x86)\\OpenGL glew-2.2.0\\include",
         "C:\\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\\include"
     ],
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "C_Cpp.errorSquiggles": "Disabled"
 }
