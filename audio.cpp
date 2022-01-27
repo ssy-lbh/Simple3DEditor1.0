@@ -111,6 +111,54 @@ void AudioPlayerWindow::PlayButton::Render(){
 AudioPlayerWindow::ProgressBar::ProgressBar(AudioPlayerWindow* window) : window(window) {}
 AudioPlayerWindow::ProgressBar::~ProgressBar(){}
 
+bool AudioPlayerWindow::ProgressBar::Trigger(Vector2 pos){
+    return pos.x >= this->pos - 0.05f && pos.x <= this->pos + 0.05f && pos.y >= -0.1f && pos.y <= 0.1f;
+}
+
+void AudioPlayerWindow::ProgressBar::Click(){
+    origin = pos;
+}
+
+void AudioPlayerWindow::ProgressBar::Drag(Vector2 dir){
+    ALint offset;
+
+    pos = Clamp(origin + dir.x, -0.6f, 0.6f);
+    offset = Clamp((int)(((pos + 0.6f) / 1.2f) * window->alAudioSize), 0, window->alAudioSize);
+    offset &= 0xFFFFFFFC;// 去除最后两位，避免偏移到样本中间
+
+    alSourcei(window->alSrc, AL_BYTE_OFFSET, offset);
+}
+
+void AudioPlayerWindow::ProgressBar::Hover(){
+    hover = true;
+}
+
+void AudioPlayerWindow::ProgressBar::Leave(){
+    hover = false;
+}
+
+AudioPlayerWindow::LoopOption::LoopOption(AudioPlayerWindow* window) : window(window) {}
+AudioPlayerWindow::LoopOption::~LoopOption(){}
+
+bool AudioPlayerWindow::LoopOption::Trigger(Vector2 pos){
+    return pos.x >= 0.7f && pos.x <= 0.9f && pos.y >= -0.1f && pos.y <= 0.1f;
+}
+
+void AudioPlayerWindow::LoopOption::Click(){
+    loop = !loop;
+    DebugLog("AudioPlayerWindow::LoopOption State %s", loop ? "Looping" : "Default");
+    alSourcei(window->alSrc, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+}
+
+void AudioPlayerWindow::LoopOption::Render(){
+    if (loop){
+        glColor3f(0.0f, 0.0f, 1.0f);
+    }else{
+        glColor3f(0.0f, 0.0f, 0.0f);
+    }
+    GLUtils::DrawRect(0.7f, -0.1f, 0.9f, 0.1f);
+}
+
 void AudioPlayerWindow::ProgressBar::Render(){
     if (window->launched){
         ALint offset;
@@ -125,8 +173,12 @@ void AudioPlayerWindow::ProgressBar::Render(){
         glEnd();
         glLineWidth(1.0f);
 
-        float pos = Lerp(-0.6f, 0.6f, (float)offset / window->alAudioSize);
-        glColor3f(0.0f, 0.0f, 0.5f);
+        pos = Lerp(-0.6f, 0.6f, (float)offset / window->alAudioSize);
+        if (hover){
+            glColor3f(0.0f, 0.0f, 0.3f);
+        }else{
+            glColor3f(0.0f, 0.0f, 0.5f);
+        }
         GLUtils::DrawRect(pos - 0.05f, -0.1f, pos + 0.05f, 0.1f);
     }
 }
@@ -136,6 +188,7 @@ AudioPlayerWindow::AudioPlayerWindow(){
 
     uiMgr->AddButton(new PlayButton(this));
     uiMgr->AddButton(new ProgressBar(this));
+    uiMgr->AddButton(new LoopOption(this));
 
     path[0] = L'\0';
 }
@@ -426,3 +479,68 @@ ALint AudioPlayerWindow::GetWaveFormat(PWAVEFORMATEX lpwav){
     }
     return format;
 }
+
+AudioCaptureWindow::AudioCaptureWindow(){}
+AudioCaptureWindow::~AudioCaptureWindow(){}
+
+bool AudioCaptureWindow::IsFocus(){
+    return focus;
+}
+
+void AudioCaptureWindow::OnRender(){}
+
+void AudioCaptureWindow::OnCreate(HWND hWnd){
+    this->hWnd = hWnd;
+}
+
+void AudioCaptureWindow::AudioCaptureWindow::OnClose(){}
+
+void AudioCaptureWindow::OnResize(int x, int y){
+    size.x = x;
+    size.y = y;
+}
+
+void AudioCaptureWindow::OnMouseMove(int x, int y){
+    cursorPos.x = 2.0f * x / size.x - 1.0f;
+    cursorPos.y = 2.0f * y / size.y - 1.0f;
+}
+
+void AudioCaptureWindow::OnLeftDown(int x, int y){
+    cursorPos.x = 2.0f * x / size.x - 1.0f;
+    cursorPos.y = 2.0f * y / size.y - 1.0f;
+}
+
+void AudioCaptureWindow::OnLeftUp(int x, int y){
+    cursorPos.x = 2.0f * x / size.x - 1.0f;
+    cursorPos.y = 2.0f * y / size.y - 1.0f;
+}
+
+void AudioCaptureWindow::OnRightDown(int x, int y){
+    cursorPos.x = 2.0f * x / size.x - 1.0f;
+    cursorPos.y = 2.0f * y / size.y - 1.0f;
+}
+
+void AudioCaptureWindow::OnRightUp(int x, int y){
+    cursorPos.x = 2.0f * x / size.x - 1.0f;
+    cursorPos.y = 2.0f * y / size.y - 1.0f;
+}
+
+void AudioCaptureWindow::OnMouseHover(int key, int x, int y){}
+
+void AudioCaptureWindow::OnMouseLeave(){}
+
+void AudioCaptureWindow::OnFocus(){
+    focus = true;
+}
+
+void AudioCaptureWindow::OnKillFocus(){
+    focus = false;
+}
+
+void AudioCaptureWindow::OnMouseWheel(int delta){}
+
+void AudioCaptureWindow::OnMenuAccel(int id, bool accel){}
+
+void AudioCaptureWindow::OnDropFileA(const char* path){}
+
+void AudioCaptureWindow::OnDropFileW(const wchar_t* path){}

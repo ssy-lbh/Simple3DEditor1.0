@@ -375,3 +375,23 @@ Quaternion Slerp(Quaternion a, Quaternion b, float t){
     float angle = Acos(dif.w);
     return Quaternion::AxisAngle(dif.GetAxis(), angle * t) * a;
 }
+
+int Clamp(int x, int a, int b){
+    if (x <= a){
+        return a;
+    }
+    if (x >= b){
+        return b;
+    }
+    return x;
+}
+
+float Clamp(float x, float a, float b){
+    if (x <= a){
+        return a;
+    }
+    if (x >= b){
+        return b;
+    }
+    return x;
+}

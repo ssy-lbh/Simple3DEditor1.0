@@ -55,8 +55,8 @@ private:
 
     class PlayButton : public IButton {
     private:
-        bool hover = false;
         AudioPlayerWindow* window;
+        bool hover = false;
 
     public:
         PlayButton(AudioPlayerWindow* window);
@@ -72,11 +72,33 @@ private:
     class ProgressBar : public IButton {
     private:
         AudioPlayerWindow* window;
+        bool hover = false;
+        float pos = -0.6f;
+        float origin;
     
     public:
         ProgressBar(AudioPlayerWindow* window);
         virtual ~ProgressBar() override;
 
+        virtual bool Trigger(Vector2 pos) override;
+        virtual void Click() override;
+        virtual void Drag(Vector2 dir) override;
+        virtual void Hover() override;
+        virtual void Leave() override;
+        virtual void Render() override;
+    };
+
+    class LoopOption : public IButton {
+        private:
+        AudioPlayerWindow* window;
+        bool loop = false;
+    
+    public:
+        LoopOption(AudioPlayerWindow* window);
+        virtual ~LoopOption() override;
+
+        virtual bool Trigger(Vector2 pos) override;
+        virtual void Click() override;
         virtual void Render() override;
     };
 
@@ -115,6 +137,12 @@ public:
 class AudioCaptureWindow : public IWindow {
 private:
     bool focus = false;
+    HWND hWnd;
+
+    Vector2 size;
+    Vector2 cursorPos;
+
+    ALCdevice* capDev;
 
 public:
     AudioCaptureWindow();

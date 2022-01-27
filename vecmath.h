@@ -177,4 +177,7 @@ Vector2 Lerp(Vector2 a, Vector2 b, float t);
 Vector3 Lerp(Vector3 a, Vector3 b, float t);
 Quaternion Slerp(Quaternion a, Quaternion b, float t);
 
+int Clamp(int x, int a, int b);
+float Clamp(float x, float a, float b);
+
 #endif
