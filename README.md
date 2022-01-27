@@ -1,72 +1,72 @@
-# Forest Engine
+# Simple3DEditor
 
-## Introduction
+## 介绍
 
-An simple&elegant Open-GL based open-code 3D game template written in C++;
+一个简单的3D编辑器，简单到Hello World级别，使用C++编写，图形基于OpenGL
 
-## Architecture
+## 软件架构
 
-1. colorboard: windowed colorboard for selecting a color
-2. font: font manager
-3. geodef: function definer for basic geo-elements.
-4. gltools: The CORE
-5. log: log moudle
-6. main: main window
-7. menu: a simple menu
-8. mesh: mesh utils
-9. nodemap: visual nodemap editor
-10. container: window container
-11. shell: windows-shell extension
-12. vecmath: math libraries
-13. uimgr: UI manager
+1. colorboard: 调色板窗口，用于选取颜色
+2. font: 管理字体及其绘制
+3. geodef: 几何元素结构体和函数定义
+4. gltools: 一些关于OpenGL的封装函数
+5. log: 日志管理
+6. main: 主窗口部分
+7. menu: 简易菜单
+8. mesh: 网格体类，管理几何图形元素
+9. nodemap: 节点编辑器窗口，计划作为流程蓝图、材质编辑器等
+10. container: 窗口容器
+11. shell: windows的一些特殊功能
+12. vecmath: 数学基础库
+13. uimgr: 简单的UI管理器
 
-## How-to-use
+## 安装教程
 
-1. For users,just download the release(why people will try to play this?)
-2. For developers trying to create a new game with this,clone this,write your game in main,then use mingw to compile.
-3. For developers trying to use this as a library,read the "Architecture" part ;)
+1. 直接下载release或者下载源代码编译
+2. 确保mingw工具已经安装并配置路径
+3. 下载文件夹路径下执行make.exe
 
-## Disclaimer
+## 使用说明
 
-Bugs are expected fot this project is still under development.
+1. 文档暂且没时间写，快捷键可以看.rc文件
+2. 可能出现一些bug
 
-## Default hotkeys
+## 快捷键一览表
 
-1. "q"：rotate（deprecated）
-2. "e"：reverse-rotate（deprecated）
-3. "p"：add a new point
-4. "f"：add lines or planes（make point selection first!）
-5. "g"：move
-6. "r"：rotate（under dev）
-7. "s"：zoom（under dev）
-8. "c"：color selector（make point selection first!）
-9. "x"：X-axis operation
-10. "y"：Y-axis operation
-11. "z"：Z-axis operation
-12. "X"(shift + x)：YZ-plane operation
-13. "Y"(shift + y)：ZX-plane operation
-14. "Z"(shift + z)：XY-plane operation
-15. delete：delete a point
-16. ESC：exit
-17. Ctrl+S：save
-18. Ctrl+L: open
-19. Alt+(0-9): toolbar selection
-20. Alt+/ Alt+?：about
-21. "e": export a new point(buggy)
+1. "q"：逆时针旋转（目前考虑弃用）
+2. "e"：顺时针旋转（目前考虑弃用）
+3. "p"：添加点
+4. "f"：添加线、面（选择两个或三个点）
+5. "g"：移动
+6. "r"：旋转（暂未完成）
+7. "s"：缩放（暂未完成）
+8. "c"：选择颜色（先选择顶点）
+9. "x"：X轴操作
+10. "y"：Y轴操作
+11. "z"：Z轴操作
+12. "X"(shift + x)：YZ平面操作
+13. "Y"(shift + y)：ZX平面操作
+14. "Z"(shift + z)：XY平面操作
+15. delete：删除顶点
+16. ESC：退出
+17. Ctrl+S：保存
+18. Alt+/ Alt+?：软件信息
+19. Alt+(0-9): 工具选择
+20. Ctrl+L: 加载
+21. "e": 引出新顶点（不稳定）
 
-## Contribution
+## 参与贡献
 
-Dev:
+1. Fork 本仓库
+2. 新建 Feat_xxx 分支
+3. 提交代码
+4. 新建 Pull Request
 
-1,Fork the repository
-2,Create Feat_xxx branch
-3,Commit your code
-4,Create Pull Request
+## 特技
 
-User:
-1,Create an issue
-2,Describe your problem
-
-## Known bugs
-
-1. issues:I4S2IG memory leak in Mesh
+1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
+2. Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
+3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
+4. [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
+5. Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
+6. Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
