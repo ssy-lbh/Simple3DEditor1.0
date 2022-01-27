@@ -1073,7 +1073,7 @@ ATOM Main::RegClass(){
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hCursor = LoadCursor(hInst, MAKEINTRESOURCE(IDC_NORMAL));
     wc.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
     wc.hIconSm = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
     wc.hInstance = hInst;
@@ -1285,6 +1285,7 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
         PostQuitMessage(0);
         break;
     case WM_LBUTTONDOWN:
+        SetCursor(LoadCursor(hInst, MAKEINTRESOURCE(IDC_CLICKED)));
         SetCapture(hWnd);
         break;
     case WM_LBUTTONUP:

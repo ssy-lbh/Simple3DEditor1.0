@@ -37,10 +37,13 @@ END
 
 IDI_ICON1 ICON              "res/icon/app_icon3.ico"
 
-IDC_MOVE CURSOR             "res/cursor/move.cur"
+IDC_NORMAL CURSOR           "res/cursor/cursor_normal.cur"
+IDC_CLICKED CURSOR          "res/cursor/cursor_clicked.cur"
 
 IDS_BASIC_VERT SHADER       "res/shader/basic_vert.vert"
 IDS_BASIC_FRAG SHADER       "res/shader/basic_frag.frag"
+
+IDB_EARTH_WATER BITMAP      "res/texture/earth_water.bmp"
 
 IDC_MENU MENU
 BEGIN

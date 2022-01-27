@@ -75,5 +75,5 @@ sign: $(OUTPUT)
 	$(SIGNTOOL) timestamp /t $(TIMESTAMP) $(OUTPUT)
 
 clean:
-	$(RM) $(OUTPUT) $(PROGOBJ) $(RESOBJ)
+	-$(RM) $(OUTPUT) $(PROGOBJ) $(RESOBJ)
 	-$(MKDIR) build

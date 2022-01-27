@@ -26,9 +26,8 @@ void glInitASCIIFont(){
 }
 
 void glDrawString(const char* text){
-    for (; *text != '\0'; text++){
-        glCallList(font + *text);
-    }
+    glListBase(font);
+    glCallLists(strlen(text), GL_UNSIGNED_BYTE, text);
 }
 
 //TODO 暂时不可用，需要修改
@@ -64,4 +63,10 @@ void glDrawCNString(const wchar_t* text){
     }
 
     glDeleteLists(font, 1);
+}
+
+int glGetCNStringWidth(const wchar_t* text){
+    HDC hDC = wglGetCurrentDC();
+    size_t len = wcslen(text);
+    
 }
