@@ -68,5 +68,9 @@ void glDrawCNString(const wchar_t* text){
 int glGetCNStringWidth(const wchar_t* text){
     HDC hDC = wglGetCurrentDC();
     size_t len = wcslen(text);
+    SIZE size;
     
+    GetTextExtentPoint32W(hDC, text, len, &size);
+
+    return size.cx;
 }
