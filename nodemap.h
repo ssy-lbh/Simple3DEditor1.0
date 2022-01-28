@@ -3,12 +3,12 @@
 
 #include "uimgr.h"
 #include "menu.h"
+#include "gltools.h"
 
 class NodeMapWindow;
 
 class NodeMapWindow : public IWindow {
 private:
-    HWND hWnd;
     bool focus = false;
 
     Vector2 cliSize;
@@ -24,12 +24,15 @@ private:
     Menu* menu;
     Vector2 menuPos;
 
+    GLTexture2D* bktex;
+
     class MoveButton : public IButton {
     private:
         Vector2 center;
         float radius;
         Vector2 start;
         NodeMapWindow* window;
+
     public:
         MoveButton(Vector2 center, float radius, NodeMapWindow* window);
         virtual ~MoveButton() override;
@@ -46,6 +49,7 @@ private:
         Vector2 position;
         Node* connNode = NULL;
         Vector2 offset;
+
     public:
         Node(NodeMapWindow* window);
         Node(Vector2 pos, NodeMapWindow* window);
@@ -68,8 +72,9 @@ public:
 
     virtual bool IsFocus() override;
     virtual void OnRender() override;
-    virtual void OnCreate(HWND hWnd) override;
     virtual void OnClose() override;
+    virtual void OnChar(char c) override;
+    virtual void OnUnichar(wchar_t c) override;
     virtual void OnResize(int x, int y) override;
     virtual void OnMouseMove(int x, int y) override;
     virtual void OnLeftDown(int x, int y) override;

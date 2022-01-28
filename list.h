@@ -16,10 +16,10 @@ private:
         if (ptr + reserve < size){
             return;
         }
-        //DebugLog("List Size Increased");
         while (ptr + reserve >= size){
             size <<= 1;
         }
+        //DebugLog("List %p Size Increased %llu", this, size);
         T* newData = new T[size];
         for (size_t i = 0; i < ptr; i++){
             newData[i] = data[i];
@@ -31,7 +31,13 @@ private:
 public:
     List(){
         //DebugLog("List()");
-        size = 32;
+        size = 8;
+        data = new T[size];
+        ptr = 0;
+    }
+
+    List(size_t size){
+        this->size = size;
         data = new T[size];
         ptr = 0;
     }
@@ -86,7 +92,7 @@ public:
 
     List<T>& Add(T val){
         //DebugLog("Add");
-        Check(1);
+        Check(10);
         data[ptr++] = val;
         return *this;
     }
@@ -125,7 +131,7 @@ public:
 
     T& operator[](size_t index){
         if (index >= ptr){
-            DebugError("Critical: List<T>::operator[] When Index Overflow");
+            DebugError("Critical: List<T>::operator[](%llu) When Index Overflow", index);
         }
         return data[index];
     }
@@ -133,7 +139,7 @@ public:
     T& GetItem(size_t index){
         //DebugLog("GetItem %d", index);
         if (index >= ptr){
-            DebugError("Critical: List<T>::GetItem When Index Overflow");
+            DebugError("Critical: List<T>::GetItem(%llu) When Index Overflow", index);
         }
         return data[index];
     }

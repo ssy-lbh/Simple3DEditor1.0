@@ -26,9 +26,6 @@ public:
     Vector2 cliSize, cliInvSize;
     float aspect;
 
-    HWND hWnd;
-    HINSTANCE hInst;
-
     bool focus = false;
 
 private:
@@ -40,6 +37,8 @@ private:
     Vector3 camUp = Vector3::up;
     Vector3 camForward = Vector3::forward;
     float camRange = 100.0f;
+
+    bool noRender = false;
 
     Menu* menu = NULL;
     Vector2 menuPos = Vector2::zero;
@@ -66,6 +65,7 @@ private:
         float radius;
         Vector3 start;
         MainWindow* main;
+
     public:
         MoveButton(Vector2 center, float radius, MainWindow* main);
         virtual ~MoveButton() override;
@@ -82,6 +82,7 @@ private:
         float radius;
         Quaternion start;
         MainWindow* main;
+
     public:
         RotateButton(Vector2 center, float radius, MainWindow* main);
         virtual ~RotateButton() override;
@@ -103,12 +104,13 @@ private:
         List<MoveInfo> moveInfo;
         bool x, y, z;
         MainWindow* main;
+
     public:
         MoveOperation(MainWindow* main);
         virtual ~MoveOperation() override;
         virtual void OnEnter() override;
         virtual void OnMove() override;
-        virtual void OnCommand(UINT id) override;
+        virtual void OnCommand(int id) override;
         virtual void OnConfirm() override;
         virtual void OnUndo() override;
     };
@@ -128,12 +130,13 @@ private:
         Vector2 screenCenter;
         float dis;
         Quaternion rotate;
+
     public:
         RotateOperation(MainWindow* main);
         virtual ~RotateOperation() override;
         virtual void OnEnter() override;
         virtual void OnMove() override;
-        virtual void OnCommand(UINT id) override;
+        virtual void OnCommand(int id) override;
         virtual void OnConfirm() override;
         virtual void OnUndo() override;
     };
@@ -153,12 +156,13 @@ private:
         Vector2 screenCenter;
         float startSize;
         float scale;
+
     public:
         SizeOperation(MainWindow* main);
         virtual ~SizeOperation() override;
         virtual void OnEnter() override;
         virtual void OnMove() override;
-        virtual void OnCommand(UINT id) override;
+        virtual void OnCommand(int id) override;
         virtual void OnConfirm() override;
         virtual void OnUndo() override;
     };
@@ -190,7 +194,7 @@ private:
     };
 
 public:
-    MainWindow(HINSTANCE hInstance);
+    MainWindow();
     virtual ~MainWindow() override;
 
     void InitCamera();
@@ -209,8 +213,10 @@ public:
 
     virtual bool IsFocus() override;
     virtual void OnRender() override;
-    virtual void OnCreate(HWND hWnd) override;
     virtual void OnClose() override;
+    virtual void OnTimer(int id) override;
+    virtual void OnChar(char c) override;
+    virtual void OnUnichar(wchar_t c) override;
     virtual void OnResize(int x, int y) override;
     virtual void OnMouseMove(int x, int y) override;
     virtual void OnLeftDown(int x, int y) override;
@@ -249,25 +255,32 @@ public:
     static HGLRC hRC;
     static Main* inst;
 
-    IWindow* mainWnd;
-    RECT mainRect;
     // 测试一下面向对象的结果，成功实现双屏
+    IWindow* mainWnd;
     IWindow* mainWnd2;
-    RECT mainRect2;
+    IWindow* mainWnd3;
+    IWindow* mainWnd4;
 
     LRContainer* container;
+    UDContainer* udCont1;
+    UDContainer* udCont2;
+
+    bool reqRender = false;
 
     Main();
     ~Main();
+    
     ATOM RegClass();
     HWND CreateWnd();
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    void FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     void FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    static void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT_PTR wParam, DWORD lParam);
 
     void OnResize(int x, int y);
     void OnRender();
+
+    static void RequestRender();
 
     int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
 };

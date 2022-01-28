@@ -2,6 +2,7 @@
 
 #include <windows.h>
 
+#include "main.h"
 #include "log.h"
 
 bool ShellEInputWindow(InputAttribute* attrs, int cnt){
@@ -53,24 +54,47 @@ bool ShellEInputWindow(InputAttribute* attrs, int cnt){
     WaitForSingleObject(psInfo.hProcess, INFINITE);
     CloseHandle(psInfo.hProcess);
     CloseHandle(psInfo.hThread);
-    //TODO ¹¤¾ß³ÌÐòÐÞºÃÔÙÐ´Êä³ö½âÎö
+    //TODO å·¥å…·ç¨‹åºä¿®å¥½å†å†™è¾“å‡ºè§£æž
     CloseHandle(hAttr);
     return true;
 }
 
-bool ShellFileSelectWindow(HWND hWnd, wchar_t* buffer, size_t len, const wchar_t* lpstrFilter, DWORD flags){
+bool ShellFileSelectWindowA(HWND hWnd, char* buffer, size_t len, const char* lpstrFilter, DWORD flags){
+    OPENFILENAMEA ofn;
+
+    RtlZeroMemory(&ofn, sizeof(OPENFILENAMEA));
+    ofn.lStructSize = sizeof(OPENFILENAMEA);
+    ofn.hwndOwner = hWnd;
+    // ç»“å°¾ä¸ºä¸¤ä¸ª'\0'ï¼Œæ¯ä¸¤ä¸ªå­—ç¬¦ä¸²æž„æˆæè¿°ã€è¿‡æ»¤å¯¹ï¼Œå¢žåŠ è¿‡æ»¤æ¨¡æ¿å¯ç”¨';'åˆ†éš”å¤šä¸ªæ¨¡æ¿
+    ofn.lpstrFilter = lpstrFilter;
+    ofn.lpstrInitialDir = "./";
+    ofn.lpstrFile = buffer;
+    ofn.nMaxFile = len;
+    ofn.nFilterIndex = 0;
+    //æ ‡å¿—å¦‚æžœæ˜¯å¤šé€‰è¦åŠ ä¸ŠOFN_ALLOWMULTISELECT 
+    ofn.Flags = flags;
+    if (!GetOpenFileNameA(&ofn)){
+        return false;
+    }
+    if (*buffer == '\0'){
+        return false;
+    }
+    return true;
+}
+
+bool ShellFileSelectWindowW(HWND hWnd, wchar_t* buffer, size_t len, const wchar_t* lpstrFilter, DWORD flags){
     OPENFILENAMEW ofn;
 
-    RtlZeroMemory(&ofn, sizeof(OPENFILENAME));
-    ofn.lStructSize = sizeof(OPENFILENAME);
+    RtlZeroMemory(&ofn, sizeof(OPENFILENAMEW));
+    ofn.lStructSize = sizeof(OPENFILENAMEW);
     ofn.hwndOwner = hWnd;
-    // ½áÎ²ÎªÁ½¸ö'\0'£¬Ã¿Á½¸ö×Ö·û´®¹¹³ÉÃèÊö¡¢¹ýÂË¶Ô£¬Ôö¼Ó¹ýÂËÄ£°å¿ÉÓÃ';'·Ö¸ô¶à¸öÄ£°å
+    // ç»“å°¾ä¸ºä¸¤ä¸ª'\0'ï¼Œæ¯ä¸¤ä¸ªå­—ç¬¦ä¸²æž„æˆæè¿°ã€è¿‡æ»¤å¯¹ï¼Œå¢žåŠ è¿‡æ»¤æ¨¡æ¿å¯ç”¨';'åˆ†éš”å¤šä¸ªæ¨¡æ¿
     ofn.lpstrFilter = lpstrFilter;
     ofn.lpstrInitialDir = L"./";
     ofn.lpstrFile = buffer;
     ofn.nMaxFile = len;
     ofn.nFilterIndex = 0;
-    //±êÖ¾Èç¹ûÊÇ¶àÑ¡Òª¼ÓÉÏOFN_ALLOWMULTISELECT 
+    //æ ‡å¿—å¦‚æžœæ˜¯å¤šé€‰è¦åŠ ä¸ŠOFN_ALLOWMULTISELECT 
     ofn.Flags = flags;
     if (!GetOpenFileNameW(&ofn)){
         return false;
@@ -79,4 +103,22 @@ bool ShellFileSelectWindow(HWND hWnd, wchar_t* buffer, size_t len, const wchar_t
         return false;
     }
     return true;
+}
+
+bool ShellCommandLineA(const char* lpStr){
+    char* args = strchr(lpStr, ' ');
+    if (args){
+        *(args++) = '\0';
+        return (DWORD_PTR)ShellExecuteA(Main::hWnd, "open", lpStr, args, NULL, SW_HIDE) >= 32;
+    }
+    return (DWORD_PTR)ShellExecuteA(Main::hWnd, "open", lpStr, NULL, NULL, SW_HIDE) >= 32;
+}
+
+bool ShellCommandLineW(const wchar_t* lpStr){
+    wchar_t* args = wcschr(lpStr, ' ');
+    if (args){
+        *(args++) = L'\0';
+        return (DWORD_PTR)ShellExecuteW(Main::hWnd, L"open", lpStr, args, NULL, SW_HIDE) >= 32;
+    }
+    return (DWORD_PTR)ShellExecuteW(Main::hWnd, L"open", lpStr, NULL, NULL, SW_HIDE) >= 32;
 }

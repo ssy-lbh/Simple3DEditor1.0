@@ -12,6 +12,7 @@ private:
     List<Vertex*> vertices;
     List<Edge*> edges;
     List<Face*> faces;
+    
 public:
     Mesh();
     ~Mesh();

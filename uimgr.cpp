@@ -125,6 +125,18 @@ bool UIManager::LeftUp(){
     return false;
 }
 
+void UIManager::Char(char c){
+    if (cur){
+        cur->Char(c);
+    }
+}
+
+void UIManager::Unichar(wchar_t c){
+    if (cur){
+        cur->Unichar(c);
+    }
+}
+
 void UIManager::Foreach(void(*func)(IButton*)){
     buttons.Foreach(func);
 }
@@ -141,6 +153,8 @@ void IButton::Click(){}
 void IButton::Drag(Vector2 dir){}
 void IButton::ClickEnd(){}
 void IButton::Leave(){}
+void IButton::Char(char c){}
+void IButton::Unichar(wchar_t c){}
 void IButton::Render(){}
 
 IOperation::IOperation(){}
@@ -151,7 +165,7 @@ void IOperation::OnUndo(){}
 void IOperation::OnRightDown(){}
 void IOperation::OnRightUp(){}
 void IOperation::OnMove(){}
-void IOperation::OnCommand(UINT id){}
+void IOperation::OnCommand(int id){}
 
 ViewportManager* ViewportManager::inst = new ViewportManager();
 
@@ -235,8 +249,11 @@ IWindow::IWindow(){}
 IWindow::~IWindow(){}
 bool IWindow::IsFocus(){ return true; }
 void IWindow::OnRender(){}
-void IWindow::OnCreate(HWND hWnd){}
+void IWindow::OnCreate(){}
 void IWindow::OnClose(){}
+void IWindow::OnTimer(int id){}
+void IWindow::OnChar(char c){}
+void IWindow::OnUnichar(wchar_t c){}
 void IWindow::OnResize(int x, int y){}
 void IWindow::OnMouseMove(int x, int y){}
 void IWindow::OnLeftDown(int x, int y){}

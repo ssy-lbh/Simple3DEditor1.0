@@ -2,6 +2,7 @@
 
 #include "opengl/gl/gl.h"
 
+#include "res.h"
 #include "gltools.h"
 #include "log.h"
 
@@ -164,6 +165,18 @@ void NodeMapWindow::OnRender(){
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    if (!bktex){
+        bktex = new GLTexture2D(IDB_EARTH_WATER);
+    }
+    bktex->Enable();
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.0f, 0.0f); glVertex2f(-1.0f, -1.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, -1.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex2f(-1.0f, 1.0f);
+    glEnd();
+    bktex->Disable();
+
     // UI绘制
     uiMgr->Render();
 
@@ -180,11 +193,17 @@ void NodeMapWindow::OnRender(){
         menu->Render(menuPos.x, menuPos.y);
 }
 
-void NodeMapWindow::OnCreate(HWND hWnd){
-    this->hWnd = hWnd;
+void NodeMapWindow::OnClose(){}
+
+void NodeMapWindow::OnChar(char c){
+    uiMgr->Char(c);
+    nodeMgr->Char(c);
 }
 
-void NodeMapWindow::OnClose(){}
+void NodeMapWindow::OnUnichar(wchar_t c){
+    uiMgr->Unichar(c);
+    nodeMgr->Unichar(c);
+}
 
 void NodeMapWindow::OnResize(int x, int y){
     UpdateWindowSize(x, y);

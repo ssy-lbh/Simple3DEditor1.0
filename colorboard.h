@@ -15,10 +15,12 @@ private:
     HWND hWnd;
     HDC hDC;
     HGLRC hRC;
+    
     Vector3 color;
     Vector2 cursorPos;
     RECT cliRect;
     float white = 1.0f;
+
 public:
     ColorBoard();
     ~ColorBoard();

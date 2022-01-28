@@ -23,7 +23,7 @@ PROGOBJ		= main.o log.o vecmath.o font.o menu.o gltools.o uimgr.o mesh.o\
 				soundtouch\AAFilter.o soundtouch\FIRFilter.o soundtouch\FIFOSampleBuffer.o\
 				soundtouch\PeakFinder.o soundtouch\BPMDetect.o
 EXTRAOBJ	= soundtouch\mmx_optimized.o soundtouch\sse_optimized.o soundtouch\cpu_detect_x86.o
-RESOBJ		= res.o
+RESOBJ		= res.o string.o
 OUTPUT 		= main.exe
 
 SIGNTOOL	= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe"

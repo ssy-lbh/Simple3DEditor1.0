@@ -198,7 +198,7 @@ GLTexture2D::GLTexture2D(int resid){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       //缩小纹理过滤方式
 	
     glTexImage2D(GL_TEXTURE_2D, 0, channel, bitmap.bmWidth, bitmap.bmHeight, 0,
-                (channel == 4 ? GL_RGBA : (channel == 3 ? GL_RGB : GL_R))
+                (channel == 4 ? GL_BGRA_EXT : (channel == 3 ? GL_BGR_EXT : GL_R))
                 , GL_UNSIGNED_BYTE, pBits);
     
     delete[] pBits;

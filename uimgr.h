@@ -24,9 +24,11 @@ private:
     Vector2 startPos;
     Vector2 cursorPos;
     bool leftDown = false;
+
 public:
     UIManager();
     ~UIManager();
+
     void CursorMove(Vector2 pos);
     void AddButton(IButton* btn);
     void DeleteButton(IButton* btn);
@@ -37,6 +39,8 @@ public:
     void RenderTransform();
     bool LeftDown();
     bool LeftUp();
+    void Char(char c);
+    void Unichar(wchar_t c);
     void Foreach(void(*func)(IButton*));
     void Foreach(void(*func)(IButton*, void*), void* user);
 };
@@ -45,6 +49,7 @@ class ViewportManager {
 private:
     List<RECT> rects;
     RECT curRect;
+
 public:
     static ViewportManager* inst;
 
@@ -75,6 +80,8 @@ public:
     virtual void Drag(Vector2 dir);
     virtual void ClickEnd();
     virtual void Leave();
+    virtual void Char(char c);
+    virtual void Unichar(wchar_t c);
     virtual void Render();
 };
 
@@ -89,7 +96,7 @@ public:
     virtual void OnRightDown();
     virtual void OnRightUp();
     virtual void OnMove();
-    virtual void OnCommand(UINT id);
+    virtual void OnCommand(int id);
 };
 
 class ITool {
@@ -114,8 +121,11 @@ public:
 
     virtual bool IsFocus();
     virtual void OnRender();
-    virtual void OnCreate(HWND hWnd);
+    virtual void OnCreate();
     virtual void OnClose();
+    virtual void OnTimer(int id);
+    virtual void OnChar(char c);
+    virtual void OnUnichar(wchar_t c);
     virtual void OnResize(int x, int y);
     virtual void OnMouseMove(int x, int y);
     virtual void OnLeftDown(int x, int y);

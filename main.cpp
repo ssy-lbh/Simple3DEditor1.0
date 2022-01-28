@@ -105,7 +105,7 @@ void MainWindow::MoveOperation::OnUndo(){
     });
 }
 
-void MainWindow::MoveOperation::OnCommand(UINT id){
+void MainWindow::MoveOperation::OnCommand(int id){
     switch (id){
     case IDM_OP_X: x = true; y = z = false; break;
     case IDM_OP_Y: y = true; z = x = false; break;
@@ -162,7 +162,7 @@ void MainWindow::RotateOperation::OnUndo(){
     });
 }
 
-void MainWindow::RotateOperation::OnCommand(UINT id){
+void MainWindow::RotateOperation::OnCommand(int id){
     switch (id){
     case IDM_OP_X: x = true; y = z = false; break;
     case IDM_OP_Y: y = true; z = x = false; break;
@@ -218,7 +218,7 @@ void MainWindow::SizeOperation::OnUndo(){
     });
 }
 
-void MainWindow::SizeOperation::OnCommand(UINT id){
+void MainWindow::SizeOperation::OnCommand(int id){
     switch (id){
     case IDM_OP_X: x = true; y = z = false; break;
     case IDM_OP_Y: y = true; z = x = false; break;
@@ -283,7 +283,7 @@ void MainWindow::SelectTool::OnRender(){
     }
 }
 
-MainWindow::MainWindow(HINSTANCE hInstance) : hInst(hInstance) {
+MainWindow::MainWindow(){
     uiMgr = new UIManager();
     mesh = new Mesh();
     SetTool(new EmptyTool(this));
@@ -433,6 +433,11 @@ void MainWindow::RenderModelView(){
 }
 
 void MainWindow::OnRender(){
+    if (noRender){
+        noRender = false;
+        return;
+    }
+
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClearDepth(1.0);
 
@@ -549,7 +554,7 @@ void MainWindow::UpdateDistance(){
 void MainWindow::GetTextInput(){
     static MainWindow* window;
     window = this;
-    DialogBox(hInst, MAKEINTRESOURCE(IDD_TEXT), hWnd,
+    DialogBox(Main::hInst, MAKEINTRESOURCE(IDD_TEXT), Main::hWnd,
         (DLGPROC)[]
 #ifndef _WIN64
         __attribute__((__stdcall__))
@@ -597,7 +602,7 @@ void MainWindow::DeletePoint(){
 }
 
 bool MainWindow::SaveMesh(Mesh* mesh){
-    if (!ShellFileSelectWindow(hWnd, inputText, MAX_PATH, L"3D对象(*.obj)\0*.obj\0", OFN_PATHMUSTEXIST | OFN_EXPLORER)){
+    if (!ShellFileSelectWindowW(Main::hWnd, inputText, MAX_PATH, L"3D对象(*.obj)\0*.obj\0", OFN_PATHMUSTEXIST | OFN_EXPLORER)){
         DebugError("Stop Saving");
         return false;
     }
@@ -625,7 +630,7 @@ bool MainWindow::SaveMesh(Mesh* mesh){
 }
 
 bool MainWindow::LoadMesh(Mesh* mesh){
-    if (!ShellFileSelectWindow(hWnd, inputText, MAX_PATH, L"3D对象(*.obj)\0*.obj\0", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER)){
+    if (!ShellFileSelectWindowW(Main::hWnd, inputText, MAX_PATH, L"3D对象(*.obj)\0*.obj\0", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER)){
         DebugLog("Stop Loading");
         return false;
     }
@@ -641,6 +646,8 @@ bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
     char* fileData;
     size_t fileLen, filePtr = 0;
     List<Vertex*> vert;
+    List<Vector2*> vertUV;
+    List<Vector3*> vertNormal;
 
     DebugLog("Loading Object");
     GetFileInformationByHandle(hFile, &fileInfo);
@@ -651,25 +658,29 @@ bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
 
     ReadFile(hFile, fileData, fileLen, NULL, NULL);
 
-    int v_idx = 0, t_idx = 0, n_idx = 0;
     for (size_t i = 0; i < fileLen; i++){
         Vector3 vec;
         int v1, v2, v3;
+        int vt1, vt2, vt3;
+        int vn1, vn2, vn3;
         if (fileData[i] == '\n' || i == fileLen){
             fileData[i] = '\0';
             if (fileData[filePtr] == '#'){
                 DebugLog("Object Annotation %s", fileData + filePtr + 1);
-            }else if (__builtin_sscanf(fileData + filePtr, "v %f %f %f", &vec.x, &vec.y, &vec.z)){
-                //DebugLog("Vertex %f %f %f", pos.x, pos.y, pos.z);
-                vert.Add(mesh->AddVertex(vec + camLookat));
-                v_idx++;
-            }else if (__builtin_sscanf(fileData + filePtr, "f %d %d %d", &v1, &v2, &v3)){
-                //DebugLog("Fragment %d %d %d", v1, v2, v3);
+            }else if (__builtin_sscanf(fileData + filePtr, "v %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
+                vert.Add(mesh->AddVertex(vec + camLookat));\
+            }else if (__builtin_sscanf(fileData + filePtr, "f %d//%d %d//%d %d//%d", &v1, &vn1, &v2, &vn2, &v3, &vn3) == 6){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
-            }else if (__builtin_sscanf(fileData + filePtr, "vt %f %f %f", &vec.x, &vec.y, &vec.z)){
-                vert[++t_idx]->uv = vec;
-            }else if (__builtin_sscanf(fileData + filePtr, "vn %f %f %f", &vec.x, &vec.y, &vec.z)){
-                vert[++n_idx]->normal = vec;
+            }else if (__builtin_sscanf(fileData + filePtr, "f %d/%d %d/%d %d/%d", &v1, &vt1, &v2, &vt2, &v3, &vt3) == 6){
+                mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
+            }else if (__builtin_sscanf(fileData + filePtr, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3) == 9){
+                mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
+            }else if (__builtin_sscanf(fileData + filePtr, "f %d %d %d", &v1, &v2, &v3) == 3){
+                mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
+            }else if (__builtin_sscanf(fileData + filePtr, "vt %f %f", &vec.x, &vec.y) == 2){
+                vertUV.Add(new Vector2(vec.x, vec.y));
+            }else if (__builtin_sscanf(fileData + filePtr, "vn %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
+                vertNormal.Add(new Vector3(vec));
             }else{
                 DebugLog("Object File Unknown Line %s", fileData + filePtr);
             }
@@ -677,6 +688,10 @@ bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
         }
     }
     delete[] fileData;
+
+    Free(vertUV);
+    Free(vertNormal);
+
     return true;
 }
 
@@ -733,7 +748,7 @@ bool MainWindow::LoadMeshW(Mesh* mesh, const wchar_t* path){
 }
 
 void MainWindow::AboutBox(){
-    DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd,
+    DialogBox(Main::hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), Main::hWnd,
         (DLGPROC)[]
 #ifndef _WIN64
         __attribute__((__stdcall__))
@@ -754,6 +769,8 @@ void MainWindow::AboutBox(){
 }
 
 void MainWindow::OnClose(){}
+
+void MainWindow::OnTimer(int id){}
 
 void MainWindow::OnResize(int x, int y){
     UpdateWindowSize(x, y);
@@ -852,6 +869,14 @@ void MainWindow::OnLeftUp(int x, int y){
     if (curTool){
         curTool->OnLeftUp();
     }
+}
+
+void MainWindow::OnChar(char c){
+    uiMgr->Char(c);
+}
+
+void MainWindow::OnUnichar(wchar_t c){
+    uiMgr->Unichar(c);
 }
 
 void MainWindow::OnMouseWheel(int delta){
@@ -1077,11 +1102,18 @@ void MainWindow::OnMenuAccel(int id, bool accel){
 }
 
 void MainWindow::OnDropFileA(const char* path){
+    char* suffix = strrchr(path, '.');
+    char message[60];
+    char caption[20];
+    LoadString(Main::hInst, IDS_OBJFILE_FORM_WARNING, message, 60);
+    LoadString(Main::hInst, IDS_OBJFILE_FORM_WARNING_CAPTION, caption, 20);
+    if (strcmp(suffix, ".obj")){
+        if (MessageBox(Main::hWnd, message, caption, MB_OKCANCEL | MB_ICONWARNING) == IDCANCEL){
+            DebugLog("MainWindow::OnDropFileA Stop Load File");
+            return;
+        }
+    }
     LoadMeshA(mesh, path);
-}
-
-void MainWindow::OnCreate(HWND hWnd){
-    this->hWnd = hWnd;
 }
 
 bool MainWindow::IsFocus(){
@@ -1116,7 +1148,7 @@ ATOM Main::RegClass(){
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hCursor = LoadCursor(hInst, MAKEINTRESOURCEA(IDC_NORMAL));
     wc.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
     wc.hIconSm = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
     wc.hInstance = hInst;
@@ -1143,109 +1175,6 @@ HWND Main::CreateWnd(){
     );
 }
 
-void Main::FireEvent(IWindow* window, RECT rect, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    RECT cliRect;
-    GetClientRect(hWnd, &cliRect);
-    // 事件鼠标坐标上下需反转
-    int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
-    switch (uMsg){
-    case WM_CREATE:
-        window->OnCreate(hWnd);
-        break;
-    case WM_CLOSE:
-        window->OnClose();
-        break;
-    case WM_SIZE:
-        OnResize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_MOUSEMOVE:{
-        bool inRect = GLUtils::InRect(x, y, rect);
-        if (window->IsFocus())
-            window->OnMouseMove(x - rect.left, y - rect.bottom);
-    }
-        break;
-    case WM_MOUSEWHEEL:
-        if (window->IsFocus())
-            window->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
-        break;
-    case WM_MOUSELEAVE:
-        window->OnMouseLeave();
-        break;
-    case WM_MOUSEHOVER:
-        window->OnMouseHover(wParam, x - rect.left, y - rect.bottom);
-        break;
-    case WM_SETFOCUS:
-        break;
-    case WM_KILLFOCUS:
-        if (window->IsFocus())
-            window->OnKillFocus();
-        break;
-    case WM_LBUTTONDOWN:{
-        bool inRect = GLUtils::InRect(x, y, rect);
-        if (inRect && !window->IsFocus()){
-            window->OnFocus();
-            window->OnMouseMove(x - rect.left, y - rect.bottom);
-        }else if (!inRect && window->IsFocus()){
-            window->OnKillFocus();
-        }
-        if (window->IsFocus())
-            window->OnLeftDown(x - rect.left, y - rect.bottom);
-    }
-        break;
-    case WM_LBUTTONUP:
-        if (window->IsFocus())
-            window->OnLeftUp(x - rect.left, y - rect.bottom);
-        break;
-    case WM_RBUTTONDOWN:{
-        bool inRect = GLUtils::InRect(x, y, rect);
-        if (inRect && !window->IsFocus()){
-            window->OnFocus();
-            window->OnMouseMove(x - rect.left, y - rect.bottom);
-        }else if (!inRect && window->IsFocus()){
-            window->OnKillFocus();
-        }
-        if (window->IsFocus())
-            window->OnRightDown(x - rect.left, y - rect.bottom);
-    }
-        break;
-    case WM_RBUTTONUP:
-        if(window->IsFocus())
-            window->OnRightUp(x - rect.left, y - rect.bottom);
-        break;
-    case WM_COMMAND:
-        switch (HIWORD(wParam)){
-        case 0:
-            if (window->IsFocus())
-                window->OnMenuAccel(LOWORD(wParam), false);
-            break;
-        case 1:
-            if (window->IsFocus())
-                window->OnMenuAccel(LOWORD(wParam), true);
-            break;
-        default:
-            //因为组件模型不同，该接口可能弃用
-            //window->OnControl(HIWORD(wParam), LOWORD(wParam), (HWND)(DWORD_PTR)lParam);
-            break;
-        }
-        break;
-    case WM_DROPFILES:{
-        UINT cnt;
-        char path[MAX_PATH];
-        wchar_t wpath[MAX_PATH];
-
-        cnt = DragQueryFile((HDROP)wParam, 0xFFFFFFFF, NULL, 0);
-        for (UINT i = 0; i < cnt; i++){
-            DragQueryFileA((HDROP)wParam, i, path, MAX_PATH);
-            window->OnDropFileA(path);
-            DragQueryFileW((HDROP)wParam, i, wpath, MAX_PATH);
-            window->OnDropFileW(wpath);
-        }
-        DragFinish((HDROP)wParam);
-    }
-        break;
-    }
-}
-
 void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     RECT cliRect;
     GetClientRect(hWnd, &cliRect);
@@ -1253,10 +1182,13 @@ void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
     int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
     switch (uMsg){
     case WM_CREATE:
-        window->OnCreate(hWnd);
+        window->OnCreate();
         break;
     case WM_CLOSE:
         window->OnClose();
+        break;
+    case WM_TIMER:
+        window->OnTimer(wParam);
         break;
     case WM_SIZE:
         window->OnResize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -1291,6 +1223,17 @@ void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
     case WM_RBUTTONUP:
         window->OnRightUp(x, y);
         break;
+    case WM_CHAR:
+        window->OnChar(wParam);
+        break;
+    case WM_UNICHAR:
+        // 当其他软件试图使用UNICODE_NOCHAR测试本软件是否处理unicode字符时
+        // 给予TRUE作为回应并忽视此消息
+        if (wParam == UNICODE_NOCHAR){
+            break;
+        }
+        window->OnUnichar(wParam);
+        break;
     case WM_COMMAND:
         switch (HIWORD(wParam)){
         case 0:
@@ -1320,24 +1263,28 @@ void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 }
 
 LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    //FireEvent(mainWnd, mainRect, hWnd, uMsg, wParam, lParam);
-    //FireEvent(mainWnd2, mainRect2, hWnd, uMsg, wParam, lParam);
-
     //将事件发送至对应整个窗口的组件容器
     FireEvent(container, hWnd, uMsg, wParam, lParam);
 
     switch (uMsg){
     case WM_CREATE:
         DragAcceptFiles(hWnd, TRUE);
+        SetTimer(hWnd, 0, 10, NULL);
         break;
     case WM_CLOSE:
         PostQuitMessage(0);
         break;
     case WM_LBUTTONDOWN:
+        SetCursor(LoadCursor(hInst, MAKEINTRESOURCE(IDC_CLICKED)));
         SetCapture(hWnd);
         break;
     case WM_LBUTTONUP:
         ReleaseCapture();
+        break;
+    case WM_UNICHAR:
+        if (wParam == UNICODE_NOCHAR){
+            return TRUE;
+        }
         break;
     }
 
@@ -1348,9 +1295,17 @@ LRESULT CALLBACK Main::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     return Main::inst->LocalWndProc(hWnd, uMsg, wParam, lParam);
 }
 
+void CALLBACK Main::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR wParam, DWORD lParam){
+    return;
+}
+
 void Main::OnResize(int x, int y){
     //TODO 这里做子窗口大小管理
     container->OnResize(x, y);
+}
+
+void Main::RequestRender(){
+    inst->reqRender = true;
 }
 
 void Main::OnRender(){
@@ -1365,10 +1320,14 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     hInst = hInstance;
 
-    mainWnd = new MainWindow(hInst);
+    mainWnd = new MainWindow();
     mainWnd2 = new AudioPlayerWindow();
+    mainWnd3 = new NodeMapWindow();
+    mainWnd4 = new AudioCaptureWindow();
 
-    container = new LRContainer(mainWnd, mainWnd2);
+    udCont1 = new UDContainer(mainWnd, mainWnd3);
+    udCont2 = new UDContainer(mainWnd2, mainWnd4);
+    container = new LRContainer(udCont1, udCont2);
 
     RegClass();
     ColorBoard::RegClass(hInstance);
@@ -1403,9 +1362,12 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
             } else {
                 TranslateMessage(&Msg);
                 DispatchMessage(&Msg);
-                wglMakeCurrent(hDC, hRC);
-                OnRender();
-                SwapBuffers(hDC);
+                if (reqRender || Msg.message != WM_TIMER){
+                    reqRender = false;
+                    wglMakeCurrent(hDC, hRC);
+                    OnRender();
+                    SwapBuffers(hDC);
+                }
             }
         }
     }

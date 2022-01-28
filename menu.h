@@ -49,6 +49,7 @@ private:
 
     Menu* curMenu = NULL;
     Vector2 menuPos;
+    
 public:
     Menu();
     ~Menu();

@@ -1,0 +1,9 @@
+#include "res.h"
+
+STRINGTABLE
+BEGIN
+    IDS_OBJFILE_FORM_WARNING "未识别的文件格式，是否继续导入？"
+    IDS_OBJFILE_FORM_WARNING_CAPTION "文件格式错误"
+    IDS_WAVFILE_FORM_WARNING "未识别的文件格式，是否继续导入？"
+    IDS_WAVFILE_FORM_WARNING_CAPTION "文件格式错误"
+END

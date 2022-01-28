@@ -26,14 +26,29 @@ void LRContainer::OnRender(){
     ViewportManager::inst->PopViewport();
 }
 
-void LRContainer::OnCreate(HWND hWnd){
-    lWindow->OnCreate(hWnd);
-    rWindow->OnCreate(hWnd);
+void LRContainer::OnCreate(){
+    lWindow->OnCreate();
+    rWindow->OnCreate();
 }
 
 void LRContainer::OnClose(){
     lWindow->OnClose();
     rWindow->OnClose();
+}
+
+void LRContainer::OnTimer(int id){
+    lWindow->OnTimer(id);
+    rWindow->OnTimer(id);
+}
+
+void LRContainer::OnChar(char c){
+    if (focus)
+        focus->OnChar(c);
+}
+
+void LRContainer::OnUnichar(wchar_t c){
+    if (focus)
+        focus->OnUnichar(c);
 }
 
 void LRContainer::OnResize(int x, int y){
@@ -206,14 +221,29 @@ void UDContainer::OnRender(){
     ViewportManager::inst->PopViewport();
 }
 
-void UDContainer::OnCreate(HWND hWnd){
-    uWindow->OnCreate(hWnd);
-    dWindow->OnCreate(hWnd);
+void UDContainer::OnCreate(){
+    uWindow->OnCreate();
+    dWindow->OnCreate();
 }
 
 void UDContainer::OnClose(){
     uWindow->OnClose();
     dWindow->OnClose();
+}
+
+void UDContainer::OnTimer(int id){
+    uWindow->OnTimer(id);
+    dWindow->OnTimer(id);
+}
+
+void UDContainer::OnChar(char c){
+    if (focus)
+        focus->OnChar(c);
+}
+
+void UDContainer::OnUnichar(wchar_t c){
+    if (focus)
+        focus->OnUnichar(c);
 }
 
 void UDContainer::OnResize(int x, int y){
@@ -246,7 +276,7 @@ void UDContainer::OnLeftDown(int x, int y){
     cursorPos.y = y;
     if (dragEnable && Abs(y - dis) < 4.0f){
         adjustPos = true;
-        SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+        SetCursor(LoadCursor(NULL, IDC_SIZENS));
         return;
     }
     UpdateFocus();
