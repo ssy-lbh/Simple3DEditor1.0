@@ -404,8 +404,7 @@ uint RateTransposerInteger::transposeMono(SAMPLETYPE *dest, const SAMPLETYPE *sr
 // Transposes the sample rate of the given samples using linear interpolation. 
 // 'Stereo' version of the routine. Returns the number of samples returned in 
 // the "dest" buffer
-uint
-RateTransposerInteger::transposeStereo(SAMPLETYPE *dest, const SAMPLETYPE *src, uint nSamples) {
+uint RateTransposerInteger::transposeStereo(SAMPLETYPE *dest, const SAMPLETYPE *src, uint nSamples) {
     unsigned int srcPos, i, used;
     LONG_SAMPLETYPE temp, vol1;
 

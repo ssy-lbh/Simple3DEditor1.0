@@ -43,6 +43,17 @@ void GLUtils::DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC){
     ReleaseDC(hWnd, hDC);
 }
 
+void GLUtils::Clear2DViewport(){
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void GLUtils::Clear3DViewport(){
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearDepth(1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 RECT GLUtils::MakeRect(LONG left, LONG right, LONG bottom, LONG top){
     RECT ret;
     ret.left = left; ret.right = right;

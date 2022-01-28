@@ -8,6 +8,9 @@
 #include "gltools.h"
 #include "soundtouch/SoundTouch.h"
 
+ALCdevice* AudioUtils::alDev;
+ALCcontext* AudioUtils::alCtx;
+
 AudioUtils::Complex::Complex(_Complex float comp) : comp(comp) {}
 AudioUtils::Complex::~Complex(){}
 
@@ -71,6 +74,22 @@ void AudioUtils::FFT(_Complex float* input, int sizebit, bool inv){
             input[i] /= size;
         }
     }
+}
+
+void AudioUtils::InitOpenAL(){
+    alDev = alcOpenDevice(NULL);
+    alCtx = alcCreateContext(alDev, NULL);
+
+    alcMakeContextCurrent(alCtx);
+
+    alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+    alListener3f(AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+    alListener3f(AL_ORIENTATION, 0.0f, 1.0f, 0.0f);
+}
+
+void AudioUtils::UninitOpenAL(){
+    alcCloseDevice(alDev);
+    alcDestroyContext(alCtx);
 }
 
 AudioPlayerWindow::PlayButton::PlayButton(AudioPlayerWindow* window) : window(window) {}
@@ -204,9 +223,6 @@ AudioPlayerWindow::~AudioPlayerWindow(){
 
         alDeleteBuffers(1, &alBuf);
         alDeleteSources(1, &alSrc);
-
-        alcDestroyContext(alCtx);
-        alcCloseDevice(alDev);
     }
 }
 
@@ -387,11 +403,6 @@ void AudioPlayerWindow::Load(const wchar_t* file){
 
     DebugLog("OpenAL Started");
 
-    alDev = alcOpenDevice(NULL);
-    alCtx = alcCreateContext(alDev, NULL);
-
-    alcMakeContextCurrent(alCtx);
-
     alGenSources(1, &alSrc);
     alGenBuffers(1, &alBuf);
 
@@ -477,6 +488,7 @@ void AudioPlayerWindow::Launch(){
     }
 
     ALint cnt;
+
     alGetSourcei(alSrc, AL_BUFFERS_QUEUED, &cnt);
     if (cnt == 0){
         alSourceQueueBuffers(alSrc, 1, &alBuf);
@@ -496,6 +508,7 @@ void AudioPlayerWindow::Stop(){
 
 bool AudioPlayerWindow::IsLaunched(){
     ALint state;
+
     alGetSourcei(alSrc, AL_SOURCE_STATE, &state);
     if (state == AL_PLAYING){
         launched = true;
@@ -532,13 +545,35 @@ ALint AudioPlayerWindow::GetWaveFormat(PWAVEFORMATEX lpwav){
     return format;
 }
 
-AudioCaptureWindow::AudioCaptureWindow(){}
+AudioCaptureWindow::AudioCaptureWindow(){
+    //SoundTouch 貌似在我的电脑上性能有限，不能很好做到实时变音
+    soundTouch = new soundtouch::SoundTouch();
+    soundTouch->setChannels(1);
+    soundTouch->setSampleRate(freq);
+    soundTouch->setPitchSemiTones(12);
+    soundTouch->setTempo(1.0f);
+    soundTouch->clear();
+}
 
 AudioCaptureWindow::~AudioCaptureWindow(){
-    if (capDev) alcCloseDevice(capDev);
-
     if (capBuf) delete (short*)capBuf;
     if (freqBuf) delete freqBuf;
+
+    if (capDev){
+        alcCaptureCloseDevice(capDev);
+    }
+
+    if (playBuf){
+        alSourceStop(alSrc);
+        alDeleteSources(1, &alSrc);
+        alDeleteBuffers(1 << queueBit, alBuf);
+        delete[] playBuf;
+    }
+
+    if (soundTouch){
+        soundTouch->clear();
+        delete soundTouch;
+    }
 }
 
 bool AudioCaptureWindow::IsFocus(){
@@ -546,25 +581,37 @@ bool AudioCaptureWindow::IsFocus(){
 }
 
 void AudioCaptureWindow::OnRender(){
-    const int bit = 10;
-    ALint sampleCnt;
+    ALint cnt;
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     if (capture){
-        alcGetIntegerv(capDev, ALC_CAPTURE_SAMPLES, 1, &sampleCnt);
-        if (sampleCnt >= (1 << bit)){
+        alcGetIntegerv(capDev, ALC_CAPTURE_SAMPLES, 1, &cnt);
+
+        if (cnt >= (1 << bit)){
             alcCaptureSamples(capDev, capBuf, 1 << bit);
+
+            if (soundTouch->numUnprocessedSamples() <= (1 << (bit + queueBit)) && tail - head < (1 << queueBit) - 1){
+                //DebugLog("SoundTouch::putSamples");
+                soundTouch->putSamples((soundtouch::SAMPLETYPE*)capBuf, 1 << bit);
+            }
+            if (soundTouch->numSamples() >= (1 << bit) && playBuf){
+                //DebugLog("SoundTouch::receiveSamples");
+                soundTouch->receiveSamples(playBuf, 1 << bit);
+                UpdateBuffer(playBuf, 1 << (bit + 1));
+            }
+
             for (int i = 0; i < (1 << bit); i++){
                 freqBuf[i] = ((short*)capBuf)[i];
             }
             AudioUtils::FFT(freqBuf, bit, false);
         }
+
         glBegin(GL_LINES);
         for (int i = 0; i < 1024; i++){
             float rate = i / 1024.0f;
-            float amp = Clamp(__builtin_log(AudioUtils::Complex(freqBuf[i]).MagnitudeSqr()) * 0.1f, 0.01f, 1.0f);
+            float amp = Clamp(__builtin_log(AudioUtils::Complex(freqBuf[i << (bit - 10)]).MagnitudeSqr()) * 0.1f, 0.01f, 1.0f);
             glColor3f(rate, 1.0f - rate, 0.0f);
             glVertex2f(rate * 2.0f - 1.0f, -amp);
             glVertex2f(rate * 2.0f - 1.0f, amp);
@@ -578,6 +625,10 @@ void AudioCaptureWindow::OnCreate(){
 }
 
 void AudioCaptureWindow::OnClose(){}
+
+void AudioCaptureWindow::OnTimer(int id){
+    Main::RequestRender();
+}
 
 void AudioCaptureWindow::OnChar(char c){}
 
@@ -639,16 +690,45 @@ void AudioCaptureWindow::Launch(){
         return;
     }
 
-    capDev = alcCaptureOpenDevice(NULL, 44100, AL_FORMAT_MONO16, 1 << 12);
+    capDev = alcCaptureOpenDevice(NULL, freq, AL_FORMAT_MONO16, 1 << (bit + 2));
 
-    if (!capBuf) capBuf = new short[1 << 10];
-    if (!freqBuf) freqBuf = new _Complex float[1 << 10];
+    if (!capBuf) capBuf = new short[1 << bit];
+    if (!freqBuf) freqBuf = new _Complex float[1 << bit];
+    if (!playBuf){
+        alGenSources(1, &alSrc);
+        alGenBuffers(1 << queueBit, alBuf);
+        playBuf = new short[1 << bit];
+
+        alSourcePlay(alSrc);
+    }
 
     alcCaptureStart(capDev);
     capture = true;
+
+    DebugError("AudioCaptureWindow::Launch Success");
 }
 
 void AudioCaptureWindow::Stop(){
     alcCaptureStop(capDev);
     capture = false;
+}
+
+void AudioCaptureWindow::UpdateBuffer(ALvoid* buf, ALsizei size){
+    ALint cnt;
+    ALint state;
+
+    //DebugLog("AudioCaptureWindow %p Queue Buffer %d %d", this, head, alBuf[head & queueMask]);
+    alBufferData(alBuf[head & queueMask], AL_FORMAT_MONO16, buf, size, freq);
+    alSourceQueueBuffers(alSrc, 1, &alBuf[(head++) & queueMask]);
+
+    alGetSourcei(alSrc, AL_BUFFERS_PROCESSED, &cnt);
+    while (cnt--){
+        //DebugLog("AudioCaptureWindow %p Unqueue Buffer %d %d", this, tail, alBuf[tail & queueMask]);
+        alSourceUnqueueBuffers(alSrc, 1, &alBuf[(tail++) & queueMask]);
+    }
+
+    alGetSourcei(alSrc, AL_SOURCE_STATE, &state);
+    if (state != AL_PLAYING){
+        alSourcePlay(alSrc);
+    }
 }

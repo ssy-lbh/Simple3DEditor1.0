@@ -16,29 +16,37 @@ void LRContainer::OnRender(){
     tmp = ViewportManager::inst->GetCurrentRect();
     tmp.right = tmp.left + dis;
     ViewportManager::inst->PushViewport(tmp);
-    lWindow->OnRender();
+    if (lWindow){
+        lWindow->OnRender();
+    }else{
+        GLUtils::Clear3DViewport();
+    }
     ViewportManager::inst->PopViewport();
 
     tmp = ViewportManager::inst->GetCurrentRect();
     tmp.left = tmp.left + dis;
     ViewportManager::inst->PushViewport(tmp);
-    rWindow->OnRender();
+    if (rWindow){
+        rWindow->OnRender();
+    }else{
+        GLUtils::Clear3DViewport();
+    }
     ViewportManager::inst->PopViewport();
 }
 
 void LRContainer::OnCreate(){
-    lWindow->OnCreate();
-    rWindow->OnCreate();
+    if (lWindow) lWindow->OnCreate();
+    if (rWindow) rWindow->OnCreate();
 }
 
 void LRContainer::OnClose(){
-    lWindow->OnClose();
-    rWindow->OnClose();
+    if (lWindow) lWindow->OnClose();
+    if (rWindow) rWindow->OnClose();
 }
 
 void LRContainer::OnTimer(int id){
-    lWindow->OnTimer(id);
-    rWindow->OnTimer(id);
+    if (lWindow) lWindow->OnTimer(id);
+    if (rWindow) rWindow->OnTimer(id);
 }
 
 void LRContainer::OnChar(char c){
@@ -58,8 +66,8 @@ void LRContainer::OnResize(int x, int y){
     size.x = x;
     size.y = y;
     dis = GLUtils::Clamp(dis, 0.0f, size.x);
-    lWindow->OnResize(dis, y);
-    rWindow->OnResize(x - dis, y);
+    if (lWindow) lWindow->OnResize(dis, y);
+    if (rWindow) rWindow->OnResize(x - dis, y);
 }
 
 void LRContainer::OnMouseMove(int x, int y){
@@ -68,8 +76,8 @@ void LRContainer::OnMouseMove(int x, int y){
     if (adjustPos){
         SetCursor(LoadCursor(NULL, IDC_SIZEWE));
         dis = x;
-        lWindow->OnResize(dis, size.y);
-        rWindow->OnResize(size.x - dis, size.y);
+        if (lWindow) lWindow->OnResize(dis, size.y);
+        if (rWindow) rWindow->OnResize(size.x - dis, size.y);
         return;
     }
     if (focus)
@@ -85,7 +93,8 @@ void LRContainer::OnLeftDown(int x, int y){
         return;
     }
     UpdateFocus();
-    focus->OnLeftDown(right ? x - dis : x, y);
+    if (focus)
+        focus->OnLeftDown(right ? x - dis : x, y);
 }
 
 void LRContainer::OnLeftUp(int x, int y){
@@ -100,7 +109,8 @@ void LRContainer::OnRightDown(int x, int y){
     cursorPos.x = x;
     cursorPos.y = y;
     UpdateFocus();
-    focus->OnRightDown(right ? x - dis : x, y);
+    if (focus)
+        focus->OnRightDown(right ? x - dis : x, y);
 }
 
 void LRContainer::OnRightUp(int x, int y){
@@ -156,7 +166,8 @@ void LRContainer::UpdateFocus(){
         if (focus != lWindow){
             if (focus)
                 focus->OnKillFocus();
-            lWindow->OnFocus();
+            if (lWindow)
+                lWindow->OnFocus();
         }
         focus = lWindow;
         right = false;
@@ -164,18 +175,20 @@ void LRContainer::UpdateFocus(){
         if (focus != rWindow){
             if (focus)
                 focus->OnKillFocus();
-            rWindow->OnFocus();
+            if (rWindow)
+                rWindow->OnFocus();
         }
         focus = rWindow;
         right = true;
     }
-    focus->OnMouseMove(right ? cursorPos.x - dis : cursorPos.x, cursorPos.y);
+    if (focus)
+        focus->OnMouseMove(right ? cursorPos.x - dis : cursorPos.x, cursorPos.y);
     DebugLog("LRContainer::focus %p", focus);
 }
 
 void LRContainer::FreeWindow(){
-    delete lWindow;
-    delete rWindow;
+    if (lWindow) delete lWindow;
+    if (rWindow) delete rWindow;
 }
 
 IWindow* LRContainer::GetLeftWindow(){
@@ -211,29 +224,37 @@ void UDContainer::OnRender(){
     tmp = ViewportManager::inst->GetCurrentRect();
     tmp.bottom = tmp.bottom + dis;
     ViewportManager::inst->PushViewport(tmp);
-    uWindow->OnRender();
+    if (uWindow){
+        uWindow->OnRender();
+    }else{
+        GLUtils::Clear3DViewport();
+    }
     ViewportManager::inst->PopViewport();
 
     tmp = ViewportManager::inst->GetCurrentRect();
     tmp.top = tmp.bottom + dis;
     ViewportManager::inst->PushViewport(tmp);
-    dWindow->OnRender();
+    if (dWindow){
+        dWindow->OnRender();
+    }else{
+        GLUtils::Clear3DViewport();
+    }
     ViewportManager::inst->PopViewport();
 }
 
 void UDContainer::OnCreate(){
-    uWindow->OnCreate();
-    dWindow->OnCreate();
+    if (uWindow) uWindow->OnCreate();
+    if (dWindow) dWindow->OnCreate();
 }
 
 void UDContainer::OnClose(){
-    uWindow->OnClose();
-    dWindow->OnClose();
+    if (uWindow) uWindow->OnClose();
+    if (dWindow) dWindow->OnClose();
 }
 
 void UDContainer::OnTimer(int id){
-    uWindow->OnTimer(id);
-    dWindow->OnTimer(id);
+    if (uWindow) uWindow->OnTimer(id);
+    if (dWindow) dWindow->OnTimer(id);
 }
 
 void UDContainer::OnChar(char c){
@@ -253,8 +274,8 @@ void UDContainer::OnResize(int x, int y){
     size.x = x;
     size.y = y;
     dis = GLUtils::Clamp(dis, 0.0f, size.y);
-    uWindow->OnResize(x, y - dis);
-    dWindow->OnResize(x, dis);
+    if (uWindow) uWindow->OnResize(x, y - dis);
+    if (dWindow) dWindow->OnResize(x, dis);
 }
 
 void UDContainer::OnMouseMove(int x, int y){
@@ -263,8 +284,8 @@ void UDContainer::OnMouseMove(int x, int y){
     if (adjustPos){
         SetCursor(LoadCursor(NULL, IDC_SIZENS));
         dis = y;
-        uWindow->OnResize(size.x, size.y - dis);
-        dWindow->OnResize(size.x, dis);
+        if (uWindow) uWindow->OnResize(size.x, size.y - dis);
+        if (dWindow) dWindow->OnResize(size.x, dis);
         return;
     }
     if (focus)
@@ -352,7 +373,8 @@ void UDContainer::UpdateFocus(){
         if (focus != dWindow){
             if (focus)
                 focus->OnKillFocus();
-            dWindow->OnFocus();
+            if (dWindow)
+                dWindow->OnFocus();
         }
         focus = dWindow;
         up = false;
@@ -360,18 +382,20 @@ void UDContainer::UpdateFocus(){
         if (focus != uWindow){
             if (focus)
                 focus->OnKillFocus();
-            uWindow->OnFocus();
+            if (uWindow)
+                uWindow->OnFocus();
         }
         focus = uWindow;
         up = true;
     }
-    focus->OnMouseMove(cursorPos.x, up ? cursorPos.y - dis : cursorPos.y);
+    if (focus)
+        focus->OnMouseMove(cursorPos.x, up ? cursorPos.y - dis : cursorPos.y);
     DebugLog("UDContainer::focus %p", focus);
 }
 
 void UDContainer::FreeWindow(){
-    delete uWindow;
-    delete dWindow;
+    if (uWindow) delete uWindow;
+    if (dWindow) delete dWindow;
 }
 
 IWindow* UDContainer::GetUpWindow(){

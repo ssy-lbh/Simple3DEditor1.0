@@ -15,6 +15,8 @@ public:
     static void DrawCorner(float x, float y, float start, float end, float radius, float step);
     static void EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC);
     static void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC);
+    static void Clear2DViewport();
+    static void Clear3DViewport();
     static RECT MakeRect(LONG left, LONG right, LONG bottom, LONG top);
     static bool InRect(int x, int y, RECT rect);
     static void DrawBezier(Vector2 p1, Vector2 p2, Vector2 p3, float step);

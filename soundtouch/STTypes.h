@@ -112,7 +112,7 @@ namespace soundtouch {
     /// routines compiled for whatever reason, you may disable these optimizations
     /// to make the library compile.
 
-//#define SOUNDTOUCH_ALLOW_X86_OPTIMIZATIONS     1
+#define SOUNDTOUCH_ALLOW_X86_OPTIMIZATIONS     1
 
     /// In GNU environment, allow the user to override this setting by
     /// giving the following switch to the configure script:

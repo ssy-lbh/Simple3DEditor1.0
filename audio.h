@@ -9,12 +9,17 @@
 
 #include "uimgr.h"
 
+#include "soundtouch/SoundTouch.h"
+
 class AudioUtils;
 class AudioPlayerWindow;
 class AudioCaptureWindow;
 
 class AudioUtils {
 public:
+    static ALCdevice* alDev;
+    static ALCcontext* alCtx;
+
     union Complex {
         _Complex float comp;
         float real, imag;
@@ -28,6 +33,8 @@ public:
 
     static bool CheckALError(const char* tag, const char* file, int line);
     static void FFT(_Complex float* input, int sizebit, bool inv);
+    static void InitOpenAL();
+    static void UninitOpenAL();
 };
 
 class AudioPlayerWindow : public IWindow {
@@ -44,8 +51,6 @@ private:
     bool loaded = false;
     bool launched = false;
 
-    ALCdevice* alDev = NULL;
-    ALCcontext* alCtx = NULL;
     ALuint alSrc;
     ALuint alBuf;
 
@@ -147,6 +152,12 @@ public:
 
 class AudioCaptureWindow : public IWindow {
 private:
+    static const int bit = 14;
+    static const int queueBit = 2;
+    static const int queueMask = ((1 << queueBit) - 1);
+
+    static const int freq = 44100;
+
     bool focus = false;
 
     Vector2 size;
@@ -155,8 +166,15 @@ private:
     ALCdevice* capDev = NULL;
     ALvoid* capBuf = NULL;
     _Complex float* freqBuf = NULL;
+    soundtouch::SAMPLETYPE* playBuf = NULL;
 
     bool capture = false;
+
+    ALuint alBuf[1 << queueBit];
+    ALuint alSrc;
+    int head = 0, tail = 0;
+
+    soundtouch::SoundTouch* soundTouch = NULL;
 
 public:
     AudioCaptureWindow();
@@ -166,6 +184,7 @@ public:
     virtual void OnRender() override;
     virtual void OnCreate() override;
     virtual void OnClose() override;
+    virtual void OnTimer(int id) override;
     virtual void OnChar(char c) override;
     virtual void OnUnichar(wchar_t c) override;
     virtual void OnResize(int x, int y) override;
@@ -185,6 +204,7 @@ public:
 
     void Launch();
     void Stop();
+    void UpdateBuffer(ALvoid* buf, ALsizei size);
 };
 
 #endif

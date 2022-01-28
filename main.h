@@ -256,14 +256,14 @@ public:
     static Main* inst;
 
     // 测试一下面向对象的结果，成功实现双屏
-    IWindow* mainWnd;
-    IWindow* mainWnd2;
-    IWindow* mainWnd3;
-    IWindow* mainWnd4;
+    IWindow* mainWnd = NULL;
+    IWindow* mainWnd2 = NULL;
+    IWindow* mainWnd3 = NULL;
+    IWindow* mainWnd4 = NULL;
 
-    LRContainer* container;
-    UDContainer* udCont1;
-    UDContainer* udCont2;
+    LRContainer* container = NULL;
+    UDContainer* udCont1 = NULL;
+    UDContainer* udCont2 = NULL;
 
     bool reqRender = false;
 

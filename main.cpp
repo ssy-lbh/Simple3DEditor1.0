@@ -646,8 +646,8 @@ bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
     char* fileData;
     size_t fileLen, filePtr = 0;
     List<Vertex*> vert;
-    List<Vector2*> vertUV;
-    List<Vector3*> vertNormal;
+    List<Vector2> vertUV;
+    List<Vector3> vertNormal;
 
     DebugLog("Loading Object");
     GetFileInformationByHandle(hFile, &fileInfo);
@@ -668,19 +668,31 @@ bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
             if (fileData[filePtr] == '#'){
                 DebugLog("Object Annotation %s", fileData + filePtr + 1);
             }else if (__builtin_sscanf(fileData + filePtr, "v %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
-                vert.Add(mesh->AddVertex(vec + camLookat));\
+                vert.Add(mesh->AddVertex(vec + camLookat));
             }else if (__builtin_sscanf(fileData + filePtr, "f %d//%d %d//%d %d//%d", &v1, &vn1, &v2, &vn2, &v3, &vn3) == 6){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
+                vert[v1 - 1]->normal = vertNormal[vn1 - 1];
+                vert[v2 - 1]->normal = vertNormal[vn2 - 1];
+                vert[v3 - 1]->normal = vertNormal[vn3 - 1];
             }else if (__builtin_sscanf(fileData + filePtr, "f %d/%d %d/%d %d/%d", &v1, &vt1, &v2, &vt2, &v3, &vt3) == 6){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
+                vert[v1 - 1]->uv = vertUV[vn1 - 1];
+                vert[v2 - 1]->uv = vertUV[vn2 - 1];
+                vert[v3 - 1]->uv = vertUV[vn3 - 1];
             }else if (__builtin_sscanf(fileData + filePtr, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3) == 9){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
+                vert[v1 - 1]->uv = vertUV[vn1 - 1];
+                vert[v2 - 1]->uv = vertUV[vn2 - 1];
+                vert[v3 - 1]->uv = vertUV[vn3 - 1];
+                vert[v1 - 1]->normal = vertNormal[vn1 - 1];
+                vert[v2 - 1]->normal = vertNormal[vn2 - 1];
+                vert[v3 - 1]->normal = vertNormal[vn3 - 1];
             }else if (__builtin_sscanf(fileData + filePtr, "f %d %d %d", &v1, &v2, &v3) == 3){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
             }else if (__builtin_sscanf(fileData + filePtr, "vt %f %f", &vec.x, &vec.y) == 2){
-                vertUV.Add(new Vector2(vec.x, vec.y));
+                vertUV.Add(Vector2(vec.x, vec.y));
             }else if (__builtin_sscanf(fileData + filePtr, "vn %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
-                vertNormal.Add(new Vector3(vec));
+                vertNormal.Add(Vector3(vec));
             }else{
                 DebugLog("Object File Unknown Line %s", fileData + filePtr);
             }
@@ -688,9 +700,6 @@ bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
         }
     }
     delete[] fileData;
-
-    Free(vertUV);
-    Free(vertNormal);
 
     return true;
 }
@@ -1320,6 +1329,8 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     hInst = hInstance;
 
+    AudioUtils::InitOpenAL();
+
     mainWnd = new MainWindow();
     mainWnd2 = new AudioPlayerWindow();
     mainWnd3 = new NodeMapWindow();
@@ -1375,6 +1386,8 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     GLUtils::DisableOpenGL(hWnd, hDC, hRC);
 
     DestroyWindow(hWnd);
+
+    AudioUtils::UninitOpenAL();
     
     return Msg.wParam;
 }

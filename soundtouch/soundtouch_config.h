@@ -2,7 +2,7 @@
 /* include/soundtouch_config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Never allow x86 optimizations in iOS simulator build */
-#define ALLOW_X86_OPTIMIZATIONS 0
+#define ALLOW_X86_OPTIMIZATIONS 1
 
 /* Use Integer as Sample type */
 #define INTEGER_SAMPLES 1

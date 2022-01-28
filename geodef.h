@@ -13,7 +13,7 @@ class Vertex {
 public:
     Vector3 pos;
     Vector3 normal = Vector3::forward;
-    Vector3 uv = Vector3::zero;
+    Vector2 uv = Vector2::zero;
     Vector3 color = Vector3::one;
     List<Edge*> edges;
     List<Face*> faces;

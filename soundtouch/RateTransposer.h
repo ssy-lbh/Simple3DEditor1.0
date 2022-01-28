@@ -60,6 +60,8 @@ namespace soundtouch {
 /// instance instead of the "new" operator; that function automatically 
 /// chooses a correct implementation depending on if integer or floating 
 /// arithmetics are to be used.
+    typedef signed char BOOL;
+
     class RateTransposer : public FIFOProcessor {
     protected:
         /// Anti-alias filter object

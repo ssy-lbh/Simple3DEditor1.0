@@ -5,6 +5,8 @@
 
 #include "geodef.h"
 
+#include "gltools.h"
+
 class Mesh;
 
 class Mesh {
@@ -12,6 +14,8 @@ private:
     List<Vertex*> vertices;
     List<Edge*> edges;
     List<Face*> faces;
+
+    GLTexture2D* modeltex = NULL;
     
 public:
     Mesh();
