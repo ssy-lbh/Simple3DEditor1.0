@@ -407,7 +407,6 @@ void AudioPlayerWindow::PreloadFileW(const wchar_t* file){
             }
             wcscpy_s(path, L".\\temp.wav");
             LoadFileW(path);
-            DeleteFileW(path);
             return;
         case IDNO:
             wcscpy_s(path, file);
