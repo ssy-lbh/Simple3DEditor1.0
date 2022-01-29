@@ -86,6 +86,7 @@ merge:
 # git reflog 历史操作日志 (包含回退操作)('q'退出)
 # git reset --hard HEAD^ 回退到上一版本
 # git reset --hard id (id 在 git reflog 里，用于撤销)
+# git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch ${file}' --prune-empty --tag-name-filter cat -- --all
 
 # $(SIGNTOOL) sign /f $(CERT) /p $(PASSWORD) $(OUTPUT)
 # signtool.exe sign /f "D:\code\.Certificate\lin-boheng.pfx" /p ... main.exe
