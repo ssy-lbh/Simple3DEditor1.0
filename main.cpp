@@ -694,7 +694,7 @@ bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
             }else if (__builtin_sscanf(fileData + filePtr, "vn %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
                 vertNormal.Add(Vector3(vec));
             }else{
-                DebugLog("Object File Unknown Line %s", fileData + filePtr);
+                DebugError("Object File Unknown Line %s", fileData + filePtr);
             }
             filePtr = i + 1;
         }

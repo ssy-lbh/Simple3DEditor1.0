@@ -141,7 +141,10 @@ public:
     virtual void OnDropFileA(const char* path) override;
     virtual void OnDropFileW(const wchar_t* path) override;
 
-    void Load(const wchar_t* file);
+    void OnInsLoad();
+
+    void PreloadFileW(const wchar_t* file);
+    void LoadFileW(const wchar_t* file);
     bool IsLoaded();
     void Launch();
     void Stop();

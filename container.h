@@ -8,10 +8,10 @@ class LRContainer : public IWindow {
 private:
     IWindow* lWindow;
     IWindow* rWindow;
-    LONG dis = 800;
+    LONG dis = 1;
     IWindow* focus = NULL;
     bool right = false;
-    Vector2 size;
+    Vector2 size = Vector2(2.0f, 0.0f);
     Vector2 cursorPos;
     bool adjustPos = false;
     bool dragEnable = true;
@@ -55,10 +55,10 @@ class UDContainer : public IWindow {
 private:
     IWindow* uWindow;
     IWindow* dWindow;
-    LONG dis = 200;
+    LONG dis = 1;
     IWindow* focus = NULL;
     bool up = false;
-    Vector2 size;
+    Vector2 size = Vector2(0.0f, 2.0f);
     Vector2 cursorPos;
     bool adjustPos = false;
     bool dragEnable = true;

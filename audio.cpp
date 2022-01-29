@@ -6,6 +6,7 @@
 #include "res.h"
 #include "font.h"
 #include "gltools.h"
+#include "shell.h"
 #include "soundtouch/SoundTouch.h"
 
 ALCdevice* AudioUtils::alDev;
@@ -81,6 +82,12 @@ void AudioUtils::InitOpenAL(){
     alCtx = alcCreateContext(alDev, NULL);
 
     alcMakeContextCurrent(alCtx);
+
+    DebugLog("OpenAL Enabled");
+    DebugLog("OpenAL Version %s", alGetString(AL_VERSION));
+    DebugLog("OpenAL Renderer %s", alGetString(AL_RENDERER));
+    DebugLog("OpenAL Vendor %s", alGetString(AL_VENDOR));
+    //DebugLog("OpenAL Extensions %s", alGetString(AL_EXTENSIONS));
 
     alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
     alListener3f(AL_VELOCITY, 0.0f, 0.0f, 0.0f);
@@ -357,37 +364,80 @@ void AudioPlayerWindow::OnKillFocus(){
 
 void AudioPlayerWindow::OnMouseWheel(int delta){}
 
-void AudioPlayerWindow::OnMenuAccel(int id, bool accel){}
+void AudioPlayerWindow::OnMenuAccel(int id, bool accel){
+    DebugLog("AudioPlayerWindow::OnMenuAccel %d %s", id, accel ? "true" : "false");
+    switch (id){
+    case IDM_LOAD:
+        OnInsLoad();
+        break;
+    }
+}
 
 void AudioPlayerWindow::OnDropFileA(const char* path){}
 
 void AudioPlayerWindow::OnDropFileW(const wchar_t* path){
-    wchar_t* suffix = wcsrchr(path, L'.');
+    PreloadFileW(path);
+}
+
+void AudioPlayerWindow::OnInsLoad(){
+    wchar_t file[MAX_PATH];
+    file[0] = L'\0';
+    // 暂不使用 L"PCM音频文件(*.wav)\0*.wav\0所有音频类型(.*)\0*.*\0"，此状态下发现Shell时可能的环境错误
+    if (!ShellFileSelectWindowW(Main::hWnd, file, MAX_PATH, L"PCM音频文件(*.wav)\0*.wav\0", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER)){
+        DebugLog("Stop Loading");
+    }
+    PreloadFileW(file);
+}
+
+void AudioPlayerWindow::PreloadFileW(const wchar_t* file){
+    wchar_t* suffix = wcsrchr(file, L'.');
     char message[60];
     char caption[20];
     LoadString(Main::hInst, IDS_WAVFILE_FORM_WARNING, message, 60);
     LoadString(Main::hInst, IDS_WAVFILE_FORM_WARNING_CAPTION, caption, 20);
-    if (wcscmp(suffix, L".wav")){
-        if (MessageBox(Main::hWnd, message, caption, MB_OKCANCEL | MB_ICONWARNING) == IDCANCEL){
-            DebugLog("AudioPlayerWindow::OnDropFileW Stop Load File");
+    if (suffix == NULL || wcscmp(suffix, L".wav")){
+        switch (MessageBox(Main::hWnd, message, caption, MB_YESNOCANCEL | MB_ICONWARNING)){
+        case IDCANCEL:
+            DebugLog("AudioPlayerWindow::PreloadFileW Stop Load File");
             return;
+        case IDYES:
+            if (!ShellFFmpegW(file, L".\\temp.wav")){
+                DebugError("AudioPlayerWindow::PreloadFileW ShellFFmpegW Failed");
+                return;
+            }
+            wcscpy_s(path, L".\\temp.wav");
+            LoadFileW(path);
+            DeleteFileW(path);
+            return;
+        case IDNO:
+            wcscpy_s(path, file);
+            break;
         }
+    }else{
+        wcscpy_s(path, file);
     }
-    wcscpy_s(this->path, path);
-    if (!loaded){
-        Load(path);
-    }
+    LoadFileW(path);
 }
 
-void AudioPlayerWindow::Load(const wchar_t* file){
-    if (path[0] == L'\0'){
+void AudioPlayerWindow::LoadFileW(const wchar_t* file){
+    if (file[0] == L'\0'){
         return;
     }
 
-    DebugLog("AudioPlayerWindow::Load From");
+    if (loaded){
+        DebugLog("AudioPlayerWindow::LoadFileW Unload %S", path);
+        if (launched){
+            Stop();
+        }
+        alDeleteBuffers(1, &alBuf);
+        alDeleteSources(1, &alSrc);
+        loaded = false;
+    }
+
+    DebugLog("AudioPlayerWindow::LoadFileW From %S", file);
 
     HANDLE hFile = CreateFileW(
-        path,
+        file,
         GENERIC_READ,
         FILE_SHARE_READ,
         NULL,
@@ -397,7 +447,7 @@ void AudioPlayerWindow::Load(const wchar_t* file){
     );
 
     if (hFile == INVALID_HANDLE_VALUE){
-        DebugError("AudioPlayerWindow::Load File Open Failed");
+        DebugError("AudioPlayerWindow::LoadFileW File Open Failed");
         return;
     }
 
@@ -414,24 +464,28 @@ void AudioPlayerWindow::Load(const wchar_t* file){
     bool fmtRead = false;
     ReadFile(hFile, &specNum, 4, NULL, NULL);
     if (specNum != *(DWORD*)"RIFF"){
-        DebugError("AudioPlayerWindow::Load File Magic Number 'RIFF' Not Found");
+        CloseHandle(hFile);
+        DebugError("AudioPlayerWindow::LoadFileW File Magic Number 'RIFF' Not Found");
         return;
     }
     ReadFile(hFile, &specNum, 4, NULL, NULL);
     ReadFile(hFile, &specNum, 4, NULL, NULL);
     if (specNum != *(DWORD*)"WAVE"){
-        DebugError("AudioPlayerWindow::Load File Magic Number 'WAVE' Not Found");
+        CloseHandle(hFile);
+        DebugError("AudioPlayerWindow::LoadFileW File Magic Number 'WAVE' Not Found");
         return;
     }
     ReadFile(hFile, &specNum, 4, &readLen, NULL);
     while (true){
         if (readLen != 4){
+            CloseHandle(hFile);
             return;
         }
         if (specNum == *(DWORD*)"fmt "){
             ReadFile(hFile, &specNum, 4, &readLen, NULL);
             if (specNum != 0x10){
-                DebugError("AudioPlayerWindow::Load File Format Length Is Not 0x10 [%d]", specNum);
+                CloseHandle(hFile);
+                DebugError("AudioPlayerWindow::LoadFileW File Format Length Is Not 0x10 [%d]", specNum);
                 return;
             }
             ReadFile(hFile, &wav, 0x10, NULL, NULL);
@@ -448,12 +502,14 @@ void AudioPlayerWindow::Load(const wchar_t* file){
         ReadFile(hFile, &specNum, 4, &readLen, NULL);
     }
     if (!fmtRead){
-        DebugError("AudioPlayerWindow::Load File Format Not Found");
+        CloseHandle(hFile);
+        DebugError("AudioPlayerWindow::LoadFileW File Format Not Found");
         return;
     }
     ALint format = GetWaveFormat(&wav);
     if (format == -1){
-        DebugError("AudioPlayerWindow::Load File Format Unrecognized");
+        CloseHandle(hFile);
+        DebugError("AudioPlayerWindow::LoadFileW File Format Unrecognized");
         return;
     }
 
@@ -468,7 +524,7 @@ void AudioPlayerWindow::Load(const wchar_t* file){
     alSampleSize = wav.nBlockAlign;
     alChannels = wav.nChannels;
 
-    DebugLog("AudioPlayerWindow::Load Success");
+    DebugLog("AudioPlayerWindow::LoadFileW Success");
 
     loaded = true;
 }
@@ -504,6 +560,8 @@ void AudioPlayerWindow::Launch(){
 void AudioPlayerWindow::Stop(){
     alSourceStop(alSrc);
     alSourceUnqueueBuffers(alSrc, 1, &alBuf);
+
+    launched = false;
 }
 
 bool AudioPlayerWindow::IsLaunched(){
@@ -705,7 +763,7 @@ void AudioCaptureWindow::Launch(){
     alcCaptureStart(capDev);
     capture = true;
 
-    DebugError("AudioCaptureWindow::Launch Success");
+    DebugLog("AudioCaptureWindow::Launch Success");
 }
 
 void AudioCaptureWindow::Stop(){

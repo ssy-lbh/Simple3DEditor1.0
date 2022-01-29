@@ -106,19 +106,111 @@ bool ShellFileSelectWindowW(HWND hWnd, wchar_t* buffer, size_t len, const wchar_
 }
 
 bool ShellCommandLineA(const char* lpStr){
-    char* args = strchr(lpStr, ' ');
+    DWORD_PTR res;
+    const char* args = strchr(lpStr, ' ');
     if (args){
-        *(args++) = '\0';
-        return (DWORD_PTR)ShellExecuteA(Main::hWnd, "open", lpStr, args, NULL, SW_HIDE) >= 32;
+        char file[MAX_PATH];
+        size_t len = (args++) - lpStr;
+
+        strncpy_s(file, lpStr, len);
+        DebugLog("[Shell] %s", file);
+        DebugLog("[Shell] Arguments %s", args);
+
+        res = (DWORD_PTR)ShellExecuteA(Main::hWnd, "open", file, args, NULL, SW_HIDE);
+        if (res >= 32){
+            return true;
+        }else{
+            DebugError("[Shell] Failed %d", res);
+            return false;
+        }
     }
-    return (DWORD_PTR)ShellExecuteA(Main::hWnd, "open", lpStr, NULL, NULL, SW_HIDE) >= 32;
+    DebugLog("[Shell] %s", lpStr);
+
+    res = (DWORD_PTR)ShellExecuteA(Main::hWnd, "open", lpStr, NULL, NULL, SW_HIDE);
+    if (res >= 32){
+        return true;
+    }else{
+        DebugError("[Shell] Failed %d", res);
+        return false;
+    }
 }
 
 bool ShellCommandLineW(const wchar_t* lpStr){
-    wchar_t* args = wcschr(lpStr, ' ');
+    DWORD_PTR res;
+    const wchar_t* args = wcschr(lpStr, L' ');
     if (args){
-        *(args++) = L'\0';
-        return (DWORD_PTR)ShellExecuteW(Main::hWnd, L"open", lpStr, args, NULL, SW_HIDE) >= 32;
+        wchar_t file[MAX_PATH];
+        size_t len = (args++) - lpStr;
+
+        wcsncpy_s(file, lpStr, len);
+        DebugLog("[Shell] %S", file);
+        DebugLog("[Shell] Arguments %S", args);
+
+        res = (DWORD_PTR)ShellExecuteW(Main::hWnd, L"open", file, args, NULL, SW_HIDE);
+        if (res >= 32){
+            return true;
+        }else{
+            DebugError("[Shell] Failed %d", res);
+            return false;
+        }
     }
-    return (DWORD_PTR)ShellExecuteW(Main::hWnd, L"open", lpStr, NULL, NULL, SW_HIDE) >= 32;
+    DebugLog("[Shell] %S", lpStr);
+    
+    res = (DWORD_PTR)ShellExecuteW(Main::hWnd, L"open", lpStr, NULL, NULL, SW_HIDE);
+    if (res >= 32){
+        return true;
+    }else{
+        DebugError("[Shell] Failed %d", res);
+        return false;
+    }
+}
+
+bool ShellFFmpegA(const char* source, const char* target){
+    char cmd[(MAX_PATH << 1) + 10];
+    __builtin_snprintf(cmd, (MAX_PATH << 1) + 10, ".\\ffmpeg\\ffmpeg.exe -i \"%s\" \"%s\"", source, target);
+    if (!ShellCommandLineA(cmd)){
+        return false;
+    }
+    for (int i = 0; i < 50; i++){
+        HANDLE hFile = CreateFileA(
+            target,
+            GENERIC_READ,
+            FILE_SHARE_READ,
+            NULL,
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL,
+            NULL
+        );
+        if (hFile != INVALID_HANDLE_VALUE){
+            CloseHandle(hFile);
+            return true;
+        }
+        Sleep(40);
+    }
+    return false;
+}
+
+bool ShellFFmpegW(const wchar_t* source, const wchar_t* target){
+    char cmd[(MAX_PATH << 2) + 10];
+    __builtin_snprintf(cmd, (MAX_PATH << 2) + 10, ".\\ffmpeg\\ffmpeg.exe -i \"%S\" \"%S\"", source, target);
+    if (!ShellCommandLineA(cmd)){
+        return false;
+    }
+    for (int i = 0; i < 50; i++){
+        HANDLE hFile = CreateFileW(
+            target,
+            GENERIC_READ,
+            FILE_SHARE_READ,
+            NULL,
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL,
+            NULL
+        );
+        if (hFile != INVALID_HANDLE_VALUE){
+            CloseHandle(hFile);
+            return true;
+        }
+        Sleep(40);
+    }
+    return false;
 }

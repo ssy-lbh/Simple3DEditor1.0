@@ -63,9 +63,9 @@ void LRContainer::OnResize(int x, int y){
     if (x == 0 && y == 0){
         return;
     }
+    dis = __builtin_roundf(GLUtils::Clamp(dis * x / size.x, 0.0f, x));
     size.x = x;
     size.y = y;
-    dis = GLUtils::Clamp(dis, 0.0f, size.x);
     if (lWindow) lWindow->OnResize(dis, y);
     if (rWindow) rWindow->OnResize(x - dis, y);
 }
@@ -138,7 +138,7 @@ void LRContainer::OnKillFocus(){
     if (focus)
         focus->OnKillFocus();
     focus = NULL;
-    DebugLog("LRContainer::focus %p", focus);
+    //DebugLog("LRContainer::focus %p", focus);
 }
 
 void LRContainer::OnMouseWheel(int delta){
@@ -183,7 +183,7 @@ void LRContainer::UpdateFocus(){
     }
     if (focus)
         focus->OnMouseMove(right ? cursorPos.x - dis : cursorPos.x, cursorPos.y);
-    DebugLog("LRContainer::focus %p", focus);
+    //DebugLog("LRContainer::focus %p", focus);
 }
 
 void LRContainer::FreeWindow(){
@@ -271,9 +271,9 @@ void UDContainer::OnResize(int x, int y){
     if (x == 0 && y == 0){
         return;
     }
+    dis = __builtin_roundf(GLUtils::Clamp(dis * y / size.y, 0.0f, y));
     size.x = x;
     size.y = y;
-    dis = GLUtils::Clamp(dis, 0.0f, size.y);
     if (uWindow) uWindow->OnResize(x, y - dis);
     if (dWindow) dWindow->OnResize(x, dis);
 }
@@ -345,7 +345,7 @@ void UDContainer::OnKillFocus(){
     if (focus)
         focus->OnKillFocus();
     focus = NULL;
-    DebugLog("LRContainer::focus %p", focus);
+    //DebugLog("LRContainer::focus %p", focus);
 }
 
 void UDContainer::OnMouseWheel(int delta){
@@ -390,7 +390,7 @@ void UDContainer::UpdateFocus(){
     }
     if (focus)
         focus->OnMouseMove(cursorPos.x, up ? cursorPos.y - dis : cursorPos.y);
-    DebugLog("UDContainer::focus %p", focus);
+    //DebugLog("UDContainer::focus %p", focus);
 }
 
 void UDContainer::FreeWindow(){
