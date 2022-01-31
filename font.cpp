@@ -26,29 +26,23 @@ void glInitASCIIFont(){
 }
 
 void glDrawString(const char* text){
-    for (; *text != '\0'; text++){
-        glCallList(font + *text);
-    }
+    glListBase(font);
+    glCallLists(strlen(text), GL_UNSIGNED_BYTE, text);
 }
 
-//TODO 暂时不可用，需要修改
 void glDrawCNString(const char* text){
     size_t wlen = 0;
     wchar_t* wstr;
 
-    for (; *text != '\0'; text++){
-        if(IsDBCSLeadByte(*text))
-            ++text;
-        ++wlen;
-    }
+    wlen = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, text, -1, NULL, 0);
 
-    wstr = (wchar_t*)malloc((wlen + 1) * sizeof(wchar_t));
+    wstr = new wchar_t[wlen + 1];
     MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, text, -1, wstr, wlen);
     wstr[wlen] = L'\0';
 
     glDrawCNString(wstr);
 
-    free(wstr);
+    delete[] wstr;
 }
 
 void glDrawCNString(const wchar_t* text){
@@ -64,4 +58,24 @@ void glDrawCNString(const wchar_t* text){
     }
 
     glDeleteLists(font, 1);
+}
+
+int glGetStringWidth(const char* text){
+    HDC hDC = wglGetCurrentDC();
+    size_t len = strlen(text);
+    SIZE size;
+    
+    GetTextExtentPoint32A(hDC, text, len, &size);
+
+    return size.cx;
+}
+
+int glGetCNStringWidth(const wchar_t* text){
+    HDC hDC = wglGetCurrentDC();
+    size_t len = wcslen(text);
+    SIZE size;
+    
+    GetTextExtentPoint32W(hDC, text, len, &size);
+
+    return size.cx;
 }

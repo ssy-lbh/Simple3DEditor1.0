@@ -7,6 +7,7 @@
 
 #include "list.h"
 #include "vecmath.h"
+#include "gltools.h"
 
 class UIManager;
 class ViewportManager;
@@ -39,8 +40,8 @@ public:
     void RenderTransform();
     bool LeftDown();
     bool LeftUp();
-    void Char(char c);
-    void Unichar(wchar_t c);
+    bool Char(char c);
+    bool Unichar(wchar_t c);
     void Foreach(void(*func)(IButton*));
     void Foreach(void(*func)(IButton*, void*), void* user);
 };
@@ -66,6 +67,8 @@ public:
     void EnableScissor();
     void DisableScissor();
     Vector2 GetClientSize();
+    RECT CalculateChildRect(float left, float right, float bottom, float top);
+    void PushChildViewport(float left, float right, float bottom, float top);
 };
 
 //TODO 按钮在触发按下后持续生效到停止
@@ -80,9 +83,67 @@ public:
     virtual void Drag(Vector2 dir);
     virtual void ClickEnd();
     virtual void Leave();
-    virtual void Char(char c);
-    virtual void Unichar(wchar_t c);
+    virtual bool Char(char c);
+    virtual bool Unichar(wchar_t c);
     virtual void Render();
+};
+
+class IconButton : public IButton {
+private:
+    Vector2 position;
+    Vector2 size;
+    float radius;
+
+    GLTexture2D* texture = NULL;
+    void(*onClick)(void*) = NULL;
+    void* user = NULL;
+
+public:
+    IconButton(Vector2 position, Vector2 size);
+    IconButton(Vector2 position, Vector2 size, float radius);
+    virtual ~IconButton() override;
+
+    virtual bool Trigger(Vector2 pos) override;
+    virtual void Click() override;
+    virtual void Render() override;
+
+    void OnClick(void(*func)(void*));
+    void SetUserData(void* data);
+    void SetIcon(const char* texPath);
+    void SetIcon(int iconRes);
+    void SetIcon(GLTexture2D* tex);
+};
+
+class UIEditA : public IButton {
+private:
+    // 左上角位置
+    Vector2 position;
+    Vector2 size;
+    Vector3 bkColor = Vector3::zero;
+    Vector3 fontColor = Vector3::one;
+    Vector3 selColor = Vector3(0.0f, 0.0f, 1.0f);
+
+    char text[MAX_PATH + 1];
+    bool editing = false;
+    size_t editPos;
+
+public:
+    UIEditA(Vector2 pos, Vector2 size);
+    virtual ~UIEditA();
+
+    virtual bool Trigger(Vector2 pos) override;
+    virtual void Hover() override;
+    virtual void Click() override;
+    virtual void Leave() override;
+    virtual bool Char(char c) override;
+    virtual void Render() override;
+
+    void SetBackgroundColor(Vector3 color);
+    void SetFontColor(Vector3 color);
+    void SetSelectionColor(Vector3 color);
+    Vector3 GetBackgroundColor();
+    Vector3 GetFontColor();
+    Vector3 GetSelectionColor();
 };
 
 class IOperation {

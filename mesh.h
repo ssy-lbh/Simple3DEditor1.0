@@ -31,6 +31,8 @@ public:
     void DeleteTriFace(Face* f);
     void Render();
     void WriteToOBJ(HANDLE hFile);
+    // ID为-1时删除
+    void SetTexture(int resid);
 };
 
 #endif

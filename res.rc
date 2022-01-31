@@ -70,6 +70,11 @@ BEGIN
         MENUITEM "点选",                            IDM_TOOL_EMPTY
         MENUITEM "框选",                            IDM_TOOL_SELECTBOX
     END
+    POPUP "纹理(&P)"
+    BEGIN
+        MENUITEM "启用",                            IDM_TEXTURE_ENABLE
+        MENUITEM "停用",                            IDM_TEXTURE_DISABLE
+    END
     POPUP "版本(&H)"
     BEGIN
         MENUITEM "关于(&A) ...",                    IDM_ABOUT

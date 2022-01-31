@@ -2,6 +2,7 @@
 
 #include "vecmath.h"
 
+#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
 
 void GLUtils::DrawCorner(float x, float y, float start, float end, float radius, float step){

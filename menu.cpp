@@ -102,6 +102,7 @@ void Menu::RenderItem(MenuItem* item){
         glVertex2f(minPos.x, minPos.y + 15.0f * cliInvSize.y);
         glVertex2f(minPos.x + 250.0f * cliInvSize.y, minPos.y + 15.0f * cliInvSize.y);
         glEnd();
+        glLineWidth(1.0f);
         break;
     case MenuItem::ItemType::GROUP:{
         float height = 30.0f * cliInvSize.y, width = 250.0f * cliInvSize.y;

@@ -5,6 +5,8 @@
 
 #include "opengl/gl/gl.h"
 
+#include "font.h"
+
 UIManager::UIManager(){}
 
 UIManager::~UIManager(){
@@ -125,16 +127,18 @@ bool UIManager::LeftUp(){
     return false;
 }
 
-void UIManager::Char(char c){
+bool UIManager::Char(char c){
     if (cur){
-        cur->Char(c);
+        return cur->Char(c);
     }
+    return false;
 }
 
-void UIManager::Unichar(wchar_t c){
+bool UIManager::Unichar(wchar_t c){
     if (cur){
-        cur->Unichar(c);
+        return cur->Unichar(c);
     }
+    return false;
 }
 
 void UIManager::Foreach(void(*func)(IButton*)){
@@ -153,9 +157,75 @@ void IButton::Click(){}
 void IButton::Drag(Vector2 dir){}
 void IButton::ClickEnd(){}
 void IButton::Leave(){}
-void IButton::Char(char c){}
-void IButton::Unichar(wchar_t c){}
+bool IButton::Char(char c){ return false; }
+bool IButton::Unichar(wchar_t c){ return false; }
 void IButton::Render(){}
+
+UIEditA::UIEditA(Vector2 pos, Vector2 size) : position(pos), size(size) {
+    text[0] = '\0';
+}
+
+UIEditA::~UIEditA(){}
+
+bool UIEditA::Trigger(Vector2 pos){
+    return pos.x >= position.x && pos.x <= position.x + size.x && pos.y >= position.y && pos.y <= position.y + size.y;
+}
+
+void UIEditA::Hover(){
+    SetCursor(LoadCursor(NULL, IDC_IBEAM));
+}
+
+void UIEditA::Click(){
+    editing = true;
+    editPos = 0;
+}
+
+void UIEditA::Leave(){
+    editing = false;
+    text[editPos] = '\0';
+}
+
+bool UIEditA::Char(char c){
+    if (!editing){
+        return false;
+    }
+    switch (c){
+    case '\r':
+        editing = false;
+        return true;
+    case '\n':
+        return true;
+    case '\b':
+        if (editPos == 0)
+            return true;
+        text[--editPos] = '\0';
+        return true;
+    }
+    if (editPos >= MAX_PATH){
+        return true;
+    }
+    text[editPos++] = c;
+    text[editPos] = '\0';
+    return true;
+}
+
+void UIEditA::Render(){
+    glColor3f(bkColor.x, bkColor.y, bkColor.z);
+    GLUtils::DrawRect(position, position + size);
+
+    //TODO 补全图形功能
+
+    glColor3f(fontColor.x, fontColor.y, fontColor.z);
+    glRasterPos2f(position.x, position.y);
+    glDrawString(text);
+}
+
+void UIEditA::SetBackgroundColor(Vector3 color){ bkColor = color; }
+void UIEditA::SetFontColor(Vector3 color){ fontColor = color; }
+void UIEditA::SetSelectionColor(Vector3 color){ selColor = color; }
+Vector3 UIEditA::GetBackgroundColor(){ return bkColor; }
+Vector3 UIEditA::GetFontColor(){ return fontColor; }
+Vector3 UIEditA::GetSelectionColor(){ return selColor; }
 
 IOperation::IOperation(){}
 IOperation::~IOperation(){}
@@ -232,6 +302,25 @@ void ViewportManager::DisableScissor(){
 
 Vector2 ViewportManager::GetClientSize(){
     return Vector2(curRect.right - curRect.left, curRect.top - curRect.bottom);
+}
+
+RECT ViewportManager::CalculateChildRect(float left, float right, float bottom, float top){
+    RECT rect;
+    LONG height, width;
+
+    height = GetCurrentHeight();
+    width = GetCurrentWidth();
+
+    rect.left = curRect.left + __builtin_roundf(width * Clamp(left, 0.0f, 1.0f));
+    rect.right = curRect.left + __builtin_roundf(width * Clamp(right, 0.0f, 1.0f));
+    rect.bottom = curRect.bottom + __builtin_roundf(height * Clamp(bottom, 0.0f, 1.0f));
+    rect.top = curRect.bottom + __builtin_roundf(height * Clamp(top, 0.0f, 1.0f));
+
+    return rect;
+}
+
+void ViewportManager::PushChildViewport(float left, float right, float bottom, float top){
+    PushViewport(CalculateChildRect(left, right, bottom, top));
 }
 
 ITool::ITool(){}

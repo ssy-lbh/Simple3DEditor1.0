@@ -69,11 +69,15 @@ $(EXTRAOBJ): $(BUILD_PATH)\\%.o: %.cpp
 $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 	$(RES) -i $< -o $@
 
+BRANCH		= AVDevelop
+COMMITMSG	= "update"
+
 commit:
-	git checkout develop
+	-$(RM) temp.wav
+	git checkout $(BRANCH)
 	git add *
-	git commit -m "update"
-	git push -u origin develop
+	git commit -m $(COMMITMSG)
+	git push -u origin $(BRANCH)
 
 merge:
 	git checkout master

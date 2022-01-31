@@ -149,7 +149,6 @@ void Mesh::Render(){
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_POINTS);
     vertices.Foreach([](Vertex* v){
-        //glColor3f(v->color.x, v->color.y, v->color.z);
         glVertex3f(v->pos.x, v->pos.y, v->pos.z);
     });
     glEnd();
@@ -160,18 +159,11 @@ void Mesh::Render(){
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_LINES);
     edges.Foreach([](Edge* e){
-        //glColor3f(e->v1->color.x, e->v1->color.y, e->v1->color.z);
         glVertex3f(e->v1->pos.x, e->v1->pos.y, e->v1->pos.z);
-        //glColor3f(e->v2->color.x, e->v2->color.y, e->v2->color.z);
         glVertex3f(e->v2->pos.x, e->v2->pos.y, e->v2->pos.z);
     });
     glEnd();
     glDisable(GL_LINE_SMOOTH);
-
-    // 测试代码
-    if (!modeltex){
-        modeltex = new GLTexture2D(IDB_EARTH_WATER);
-    }
 
     if (modeltex){
         modeltex->Enable();
@@ -288,4 +280,18 @@ size_t Mesh::FindScreenRect(Vector3 camPos, Quaternion camDir, float zNear, floa
         }
     }, &pack);
     return pack.cnt;
+}
+
+void Mesh::SetTexture(int resid){
+    if (resid == -1){
+        if (modeltex){
+            delete modeltex;
+            modeltex = NULL;
+        }
+        return;
+    }
+    if (modeltex){
+        delete modeltex;
+    }
+    modeltex = new GLTexture2D(resid);
 }

@@ -5,8 +5,6 @@
 
 #include "vecmath.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-
 class GLUtils;
 class GLTexture2D;
 

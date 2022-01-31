@@ -385,6 +385,7 @@ void AudioPlayerWindow::OnInsLoad(){
     // 暂不使用 L"PCM音频文件(*.wav)\0*.wav\0所有音频类型(.*)\0*.*\0"，此状态下发现Shell时可能的环境错误
     if (!ShellFileSelectWindowW(Main::hWnd, file, MAX_PATH, L"PCM音频文件(*.wav)\0*.wav\0", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER)){
         DebugLog("Stop Loading");
+        return;
     }
     PreloadFileW(file);
 }
@@ -407,6 +408,7 @@ void AudioPlayerWindow::PreloadFileW(const wchar_t* file){
             }
             wcscpy_s(path, L".\\temp.wav");
             LoadFileW(path);
+            DeleteFileW(L".\\temp.wav");
             return;
         case IDNO:
             wcscpy_s(path, file);

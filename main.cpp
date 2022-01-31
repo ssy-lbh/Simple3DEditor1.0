@@ -325,6 +325,8 @@ MainWindow::MainWindow(){
 
     uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
     uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
+
+    //uiMgr->AddButton(new UIEditA(Vector2(0.0f, 0.0f), Vector2(0.5f, 0.1f)));
 }
 
 MainWindow::~MainWindow(){
@@ -1103,10 +1105,23 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     case IDM_TOOL_SELECTBOX:
         SetTool(new SelectTool(this));
         break;
-    }
-    // 当前操作的命令
-    if (curOp){
-        curOp->OnCommand(id);
+    case IDM_TEXTURE_ENABLE:
+        mesh->SetTexture(IDB_EARTH_WATER);
+        break;
+    case IDM_TEXTURE_DISABLE:
+        mesh->SetTexture(-1);
+        break;
+    case IDM_OP_X:
+    case IDM_OP_Y:
+    case IDM_OP_Z:
+    case IDM_OP_PLANE_X:
+    case IDM_OP_PLANE_Y:
+    case IDM_OP_PLANE_Z:
+        // 当前操作的命令
+        if (curOp){
+            curOp->OnCommand(id);
+        }
+        break;
     }
 }
 
