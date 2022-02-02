@@ -558,7 +558,7 @@ void MainWindow::GetTextInput(){
     window = this;
     DialogBox(Main::hInst, MAKEINTRESOURCE(IDD_TEXT), Main::hWnd,
         (DLGPROC)[]
-#ifndef _WIN64
+#if (!_WIN64) && _WIN32
         __attribute__((__stdcall__))
 #endif
         (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
@@ -761,7 +761,7 @@ bool MainWindow::LoadMeshW(Mesh* mesh, const wchar_t* path){
 void MainWindow::AboutBox(){
     DialogBox(Main::hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), Main::hWnd,
         (DLGPROC)[]
-#ifndef _WIN64
+#if (!_WIN64) && _WIN32
         __attribute__((__stdcall__))
 #endif
         (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
@@ -932,9 +932,19 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         DeletePoint();
         break;
     case IDM_EXCLUDE:{
+        List<Vertex*> copies;
         size_t cnt = selectedPoints.Size();
         for (size_t i = 0; i < cnt; i++){
+            copies.Add(selectedPoints[i]);
             selectedPoints[i] = mesh->AddVertex(selectedPoints[i]->pos);
+        }
+        for (size_t i = 0; i < cnt; i++){
+            for (size_t j = i + 1; j < cnt; j++){
+                if (copies[i]->EdgeRelateTo(copies[j])){
+                    mesh->AddTriFace(copies[i], copies[j], selectedPoints[j]);
+                    mesh->AddTriFace(copies[i], selectedPoints[i], selectedPoints[j]);
+                }
+            }
         }
         SetOperation(new MoveOperation(this));
         break;
