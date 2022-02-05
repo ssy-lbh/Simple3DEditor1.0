@@ -1,5 +1,7 @@
 #include "shell.h"
 
+#include <stdio.h>
+
 #include <windows.h>
 
 #include "main.h"
@@ -167,7 +169,7 @@ bool ShellCommandLineW(const wchar_t* lpStr){
 
 bool ShellFFmpegA(const char* source, const char* target){
     char cmd[(MAX_PATH << 1) + 10];
-    __builtin_snprintf(cmd, (MAX_PATH << 1) + 10, ".\\ffmpeg\\ffmpeg.exe -i \"%s\" \"%s\"", source, target);
+    __builtin_snprintf(cmd, (MAX_PATH << 1) + 10, ".\\ffmpeg\\ffmpeg.exe -i \"%s\" -y \"%s\"", source, target);
     if (!ShellCommandLineA(cmd)){
         return false;
     }
@@ -191,9 +193,9 @@ bool ShellFFmpegA(const char* source, const char* target){
 }
 
 bool ShellFFmpegW(const wchar_t* source, const wchar_t* target){
-    char cmd[(MAX_PATH << 2) + 10];
-    __builtin_snprintf(cmd, (MAX_PATH << 2) + 10, ".\\ffmpeg\\ffmpeg.exe -i \"%S\" \"%S\"", source, target);
-    if (!ShellCommandLineA(cmd)){
+    wchar_t cmd[(MAX_PATH << 1) + 10];
+    __mingw_snwprintf(cmd, (MAX_PATH << 2) + 10, L".\\ffmpeg\\ffmpeg.exe -i \"%S\" -y \"%S\"", source, target);
+    if (!ShellCommandLineW(cmd)){
         return false;
     }
     for (int i = 0; i < 50; i++){

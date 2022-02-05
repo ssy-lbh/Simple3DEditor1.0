@@ -108,6 +108,28 @@ private:
         virtual void OnUndo() override;
     };
 
+    class ExcludeOperation : public IOperation {
+    private:
+        struct MoveInfo {
+            Vertex* vert;
+            Vector3 pos;
+        };
+
+        Vector2 start;
+        List<MoveInfo> moveInfo;
+        bool x, y, z;
+        MainWindow* main;
+
+    public:
+        ExcludeOperation(MainWindow* main);
+        virtual ~ExcludeOperation() override;
+        virtual void OnEnter() override;
+        virtual void OnMove() override;
+        virtual void OnCommand(int id) override;
+        virtual void OnConfirm() override;
+        virtual void OnUndo() override;
+    };
+
     class RotateOperation : public IOperation {
     private:
         struct RotateInfo {

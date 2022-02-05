@@ -185,6 +185,53 @@ GLTexture2D::GLTexture2D(const char* path){
     stbi_image_free(image);
 }
 
+GLTexture2D::GLTexture2D(const wchar_t* path){
+    HANDLE hFile;
+    BY_HANDLE_FILE_INFORMATION Info;
+    stbi_uc* data;
+    size_t dataSize;
+
+    int x, y, channel;
+    stbi_uc* image;
+
+    hFile = CreateFileW(
+        path,
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+    if (hFile == INVALID_HANDLE_VALUE){
+        tex = 0;
+        return;
+    }
+
+    GetFileInformationByHandle(hFile, &Info);
+    dataSize = ((size_t)Info.nFileSizeHigh) | Info.nFileSizeLow;
+    data = new stbi_uc[dataSize];
+    ReadFile(hFile, data, dataSize, NULL, NULL);
+    image = stbi_load_from_memory(data, dataSize, &x, &y, &channel, 4);
+    delete[] data;
+
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); //支持4字节对齐
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);      //S方向上贴图
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);      //T方向上贴图
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       //放大纹理过滤方式
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       //缩小纹理过滤方式
+	
+    glTexImage2D(GL_TEXTURE_2D, 0, channel, x, y, 0,
+                (channel == 4 ? GL_RGBA : (channel == 3 ? GL_RGB : GL_R))
+                , GL_UNSIGNED_BYTE, image);
+    
+    stbi_image_free(image);
+}
+
 GLTexture2D::GLTexture2D(int resid){
     HBITMAP hBitmap;
     BITMAP bitmap;

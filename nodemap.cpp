@@ -171,7 +171,7 @@ void NodeMapWindow::OnRender(){
         bktex = new GLTexture2D(IDB_NODEMAP_BACKGROUND);
     }
     bktex->Enable();
-    glColor3f(1.0f, 1.0f, 1.0f);
+    glColor3f(0.5f, 0.5f, 0.5f);
     glBegin(GL_TRIANGLE_FAN);
     glTexCoord2f(0.0f, 0.0f); glVertex2f(-1.0f, -1.0f);
     glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, -1.0f);

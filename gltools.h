@@ -33,8 +33,10 @@ public:
 class GLTexture2D {
 private:
     GLuint tex;
+    
 public:
     GLTexture2D(const char* path);
+    GLTexture2D(const wchar_t* path);
     GLTexture2D(int resid);
     ~GLTexture2D();
     void Enable();

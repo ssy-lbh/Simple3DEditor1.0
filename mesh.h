@@ -36,6 +36,7 @@ public:
     void WriteToOBJ(HANDLE hFile, bool uv = false, bool normal = false);
     // ID为-1时删除
     void SetTexture(int resid);
+    void SetTexture(GLTexture2D* texture);
     void ResetTexture();
     bool EnableTexture();
     bool DisableTexture();

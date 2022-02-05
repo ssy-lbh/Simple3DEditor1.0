@@ -3,6 +3,7 @@
 
 #include "uimgr.h"
 #include "menu.h"
+#include "geodef.h"
 
 class Texture1D;
 class Texture2D;
@@ -21,7 +22,30 @@ private:
     Vector2 cliSize;
     float aspect;
 
+    IOperation* curOp = NULL;
     ITool* curTool;
+
+    class MoveOperation : public IOperation {
+    private:
+        struct MoveInfo {
+            Vertex* vert;
+            Vector2 uv;
+        };
+
+        Vector2 start;
+        List<MoveInfo> moveInfo;
+        bool x, y;
+        UVEditWindow* main;
+
+    public:
+        MoveOperation(UVEditWindow* main);
+        virtual ~MoveOperation() override;
+        virtual void OnEnter() override;
+        virtual void OnMove() override;
+        virtual void OnCommand(int id) override;
+        virtual void OnConfirm() override;
+        virtual void OnUndo() override;
+    };
 
     class EmptyTool : public ITool {
     private:
@@ -31,6 +55,22 @@ private:
         EmptyTool(UVEditWindow* window);
         ~EmptyTool() override;
         virtual void OnLeftDown() override;
+    };
+
+    class SelectTool : public ITool {
+    private:
+        UVEditWindow* window;
+        Vector2 start;
+        Vector2 end;
+        bool leftDown;
+        
+    public:
+        SelectTool(UVEditWindow* window);
+        virtual ~SelectTool() override;
+        virtual void OnLeftDown() override;
+        virtual void OnLeftUp() override;
+        virtual void OnMove() override;
+        virtual void OnRender() override;
     };
 
 public:
@@ -48,18 +88,19 @@ public:
     virtual void OnFocus() override;
     virtual void OnKillFocus() override;
     virtual void OnMenuAccel(int id, bool accel) override;
+    virtual void OnDropFileW(const wchar_t* path) override;
 
     void UpdateCursor(int x, int y);
     void UpdateWindowSize(int x, int y);
 
+    void SetOperation(IOperation* op);
     void SetTool(ITool* tool);
 };
 
 class PaintWindow : public IWindow {
 private:
-    bool focus;
-    UIManager* uiMgr;
-    Menu* menu;
+    bool focus = false;
+
     IOperation* curOp;
     ITool* brush;
 
@@ -69,25 +110,15 @@ public:
 
     virtual bool IsFocus() override;
     virtual void OnRender() override;
-    virtual void OnCreate() override;
-    virtual void OnClose() override;
-    virtual void OnTimer(int id) override;
-    virtual void OnChar(char c) override;
-    virtual void OnUnichar(wchar_t c) override;
     virtual void OnResize(int x, int y) override;
     virtual void OnMouseMove(int x, int y) override;
     virtual void OnLeftDown(int x, int y) override;
     virtual void OnLeftUp(int x, int y) override;
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
-    virtual void OnMouseHover(int key, int x, int y) override;
-    virtual void OnMouseLeave() override;
     virtual void OnFocus() override;
     virtual void OnKillFocus() override;
-    virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
-    virtual void OnDropFileA(const char* path) override;
-    virtual void OnDropFileW(const wchar_t* path) override;
 };
 
 #endif

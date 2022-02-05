@@ -86,7 +86,7 @@ void MainWindow::MoveOperation::OnMove(){
     Vector3 delta;
     if (moveInfo.Size() > 0){
         mov = (main->cursorPos - start) * main->camDis;
-        delta = main->camRight * mov.x + main->camUp * mov.y;
+        delta = main->camRight * mov.x * main->aspect + main->camUp * mov.y;
         delta = Vector3(x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
         moveInfo.Foreach<Vector3*>([](MoveInfo info, Vector3* offset){
             info.vert->pos = info.pos + *offset;
@@ -107,6 +107,72 @@ void MainWindow::MoveOperation::OnUndo(){
 }
 
 void MainWindow::MoveOperation::OnCommand(int id){
+    switch (id){
+    case IDM_OP_X: x = true; y = z = false; break;
+    case IDM_OP_Y: y = true; z = x = false; break;
+    case IDM_OP_Z: z = true; x = y = false; break;
+    case IDM_OP_PLANE_X: x = false; y = z = true; break;
+    case IDM_OP_PLANE_Y: y = false; z = x = true; break;
+    case IDM_OP_PLANE_Z: z = false; x = y = true; break;
+    }
+}
+
+MainWindow::ExcludeOperation::ExcludeOperation(MainWindow* main) : main(main) {}
+MainWindow::ExcludeOperation::~ExcludeOperation(){}
+
+void MainWindow::ExcludeOperation::OnEnter(){
+    DebugLog("ExcludeOperation OnEnter");
+    x = y = z = true;
+    start = main->cursorPos;
+    List<Vertex*> copies;
+    size_t cnt = Main::data->selectedPoints.Size();
+    for (size_t i = 0; i < cnt; i++){
+        copies.Add(Main::data->selectedPoints[i]);
+        Main::data->selectedPoints[i] = Main::data->mesh->AddVertex(Main::data->selectedPoints[i]->pos);
+        Main::data->mesh->AddEdge(copies[i], Main::data->selectedPoints[i]);
+    }
+    for (size_t i = 0; i < cnt; i++){
+        for (size_t j = i + 1; j < cnt; j++){
+            if (copies[i]->EdgeRelateTo(copies[j])){
+                Main::data->mesh->AddTriFace(copies[i], copies[j], Main::data->selectedPoints[j]);
+                Main::data->mesh->AddTriFace(copies[i], Main::data->selectedPoints[i], Main::data->selectedPoints[j]);
+            }
+        }
+    }
+    if (Main::data->selectedPoints.Size() > 0){
+        Main::data->selectedPoints.Foreach<ExcludeOperation*>([](Vertex* v, ExcludeOperation* op){
+            op->moveInfo.Add({v, v->pos});
+        }, this);
+    }
+}
+
+void MainWindow::ExcludeOperation::OnMove(){
+    Vector2 mov;
+    Vector3 delta;
+    if (moveInfo.Size() > 0){
+        mov = (main->cursorPos - start) * main->camDis;
+        delta = main->camRight * mov.x * main->aspect + main->camUp * mov.y;
+        delta = Vector3(x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
+        moveInfo.Foreach<Vector3*>([](MoveInfo info, Vector3* offset){
+            info.vert->pos = info.pos + *offset;
+        }, &delta);
+        DebugLog("ExcludeOperation OnMove %f %f %f", x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
+    }
+}
+
+void MainWindow::ExcludeOperation::OnConfirm(){
+    DebugLog("ExcludeOperation OnConfirm");
+}
+
+void MainWindow::ExcludeOperation::OnUndo(){
+    DebugLog("ExcludeOperation OnUndo");
+    Main::data->selectedPoints.Clear();
+    moveInfo.Foreach<Mesh*>([](MoveInfo info, Mesh* mesh){
+        mesh->DeleteVertex(info.vert);
+    }, Main::data->mesh);
+}
+
+void MainWindow::ExcludeOperation::OnCommand(int id){
     switch (id){
     case IDM_OP_X: x = true; y = z = false; break;
     case IDM_OP_Y: y = true; z = x = false; break;
@@ -518,10 +584,10 @@ void MainWindow::UpdateRotation(){
 void MainWindow::UpdateDistance(){
     DebugLog("Camera Distance %f", camDis);
     camPos = camLookat - camForward * camDis;
-    if (camRange < camDis * 20.0f){
-        camRange *= 2.0f;
-    }else if (camRange > camDis * 40.0f){
-        camRange *= 0.5f;
+    if (camRange < camDis * 8.0f){
+        camRange *= 5.0f;
+    }else if (camRange > camDis * 100.0f){
+        camRange *= 0.2f;
     }
 }
 
@@ -599,7 +665,7 @@ bool MainWindow::SaveMesh(Mesh* mesh){
         return false;
     }
     DebugLog("Saving Object");
-    mesh->WriteToOBJ(hFile);
+    mesh->WriteToOBJ(hFile, true, true);
     CloseHandle(hFile);
     return true;
 }
@@ -896,25 +962,9 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     case IDM_DELETE:
         DeletePoint();
         break;
-    case IDM_EXCLUDE:{
-        Mesh* mesh = Main::data->mesh;
-        List<Vertex*> copies;
-        size_t cnt = Main::data->selectedPoints.Size();
-        for (size_t i = 0; i < cnt; i++){
-            copies.Add(Main::data->selectedPoints[i]);
-            Main::data->selectedPoints[i] = mesh->AddVertex(Main::data->selectedPoints[i]->pos);
-        }
-        for (size_t i = 0; i < cnt; i++){
-            for (size_t j = i + 1; j < cnt; j++){
-                if (copies[i]->EdgeRelateTo(copies[j])){
-                    mesh->AddTriFace(copies[i], copies[j], Main::data->selectedPoints[j]);
-                    mesh->AddTriFace(copies[i], Main::data->selectedPoints[i], Main::data->selectedPoints[j]);
-                }
-            }
-        }
-        SetOperation(new MoveOperation(this));
+    case IDM_EXCLUDE:
+        SetOperation(new ExcludeOperation(this));
         break;
-    }
     case IDM_MESH_BASIC_PLANE:{
         Mesh* mesh = Main::data->mesh;
         Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, 0.0f) + camLookat);
@@ -1091,6 +1141,14 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         break;
     case IDM_TEXTURE_DISABLE:
         Main::data->mesh->ResetTexture();
+        break;
+    case IDM_TEXTURE_LOAD:
+        if (!ShellFileSelectWindowW(Main::hWnd, inputText, MAX_PATH, L"任意图片格式(*.*)\0*.*\0", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER)){
+            DebugLog("Stop Loading");
+            break;
+        }
+        inputText[MAX_PATH] = '\0';
+        Main::data->mesh->SetTexture(new GLTexture2D(inputText));
         break;
     case IDM_OP_X:
     case IDM_OP_Y:

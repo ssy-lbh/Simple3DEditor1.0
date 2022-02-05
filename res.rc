@@ -75,6 +75,7 @@ BEGIN
     BEGIN
         MENUITEM "启用",                            IDM_TEXTURE_ENABLE
         MENUITEM "停用",                            IDM_TEXTURE_DISABLE
+        MENUITEM "加载",                            IDM_TEXTURE_LOAD
     END
     POPUP "版本(&H)"
     BEGIN

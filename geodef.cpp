@@ -13,6 +13,10 @@ void Vertex::UpdateNormal(){
     faces.Foreach<Vector3*>([](Face* f, Vector3* n){
         *n += f->normal;
     }, &dir);
+    if (dir.SqrMagnitude() == 0.0f){
+        normal = Vector3::forward;
+        return;
+    }
     normal = dir.Normal();
 }
 

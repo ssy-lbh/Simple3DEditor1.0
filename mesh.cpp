@@ -268,12 +268,13 @@ void Mesh::Render(){
         glBegin(GL_TRIANGLES);
         faces.Foreach([](Face* f){
             Vertex* v;
+            // V坐标已经反转
             v = f->vertices.GetItem(0);
-            glTexCoord2f(v->uv.x, v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+            glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
             v = f->vertices.GetItem(1);
-            glTexCoord2f(v->uv.x, v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+            glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
             v = f->vertices.GetItem(2);
-            glTexCoord2f(v->uv.x, v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+            glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
         });
         glEnd();
         glShadeModel(GL_FLAT);
@@ -375,6 +376,12 @@ void Mesh::SetTexture(int resid){
         delete modeltex;
     }
     modeltex = new GLTexture2D(resid);
+}
+
+void Mesh::SetTexture(GLTexture2D* texture){
+    if (modeltex)
+        delete modeltex;
+    modeltex = texture;
 }
 
 void Mesh::ResetTexture(){
