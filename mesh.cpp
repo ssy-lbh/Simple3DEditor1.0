@@ -38,6 +38,101 @@ Vertex* Mesh::Find(Vector3 ori, Vector3 dir){
     }
 }
 
+size_t Mesh::FindScreenRect(Vector3 camPos, Quaternion camDir, float zNear, float zFar, float x1, float x2, float y1, float y2, List<Vertex*>& result){
+    struct {
+        size_t cnt;
+        Vector3 camPos;
+        Quaternion camDir;
+        float zNear;
+        float zFar;
+        float x1, x2, y1, y2;
+        List<Vertex*>* list;
+    }pack;
+    pack.cnt = 0;
+    pack.camPos = camPos;
+    pack.camDir = camDir;
+    pack.zNear = zNear;
+    pack.zFar = zFar;
+    if (x1 < x2){
+        pack.x1 = x1;
+        pack.x2 = x2;
+    }else{
+        pack.x1 = x2;
+        pack.x2 = x1;
+    }
+    if (y1 < y2){
+        pack.y1 = y1;
+        pack.y2 = y2;
+    }else{
+        pack.y1 = y2;
+        pack.y2 = y1;
+    }
+    pack.list = &result;
+    vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
+        Vector3 lookPos = (-m->camDir) * (p->pos - m->camPos);
+        if (lookPos.y < m->zNear || lookPos.y > m->zFar){
+            return;
+        }
+        float x = lookPos.x / lookPos.y;
+        float z = lookPos.z / lookPos.y;
+        if (x >= m->x1 && x <= m->x2 && z >= m->y1 && z <= m->y2){
+            m->cnt++;
+            m->list->Add(p);
+        }
+    }, &pack);
+    return pack.cnt;
+}
+
+Vertex* Mesh::FindUV(Vector2 uv, float err){
+    struct {
+        float err;
+        Vector2 uv;
+        Vertex* res;
+    }pack;
+    pack.err = err * err;
+    pack.uv = uv;
+    pack.res = NULL;
+    vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
+        if (m->res)
+            return;
+        if ((p->uv - m->uv).SqrMagnitude() <= m->err){
+            m->res = p;
+        }
+    }, &pack);
+    return pack.res;
+}
+
+size_t Mesh::FindUVRect(Vector2 uv1, Vector2 uv2, List<Vertex*>& result){
+    struct {
+        size_t cnt;
+        float x1, x2, y1, y2;
+        List<Vertex*>* list;
+    }pack;
+    pack.cnt = 0;
+    if (uv1.x < uv2.x){
+        pack.x1 = uv1.x;
+        pack.x2 = uv2.x;
+    }else{
+        pack.x1 = uv2.x;
+        pack.x2 = uv1.x;
+    }
+    if (uv1.y < uv2.y){
+        pack.y1 = uv1.y;
+        pack.y2 = uv2.y;
+    }else{
+        pack.y1 = uv2.y;
+        pack.y2 = uv1.y;
+    }
+    pack.list = &result;
+    vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
+        if (p->uv.x >= m->x1 && p->uv.x <= m->x2 && p->uv.y >= m->y1 && p->uv.y <= m->y2){
+            m->cnt++;
+            m->list->Add(p);
+        }
+    }, &pack);
+    return pack.cnt;
+}
+
 Vertex* Mesh::AddVertex(Vector3 pos){
     Vertex* v = new Vertex(pos);
     vertices.Add(v);
@@ -202,13 +297,39 @@ void Mesh::Render(){
     }
 }
 
-void Mesh::WriteToOBJ(HANDLE hFile){
+void Mesh::RenderUVMap(){
+    glDisable(GL_LIGHTING);
+    glEnable(GL_POINT_SMOOTH);
+    glPointSize(4.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_POINTS);
+    vertices.Foreach([](Vertex* v){
+        glVertex2f(v->uv.x, v->uv.y);
+    });
+    glEnd();
+    glDisable(GL_POINT_SMOOTH);
+
+    glEnable(GL_LINE_SMOOTH);
+    glLineWidth(1.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_LINES);
+    edges.Foreach([](Edge* e){
+        glVertex2f(e->v1->uv.x, e->v1->uv.y);
+        glVertex2f(e->v2->uv.x, e->v2->uv.y);
+    });
+    glEnd();
+    glDisable(GL_LINE_SMOOTH);
+}
+
+void Mesh::WriteToOBJ(HANDLE hFile, bool uv, bool normal){
     size_t index = 0;
     WriteFile(hFile, "# StereoVision 3D Editor\n", 25, NULL, NULL);
     WriteFile(hFile, "# Author: lin-boheng@gitee.com\n", 31, NULL, NULL);
+    // 顶点索引
     vertices.Foreach<size_t*>([](Vertex* v, size_t* i){
         v->index = ++*i;
     }, &index);
+    // 顶点
     vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
         char tmp[MAX_PATH + 1];
         DWORD len;
@@ -216,70 +337,30 @@ void Mesh::WriteToOBJ(HANDLE hFile){
         WriteFile(hFile, tmp, len, &len, NULL);
     }, hFile);
     // 纹理UV坐标
-    // vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
-    //     char tmp[MAX_PATH + 1];
-    //     DWORD len;
-    //     len = __builtin_snprintf(tmp, MAX_PATH, "vt %f %f %f\n", v->uv.x, v->uv.y, v->uv.z);
-    //     WriteFile(hFile, tmp, len, &len, NULL);
-    // }, hFile);
+    if (uv){
+        vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
+            char tmp[MAX_PATH + 1];
+            DWORD len;
+            len = __builtin_snprintf(tmp, MAX_PATH, "vt %f %f\n", v->uv.x, v->uv.y);
+            WriteFile(hFile, tmp, len, &len, NULL);
+        }, hFile);
+    }
     // 顶点法线
-    // vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
-    //     char tmp[MAX_PATH + 1];
-    //     DWORD len;
-    //     len = __builtin_snprintf(tmp, MAX_PATH, "vn %f %f %f\n", v->normal.x, v->normal.y, v->normal.z);
-    //     WriteFile(hFile, tmp, len, &len, NULL);
-    // }, hFile);
+    if (normal){
+        vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
+            char tmp[MAX_PATH + 1];
+            DWORD len;
+            len = __builtin_snprintf(tmp, MAX_PATH, "vn %f %f %f\n", v->normal.x, v->normal.y, v->normal.z);
+            WriteFile(hFile, tmp, len, &len, NULL);
+        }, hFile);
+    }
+    // 片元
     faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
         char tmp[MAX_PATH + 1];
         DWORD len;
         len = __builtin_snprintf(tmp, MAX_PATH, "f %d %d %d\n", f->vertices.GetItem(0)->index, f->vertices.GetItem(1)->index, f->vertices.GetItem(2)->index);
         WriteFile(hFile, tmp, len, &len, NULL);
     }, hFile);
-}
-
-size_t Mesh::FindScreenRect(Vector3 camPos, Quaternion camDir, float zNear, float zFar, float x1, float x2, float y1, float y2, List<Vertex*>& result){
-    struct {
-        size_t cnt;
-        Vector3 camPos;
-        Quaternion camDir;
-        float zNear;
-        float zFar;
-        float x1, x2, y1, y2;
-        List<Vertex*>* list;
-    }pack;
-    pack.cnt = 0;
-    pack.camPos = camPos;
-    pack.camDir = camDir;
-    pack.zNear = zNear;
-    pack.zFar = zFar;
-    if (x1 < x2){
-        pack.x1 = x1;
-        pack.x2 = x2;
-    }else{
-        pack.x1 = x2;
-        pack.x2 = x1;
-    }
-    if (y1 < y2){
-        pack.y1 = y1;
-        pack.y2 = y2;
-    }else{
-        pack.y1 = y2;
-        pack.y2 = y1;
-    }
-    pack.list = &result;
-    vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
-        Vector3 lookPos = (-m->camDir) * (p->pos - m->camPos);
-        if (lookPos.y < m->zNear || lookPos.y > m->zFar){
-            return;
-        }
-        float x = lookPos.x / lookPos.y;
-        float z = lookPos.z / lookPos.y;
-        if (x >= m->x1 && x <= m->x2 && z >= m->y1 && z <= m->y2){
-            m->cnt++;
-            m->list->Add(p);
-        }
-    }, &pack);
-    return pack.cnt;
 }
 
 void Mesh::SetTexture(int resid){
@@ -294,4 +375,25 @@ void Mesh::SetTexture(int resid){
         delete modeltex;
     }
     modeltex = new GLTexture2D(resid);
+}
+
+void Mesh::ResetTexture(){
+    if (modeltex){
+        delete modeltex;
+        modeltex = NULL;
+    }
+}
+
+bool Mesh::EnableTexture(){
+    if (!modeltex)
+        return false;
+    modeltex->Enable();
+    return true;
+}
+
+bool Mesh::DisableTexture(){
+    if (!modeltex)
+        return false;
+    modeltex->Disable();
+    return true;
 }

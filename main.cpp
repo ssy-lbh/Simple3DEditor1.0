@@ -7,6 +7,7 @@
 #include "gltools.h"
 #include "nodemap.h"
 #include "audio.h"
+#include "paint.h"
 
 #include "shell.h"
 
@@ -73,8 +74,8 @@ void MainWindow::MoveOperation::OnEnter(){
     DebugLog("MoveOperation OnEnter");
     x = y = z = true;
     start = main->cursorPos;
-    if (main->selectedPoints.Size() > 0){
-        main->selectedPoints.Foreach<MoveOperation*>([](Vertex* v, MoveOperation* op){
+    if (Main::data->selectedPoints.Size() > 0){
+        Main::data->selectedPoints.Foreach<MoveOperation*>([](Vertex* v, MoveOperation* op){
             op->moveInfo.Add({v, v->pos});
         }, this);
     }
@@ -124,12 +125,12 @@ void MainWindow::RotateOperation::OnEnter(){
     x = y = z = true;
     start = main->cursorPos;
     center = Vector3::zero;
-    if (main->selectedPoints.Size() > 0){
-        main->selectedPoints.Foreach<RotateOperation*>([](Vertex* v, RotateOperation* op){
+    if (Main::data->selectedPoints.Size() > 0){
+        Main::data->selectedPoints.Foreach<RotateOperation*>([](Vertex* v, RotateOperation* op){
             op->rotateInfo.Add({v, v->pos});
             op->center += v->pos;
         }, this);
-        center /= main->selectedPoints.Size();
+        center /= Main::data->selectedPoints.Size();
         screenCenter = main->GetScreenPosition(center);
         dis = (main->cursorPos - screenCenter).Magnitude();
     }
@@ -181,12 +182,12 @@ void MainWindow::SizeOperation::OnEnter(){
     x = y = z = true;
     start = main->cursorPos;
     center = Vector3::zero;
-    if (main->selectedPoints.Size() > 0){
-        main->selectedPoints.Foreach<SizeOperation*>([](Vertex* v, SizeOperation* op){
+    if (Main::data->selectedPoints.Size() > 0){
+        Main::data->selectedPoints.Foreach<SizeOperation*>([](Vertex* v, SizeOperation* op){
             op->sizeInfo.Add({v, v->pos});
             op->center += v->pos;
         }, this);
-        center /= main->selectedPoints.Size();
+        center /= Main::data->selectedPoints.Size();
         screenCenter = main->GetScreenPosition(center);
         startSize = (main->cursorPos - screenCenter).Magnitude();
     }
@@ -233,12 +234,12 @@ MainWindow::EmptyTool::EmptyTool(MainWindow* window) : window(window) {}
 MainWindow::EmptyTool::~EmptyTool(){}
 
 void MainWindow::EmptyTool::OnLeftDown(){
-    Vertex* v = window->mesh->Find(window->camPos, window->cursorDir);
+    Vertex* v = Main::data->mesh->Find(window->camPos, window->cursorDir);
     if (v == NULL){
-        window->selectedPoints.Clear();
+        Main::data->selectedPoints.Clear();
         DebugLog("No Point Selected");
     }else{
-        window->selectedPoints.Add(v);
+        Main::data->selectedPoints.Add(v);
         DebugLog("Select Point %f %f %f", v->pos.x, v->pos.y, v->pos.z);
     }
 }
@@ -255,11 +256,11 @@ void MainWindow::SelectTool::OnLeftDown(){
 void MainWindow::SelectTool::OnLeftUp(){
     leftDown = false;
     if (start.x == end.x && start.y == end.y){
-        window->selectedPoints.Clear();
+        Main::data->selectedPoints.Clear();
         return;
     }
     //TODO 等待实现范围框选
-    window->mesh->FindScreenRect(
+    Main::data->mesh->FindScreenRect(
         window->camPos,
         window->camDir,
         window->camDis * 0.02,
@@ -268,7 +269,7 @@ void MainWindow::SelectTool::OnLeftUp(){
         end.x * window->aspect,
         start.y,
         end.y,
-        window->selectedPoints
+        Main::data->selectedPoints
     );
 }
 
@@ -285,7 +286,6 @@ void MainWindow::SelectTool::OnRender(){
 
 MainWindow::MainWindow(){
     uiMgr = new UIManager();
-    mesh = new Mesh();
     SetTool(new EmptyTool(this));
 
     basicMenu = new Menu();
@@ -326,13 +326,13 @@ MainWindow::MainWindow(){
     uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
     uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
 
+    // 该组件测试未通过，实现未完成
     //uiMgr->AddButton(new UIEditA(Vector2(0.0f, 0.0f), Vector2(0.5f, 0.1f)));
 }
 
 MainWindow::~MainWindow(){
     if(basicMenu) delete basicMenu;
     if(uiMgr) delete uiMgr;
-    if(mesh) delete mesh;
     if(curOp) delete curOp;
     if(colorBoard) delete colorBoard;
 }
@@ -419,7 +419,7 @@ void MainWindow::RenderModelView(){
     glEnable(GL_LIGHTING);     //开启光照系统
     glEnable(GL_LIGHT0);       //开启GL_LIGHT0光源
 
-    mesh->Render();
+    Main::data->mesh->Render();
 
     // 已选择点绘制
     glDisable(GL_LIGHTING);
@@ -427,7 +427,7 @@ void MainWindow::RenderModelView(){
     glPointSize(8.0f);
     glColor3f(1.0f, 1.0f, 0.0f);
     glBegin(GL_POINTS);
-    selectedPoints.Foreach([](Vertex* p){
+    Main::data->selectedPoints.Foreach([](Vertex* p){
         glVertex3f(p->pos.x, p->pos.y, p->pos.z);
     });
     glEnd();
@@ -435,11 +435,6 @@ void MainWindow::RenderModelView(){
 }
 
 void MainWindow::OnRender(){
-    if (noRender){
-        noRender = false;
-        return;
-    }
-
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClearDepth(1.0);
 
@@ -465,21 +460,6 @@ void MainWindow::OnRender(){
     // UI绘制
     // 在之前进行3D渲染使用投影变换后，需要参数aspect
     uiMgr->Render();
-
-    if (menu)
-        menu->Render(menuPos.x, menuPos.y);
-}
-
-void MainWindow::SetMenu(Menu* m){
-    if (menu){
-        menu->ResetSelect();
-    }
-    menu = m;
-    if (menu != NULL){
-        menu->SetClientSize(cliSize);
-        menu->CursorMove(cursorPos);
-        menuPos = cursorPos;
-    }
 }
 
 void MainWindow::SetOperation(IOperation* op){
@@ -507,9 +487,6 @@ void MainWindow::UpdateWindowSize(int x, int y){
     cliInvSize.x = 1.0f / cliSize.x;
     cliInvSize.y = 1.0f / cliSize.y;
     aspect = (float)cliSize.x / cliSize.y;
-    if (menu){
-        menu->SetClientSize(cliSize);
-    }
 }
 
 //TODO 添加一些UI范围检测
@@ -517,10 +494,6 @@ void MainWindow::UpdateCursor(int x, int y){
     cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
     cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
     cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
-    if (menu){
-        menu->CursorMove(cursorPos - menuPos);
-        return;
-    }
     uiMgr->CursorMove(cursorPos);
     if (curOp){
         curOp->OnMove();
@@ -592,15 +565,15 @@ void MainWindow::GetTextInput(){
 
 void MainWindow::AddPoint(){
     Vector3 pos = camLookat + (camUp * cursorPos.y + camRight * cursorPos.x * aspect) * camDis;
-    mesh->AddVertex(pos);
+    Main::data->mesh->AddVertex(pos);
     DebugLog("Point at %f %f %f", pos.x, pos.y, pos.z);
 }
 
 void MainWindow::DeletePoint(){
-    selectedPoints.Foreach<Mesh*>([](Vertex* v, Mesh* m){
+    Main::data->selectedPoints.Foreach<Mesh*>([](Vertex* v, Mesh* m){
         m->DeleteVertex(v);
-    }, mesh);
-    selectedPoints.Clear();
+    }, Main::data->mesh);
+    Main::data->selectedPoints.Clear();
 }
 
 bool MainWindow::SaveMesh(Mesh* mesh){
@@ -803,7 +776,7 @@ void MainWindow::OnRightDown(int x, int y){
     if (curTool){
         curTool->OnRightDown();
     }
-    SetMenu(basicMenu);
+    Main::SetMenu(basicMenu);
 }
 
 void MainWindow::OnRightUp(int x, int y){
@@ -813,11 +786,11 @@ void MainWindow::OnRightUp(int x, int y){
 }
 
 void MainWindow::OnInsSave(){
-    SaveMesh(mesh);
+    SaveMesh(Main::data->mesh);
 }
 
 void MainWindow::OnInsLoad(){
-    LoadMesh(mesh);
+    LoadMesh(Main::data->mesh);
 }
 
 void MainWindow::OnInsSelectColor(){
@@ -825,22 +798,22 @@ void MainWindow::OnInsSelectColor(){
         colorBoard = new ColorBoard();
     }
     Vector3 color = colorBoard->RunAndGetColor();
-    selectedPoints.Foreach<Vector3*>([](Vertex* v, Vector3* c){
+    Main::data->selectedPoints.Foreach<Vector3*>([](Vertex* v, Vector3* c){
         v->color = *c;
     }, &color);
 }
 
 void MainWindow::OnInsTopology(){
-    switch (selectedPoints.Size()){
+    switch (Main::data->selectedPoints.Size()){
     case 0:
         break;
     case 1:
         break;
     case 2:
-        mesh->AddEdge(selectedPoints[0], selectedPoints[1]);
+        Main::data->mesh->AddEdge(Main::data->selectedPoints[0], Main::data->selectedPoints[1]);
         break;
     case 3:
-        mesh->AddTriFace(selectedPoints[0], selectedPoints[1], selectedPoints[2]);
+        Main::data->mesh->AddTriFace(Main::data->selectedPoints[0], Main::data->selectedPoints[1], Main::data->selectedPoints[2]);
         break;
     default:
         break;
@@ -848,14 +821,6 @@ void MainWindow::OnInsTopology(){
 }
 
 void MainWindow::OnLeftDown(int x, int y){
-    // 菜单消失
-    if (menu){
-        if (menu->InChainMenu(cursorPos - menuPos)){
-            menu->Click();
-        }
-        SetMenu(NULL);
-        return;
-    }
     // UI交互
     if (uiMgr->LeftDown()){
         UpdateCursor(x, y);
@@ -875,8 +840,8 @@ void MainWindow::OnLeftDown(int x, int y){
 }
 
 void MainWindow::OnLeftUp(int x, int y){
-    uiMgr->LeftUp();
     UpdateCursor(x, y);
+    uiMgr->LeftUp();
     if (curTool){
         curTool->OnLeftUp();
     }
@@ -932,17 +897,18 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         DeletePoint();
         break;
     case IDM_EXCLUDE:{
+        Mesh* mesh = Main::data->mesh;
         List<Vertex*> copies;
-        size_t cnt = selectedPoints.Size();
+        size_t cnt = Main::data->selectedPoints.Size();
         for (size_t i = 0; i < cnt; i++){
-            copies.Add(selectedPoints[i]);
-            selectedPoints[i] = mesh->AddVertex(selectedPoints[i]->pos);
+            copies.Add(Main::data->selectedPoints[i]);
+            Main::data->selectedPoints[i] = mesh->AddVertex(Main::data->selectedPoints[i]->pos);
         }
         for (size_t i = 0; i < cnt; i++){
             for (size_t j = i + 1; j < cnt; j++){
                 if (copies[i]->EdgeRelateTo(copies[j])){
-                    mesh->AddTriFace(copies[i], copies[j], selectedPoints[j]);
-                    mesh->AddTriFace(copies[i], selectedPoints[i], selectedPoints[j]);
+                    mesh->AddTriFace(copies[i], copies[j], Main::data->selectedPoints[j]);
+                    mesh->AddTriFace(copies[i], Main::data->selectedPoints[i], Main::data->selectedPoints[j]);
                 }
             }
         }
@@ -950,6 +916,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         break;
     }
     case IDM_MESH_BASIC_PLANE:{
+        Mesh* mesh = Main::data->mesh;
         Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, 0.0f) + camLookat);
         Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, 0.0f) + camLookat);
         Vertex* v3 = new Vertex(Vector3(-1.0f,  1.0f, 0.0f) + camLookat);
@@ -963,6 +930,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
         break;
     case IDM_MESH_BASIC_BLOCK:{
+        Mesh* mesh = Main::data->mesh;
         Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, -1.0f) + camLookat);
         Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, -1.0f) + camLookat);
         Vertex* v3 = new Vertex(Vector3(-1.0f,  1.0f, -1.0f) + camLookat);
@@ -997,6 +965,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
         break;
     case IDM_MESH_BASIC_CYLINDER:{
+        Mesh* mesh = Main::data->mesh;
         const int loops = 2;
         const int round = 30;
         Vertex** vert = new Vertex*[loops * round];
@@ -1026,6 +995,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
         break;
     case IDM_MESH_BASIC_SPHERE:{
+        Mesh* mesh = Main::data->mesh;
         const int loops = 10;
         const int round = 10;
         Vertex** vert = new Vertex*[loops * round];
@@ -1057,6 +1027,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
         break;
     case IDM_MESH_BASIC_CAPSULE:{
+        Mesh* mesh = Main::data->mesh;
         const int ballLoops = 5;
         const int cylinderLoops = 10;
         const int loops = 2 * ballLoops + cylinderLoops;
@@ -1107,7 +1078,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
         break;
     case IDM_MENU_BASIC:
-        SetMenu(basicMenu);
+        Main::SetMenu(basicMenu);
         break;
     case IDM_TOOL_EMPTY:
         SetTool(new EmptyTool(this));
@@ -1116,10 +1087,10 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         SetTool(new SelectTool(this));
         break;
     case IDM_TEXTURE_ENABLE:
-        mesh->SetTexture(IDB_EARTH_WATER);
+        Main::data->mesh->SetTexture(IDB_EARTH_WATER);
         break;
     case IDM_TEXTURE_DISABLE:
-        mesh->SetTexture(-1);
+        Main::data->mesh->ResetTexture();
         break;
     case IDM_OP_X:
     case IDM_OP_Y:
@@ -1147,7 +1118,7 @@ void MainWindow::OnDropFileA(const char* path){
             return;
         }
     }
-    LoadMeshA(mesh, path);
+    LoadMeshA(Main::data->mesh, path);
 }
 
 bool MainWindow::IsFocus(){
@@ -1160,7 +1131,6 @@ void MainWindow::OnFocus(){
 
 void MainWindow::OnKillFocus(){
     focus = false;
-    SetMenu(NULL);
 }
 
 Vector3 MainWindow::GetLookPosition(Vector3 pos){
@@ -1172,8 +1142,71 @@ Vector2 MainWindow::GetScreenPosition(Vector3 pos){
     return Vector2((lookPos.x / lookPos.y) / aspect, lookPos.z / lookPos.y);
 }
 
-Main::Main(){}
-Main::~Main(){}
+MainData::MainData(){
+    mesh = new Mesh();
+}
+
+MainData::~MainData(){
+    if (mesh) delete mesh;
+}
+
+void MainData::UpdateCursor(int x, int y){
+    // 坐标反转
+    cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
+    cursorPos.y = 1.0f - 2.0f * y / cliSize.y;
+    if (menu)
+        menu->CursorMove(cursorPos - menuPos);
+}
+
+void MainData::UpdateWindowSize(int x, int y){
+    cliSize.x = x;
+    cliSize.y = y;
+    aspect = cliSize.x / cliSize.y;
+    if (menu)
+        menu->SetClientSize(cliSize);
+}
+
+void MainData::SetMenu(Menu* m){
+    if (menu)
+        menu->ResetSelect();
+    menu = m;
+    if (menu){
+        menu->SetClientSize(cliSize);
+        menu->CursorMove(cursorPos);
+        menuPos = cursorPos;
+    }
+}
+
+void MainData::OnLeftDown(int x, int y){
+    UpdateCursor(x, y);
+    if (menu){
+        if (menu->InChainMenu(cursorPos - menuPos)){
+            menu->Click();
+        }
+        SetMenu(NULL);
+        return;
+    }
+}
+
+void MainData::OnLeftUp(int x, int y){
+    UpdateCursor(x, y);
+}
+
+void MainData::OnRightDown(int x, int y){
+    UpdateCursor(x, y);
+}
+
+void MainData::OnRightUp(int x, int y){
+    UpdateCursor(x, y);
+}
+
+Main::Main(){
+    data = new MainData();
+}
+
+Main::~Main(){
+    if (data) delete data;
+}
 
 ATOM Main::RegClass(){
     WNDCLASSEXA wc;
@@ -1308,12 +1341,26 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     case WM_CLOSE:
         PostQuitMessage(0);
         break;
+    case WM_SIZE:
+        data->UpdateWindowSize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        break;
+    case WM_MOUSEMOVE:
+        data->UpdateCursor(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        break;
     case WM_LBUTTONDOWN:
+        data->OnLeftDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         SetCursor(LoadCursor(hInst, MAKEINTRESOURCE(IDC_CLICKED)));
         SetCapture(hWnd);
         break;
     case WM_LBUTTONUP:
+        data->OnLeftUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         ReleaseCapture();
+        break;
+    case WM_RBUTTONDOWN:
+        data->OnRightDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        break;
+    case WM_RBUTTONUP:
+        data->OnRightUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_UNICHAR:
         if (wParam == UNICODE_NOCHAR){
@@ -1333,13 +1380,12 @@ void CALLBACK Main::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR wParam, DWORD lPara
     return;
 }
 
-void Main::OnResize(int x, int y){
-    //TODO 这里做子窗口大小管理
-    container->OnResize(x, y);
-}
-
 void Main::RequestRender(){
     inst->reqRender = true;
+}
+
+void Main::SetMenu(Menu* m){
+    data->SetMenu(m);
 }
 
 void Main::OnRender(){
@@ -1347,6 +1393,11 @@ void Main::OnRender(){
     ViewportManager::inst->EnableScissor();
 
     container->OnRender();
+
+    ViewportManager::inst->Reset(hWnd);
+
+    if (data->menu)
+        data->menu->Render(data->menuPos.x, data->menuPos.y);
 }
 
 int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
@@ -1359,7 +1410,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     mainWnd = new MainWindow();
     mainWnd2 = new AudioPlayerWindow();
     mainWnd3 = new NodeMapWindow();
-    mainWnd4 = new AudioCaptureWindow();
+    mainWnd4 = new UVEditWindow();
 
     udCont1 = new UDContainer(mainWnd, mainWnd3);
     udCont2 = new UDContainer(mainWnd2, mainWnd4);
@@ -1419,6 +1470,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
 HINSTANCE Main::hInst;
 Main* Main::inst;
+MainData* Main::data;
 HWND Main::hWnd;
 HDC Main::hDC;
 HGLRC Main::hRC;

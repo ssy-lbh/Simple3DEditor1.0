@@ -21,9 +21,6 @@ private:
 
     Menu* basicMenu;
 
-    Menu* menu;
-    Vector2 menuPos;
-
     GLTexture2D* bktex;
 
     class MoveButton : public IButton {
@@ -90,7 +87,6 @@ public:
 
     void UpdateCursor(int x, int y);
     void UpdateWindowSize(int x, int y);
-    void SetMenu(Menu* m);
     void AddNode();
 };
 

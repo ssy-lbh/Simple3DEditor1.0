@@ -17,6 +17,7 @@
 #include "colorboard.h"
 
 class MainWindow;
+class MainData;
 class Main;
 
 class MainWindow : public IWindow {
@@ -38,17 +39,9 @@ private:
     Vector3 camForward = Vector3::forward;
     float camRange = 100.0f;
 
-    bool noRender = false;
-
-    Menu* menu = NULL;
-    Vector2 menuPos = Vector2::zero;
-
     Menu* basicMenu;
 
     UIManager* uiMgr;
-    Mesh* mesh;
-
-    List<Vertex*> selectedPoints;
 
     IOperation* curOp = NULL;
 
@@ -201,7 +194,6 @@ public:
     void InitLight0();
 
     void RenderModelView();
-    void SetMenu(Menu* m);
     void SetOperation(IOperation* op);
     void SetTool(ITool* tool);
 
@@ -247,6 +239,33 @@ public:
     Vector2 GetScreenPosition(Vector3 pos);
 };
 
+class MainData {
+public:
+    Vector2 cursorPos;
+    Vector2 cliSize;
+    float aspect;
+
+    Mesh* mesh;
+
+    Menu* menu = NULL;
+    Vector2 menuPos;
+
+    List<Vertex*> selectedPoints;
+
+    MainData();
+    ~MainData();
+
+    void UpdateCursor(int x, int y);
+    void UpdateWindowSize(int x, int y);
+
+    void SetMenu(Menu* m);
+
+    void OnLeftDown(int x, int y);
+    void OnLeftUp(int x, int y);
+    void OnRightDown(int x, int y);
+    void OnRightUp(int x, int y);
+};
+
 class Main {
 public:
     static HINSTANCE hInst;
@@ -254,6 +273,7 @@ public:
     static HDC hDC;
     static HGLRC hRC;
     static Main* inst;
+    static MainData* data;
 
     // 测试一下面向对象的结果，成功实现双屏
     IWindow* mainWnd = NULL;
@@ -277,10 +297,10 @@ public:
     void FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     static void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT_PTR wParam, DWORD lParam);
 
-    void OnResize(int x, int y);
     void OnRender();
 
     static void RequestRender();
+    static void SetMenu(Menu* m);
 
     int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
 };

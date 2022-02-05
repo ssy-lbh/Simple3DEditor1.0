@@ -316,6 +316,7 @@ void UDContainer::OnLeftUp(int x, int y){
 void UDContainer::OnRightDown(int x, int y){
     cursorPos.x = x;
     cursorPos.y = y;
+    UpdateFocus();
     if (focus)
         focus->OnRightDown(x, up ? y - dis : y);
 }

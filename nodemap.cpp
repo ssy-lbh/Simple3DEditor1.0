@@ -2,6 +2,7 @@
 
 #include "opengl/gl/gl.h"
 
+#include "main.h"
 #include "res.h"
 #include "gltools.h"
 #include "log.h"
@@ -140,9 +141,10 @@ NodeMapWindow::NodeMapWindow(){
 }
 
 NodeMapWindow::~NodeMapWindow(){
-    if(uiMgr) delete uiMgr;
-    if(nodeMgr) delete nodeMgr;
-    if(basicMenu) delete basicMenu;
+    if (uiMgr) delete uiMgr;
+    if (nodeMgr) delete nodeMgr;
+    if (basicMenu) delete basicMenu;
+    if (bktex) delete bktex;
 }
 
 bool NodeMapWindow::IsFocus(){
@@ -166,7 +168,7 @@ void NodeMapWindow::OnRender(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if (!bktex){
-        bktex = new GLTexture2D(IDB_EARTH_WATER);
+        bktex = new GLTexture2D(IDB_NODEMAP_BACKGROUND);
     }
     bktex->Enable();
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -189,9 +191,6 @@ void NodeMapWindow::OnRender(){
     nodeMgr->RenderRaw();
 
     glPopMatrix();
-
-    if (menu)
-        menu->Render(menuPos.x, menuPos.y);
 }
 
 void NodeMapWindow::OnClose(){}
@@ -215,29 +214,12 @@ void NodeMapWindow::UpdateCursor(int x, int y){
     cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
     uiMgr->CursorMove(cursorPos);
     nodeMgr->CursorMove(cursorPos);
-    if (menu)
-        menu->CursorMove(cursorPos - menuPos);
 }
 
 void NodeMapWindow::UpdateWindowSize(int x, int y){
     cliSize.x = x;
     cliSize.y = y;
     aspect = (float)cliSize.x / cliSize.y;
-    if (menu != NULL){
-        menu->SetClientSize(cliSize);
-    }
-}
-
-void NodeMapWindow::SetMenu(Menu* m){
-    if (menu){
-        menu->ResetSelect();
-    }
-    menu = m;
-    if (menu != NULL){
-        menu->SetClientSize(cliSize);
-        menu->CursorMove(cursorPos);
-        menuPos = cursorPos;
-    }
 }
 
 void NodeMapWindow::AddNode(){
@@ -250,14 +232,6 @@ void NodeMapWindow::OnMouseMove(int x, int y){
 }
 
 void NodeMapWindow::OnLeftDown(int x, int y){
-    // 菜单消失
-    if (menu){
-        if (menu->InChainMenu(cursorPos - menuPos)){
-            menu->Click();
-        }
-        SetMenu(NULL);
-        return;
-    }
     // UI交互
     if (uiMgr->LeftDown()){
         UpdateCursor(x, y);
@@ -279,7 +253,7 @@ void NodeMapWindow::OnLeftUp(int x, int y){
 }
 
 void NodeMapWindow::OnRightDown(int x, int y){
-    SetMenu(basicMenu);
+    Main::SetMenu(basicMenu);
 }
 
 void NodeMapWindow::OnRightUp(int x, int y){}
@@ -294,7 +268,6 @@ void NodeMapWindow::OnFocus(){
 
 void NodeMapWindow::OnKillFocus(){
     focus = false;
-    SetMenu(NULL);
 }
 
 void NodeMapWindow::OnMouseWheel(int delta){}

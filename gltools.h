@@ -10,7 +10,10 @@ class GLTexture2D;
 
 class GLUtils {
 public:
+    // 画圆弧角
     static void DrawCorner(float x, float y, float start, float end, float radius, float step);
+    // 画圆弧角，同时四个方向UV值从0.0到1.0，覆盖整个纹理，可使用纹理坐标变换改变位置
+    static void DrawCornerWithUV(float x, float y, float start, float end, float radius, float step);
     static void EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC);
     static void DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC);
     static void Clear2DViewport();
