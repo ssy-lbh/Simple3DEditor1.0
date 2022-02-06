@@ -3,6 +3,8 @@
 #include "gltools.h"
 #include "log.h"
 
+ColorBoard* ColorBoard::inst = NULL;
+
 ColorBoard::ColorBoard(){
     DebugLog("ColorBoard Created %p", this);
     //TODO 添加属性WS_POPUP时SetProp失效
@@ -19,7 +21,6 @@ ColorBoard::ColorBoard(){
         NULL
     );
     GLUtils::EnableOpenGL(hWnd, &hDC, &hRC);
-    SetProp(hWnd, "PROP_THIS", (HANDLE)this);
 }
 
 ColorBoard::~ColorBoard(){
@@ -27,7 +28,7 @@ ColorBoard::~ColorBoard(){
     DestroyWindow(hWnd);
 }
 
-ATOM ColorBoard::RegClass(HINSTANCE hInstance){
+void ColorBoard::Init(HINSTANCE hInstance){
     WNDCLASSEXA wc;
 
     wc.cbSize = sizeof(WNDCLASSEXA);
@@ -43,16 +44,22 @@ ATOM ColorBoard::RegClass(HINSTANCE hInstance){
     wc.lpszMenuName = "";
     wc.style = 0;
 
-    return RegisterClassExA(&wc);
+    RegisterClassExA(&wc);
+
+    if (!inst)
+        inst = new ColorBoard();
+}
+
+ColorBoard* ColorBoard::GetInst(){
+    return inst;
 }
 
 LRESULT CALLBACK ColorBoard::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    ColorBoard* board = (ColorBoard*)GetProp(hWnd, "PROP_THIS");
-    if (board == NULL){
-        DebugError("ColorBoard::NullPointerException");
+    if (!inst){
+        //DebugError("ColorBoard::NullPointerException");
         return DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
-    return board->LocalWndProc(hWnd, uMsg, wParam, lParam);
+    return inst->LocalWndProc(hWnd, uMsg, wParam, lParam);
 }
 
 LRESULT CALLBACK ColorBoard::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
@@ -169,6 +176,10 @@ void ColorBoard::Render(){
     glEnd();
 
     SwapBuffers(hDC);
+}
+
+Vector3 ColorBoard::GetColor(){
+    return inst->RunAndGetColor();
 }
 
 Vector3 ColorBoard::RunAndGetColor(){

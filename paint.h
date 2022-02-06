@@ -18,7 +18,6 @@ private:
     bool focus = false;
 
     Vector2 cursorPos = Vector2::zero;
-    Vector3 cursorDir = Vector3::zero;
     Vector2 cliSize;
     float aspect;
 
@@ -101,8 +100,38 @@ class PaintWindow : public IWindow {
 private:
     bool focus = false;
 
-    IOperation* curOp;
-    ITool* brush;
+    Vector2 cursorPos = Vector2::zero;
+    Vector2 cliSize;
+    float aspect;
+
+    Menu* basicMenu;
+
+    IOperation* curOp = NULL;
+    ITool* brush = NULL;
+
+    GLuint paintTex = 0;
+    GLint width, height;
+
+    class DefaultBrush : public ITool {
+    private:
+        PaintWindow* window;
+        bool draw = false;
+        GLuint kernel;
+        GLuint kernelShader;
+        GLuint paintLoc, offsetLoc, positionLoc, radiusLoc, colorLoc;
+        Vector3 color = Vector3::one;
+
+    public:
+        DefaultBrush(PaintWindow* window);
+        virtual ~DefaultBrush() override;
+
+        virtual void OnLeftDown() override;
+        virtual void OnLeftUp() override;
+        virtual void OnMove() override;
+        virtual void OnCommand(int id) override;
+
+        void Draw();
+    };
 
 public:
     PaintWindow();
@@ -119,6 +148,15 @@ public:
     virtual void OnFocus() override;
     virtual void OnKillFocus() override;
     virtual void OnMenuAccel(int id, bool accel) override;
+
+    void UpdateCursor(int x, int y);
+    void UpdateWindowSize(int x, int y);
+
+    void SetOperation(IOperation* op);
+    void SetBrush(ITool* tool);
+
+    void CreateImage(int x, int y);
+    bool InRect(int x, int y);
 };
 
 #endif

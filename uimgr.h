@@ -173,6 +173,7 @@ public:
     virtual void OnRightUp();
     virtual void OnMove();
     virtual void OnRender();
+    virtual void OnCommand(int id);
 };
 
 class IWindow {

@@ -42,6 +42,7 @@ IDC_CLICKED CURSOR              "res/cursor/cursor_clicked.cur"
 
 IDS_BASIC_VERT SHADER           "res/shader/basic_vert.vert"
 IDS_BASIC_FRAG SHADER           "res/shader/basic_frag.frag"
+IDS_BRUSH_DEFAULT SHADER        "res/shader/brush_default.comp"
 
 IDB_EARTH_WATER BITMAP          "res/texture/earth_water.bmp"
 IDB_NODEMAP_BACKGROUND BITMAP   "res/texture/nodemap_background.bmp"
@@ -76,6 +77,7 @@ BEGIN
         MENUITEM "启用",                            IDM_TEXTURE_ENABLE
         MENUITEM "停用",                            IDM_TEXTURE_DISABLE
         MENUITEM "加载",                            IDM_TEXTURE_LOAD
+        MENUITEM "使用画布",                        IDM_TEXTURE_USE_PAINT
     END
     POPUP "版本(&H)"
     BEGIN

@@ -8,6 +8,7 @@
 #include "openal/alc.h"
 
 #include "uimgr.h"
+#include "menu.h"
 
 #include "soundtouch/SoundTouch.h"
 
@@ -45,6 +46,7 @@ private:
     Vector2 cursorPos;
 
     UIManager* uiMgr;
+    Menu* basicMenu;
 
     wchar_t path[MAX_PATH];
 

@@ -333,6 +333,7 @@ void ITool::OnRightDown(){}
 void ITool::OnRightUp(){}
 void ITool::OnMove(){}
 void ITool::OnRender(){}
+void ITool::OnCommand(int id){}
 
 IWindow::IWindow(){}
 IWindow::~IWindow(){}

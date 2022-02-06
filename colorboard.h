@@ -21,13 +21,17 @@ private:
     RECT cliRect;
     float white = 1.0f;
 
+    static ColorBoard* inst;
+
 public:
     ColorBoard();
     ~ColorBoard();
-    static ATOM RegClass(HINSTANCE hInstance);
+    static void Init(HINSTANCE hInstance);
+    static ColorBoard* GetInst();
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT CALLBACK LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     void Render();
+    static Vector3 GetColor();
     Vector3 RunAndGetColor();
 };
 

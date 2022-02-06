@@ -297,15 +297,8 @@ public:
     static Main* inst;
     static MainData* data;
 
-    // 测试一下面向对象的结果，成功实现双屏
-    IWindow* mainWnd = NULL;
-    IWindow* mainWnd2 = NULL;
-    IWindow* mainWnd3 = NULL;
-    IWindow* mainWnd4 = NULL;
-
+    // 测试过面向对象的结果，成功实现多屏
     LRContainer* container = NULL;
-    UDContainer* udCont1 = NULL;
-    UDContainer* udCont2 = NULL;
 
     bool reqRender = false;
 

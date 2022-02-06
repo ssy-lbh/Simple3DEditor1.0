@@ -218,6 +218,11 @@ AudioPlayerWindow::AudioPlayerWindow(){
     uiMgr->AddButton(new ProgressBar(this));
     uiMgr->AddButton(new LoopOption(this));
 
+    basicMenu = new Menu();
+    basicMenu->AddItem(new MenuItem(L"加载", MENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](AudioPlayerWindow* window){
+        window->OnMenuAccel(IDM_LOAD, false);
+    }, this));
+
     path[0] = L'\0';
 }
 
@@ -342,6 +347,7 @@ void AudioPlayerWindow::OnRightDown(int x, int y){
     cursorPos.x = 2.0f * x / size.x - 1.0f;
     cursorPos.y = 2.0f * y / size.y - 1.0f;
     uiMgr->CursorMove(cursorPos);
+    Main::SetMenu(basicMenu);
 }
 
 void AudioPlayerWindow::OnRightUp(int x, int y){
@@ -383,6 +389,7 @@ void AudioPlayerWindow::OnInsLoad(){
     wchar_t file[MAX_PATH];
     file[0] = L'\0';
     // 暂不使用 L"PCM音频文件(*.wav)\0*.wav\0所有音频类型(.*)\0*.*\0"，此状态下发现Shell时可能的环境错误
+    // 若要使用请拖入文件
     if (!ShellFileSelectWindowW(Main::hWnd, file, MAX_PATH, L"PCM音频文件(*.wav)\0*.wav\0", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER)){
         DebugLog("Stop Loading");
         return;
@@ -667,6 +674,10 @@ void AudioCaptureWindow::OnRender(){
             AudioUtils::FFT(freqBuf, bit, false);
         }
 
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
         glBegin(GL_LINES);
         for (int i = 0; i < 1024; i++){
             float rate = i / 1024.0f;

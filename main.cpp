@@ -365,6 +365,9 @@ MainWindow::MainWindow(){
     basicMenu->AddItem(new MenuItem(L"保存", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
         window->OnInsSave();
     }, this));
+    basicMenu->AddItem(new MenuItem(L"加载", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        window->OnInsLoad();
+    }, this));
     basicMenu->AddItem(new MenuItem());
     basicMenu->AddItem(new MenuItem(L"关于", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
         window->AboutBox();
@@ -388,6 +391,27 @@ MainWindow::MainWindow(){
         window->OnMenuAccel(IDM_MESH_BASIC_CAPSULE, false);
     }, this));
     basicMenu->AddItem(new MenuItem(L"添加", subMenu));
+
+    Menu* toolMenu = new Menu();
+    toolMenu->AddItem(new MenuItem(L"点选", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        window->OnMenuAccel(IDM_TOOL_EMPTY, false);
+    }, this));
+    toolMenu->AddItem(new MenuItem(L"点选", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        window->OnMenuAccel(IDM_TOOL_SELECTBOX, false);
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"工具", toolMenu));
+
+    Menu* texMenu = new Menu();
+    texMenu->AddItem(new MenuItem(L"启用", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        window->OnMenuAccel(IDM_TEXTURE_ENABLE, false);
+    }, this));
+    texMenu->AddItem(new MenuItem(L"停用", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        window->OnMenuAccel(IDM_TEXTURE_DISABLE, false);
+    }, this));
+    texMenu->AddItem(new MenuItem(L"加载", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        window->OnMenuAccel(IDM_TEXTURE_LOAD, false);
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"纹理", texMenu));
 
     uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
     uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
@@ -860,10 +884,7 @@ void MainWindow::OnInsLoad(){
 }
 
 void MainWindow::OnInsSelectColor(){
-    if (colorBoard == NULL){
-        colorBoard = new ColorBoard();
-    }
-    Vector3 color = colorBoard->RunAndGetColor();
+    Vector3 color = ColorBoard::GetColor();
     Main::data->selectedPoints.Foreach<Vector3*>([](Vertex* v, Vector3* c){
         v->color = *c;
     }, &color);
@@ -1150,18 +1171,12 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         inputText[MAX_PATH] = '\0';
         Main::data->mesh->SetTexture(new GLTexture2D(inputText));
         break;
-    case IDM_OP_X:
-    case IDM_OP_Y:
-    case IDM_OP_Z:
-    case IDM_OP_PLANE_X:
-    case IDM_OP_PLANE_Y:
-    case IDM_OP_PLANE_Z:
-        // 当前操作的命令
-        if (curOp){
-            curOp->OnCommand(id);
-        }
-        break;
     }
+    // 当前操作的命令
+    if (curOp)
+        curOp->OnCommand(id);
+    if (curTool)
+        curTool->OnCommand(id);
 }
 
 void MainWindow::OnDropFileA(const char* path){
@@ -1465,17 +1480,34 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     AudioUtils::InitOpenAL();
 
+    IWindow* mainWnd;
+    IWindow* mainWnd2;
+    IWindow* mainWnd3;
+    IWindow* mainWnd4;
+    IWindow* mainWnd5;
+    IWindow* mainWnd6;
+
+    LRContainer* lrCont1;
+
+    UDContainer* udCont1;
+    UDContainer* udCont2;
+    UDContainer* udCont3;
+
     mainWnd = new MainWindow();
     mainWnd2 = new AudioPlayerWindow();
-    mainWnd3 = new NodeMapWindow();
+    mainWnd3 = new PaintWindow();
     mainWnd4 = new UVEditWindow();
+    mainWnd5 = new AudioCaptureWindow();
+    mainWnd6 = new NodeMapWindow();
 
     udCont1 = new UDContainer(mainWnd, mainWnd3);
     udCont2 = new UDContainer(mainWnd2, mainWnd4);
-    container = new LRContainer(udCont1, udCont2);
+    udCont3 = new UDContainer(mainWnd5, mainWnd6);
+    lrCont1 = new LRContainer(udCont2, udCont3);
+    container = new LRContainer(udCont1, lrCont1);
 
     RegClass();
-    ColorBoard::RegClass(hInstance);
+    ColorBoard::Init(hInstance);
 
     hWnd = CreateWnd();
 
@@ -1485,6 +1517,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     DebugLog("Main Window Created");
 
     GLUtils::EnableOpenGL(hWnd, &hDC, &hRC);
+    GLUtils::EnableOpenGLEXT();
 
     DebugLog("OpenGL Enabled");
     DebugLog("OpenGL Version %s", glGetString(GL_VERSION));

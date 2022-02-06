@@ -1,6 +1,9 @@
 #include "gltools.h"
 
 #include "vecmath.h"
+#include "glfunc.h"
+#include "res.h"
+#include "main.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
@@ -36,6 +39,10 @@ void GLUtils::EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC){
 
     *hRC = wglCreateContext(*hDC);
     wglMakeCurrent(*hDC, *hRC);
+}
+
+void GLUtils::EnableOpenGLEXT(){
+    glInitEXTFunctions();
 }
 
 void GLUtils::DisableOpenGL(HWND hWnd, HDC hDC, HGLRC hRC){
@@ -263,8 +270,11 @@ GLTexture2D::GLTexture2D(int resid){
     delete[] pBits;
 }
 
+GLTexture2D::GLTexture2D(GLuint texture, bool delTex) : tex(texture), delTex(delTex) {}
+
 GLTexture2D::~GLTexture2D(){
-    glDeleteTextures(1, &tex);
+    if (delTex)
+        glDeleteTextures(1, &tex);
 }
 
 void GLTexture2D::Enable(){
@@ -274,4 +284,96 @@ void GLTexture2D::Enable(){
 
 void GLTexture2D::Disable(){
     glDisable(GL_TEXTURE_2D);
+}
+
+GLComputeProgram::GLComputeProgram(int resid){
+    HRSRC kernelSrc;
+    HGLOBAL resIdx;
+    LPVOID resPtr;
+    DWORD resSize;
+    char* srcData;
+
+    kernelSrc = FindResource(Main::hInst, MAKEINTRESOURCE(resid), MAKEINTRESOURCE(SHADER));
+    resIdx = LoadResource(Main::hInst, kernelSrc);
+    resPtr = LockResource(resIdx);
+    resSize = SizeofResource(Main::hInst, kernelSrc);
+    srcData = new char[resSize];
+    RtlCopyMemory(srcData, resPtr, resSize);
+    FreeResource(resIdx);
+
+    prog = glCreateProgram();
+    shader = glCreateShader(GL_COMPUTE_SHADER);
+
+    glShaderSource(shader, 1, &srcData, NULL);
+    glCompileShader(shader);
+
+    glAttachShader(prog, shader);
+    glLinkProgram(prog);
+}
+
+GLComputeProgram::GLComputeProgram(const char* source){
+    prog = glCreateProgram();
+    shader = glCreateShader(GL_COMPUTE_SHADER);
+
+    glShaderSource(shader, 1, &source, NULL);
+    glCompileShader(shader);
+
+    glAttachShader(prog, shader);
+    glLinkProgram(prog);
+}
+
+GLComputeProgram::~GLComputeProgram(){
+    glDeleteProgram(prog);
+    glDeleteShader(shader);
+}
+
+GLuint GLComputeProgram::GetProgram(){
+    return prog;
+}
+
+bool GLComputeProgram::CheckProgramError(){
+    GLint logLen;
+    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &logLen);
+    return logLen > 0;
+}
+
+bool GLComputeProgram::CheckShaderError(){
+    GLint logLen;
+    glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &logLen);
+    return logLen > 0;
+}
+
+void GLComputeProgram::PrintProgramLog(){
+    char* log;
+    GLint logLen;
+
+    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &logLen);
+    if (logLen){
+        log = new char[logLen];
+        glGetProgramInfoLog(prog, logLen, &logLen, log);
+        DebugError("%s", log);
+        delete[] log;
+    }
+}
+
+void GLComputeProgram::PrintShaderLog(){
+    char* log;
+    GLint logLen;
+
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLen);
+    if (logLen){
+        log = new char[logLen];
+        glGetShaderInfoLog(shader, logLen, &logLen, log);
+        DebugError("%s", log);
+        delete[] log;
+    }
+}
+
+void GLComputeProgram::Dispatch(int x, int y, int z){
+    glUseProgram(prog);
+    glDispatchCompute(x, y, z);
+}
+
+GLuint GLComputeProgram::GetLoc(const char* name){
+    return glGetUniformLocation(prog, name);
 }
