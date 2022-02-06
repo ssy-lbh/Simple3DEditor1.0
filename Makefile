@@ -7,18 +7,16 @@
 
 GCC			= g++.exe
 RM			= del
-CFLAGS 		= -I"ffmpeg\\" -I"openal\\" -I"opengl\\" -I"glew\\" -m64
+CFLAGS 		= -I"ffmpeg\\" -I"openal\\" -I"opengl\\" -m64
 OFLAGS		= -m64 -s
-LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32\
-				"ffmpeg\avcodec.lib" "ffmpeg\avformat.lib" "ffmpeg\avutil.lib" "ffmpeg\swscale.lib"\
-				"glew\glew32.lib" "openal\OpenAL32.lib"
+LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 "openal\OpenAL32.lib"
 RES  		= windres.exe
 MKDIR   	= mkdir
 
 BUILD_PATH	= build
 PROGOBJ		= main.o log.o vecmath.o font.o menu.o gltools.o uimgr.o mesh.o\
 				geodef.o colorboard.o nodemap.o shell.o container.o attrtable.o\
-				audio.o avcodec.o paint.o glfunc.o\
+				audio.o paint.o glfunc.o\
 				soundtouch\SoundTouch.o soundtouch\TDStretch.o soundtouch\RateTransposer.o\
 				soundtouch\AAFilter.o soundtouch\FIRFilter.o soundtouch\FIFOSampleBuffer.o\
 				soundtouch\PeakFinder.o soundtouch\BPMDetect.o
@@ -82,7 +80,7 @@ commit:
 merge:
 	git checkout master
 	git pull origin master
-	git merge develop
+	git merge $(BRANCH)
 	git status
 	git push origin master
 

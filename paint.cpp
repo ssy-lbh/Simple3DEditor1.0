@@ -305,62 +305,30 @@ void UVEditWindow::SetTool(ITool* tool){
 }
 
 PaintWindow::DefaultBrush::DefaultBrush(PaintWindow* window) : window(window) {
-    HRSRC kernelSrc;
-    HGLOBAL resIdx;
-    LPVOID resPtr;
-    DWORD resSize;
-    char* srcData;
-    char* log;
-    int logLen;
-
-    kernelSrc = FindResource(Main::hInst, MAKEINTRESOURCE(IDS_BRUSH_DEFAULT), MAKEINTRESOURCE(SHADER));
-    resIdx = LoadResource(Main::hInst, kernelSrc);
-    resPtr = LockResource(resIdx);
-    resSize = SizeofResource(Main::hInst, kernelSrc);
-    srcData = new char[resSize];
-    RtlCopyMemory(srcData, resPtr, resSize);
-    FreeResource(resIdx);
-
-    kernel = glCreateProgram();
-    kernelShader = glCreateShader(GL_COMPUTE_SHADER);
-
-    glShaderSource(kernelShader, 1, &srcData, NULL);
-    glCompileShader(kernelShader);
-    glGetShaderiv(kernelShader, GL_INFO_LOG_LENGTH, &logLen);
-    if (logLen){
-        log = new char[logLen];
-        glGetShaderInfoLog(kernelShader, logLen, &logLen, log);
-        DebugError("Shader IDS_BRUSH_DEFAULT Compile Info:");
-        DebugError("%s", log);
-        delete[] log;
-    }else{
-        DebugLog("Shader IDS_BRUSH_DEFAULT Compile Success");
+    prog = new GLComputeProgram(IDS_BRUSH_DEFAULT);
+    if (prog->CheckShaderError()){
+        DebugError("Shader IDS_BRUSH_DEFAULT Compile Error:");
+        prog->PrintShaderLog();
+        err = true;
+    }
+    if (prog->CheckProgramError()){
+        DebugError("Program Link Error:");
+        prog->PrintProgramLog();
+        err = true;
     }
 
-    glAttachShader(kernel, kernelShader);
-    glLinkProgram(kernel);
-    glGetProgramiv(kernel, GL_INFO_LOG_LENGTH, &logLen);
-    if (logLen){
-        log = new char[logLen];
-        glGetProgramInfoLog(kernel, logLen, &logLen, log);
-        DebugError("Program Link Info:");
-        DebugError("%s", log);
-        delete[] log;
-    }else{
-        DebugLog("Program Link Success");
-    }
+    if (err)
+        return;
 
-    paintLoc = glGetUniformLocation(kernel, "paint");
-    offsetLoc = glGetUniformLocation(kernel, "offset");
-    positionLoc = glGetUniformLocation(kernel, "position");
-    radiusLoc = glGetUniformLocation(kernel, "radius");
-    colorLoc = glGetUniformLocation(kernel, "color");
-    DebugLog("%d %d %d %d %d", paintLoc, offsetLoc, positionLoc, radiusLoc, colorLoc);
+    paintLoc = prog->GetLoc("paint");
+    offsetLoc = prog->GetLoc("offset");
+    positionLoc = prog->GetLoc("position");
+    radiusLoc = prog->GetLoc("radius");
+    colorLoc = prog->GetLoc("color");
 }
 
 PaintWindow::DefaultBrush::~DefaultBrush(){
-    glDeleteProgram(kernel);
-    glDeleteShader(kernelShader);
+    if (prog) delete prog;
 }
 
 void PaintWindow::DefaultBrush::OnLeftDown(){
@@ -372,8 +340,9 @@ void PaintWindow::DefaultBrush::OnLeftUp(){
 }
 
 void PaintWindow::DefaultBrush::OnMove(){
-    if (draw)
+    if (draw){
         Draw();
+    }
 }
 
 void PaintWindow::DefaultBrush::OnCommand(int id){
@@ -389,26 +358,25 @@ void PaintWindow::DefaultBrush::Draw(){
     GLint position[2];
     GLfloat radius = 10.0f;
 
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, window->paintTex);
-    // 省略了glActiveTexture(GL_TEXTURE0);
-    glBindImageTexture(0, window->paintTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-    glDisable(GL_TEXTURE_2D);
+    if (err)
+        return;
+
+    prog->BindTexture(0, window->paintTex, GL_READ_WRITE, GL_RGBA32F);
 
     position[0] = window->width * (window->cursorPos.x + 1.0f) * 0.5f;
     position[1] = window->height * (window->cursorPos.y + 1.0f) * 0.5f;
     offset[0] = position[0] - 12;
     offset[1] = position[1] - 12;
 
-    glUseProgram(kernel);
+    GLuint kernel = prog->GetProgram();
 
     glProgramUniform1i(kernel, paintLoc, 0);
     glProgramUniform2i(kernel, offsetLoc, offset[0], offset[1]);
     glProgramUniform2i(kernel, positionLoc, position[0], position[1]);
     glProgramUniform1f(kernel, radiusLoc, radius);
     glProgramUniform3f(kernel, colorLoc, color.x, color.y, color.z);
-
-    glDispatchCompute(3, 3, 1);
+;
+    prog->Dispatch(3, 3, 1);
 }
 
 PaintWindow::PaintWindow(){
@@ -419,6 +387,14 @@ PaintWindow::PaintWindow(){
         window->OnMenuAccel(IDM_BRUSH_DEFAULT, false);
     }, this));
     basicMenu->AddItem(new MenuItem(L"笔刷", brushMenu));
+
+    basicMenu->AddItem(new MenuItem());
+    basicMenu->AddItem(new MenuItem(L"使用画布纹理", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
+        window->OnMenuAccel(IDM_TEXTURE_USE_PAINT, false);
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"调色板", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
+        window->OnMenuAccel(IDM_SELECT_COLOR, false);
+    }, this));
 }
 
 PaintWindow::~PaintWindow(){
@@ -433,10 +409,33 @@ void PaintWindow::OnRender(){
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
     // 测试代码
     if (!paintTex){
         CreateImage(500, 500);
         SetBrush(new DefaultBrush(this));
+
+        // 可能是因为该段渲染流程使用的内部其他类型的管线
+        // Vertex会进入内部VertexBuffer
+        // Color会写入uniforn变量中
+        // glEnd()以后执行DrawCall时，颜色只会以最后设置的颜色为准
+        // 所以目前顶点属性的差值尚未解决
+
+        // GLFrameBuffer* frame = new GLFrameBuffer();
+        // frame->BindTexture(paintTex, 500, 500);
+        // frame->Enable();
+        // glColor3f(1.0f, 1.0f, 1.0f);
+        // glBegin(GL_TRIANGLES);
+        // glVertex2f(0.0f, 1.0f);
+        // glVertex2f(0.866f, -0.5f);
+        // glVertex2f(-0.866f, -0.5f);
+        // glEnd();
+        // frame->Disable();
+        // delete frame;
     }
 
     if (paintTex){
@@ -478,6 +477,8 @@ void PaintWindow::OnLeftDown(int x, int y){
 
 void PaintWindow::OnLeftUp(int x, int y){
     UpdateCursor(x, y);
+    // 刷子可能应先收到左键弹起，再得知鼠标移动
+    // 尚未决定是否修改
     if (brush){
         brush->OnLeftUp();
     }

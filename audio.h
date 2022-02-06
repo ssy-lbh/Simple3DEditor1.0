@@ -46,7 +46,9 @@ private:
     Vector2 cursorPos;
 
     UIManager* uiMgr;
+
     Menu* basicMenu;
+    MenuItem* loopItem;
 
     wchar_t path[MAX_PATH];
 
@@ -103,9 +105,9 @@ private:
     };
 
     class LoopOption : public IButton {
-        private:
+    private:
         AudioPlayerWindow* window;
-        bool loop = false;
+        bool loop;
     
     public:
         LoopOption(AudioPlayerWindow* window);
@@ -151,6 +153,8 @@ public:
     void Launch();
     void Stop();
     bool IsLaunched();
+    bool IsLoop();
+    void SetLoop(bool loop);
 
     ALint GetWaveFormat(PWAVEFORMATEX lpwav);
 };
@@ -168,6 +172,11 @@ private:
     Vector2 size;
     Vector2 cursorPos;
 
+    UIManager* uiMgr;
+
+    Menu* basicMenu;
+    MenuItem* captureItem;
+
     ALCdevice* capDev = NULL;
     ALvoid* capBuf = NULL;
     _Complex float* freqBuf = NULL;
@@ -180,6 +189,25 @@ private:
     int head = 0, tail = 0;
 
     soundtouch::SoundTouch* soundTouch = NULL;
+
+    class ProgressBar : public IButton {
+    private:
+        AudioCaptureWindow* window;
+        bool hover = false;
+        float pos = 0.0f;
+        float origin;
+    
+    public:
+        ProgressBar(AudioCaptureWindow* window);
+        virtual ~ProgressBar() override;
+
+        virtual bool Trigger(Vector2 pos) override;
+        virtual void Click() override;
+        virtual void Drag(Vector2 dir) override;
+        virtual void Hover() override;
+        virtual void Leave() override;
+        virtual void Render() override;
+    };
 
 public:
     AudioCaptureWindow();

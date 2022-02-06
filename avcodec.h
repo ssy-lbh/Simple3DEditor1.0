@@ -1,6 +1,11 @@
 #ifndef __AVCODEC__
 #define __AVCODEC__
 
+// 目前因为该库体积过大和未完成等原因
+// 内部实现完成较少且ffmpeg库尚未链接
+// 该文件未编译成对象链接入程序
+// 暂时不能调用
+
 #include <windef.h>
 
 extern "C" {

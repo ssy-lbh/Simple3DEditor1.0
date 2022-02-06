@@ -51,6 +51,9 @@ private:
     GLuint prog;
     GLuint shader;
 
+    GLint progLog = -1;
+    GLint shaderLog = -1;
+
 public:
     GLComputeProgram(int resid);
     GLComputeProgram(const char* source);
@@ -63,6 +66,23 @@ public:
     void PrintShaderLog();
     void Dispatch(int x, int y, int z);
     GLuint GetLoc(const char* name);
+    void BindTexture(GLuint unit, GLuint texture, GLenum access, GLenum format);
+};
+
+class GLFrameBuffer {
+private:
+    GLuint frame = 0;
+    int x = 0, y = 0;
+
+public:
+    GLFrameBuffer();
+    GLFrameBuffer(GLuint texture);
+    ~GLFrameBuffer();
+
+    void BindTexture(GLuint texture);
+    void BindTexture(GLuint texture, int x, int y);
+    void Enable();
+    void Disable();
 };
 
 #endif

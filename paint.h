@@ -121,6 +121,9 @@ private:
         GLuint paintLoc, offsetLoc, positionLoc, radiusLoc, colorLoc;
         Vector3 color = Vector3::one;
 
+        GLComputeProgram* prog = NULL;
+        bool err = false;
+
     public:
         DefaultBrush(PaintWindow* window);
         virtual ~DefaultBrush() override;

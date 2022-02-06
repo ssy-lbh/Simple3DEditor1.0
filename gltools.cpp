@@ -173,7 +173,7 @@ GLTexture2D::GLTexture2D(const char* path){
     int x, y, channel;
     stbi_uc* image;
 
-    image = stbi_load(path, &x, &y, &channel, 4);
+    image = stbi_load(path, &x, &y, &channel, 3);
 
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -219,7 +219,7 @@ GLTexture2D::GLTexture2D(const wchar_t* path){
     dataSize = ((size_t)Info.nFileSizeHigh) | Info.nFileSizeLow;
     data = new stbi_uc[dataSize];
     ReadFile(hFile, data, dataSize, NULL, NULL);
-    image = stbi_load_from_memory(data, dataSize, &x, &y, &channel, 4);
+    image = stbi_load_from_memory(data, dataSize, &x, &y, &channel, 3);
     delete[] data;
 
     glGenTextures(1, &tex);
@@ -332,25 +332,24 @@ GLuint GLComputeProgram::GetProgram(){
 }
 
 bool GLComputeProgram::CheckProgramError(){
-    GLint logLen;
-    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &logLen);
-    return logLen > 0;
+    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &progLog);
+    return progLog > 0;
 }
 
 bool GLComputeProgram::CheckShaderError(){
-    GLint logLen;
-    glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &logLen);
-    return logLen > 0;
+    glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &shaderLog);
+    return shaderLog > 0;
 }
 
 void GLComputeProgram::PrintProgramLog(){
     char* log;
     GLint logLen;
 
-    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &logLen);
-    if (logLen){
-        log = new char[logLen];
-        glGetProgramInfoLog(prog, logLen, &logLen, log);
+    if (progLog == -1)
+        glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &progLog);
+    if (progLog > 0){
+        log = new char[progLog];
+        glGetProgramInfoLog(prog, progLog, &progLog, log);
         DebugError("%s", log);
         delete[] log;
     }
@@ -360,10 +359,11 @@ void GLComputeProgram::PrintShaderLog(){
     char* log;
     GLint logLen;
 
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLen);
-    if (logLen){
-        log = new char[logLen];
-        glGetShaderInfoLog(shader, logLen, &logLen, log);
+    if (shaderLog == -1)
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &shaderLog);
+    if (shaderLog > 0){
+        log = new char[shaderLog];
+        glGetShaderInfoLog(shader, shaderLog, &shaderLog, log);
         DebugError("%s", log);
         delete[] log;
     }
@@ -376,4 +376,52 @@ void GLComputeProgram::Dispatch(int x, int y, int z){
 
 GLuint GLComputeProgram::GetLoc(const char* name){
     return glGetUniformLocation(prog, name);
+}
+
+void GLComputeProgram::BindTexture(GLuint unit, GLuint texture, GLenum access, GLenum format){
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // 省略了glActiveTexture(GL_TEXTURE0);
+    glBindImageTexture(unit, texture, 0, GL_FALSE, 0, access, format);
+    glDisable(GL_TEXTURE_2D);
+}
+
+GLFrameBuffer::GLFrameBuffer(){
+    glGenFramebuffers(1, &frame);
+}
+
+GLFrameBuffer::GLFrameBuffer(GLuint texture){
+    glGenFramebuffers(1, &frame);
+    BindTexture(texture);
+}
+
+GLFrameBuffer::~GLFrameBuffer(){
+    glDeleteFramebuffers(1, &frame);
+}
+
+void GLFrameBuffer::BindTexture(GLuint texture){
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+    glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_WIDTH, &x);
+    glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_HEIGHT, &y);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void GLFrameBuffer::BindTexture(GLuint texture, int x, int y){
+    this->x = x; this->y = y;
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void GLFrameBuffer::Enable(){
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame);
+    ViewportManager::inst->PushViewport({0, y, x, 0});
+}
+
+void GLFrameBuffer::Disable(){
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    ViewportManager::inst->PopViewport();
 }

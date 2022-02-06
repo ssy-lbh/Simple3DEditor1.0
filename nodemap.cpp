@@ -167,6 +167,11 @@ void NodeMapWindow::OnRender(){
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
     if (!bktex){
         bktex = new GLTexture2D(IDB_NODEMAP_BACKGROUND);
     }

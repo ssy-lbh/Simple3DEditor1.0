@@ -197,12 +197,14 @@ bool AudioPlayerWindow::LoopOption::Trigger(Vector2 pos){
 }
 
 void AudioPlayerWindow::LoopOption::Click(){
+    loop = window->IsLoop();
     loop = !loop;
+    window->SetLoop(loop);
     DebugLog("AudioPlayerWindow::LoopOption State %s", loop ? "Looping" : "Default");
-    alSourcei(window->alSrc, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
 }
 
 void AudioPlayerWindow::LoopOption::Render(){
+    loop = window->IsLoop();
     if (loop){
         glColor3f(0.0f, 0.0f, 1.0f);
     }else{
@@ -222,6 +224,10 @@ AudioPlayerWindow::AudioPlayerWindow(){
     basicMenu->AddItem(new MenuItem(L"加载", MENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](AudioPlayerWindow* window){
         window->OnMenuAccel(IDM_LOAD, false);
     }, this));
+    loopItem = new MenuItem(IsLoop() ? L"循环:开" : L"循环:关", MENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](AudioPlayerWindow* window){
+        window->SetLoop(!window->IsLoop());
+    }, this);
+    basicMenu->AddItem(loopItem);
 
     path[0] = L'\0';
 }
@@ -535,6 +541,7 @@ void AudioPlayerWindow::LoadFileW(const wchar_t* file){
     DebugLog("AudioPlayerWindow::LoadFileW Success");
 
     loaded = true;
+    loopItem->name = L"循环:关";
 }
 
 bool AudioPlayerWindow::IsLoaded(){
@@ -584,6 +591,17 @@ bool AudioPlayerWindow::IsLaunched(){
     return launched;
 }
 
+bool AudioPlayerWindow::IsLoop(){
+    ALint loop;
+    alGetSourcei(alSrc, AL_LOOPING, &loop);
+    return loop == AL_TRUE;
+}
+
+void AudioPlayerWindow::SetLoop(bool loop){
+    alSourcei(alSrc, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+    loopItem->name = loop ? L"循环:开" : L"循环:关";
+}
+
 ALint AudioPlayerWindow::GetWaveFormat(PWAVEFORMATEX lpwav){
     ALenum format = -1;
     switch (lpwav->nChannels){
@@ -611,17 +629,71 @@ ALint AudioPlayerWindow::GetWaveFormat(PWAVEFORMATEX lpwav){
     return format;
 }
 
+AudioCaptureWindow::ProgressBar::ProgressBar(AudioCaptureWindow* window) : window(window) {}
+AudioCaptureWindow::ProgressBar::~ProgressBar(){}
+
+bool AudioCaptureWindow::ProgressBar::Trigger(Vector2 pos){
+    return pos.x >= 0.8f && pos.x <= 1.0f && pos.y >= this->pos - 0.05f && pos.y <= this->pos + 0.05f;
+}
+
+void AudioCaptureWindow::ProgressBar::Click(){
+    origin = pos;
+}
+
+void AudioCaptureWindow::ProgressBar::Drag(Vector2 dir){
+    pos = Clamp(origin + dir.y, -0.8f, 0.8f);
+    window->soundTouch->setPitchSemiTones(pos * 1.25f * 12.0f);
+}
+
+void AudioCaptureWindow::ProgressBar::Hover(){
+    hover = true;
+}
+
+void AudioCaptureWindow::ProgressBar::Leave(){
+    hover = false;
+}
+
+void AudioCaptureWindow::ProgressBar::Render(){
+    if (window->capture){
+        glLineWidth(10.0f);
+        glColor3f(0.6f, 0.6f, 0.6f);
+        glBegin(GL_LINES);
+        glVertex2f(0.9f, -0.8f);
+        glVertex2f(0.9f, 0.8f);
+        glEnd();
+        glLineWidth(1.0f);
+
+        if (hover){
+            glColor3f(0.0f, 0.0f, 0.3f);
+        }else{
+            glColor3f(0.0f, 0.0f, 0.5f);
+        }
+        GLUtils::DrawRect(0.8f, pos - 0.05f, 1.0f, pos + 0.05f);
+    }
+}
+
 AudioCaptureWindow::AudioCaptureWindow(){
     //SoundTouch 貌似在我的电脑上性能有限，不能很好做到实时变音
     soundTouch = new soundtouch::SoundTouch();
     soundTouch->setChannels(1);
     soundTouch->setSampleRate(freq);
-    soundTouch->setPitchSemiTones(12);
+    soundTouch->setPitchSemiTones(0);
     soundTouch->setTempo(1.0f);
     soundTouch->clear();
+
+    uiMgr = new UIManager();
+
+    uiMgr->AddButton(new ProgressBar(this));
+
+    basicMenu = new Menu();
+    captureItem = new MenuItem(capture ? L"录音:开" : L"录音:关", MENUITEM_LAMBDA_TRANS(AudioCaptureWindow)[](AudioCaptureWindow* window){
+        window->capture ? window->Stop() : window->Launch();
+    }, this);
+    basicMenu->AddItem(captureItem);
 }
 
 AudioCaptureWindow::~AudioCaptureWindow(){
+    if (uiMgr) delete uiMgr;
     if (capBuf) delete (short*)capBuf;
     if (freqBuf) delete freqBuf;
 
@@ -687,6 +759,8 @@ void AudioCaptureWindow::OnRender(){
             glVertex2f(rate * 2.0f - 1.0f, amp);
         }
         glEnd();
+
+        uiMgr->Render();
     }
 }
 
@@ -712,26 +786,34 @@ void AudioCaptureWindow::OnResize(int x, int y){
 void AudioCaptureWindow::OnMouseMove(int x, int y){
     cursorPos.x = 2.0f * x / size.x - 1.0f;
     cursorPos.y = 2.0f * y / size.y - 1.0f;
+    uiMgr->CursorMove(cursorPos);
 }
 
 void AudioCaptureWindow::OnLeftDown(int x, int y){
     cursorPos.x = 2.0f * x / size.x - 1.0f;
     cursorPos.y = 2.0f * y / size.y - 1.0f;
+    uiMgr->CursorMove(cursorPos);
+    uiMgr->LeftDown();
 }
 
 void AudioCaptureWindow::OnLeftUp(int x, int y){
     cursorPos.x = 2.0f * x / size.x - 1.0f;
     cursorPos.y = 2.0f * y / size.y - 1.0f;
+    uiMgr->CursorMove(cursorPos);
+    uiMgr->LeftUp();
 }
 
 void AudioCaptureWindow::OnRightDown(int x, int y){
     cursorPos.x = 2.0f * x / size.x - 1.0f;
     cursorPos.y = 2.0f * y / size.y - 1.0f;
+    uiMgr->CursorMove(cursorPos);
+    Main::SetMenu(basicMenu);
 }
 
 void AudioCaptureWindow::OnRightUp(int x, int y){
     cursorPos.x = 2.0f * x / size.x - 1.0f;
     cursorPos.y = 2.0f * y / size.y - 1.0f;
+    uiMgr->CursorMove(cursorPos);
 }
 
 void AudioCaptureWindow::OnMouseHover(int key, int x, int y){}
@@ -774,6 +856,7 @@ void AudioCaptureWindow::Launch(){
 
     alcCaptureStart(capDev);
     capture = true;
+    captureItem->name = L"录音:开";
 
     DebugLog("AudioCaptureWindow::Launch Success");
 }
@@ -781,6 +864,7 @@ void AudioCaptureWindow::Launch(){
 void AudioCaptureWindow::Stop(){
     alcCaptureStop(capDev);
     capture = false;
+    captureItem->name = L"录音:关";
 }
 
 void AudioCaptureWindow::UpdateBuffer(ALvoid* buf, ALsizei size){
