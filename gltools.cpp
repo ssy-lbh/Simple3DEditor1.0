@@ -173,7 +173,7 @@ GLTexture2D::GLTexture2D(const char* path){
     int x, y, channel;
     stbi_uc* image;
 
-    image = stbi_load(path, &x, &y, &channel, 3);
+    image = stbi_load(path, &x, &y, &channel, 4);
 
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -185,9 +185,7 @@ GLTexture2D::GLTexture2D(const char* path){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       //放大纹理过滤方式
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       //缩小纹理过滤方式
 	
-    glTexImage2D(GL_TEXTURE_2D, 0, channel, x, y, 0,
-                (channel == 4 ? GL_RGBA : (channel == 3 ? GL_RGB : GL_R))
-                , GL_UNSIGNED_BYTE, image);
+    glTexImage2D(GL_TEXTURE_2D, 0, channel, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
     
     stbi_image_free(image);
 }
@@ -219,7 +217,7 @@ GLTexture2D::GLTexture2D(const wchar_t* path){
     dataSize = ((size_t)Info.nFileSizeHigh) | Info.nFileSizeLow;
     data = new stbi_uc[dataSize];
     ReadFile(hFile, data, dataSize, NULL, NULL);
-    image = stbi_load_from_memory(data, dataSize, &x, &y, &channel, 3);
+    image = stbi_load_from_memory(data, dataSize, &x, &y, &channel, 4);
     delete[] data;
 
     glGenTextures(1, &tex);
@@ -232,9 +230,7 @@ GLTexture2D::GLTexture2D(const wchar_t* path){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       //放大纹理过滤方式
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       //缩小纹理过滤方式
 	
-    glTexImage2D(GL_TEXTURE_2D, 0, channel, x, y, 0,
-                (channel == 4 ? GL_RGBA : (channel == 3 ? GL_RGB : GL_R))
-                , GL_UNSIGNED_BYTE, image);
+    glTexImage2D(GL_TEXTURE_2D, 0, channel, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
     
     stbi_image_free(image);
 }
