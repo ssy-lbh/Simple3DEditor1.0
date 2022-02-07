@@ -67,7 +67,7 @@ $(EXTRAOBJ): $(BUILD_PATH)\\%.o: %.cpp
 $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 	$(RES) -i $< -o $@
 
-BRANCH		= AVDevelop
+BRANCH		= AVdevelop
 COMMITMSG	= "update"
 
 commit:
