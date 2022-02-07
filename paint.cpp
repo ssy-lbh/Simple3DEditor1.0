@@ -304,6 +304,51 @@ void UVEditWindow::SetTool(ITool* tool){
     tool->OnSelect();
 }
 
+PaintWindow::ClearBrush::ClearBrush(PaintWindow* window) : window(window) {
+    prog = new GLComputeProgram(IDS_BRUSH_CLEAR);
+    if (prog->CheckShaderError()){
+        DebugError("Compute Shader %d Compile Error:", IDS_BRUSH_CLEAR);
+        prog->PrintShaderLog();
+        err = true;
+    }
+    if (prog->CheckProgramError()){
+        DebugError("Program Link Error:");
+        prog->PrintProgramLog();
+        err = true;
+    }
+
+    if (err)
+        return;
+
+    colorLoc = prog->GetLoc("color");
+}
+
+PaintWindow::ClearBrush::~ClearBrush(){
+    if (prog) delete prog;
+}
+
+void PaintWindow::ClearBrush::OnLeftDown(){
+    GLuint kernel;
+
+    if (err)
+        return;
+
+    prog->BindTexture(0, window->paintTex, GL_READ_WRITE, GL_RGBA32F);
+
+    kernel = prog->GetProgram();
+    glProgramUniform3f(kernel, colorLoc, color.x, color.y, color.z);
+
+    prog->Dispatch((window->width + 7) >> 3, (window->height + 7) >> 3, 1);
+}
+
+void PaintWindow::ClearBrush::OnCommand(int id){
+    switch (id){
+    case IDM_SELECT_COLOR:
+        color = ColorBoard::GetColor();
+        break;
+    }
+}
+
 PaintWindow::DefaultBrush::DefaultBrush(PaintWindow* window) : window(window) {
     prog = new GLComputeProgram(IDS_BRUSH_OVERLAY);
     if (prog->CheckShaderError()){
@@ -380,6 +425,7 @@ void PaintWindow::DefaultBrush::Draw(){
     GLint offset[2];
     GLint position[2];
     GLfloat radius = 10.0f;
+    GLuint kernel;
 
     if (err)
         return;
@@ -391,7 +437,7 @@ void PaintWindow::DefaultBrush::Draw(){
     offset[0] = position[0] - 12;
     offset[1] = position[1] - 12;
 
-    GLuint kernel = prog->GetProgram();
+    kernel = prog->GetProgram();
 
     glProgramUniform1i(kernel, paintLoc, 0);
     glProgramUniform2i(kernel, offsetLoc, offset[0], offset[1]);
@@ -420,6 +466,10 @@ PaintWindow::PaintWindow(){
     }, this));
     brushMenu->AddItem(new MenuItem(L"乘色", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
         window->OnMenuAccel(IDM_BRUSH_RGB_MUL, false);
+    }, this));
+    brushMenu->AddItem(new MenuItem());
+    brushMenu->AddItem(new MenuItem(L"清空", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
+        window->OnMenuAccel(IDM_BRUSH_CLEAR, false);
     }, this));
     basicMenu->AddItem(new MenuItem(L"笔刷", brushMenu));
 
@@ -555,6 +605,9 @@ void PaintWindow::OnMenuAccel(int id, bool accel){
     switch (id){
     case IDM_TEXTURE_USE_PAINT:
         Main::data->mesh->SetTexture(new GLTexture2D(paintTex));
+        break;
+    case IDM_BRUSH_CLEAR:
+        SetBrush(new ClearBrush(this));
         break;
     case IDM_BRUSH_DEFAULT:
         SetBrush(new DefaultBrush(this, IDS_BRUSH_OVERLAY));

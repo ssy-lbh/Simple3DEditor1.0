@@ -329,7 +329,6 @@ GLuint GLComputeProgram::GetProgram(){
 
 bool GLComputeProgram::CheckProgramError(){
     glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &progLog);
-    DebugLog("%d", progLog);
     return progLog > 0;// OpenGL 程序的日志长度为0时正常
 }
 

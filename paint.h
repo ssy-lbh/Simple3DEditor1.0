@@ -112,12 +112,27 @@ private:
     GLuint paintTex = 0;
     GLint width, height;
 
+    class ClearBrush : public ITool {
+    private:
+        PaintWindow* window;
+        GLuint colorLoc;
+        Vector3 color = Vector3::one;
+
+        GLComputeProgram* prog = NULL;
+        bool err = false;
+
+    public:
+        ClearBrush(PaintWindow* window);
+        virtual ~ClearBrush() override;
+
+        virtual void OnLeftDown() override;
+        virtual void OnCommand(int id) override;
+    };
+
     class DefaultBrush : public ITool {
     private:
         PaintWindow* window;
         bool draw = false;
-        GLuint kernel;
-        GLuint kernelShader;
         GLuint paintLoc, offsetLoc, positionLoc, radiusLoc, colorLoc;
         Vector3 color = Vector3::one;
 
