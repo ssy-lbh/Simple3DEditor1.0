@@ -305,9 +305,32 @@ void UVEditWindow::SetTool(ITool* tool){
 }
 
 PaintWindow::DefaultBrush::DefaultBrush(PaintWindow* window) : window(window) {
-    prog = new GLComputeProgram(IDS_BRUSH_DEFAULT);
+    prog = new GLComputeProgram(IDS_BRUSH_OVERLAY);
     if (prog->CheckShaderError()){
-        DebugError("Shader IDS_BRUSH_DEFAULT Compile Error:");
+        DebugError("Compute Shader %d Compile Error:", IDS_BRUSH_OVERLAY);
+        prog->PrintShaderLog();
+        err = true;
+    }
+    if (prog->CheckProgramError()){
+        DebugError("Program Link Error:");
+        prog->PrintProgramLog();
+        err = true;
+    }
+
+    if (err)
+        return;
+
+    paintLoc = prog->GetLoc("paint");
+    offsetLoc = prog->GetLoc("offset");
+    positionLoc = prog->GetLoc("position");
+    radiusLoc = prog->GetLoc("radius");
+    colorLoc = prog->GetLoc("color");
+}
+
+PaintWindow::DefaultBrush::DefaultBrush(PaintWindow* window, int shaderId) : window(window) {
+    prog = new GLComputeProgram(shaderId);
+    if (prog->CheckShaderError()){
+        DebugError("Compute Shader %d Compile Error:", shaderId);
         prog->PrintShaderLog();
         err = true;
     }
@@ -383,8 +406,20 @@ PaintWindow::PaintWindow(){
     basicMenu = new Menu();
 
     Menu* brushMenu = new Menu();
-    brushMenu->AddItem(new MenuItem(L"默认笔刷", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
+    brushMenu->AddItem(new MenuItem(L"默认", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
         window->OnMenuAccel(IDM_BRUSH_DEFAULT, false);
+    }, this));
+    brushMenu->AddItem(new MenuItem(L"加色", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
+        window->OnMenuAccel(IDM_BRUSH_RGB_ADD, false);
+    }, this));
+    brushMenu->AddItem(new MenuItem(L"减色", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
+        window->OnMenuAccel(IDM_BRUSH_CMK_ADD, false);
+    }, this));
+    brushMenu->AddItem(new MenuItem(L"水彩(未完成)", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
+        window->OnMenuAccel(IDM_BRUSH_WATERCOLOR, false);
+    }, this));
+    brushMenu->AddItem(new MenuItem(L"乘色", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
+        window->OnMenuAccel(IDM_BRUSH_RGB_MUL, false);
     }, this));
     basicMenu->AddItem(new MenuItem(L"笔刷", brushMenu));
 
@@ -417,7 +452,7 @@ void PaintWindow::OnRender(){
     // 测试代码
     if (!paintTex){
         CreateImage(500, 500);
-        SetBrush(new DefaultBrush(this));
+        SetBrush(new DefaultBrush(this, IDS_BRUSH_OVERLAY));
 
         // 可能是因为该段渲染流程使用的内部其他类型的管线
         // Vertex会进入内部VertexBuffer
@@ -511,6 +546,7 @@ void PaintWindow::OnRightUp(int x, int y){
 void PaintWindow::OnFocus(){
     focus = true;
 }
+
 void PaintWindow::OnKillFocus(){
     focus = false;
 }
@@ -521,7 +557,19 @@ void PaintWindow::OnMenuAccel(int id, bool accel){
         Main::data->mesh->SetTexture(new GLTexture2D(paintTex));
         break;
     case IDM_BRUSH_DEFAULT:
-        SetBrush(new DefaultBrush(this));
+        SetBrush(new DefaultBrush(this, IDS_BRUSH_OVERLAY));
+        break;
+    case IDM_BRUSH_RGB_ADD:
+        SetBrush(new DefaultBrush(this, IDS_BRUSH_RGB_ADD));
+        break;
+    case IDM_BRUSH_CMK_ADD:
+        SetBrush(new DefaultBrush(this, IDS_BRUSH_CMK_ADD));
+        break;
+    case IDM_BRUSH_WATERCOLOR:
+        SetBrush(new DefaultBrush(this, IDS_BRUSH_WATERCOLOR));
+        break;
+    case IDM_BRUSH_RGB_MUL:
+        SetBrush(new DefaultBrush(this, IDS_BRUSH_RGB_MUL));
         break;
     }
     if (brush)

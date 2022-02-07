@@ -329,12 +329,13 @@ GLuint GLComputeProgram::GetProgram(){
 
 bool GLComputeProgram::CheckProgramError(){
     glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &progLog);
-    return progLog > 0;
+    DebugLog("%d", progLog);
+    return progLog > 0;// OpenGL 程序的日志长度为0时正常
 }
 
 bool GLComputeProgram::CheckShaderError(){
     glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &shaderLog);
-    return shaderLog > 0;
+    return shaderLog > 0;// OpenGL 着色器的日志长度为-1时正常，不过为什么跟程序不一样？保险起见这样写
 }
 
 void GLComputeProgram::PrintProgramLog(){

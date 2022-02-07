@@ -396,7 +396,7 @@ MainWindow::MainWindow(){
     toolMenu->AddItem(new MenuItem(L"点选", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
         window->OnMenuAccel(IDM_TOOL_EMPTY, false);
     }, this));
-    toolMenu->AddItem(new MenuItem(L"点选", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+    toolMenu->AddItem(new MenuItem(L"框选", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
         window->OnMenuAccel(IDM_TOOL_SELECTBOX, false);
     }, this));
     basicMenu->AddItem(new MenuItem(L"工具", toolMenu));

@@ -30,9 +30,11 @@
 
 class Vector2;
 class Vector3;
+class Vector4;
 class Quaternion;
+class Matrix4x4;
 
-class Vector2{
+class Vector2 {
 public:
     float x;
     float y;
@@ -46,11 +48,19 @@ public:
 
     Vector2();
     Vector2(Vector2 &&) = default;
+    Vector2(Vector3 &&);
+    Vector2(Vector4 &&);
     Vector2(const Vector2 &) = default;
+    Vector2(const Vector3 &);
+    Vector2(const Vector4 &);
     Vector2 &operator=(Vector2 &&) = default;
+    Vector2 &operator=(Vector3 &&);
+    Vector2 &operator=(Vector4 &&);
     Vector2 &operator=(const Vector2 &) = default;
-    ~Vector2();
+    Vector2 &operator=(const Vector3 &);
+    Vector2 &operator=(const Vector4 &);
     Vector2(float, float);
+    ~Vector2();
     Vector2 operator+(Vector2) const;
     Vector2 operator-(Vector2) const;
     Vector2 operator*(float) const;
@@ -78,7 +88,7 @@ public:
     Vector2 Rotate(float) const;
 };
 
-class Vector3{
+class Vector3 {
 public:
     float x;
     float y;
@@ -94,12 +104,21 @@ public:
     static const Vector3 back;
 
     Vector3();
+    Vector3(Vector2 &&);
     Vector3(Vector3 &&) = default;
+    Vector3(Vector4 &&);
+    Vector3(const Vector2 &);
     Vector3(const Vector3 &) = default;
+    Vector3(const Vector4 &);
+    Vector3 &operator=(Vector2 &&);
     Vector3 &operator=(Vector3 &&) = default;
+    Vector3 &operator=(Vector4 &&);
+    Vector3 &operator=(const Vector2 &);
     Vector3 &operator=(const Vector3 &) = default;
-    ~Vector3();
+    Vector3 &operator=(const Vector4 &);
+    Vector3(float, float);
     Vector3(float, float, float);
+    ~Vector3();
     Vector3 operator+(Vector3) const;
     Vector3 operator-(Vector3) const;
     Vector3 operator*(float) const;
@@ -129,7 +148,79 @@ public:
     Vector3 RotateZ(float) const;
 };
 
-class Quaternion{
+// 齐次三维坐标向量
+class Vector4 {
+public:
+    float x;
+    float y;
+    float z;
+    // 第四维一般不会使用
+    // 除了加减操作中，点的第四维为1.0，向量第四维为0.0
+    // 此时它们相互进行运算
+    // 以及在四维矩阵变换中
+    // 第四维为1.0的点会参与平移运算
+    // 第四维为0.0的向量不会
+    float w;
+
+    static const Vector4 zero;
+    static const Vector4 one;
+    static const Vector4 up;
+    static const Vector4 down;
+    static const Vector4 left;
+    static const Vector4 right;
+    static const Vector4 forward;
+    static const Vector4 back;
+
+    Vector4();
+    Vector4(Vector2 &&);
+    Vector4(Vector3 &&);
+    Vector4(Vector4 &&) = default;
+    Vector4(const Vector2 &);
+    Vector4(const Vector3 &);
+    Vector4(const Vector4 &) = default;
+    Vector4 &operator=(Vector2 &&);
+    Vector4 &operator=(Vector3 &&);
+    Vector4 &operator=(Vector4 &&) = default;
+    Vector4 &operator=(const Vector2 &);
+    Vector4 &operator=(const Vector3 &);
+    Vector4 &operator=(const Vector4 &) = default;
+    Vector4(float, float);
+    Vector4(float, float, float);
+    Vector4(float, float, float, float);
+    Vector4(Vector3, float);
+    ~Vector4();
+    Vector4 operator+(Vector3) const;
+    Vector4 operator+(Vector4) const;
+    Vector4 operator-(Vector3) const;
+    Vector4 operator-(Vector4) const;
+    Vector4 operator*(float) const;
+    Vector4 operator/(float) const;
+    Vector4 &operator+=(Vector3);
+    Vector4 &operator-=(Vector3);
+    Vector4 &operator*=(float);
+    Vector4 &operator/=(float);
+    Vector4 operator-() const;
+    Vector4 &operator*=(Quaternion);
+    Vector4 &operator/=(Quaternion);
+
+    static float Dot(Vector4, Vector4);
+    static Vector4 Cross(Vector4, Vector4);
+    static float Cosine(Vector4, Vector4);
+    static float Sine(Vector4, Vector4);
+    static float Tangent(Vector4, Vector4);
+
+    Vector3 Normal() const;
+    Vector4 &Normalize();
+    float Magnitude() const;
+    float SqrMagnitude() const;
+    Vector4 Reflect(Vector3) const;
+    Vector4 Refract(Vector3, float) const;
+    Vector4 RotateX(float) const;
+    Vector4 RotateY(float) const;
+    Vector4 RotateZ(float) const;
+};
+
+class Quaternion {
 public:
     float x;
     float y;
@@ -143,9 +234,9 @@ public:
     Quaternion(const Quaternion &) = default;
     Quaternion &operator=(Quaternion &&) = default;
     Quaternion &operator=(const Quaternion &) = default;
-    ~Quaternion();
     Quaternion(float, float, float, float);
     Quaternion(Vector3, float);
+    ~Quaternion();
     Quaternion operator*(Quaternion) const;
     Quaternion operator*(float) const;
     Quaternion operator/(Quaternion) const;
@@ -170,6 +261,46 @@ public:
     float Magnitude() const;
     float SqrMagnitude() const;
     Vector3 GetAxis() const;
+};
+
+class Matrix4x4 {
+public:
+    float _11; float _12; float _13; float _14;
+    float _21; float _22; float _23; float _24;
+    float _31; float _32; float _33; float _34;
+    float _41; float _42; float _43; float _44;
+
+    static const Matrix4x4 zero;
+    static const Matrix4x4 identity;
+
+    Matrix4x4();
+    Matrix4x4(Quaternion &&);
+    Matrix4x4(Matrix4x4 &&) = default;
+    Matrix4x4(const Quaternion &);
+    Matrix4x4(const Matrix4x4 &) = default;
+    Matrix4x4 &operator=(Quaternion &&);
+    Matrix4x4 &operator=(Matrix4x4 &&) = default;
+    Matrix4x4 &operator=(const Quaternion &);
+    Matrix4x4 &operator=(const Matrix4x4 &) = default;
+    Matrix4x4(float, float, float, float,
+              float, float, float, float,
+              float, float, float, float,
+              float, float, float, float);
+    ~Matrix4x4();
+    Matrix4x4 operator+(Matrix4x4) const;
+    Matrix4x4 operator-(Matrix4x4) const;
+    Matrix4x4 operator*(float) const;
+    Matrix4x4 operator/(float) const;
+    Matrix4x4 &operator+=(Matrix4x4);
+    Matrix4x4 &operator-=(Matrix4x4);
+    Matrix4x4 &operator*=(float);
+    Matrix4x4 &operator/=(float);
+    Matrix4x4 operator*(Matrix4x4) const;
+    Matrix4x4 &operator*=(Matrix4x4);
+    Matrix4x4 operator-() const;
+    Matrix4x4 operator~() const;
+    Vector3 operator*(Vector3) const;
+    Vector4 operator*(Vector4) const;
 };
 
 float Lerp(float a, float b, float t);

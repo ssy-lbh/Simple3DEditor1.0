@@ -9,8 +9,8 @@ template <typename T>
 class List {
 private:
     T* data;
-    unsigned long long size;
-    unsigned long long ptr;
+    size_t size;
+    size_t ptr;
 
     void Check(size_t reserve){
         if (ptr + reserve < size){

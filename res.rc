@@ -2,9 +2,9 @@
 
 #include "res.h"
 
-ID_VERSION_INFO VERSIONINFO
-  FILEVERSION 1, 0, 0, 1
-  PRODUCTVERSION 1, 0, 0, 1
+1 VERSIONINFO
+  FILEVERSION 1,0,0,1
+  PRODUCTVERSION 1,0,0,1
   FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
   FILEFLAGS 0x1L
@@ -42,7 +42,11 @@ IDC_CLICKED CURSOR              "res/cursor/cursor_clicked.cur"
 
 IDS_BASIC_VERT SHADER           "res/shader/basic_vert.vert"
 IDS_BASIC_FRAG SHADER           "res/shader/basic_frag.frag"
-IDS_BRUSH_DEFAULT SHADER        "res/shader/brush_default.comp"
+IDS_BRUSH_OVERLAY SHADER        "res/shader/brush_overlay.comp"
+IDS_BRUSH_RGB_ADD SHADER        "res/shader/brush_rgb_add.comp"
+IDS_BRUSH_CMK_ADD SHADER        "res/shader/brush_cmk_add.comp"
+IDS_BRUSH_WATERCOLOR SHADER     "res/shader/brush_watercolor.comp"
+IDS_BRUSH_RGB_MUL SHADER        "res/shader/brush_rgb_mul.comp"
 
 IDB_EARTH_WATER BITMAP          "res/texture/earth_water.bmp"
 IDB_NODEMAP_BACKGROUND BITMAP   "res/texture/nodemap_background.bmp"
@@ -71,13 +75,6 @@ BEGIN
     BEGIN
         MENUITEM "点选",                            IDM_TOOL_EMPTY
         MENUITEM "框选",                            IDM_TOOL_SELECTBOX
-    END
-    POPUP "纹理(&P)"
-    BEGIN
-        MENUITEM "启用",                            IDM_TEXTURE_ENABLE
-        MENUITEM "停用",                            IDM_TEXTURE_DISABLE
-        MENUITEM "加载",                            IDM_TEXTURE_LOAD
-        MENUITEM "使用画布",                        IDM_TEXTURE_USE_PAINT
     END
     POPUP "版本(&H)"
     BEGIN
@@ -123,7 +120,7 @@ FONT 9, "MS Shell Dlg", 0, 0, 0x1
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 BEGIN
     ICON            IDR_MAINFRAME, IDC_STATIC, 14, 14, 21, 20
-    LTEXT           "StereoVision, 版本 1.0.0", IDC_STATIC, 42, 14, 114, 8, SS_NOPREFIX
+    LTEXT           "StereoVision, 版本 1.0.7", IDC_STATIC, 42, 14, 114, 8, SS_NOPREFIX
     LTEXT           "版权所有(c) lin-boheng@gitee.com 2021", IDC_STATIC, 24, 26, 114, 8
     DEFPUSHBUTTON   "确定", IDOK, 113, 41, 50, 14, WS_GROUP
 END

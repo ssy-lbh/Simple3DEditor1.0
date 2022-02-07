@@ -126,6 +126,7 @@ private:
 
     public:
         DefaultBrush(PaintWindow* window);
+        DefaultBrush(PaintWindow* window, int shaderId);
         virtual ~DefaultBrush() override;
 
         virtual void OnLeftDown() override;
