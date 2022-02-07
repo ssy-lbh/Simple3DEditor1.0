@@ -69,6 +69,7 @@ $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 
 BRANCH		= AVdevelop
 COMMITMSG	= "update"
+MERGE 		= AVDevelop
 
 commit:
 	-$(RM) temp.wav
@@ -78,11 +79,12 @@ commit:
 	git push -u origin $(BRANCH)
 
 merge:
-	git checkout master
-	git pull origin master
+	git checkout $(MERGE)
+	git pull origin $(MERGE)
 	git merge $(BRANCH)
 	git status
-	git push origin master
+	git push origin $(MERGE)
+	git checkout $(BRANCH)
 
 # git log 日志 ('q'退出)
 # git reflog 历史操作日志 (包含回退操作)('q'退出)
