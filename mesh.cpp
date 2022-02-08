@@ -216,11 +216,13 @@ void Mesh::DeleteVertex(Vertex* v){
     pack.m = this;
     pack.v = v;
     v->faces.Foreach<decltype(pack)*>([](Face* f, decltype(pack)* p){
+        DebugLog("Face::DeleteSelfReferenceExcept %p", f);
         f->DeleteSelfReferenceExcept(p->v);
         p->m->faces.Remove(f);
         delete f;
     }, &pack);
     v->edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* p){
+        DebugLog("Edge::DeleteSelfReferenceExcept %p", e);
         e->DeleteSelfReferenceExcept(p->v);
         p->m->edges.Remove(e);
         delete e;

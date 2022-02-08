@@ -2,6 +2,11 @@
 
 #include "gltools.h"
 #include "log.h"
+#include "res.h"
+#include "main.h"
+#include "audio.h"
+#include "nodemap.h"
+#include "paint.h"
 
 LRContainer::LRContainer(IWindow* lWindow, IWindow* rWindow) : lWindow(lWindow), rWindow(rWindow) {}
 LRContainer::~LRContainer(){}
@@ -187,8 +192,14 @@ void LRContainer::UpdateFocus(){
 }
 
 void LRContainer::FreeWindow(){
-    if (lWindow) delete lWindow;
-    if (rWindow) delete rWindow;
+    if (lWindow){
+        delete lWindow;
+        lWindow = NULL;
+    }
+    if (rWindow){
+        delete rWindow;
+        rWindow = NULL;
+    }
 }
 
 IWindow* LRContainer::GetLeftWindow(){
@@ -395,8 +406,14 @@ void UDContainer::UpdateFocus(){
 }
 
 void UDContainer::FreeWindow(){
-    if (uWindow) delete uWindow;
-    if (dWindow) delete dWindow;
+    if (uWindow){
+        delete uWindow;
+        uWindow = NULL;
+    }
+    if (dWindow){
+        delete dWindow;
+        dWindow = NULL;
+    }
 }
 
 IWindow* UDContainer::GetUpWindow(){
@@ -417,4 +434,177 @@ void UDContainer::DisableDrag(){
 
 bool UDContainer::DragEnabled(){
     return dragEnable;
+}
+
+SelectionWindow::SelectionWindow() : curWindow(NULL) {
+    InitMenu();
+}
+
+SelectionWindow::SelectionWindow(IWindow* initialWnd) : curWindow(initialWnd) {
+    InitMenu();
+}
+
+SelectionWindow::~SelectionWindow(){
+    if (selMenu) delete selMenu;
+}
+
+void SelectionWindow::InitMenu(){
+    selMenu = new Menu();
+
+    selMenu->AddItem(new MenuItem(L"主窗口", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
+        window->SetWindow(new MainWindow());
+    }, this));
+    selMenu->AddItem(new MenuItem(L"UV编辑器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
+        window->SetWindow(new UVEditWindow());
+    }, this));
+    selMenu->AddItem(new MenuItem(L"绘画窗口", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
+        window->SetWindow(new PaintWindow());
+    }, this));
+    selMenu->AddItem(new MenuItem(L"音频播放器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
+        window->SetWindow(new AudioPlayerWindow());
+    }, this));
+    selMenu->AddItem(new MenuItem(L"变声器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
+        window->SetWindow(new AudioCaptureWindow());
+    }, this));
+    selMenu->AddItem(new MenuItem(L"节点编辑器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
+        window->SetWindow(new NodeMapWindow());
+    }, this));
+    selMenu->AddItem(new MenuItem());
+    selMenu->AddItem(new MenuItem(L"左右分割", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
+        window->SetWindow(new LRContainer(window->curWindow, new SelectionWindow()), false);
+    }, this));
+    selMenu->AddItem(new MenuItem(L"上下分割", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
+        window->SetWindow(new UDContainer(window->curWindow, new SelectionWindow()), false);
+    }, this));
+}
+
+bool SelectionWindow::IsFocus(){
+    if (curWindow)
+        return curWindow->IsFocus();
+    return false;
+}
+
+void SelectionWindow::OnRender(){
+    if (curWindow){
+        curWindow->OnRender();
+    }else{
+        GLUtils::Clear3DViewport();
+    }
+}
+
+void SelectionWindow::OnCreate(){
+    if (curWindow)
+        curWindow->OnCreate();
+}
+
+void SelectionWindow::OnClose(){
+    if (curWindow)
+        curWindow->OnClose();
+}
+
+void SelectionWindow::OnTimer(int id){
+    if (curWindow)
+        curWindow->OnTimer(id);
+}
+
+void SelectionWindow::OnChar(char c){
+    if (curWindow)
+        curWindow->OnChar(c);
+}
+
+void SelectionWindow::OnUnichar(wchar_t c){
+    if (curWindow)
+        curWindow->OnUnichar(c);
+}
+
+void SelectionWindow::OnResize(int x, int y){
+    sizeX = x; sizeY = y;
+    if (curWindow)
+        curWindow->OnResize(x, y);
+}
+
+void SelectionWindow::OnMouseMove(int x, int y){
+    cursorX = x; cursorY = y;
+    if (curWindow)
+        curWindow->OnMouseMove(x, y);
+}
+
+void SelectionWindow::OnLeftDown(int x, int y){
+    if (curWindow)
+        curWindow->OnLeftDown(x, y);
+}
+
+void SelectionWindow::OnLeftUp(int x, int y){
+    if (curWindow)
+        curWindow->OnLeftUp(x, y);
+}
+
+void SelectionWindow::OnRightDown(int x, int y){
+    if (curWindow)
+        curWindow->OnRightDown(x, y);
+}
+
+void SelectionWindow::OnRightUp(int x, int y){
+    if (curWindow)
+        curWindow->OnRightUp(x, y);
+}
+
+void SelectionWindow::OnMouseHover(int key, int x, int y){
+    if (curWindow)
+        curWindow->OnMouseHover(key, x, y);
+}
+
+void SelectionWindow::OnMouseLeave(){
+    if (curWindow)
+        curWindow->OnMouseLeave();
+}
+
+void SelectionWindow::OnFocus(){
+    if (curWindow)
+        curWindow->OnFocus();
+}
+
+void SelectionWindow::OnKillFocus(){
+    if (curWindow)
+        curWindow->OnKillFocus();
+}
+
+void SelectionWindow::OnMouseWheel(int delta){
+    if (curWindow)
+        curWindow->OnMouseWheel(delta);
+}
+
+void SelectionWindow::OnMenuAccel(int id, bool accel){
+    if (id == IDM_MENU_WINDOW){
+        Main::SetMenu(selMenu);
+    }
+    if (curWindow)
+        curWindow->OnMenuAccel(id, accel);
+}
+
+void SelectionWindow::OnDropFileA(const char* path){
+    if (curWindow)
+        curWindow->OnDropFileA(path);
+}
+
+void SelectionWindow::OnDropFileW(const wchar_t* path){
+    if (curWindow)
+        curWindow->OnDropFileW(path);
+}
+
+IWindow* SelectionWindow::GetWindow(){
+    return curWindow;
+}
+
+void SelectionWindow::SetWindow(IWindow* window, bool del){
+    if (curWindow && del){
+        curWindow->OnClose();
+        delete curWindow;
+    }
+    curWindow = window;
+    if (curWindow){
+        curWindow->OnCreate();
+        curWindow->OnResize(sizeX, sizeY);
+        curWindow->OnMouseMove(cursorX, cursorY);
+    }
 }

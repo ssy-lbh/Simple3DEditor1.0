@@ -1404,7 +1404,7 @@ void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     //将事件发送至对应整个窗口的组件容器
-    FireEvent(container, hWnd, uMsg, wParam, lParam);
+    FireEvent(mainFrame, hWnd, uMsg, wParam, lParam);
 
     switch (uMsg){
     case WM_CREATE:
@@ -1465,7 +1465,7 @@ void Main::OnRender(){
     ViewportManager::inst->Reset(hWnd);
     ViewportManager::inst->EnableScissor();
 
-    container->OnRender();
+    mainFrame->OnRender();
 
     ViewportManager::inst->Reset(hWnd);
 
@@ -1493,18 +1493,20 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     UDContainer* udCont2;
     UDContainer* udCont3;
 
-    mainWnd = new MainWindow();
-    mainWnd2 = new AudioPlayerWindow();
-    mainWnd3 = new PaintWindow();
-    mainWnd4 = new UVEditWindow();
-    mainWnd5 = new AudioCaptureWindow();
-    mainWnd6 = new NodeMapWindow();
+    // mainWnd = new MainWindow();
+    // mainWnd2 = new AudioPlayerWindow();
+    // mainWnd3 = new PaintWindow();
+    // mainWnd4 = new UVEditWindow();
+    // mainWnd5 = new AudioCaptureWindow();
+    // mainWnd6 = new NodeMapWindow();
 
-    udCont1 = new UDContainer(mainWnd, mainWnd3);
-    udCont2 = new UDContainer(mainWnd2, mainWnd4);
-    udCont3 = new UDContainer(mainWnd5, mainWnd6);
-    lrCont1 = new LRContainer(udCont2, udCont3);
-    container = new LRContainer(udCont1, lrCont1);
+    // udCont1 = new UDContainer(mainWnd, mainWnd3);
+    // udCont2 = new UDContainer(mainWnd2, mainWnd4);
+    // udCont3 = new UDContainer(mainWnd5, mainWnd6);
+    // lrCont1 = new LRContainer(udCont2, udCont3);
+    // mainFrame = new LRContainer(udCont1, lrCont1);
+
+    mainFrame = new SelectionWindow();
 
     RegClass();
     ColorBoard::Init(hInstance);

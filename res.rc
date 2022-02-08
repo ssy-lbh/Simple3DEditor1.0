@@ -116,6 +116,7 @@ BEGIN
     "e",            IDM_EXCLUDE,            ASCII, NOINVERT
 
     "A",            IDM_MENU_BASIC,         ASCII, NOINVERT
+    "^W",             IDM_MENU_WINDOW,        ASCII, NOINVERT
 
     "1",            IDM_TOOL_EMPTY,         ASCII, ALT, NOINVERT
     "2",            IDM_TOOL_SELECTBOX,     ASCII, ALT, NOINVERT

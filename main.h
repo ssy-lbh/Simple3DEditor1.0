@@ -298,7 +298,7 @@ public:
     static MainData* data;
 
     // 测试过面向对象的结果，成功实现多屏
-    LRContainer* container = NULL;
+    IWindow* mainFrame = NULL;
 
     bool reqRender = false;
 
