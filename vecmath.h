@@ -311,4 +311,6 @@ Quaternion Slerp(Quaternion a, Quaternion b, float t);
 int Clamp(int x, int a, int b);
 float Clamp(float x, float a, float b);
 
+void Sort(float& x, float& y);
+
 #endif

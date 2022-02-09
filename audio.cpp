@@ -9,6 +9,8 @@
 #include "shell.h"
 #include "soundtouch/SoundTouch.h"
 
+bool AudioUtils::init = false;
+
 ALCdevice* AudioUtils::alDev;
 ALCcontext* AudioUtils::alCtx;
 
@@ -78,6 +80,11 @@ void AudioUtils::FFT(_Complex float* input, int sizebit, bool inv){
 }
 
 void AudioUtils::InitOpenAL(){
+    if (init)
+        return;
+
+    init = true;
+
     alDev = alcOpenDevice(NULL);
     alCtx = alcCreateContext(alDev, NULL);
 
@@ -215,6 +222,9 @@ void AudioPlayerWindow::LoopOption::Render(){
 
 AudioPlayerWindow::AudioPlayerWindow(){
     DebugLog("AudioPlayerWindow Launched");
+
+    AudioUtils::InitOpenAL();
+
     uiMgr = new UIManager();
 
     uiMgr->AddButton(new PlayButton(this));
@@ -676,6 +686,9 @@ void AudioCaptureWindow::ProgressBar::Render(){
 
 AudioCaptureWindow::AudioCaptureWindow(){
     DebugLog("AudioCaptureWindow Launched");
+
+    AudioUtils::InitOpenAL();
+    
     //SoundTouch 貌似在我的电脑上性能有限，不能很好做到实时变音
     soundTouch = new soundtouch::SoundTouch();
     soundTouch->setChannels(1);

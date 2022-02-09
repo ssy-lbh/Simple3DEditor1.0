@@ -122,20 +122,23 @@ MainWindow::ExcludeOperation::~ExcludeOperation(){}
 
 void MainWindow::ExcludeOperation::OnEnter(){
     DebugLog("ExcludeOperation OnEnter");
-    x = y = z = true;
-    start = main->cursorPos;
     List<Vertex*> copies;
     size_t cnt = Main::data->selPoints.Size();
+    Mesh* mesh = Main::GetMesh();
+    if (!mesh)
+        return;
+    x = y = z = true;
+    start = main->cursorPos;
     for (size_t i = 0; i < cnt; i++){
         copies.Add(Main::data->selPoints[i]);
-        Main::data->selPoints[i] = Main::data->mesh->AddVertex(Main::data->selPoints[i]->pos);
-        Main::data->mesh->AddEdge(copies[i], Main::data->selPoints[i]);
+        Main::data->selPoints[i] = mesh->AddVertex(Main::data->selPoints[i]->pos);
+        mesh->AddEdge(copies[i], Main::data->selPoints[i]);
     }
     for (size_t i = 0; i < cnt; i++){
         for (size_t j = i + 1; j < cnt; j++){
             if (copies[i]->EdgeRelateTo(copies[j])){
-                Main::data->mesh->AddTriFace(copies[i], copies[j], Main::data->selPoints[j]);
-                Main::data->mesh->AddTriFace(copies[i], Main::data->selPoints[i], Main::data->selPoints[j]);
+                mesh->AddTriFace(copies[i], copies[j], Main::data->selPoints[j]);
+                mesh->AddTriFace(copies[i], Main::data->selPoints[i], Main::data->selPoints[j]);
             }
         }
     }
@@ -166,10 +169,13 @@ void MainWindow::ExcludeOperation::OnConfirm(){
 
 void MainWindow::ExcludeOperation::OnUndo(){
     DebugLog("ExcludeOperation OnUndo");
+    Mesh* mesh = Main::GetMesh();
+    if (!mesh)
+        return;
     Main::data->selPoints.Clear();
     moveInfo.Foreach<Mesh*>([](MoveInfo info, Mesh* mesh){
         mesh->DeleteVertex(info.vert);
-    }, Main::data->mesh);
+    }, mesh);
 }
 
 void MainWindow::ExcludeOperation::OnCommand(int id){
@@ -300,14 +306,8 @@ MainWindow::EmptyTool::EmptyTool(MainWindow* window) : window(window) {}
 MainWindow::EmptyTool::~EmptyTool(){}
 
 void MainWindow::EmptyTool::OnLeftDown(){
-    Vertex* v = Main::data->mesh->Find(window->camPos, window->cursorDir);
-    if (v == NULL){
-        Main::data->selPoints.Clear();
-        DebugLog("No Point Selected");
-    }else{
-        Main::data->selPoints.Add(v);
-        DebugLog("Select Point %f %f %f", v->pos.x, v->pos.y, v->pos.z);
-    }
+    if (Main::data->curObject)
+        Main::data->curObject->OnSelect(window->camPos, window->cursorDir);
 }
 
 MainWindow::SelectTool::SelectTool(MainWindow* window) : window(window) {}
@@ -326,16 +326,11 @@ void MainWindow::SelectTool::OnLeftUp(){
         return;
     }
     //TODO 等待实现范围框选
-    Main::data->mesh->FindScreenRect(
-        window->camPos,
-        window->camDir,
-        window->camDis * 0.02,
-        window->camDis * 20.0,
-        start.x * window->aspect,
-        end.x * window->aspect,
-        start.y,
-        end.y,
-        Main::data->selPoints
+    Main::data->curObject->OnSelect(
+        window->camPos, window->camDir,
+        Vector2(window->camDis * 0.02, window->camDis * 20.0),
+        Vector2(start.x * window->aspect, start.y),
+        Vector2(end.x * window->aspect, end.y)
     );
 }
 
@@ -511,7 +506,7 @@ void MainWindow::RenderModelView(){
     glEnable(GL_LIGHTING);     //开启光照系统
     glEnable(GL_LIGHT0);       //开启GL_LIGHT0光源
 
-    Main::data->mesh->Render();
+    Main::data->scene->OnRender();
 
     // 已选择点绘制
     glDisable(GL_LIGHTING);
@@ -657,18 +652,26 @@ void MainWindow::GetTextInput(){
 
 void MainWindow::AddPoint(){
     Vector3 pos = camLookat + (camUp * cursorPos.y + camRight * cursorPos.x * aspect) * camDis;
-    Main::data->mesh->AddVertex(pos);
+    Mesh* mesh = Main::GetMesh();
+    if (!mesh)
+        return;
+    mesh->AddVertex(pos);
     DebugLog("Point at %f %f %f", pos.x, pos.y, pos.z);
 }
 
 void MainWindow::DeletePoint(){
+    Mesh* mesh = Main::GetMesh();
+    if (!mesh)
+        return;
     Main::data->selPoints.Foreach<Mesh*>([](Vertex* v, Mesh* m){
         m->DeleteVertex(v);
-    }, Main::data->mesh);
+    }, mesh);
     Main::data->selPoints.Clear();
 }
 
 bool MainWindow::SaveMesh(Mesh* mesh){
+    if (!mesh)
+        return false;
     if (!ShellFileSelectWindowW(Main::hWnd, inputText, MAX_PATH, L"3D对象(*.obj)\0*.obj\0", OFN_PATHMUSTEXIST | OFN_EXPLORER)){
         DebugError("Stop Saving");
         return false;
@@ -697,6 +700,8 @@ bool MainWindow::SaveMesh(Mesh* mesh){
 }
 
 bool MainWindow::LoadMesh(Mesh* mesh){
+    if (!mesh)
+        return false;
     if (!ShellFileSelectWindowW(Main::hWnd, inputText, MAX_PATH, L"3D对象(*.obj)\0*.obj\0", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER)){
         DebugLog("Stop Loading");
         return false;
@@ -716,6 +721,8 @@ bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
     List<Vector2> vertUV;
     List<Vector3> vertNormal;
 
+    if (!mesh)
+        return false;
     DebugLog("Loading Object");
     GetFileInformationByHandle(hFile, &fileInfo);
     //fileLen = ((size_t)fileInfo.nFileSizeHigh << 32) | fileInfo.nFileSizeLow;
@@ -777,6 +784,8 @@ bool MainWindow::LoadMeshA(Mesh* mesh, const char* path){
     size_t fileLen, filePtr = 0;
     List<Vertex*> vert;
 
+    if (!mesh)
+        return false;
     HANDLE hFile = CreateFileA(
         path,
         GENERIC_READ,
@@ -803,6 +812,8 @@ bool MainWindow::LoadMeshW(Mesh* mesh, const wchar_t* path){
     size_t fileLen, filePtr = 0;
     List<Vertex*> vert;
 
+    if (!mesh)
+        return false;
     HANDLE hFile = CreateFileW(
         path,
         GENERIC_READ,
@@ -878,11 +889,25 @@ void MainWindow::OnRightUp(int x, int y){
 }
 
 void MainWindow::OnInsSave(){
-    SaveMesh(Main::data->mesh);
+    SaveMesh(Main::GetMesh());
 }
 
 void MainWindow::OnInsLoad(){
-    LoadMesh(Main::data->mesh);
+    LoadMesh(Main::GetMesh());
+}
+
+void MainWindow::OnInsTopology(){
+    Mesh* mesh = Main::GetMesh();
+    if (!mesh)
+        return;
+    switch (Main::data->selPoints.Size()){
+    case 2:
+        mesh->AddEdge(Main::data->selPoints[0], Main::data->selPoints[1]);
+        break;
+    case 3:
+        mesh->AddTriFace(Main::data->selPoints[0], Main::data->selPoints[1], Main::data->selPoints[2]);
+        break;
+    }
 }
 
 void MainWindow::OnInsSelectColor(){
@@ -890,23 +915,6 @@ void MainWindow::OnInsSelectColor(){
     Main::data->selPoints.Foreach<Vector3*>([](Vertex* v, Vector3* c){
         v->color = *c;
     }, &color);
-}
-
-void MainWindow::OnInsTopology(){
-    switch (Main::data->selPoints.Size()){
-    case 0:
-        break;
-    case 1:
-        break;
-    case 2:
-        Main::data->mesh->AddEdge(Main::data->selPoints[0], Main::data->selPoints[1]);
-        break;
-    case 3:
-        Main::data->mesh->AddTriFace(Main::data->selPoints[0], Main::data->selPoints[1], Main::data->selPoints[2]);
-        break;
-    default:
-        break;
-    }
 }
 
 void MainWindow::OnLeftDown(int x, int y){
@@ -989,7 +997,9 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         SetOperation(new ExcludeOperation(this));
         break;
     case IDM_MESH_BASIC_PLANE:{
-        Mesh* mesh = Main::data->mesh;
+        Mesh* mesh = Main::GetMesh();
+        if (!mesh)
+            break;
         Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, 0.0f) + camLookat);
         Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, 0.0f) + camLookat);
         Vertex* v3 = new Vertex(Vector3(-1.0f,  1.0f, 0.0f) + camLookat);
@@ -1003,7 +1013,9 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
         break;
     case IDM_MESH_BASIC_BLOCK:{
-        Mesh* mesh = Main::data->mesh;
+        Mesh* mesh = Main::GetMesh();
+        if (!mesh)
+            break;
         Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, -1.0f) + camLookat);
         Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, -1.0f) + camLookat);
         Vertex* v3 = new Vertex(Vector3(-1.0f,  1.0f, -1.0f) + camLookat);
@@ -1038,7 +1050,9 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
         break;
     case IDM_MESH_BASIC_CYLINDER:{
-        Mesh* mesh = Main::data->mesh;
+        Mesh* mesh = Main::GetMesh();
+        if (!mesh)
+            break;
         const int loops = 2;
         const int round = 30;
         Vertex** vert = new Vertex*[loops * round];
@@ -1068,7 +1082,9 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
         break;
     case IDM_MESH_BASIC_SPHERE:{
-        Mesh* mesh = Main::data->mesh;
+        Mesh* mesh = Main::GetMesh();
+        if (!mesh)
+            break;
         const int loops = 10;
         const int round = 10;
         Vertex** vert = new Vertex*[loops * round];
@@ -1100,7 +1116,9 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     }
         break;
     case IDM_MESH_BASIC_CAPSULE:{
-        Mesh* mesh = Main::data->mesh;
+        Mesh* mesh = Main::GetMesh();
+        if (!mesh)
+            break;
         const int ballLoops = 5;
         const int cylinderLoops = 10;
         const int loops = 2 * ballLoops + cylinderLoops;
@@ -1159,19 +1177,31 @@ void MainWindow::OnMenuAccel(int id, bool accel){
     case IDM_TOOL_SELECTBOX:
         SetTool(new SelectTool(this));
         break;
-    case IDM_TEXTURE_ENABLE:
-        Main::data->mesh->SetTexture(IDB_EARTH_WATER);
+    case IDM_TEXTURE_ENABLE:{
+        Mesh* mesh = Main::GetMesh();
+        if (!mesh)
+            break;
+        mesh->SetTexture(IDB_EARTH_WATER);
+    }
         break;
-    case IDM_TEXTURE_DISABLE:
-        Main::data->mesh->ResetTexture();
+    case IDM_TEXTURE_DISABLE:{
+        Mesh* mesh = Main::GetMesh();
+        if (!mesh)
+            break;
+        mesh->ResetTexture();
+    }
         break;
-    case IDM_TEXTURE_LOAD:
+    case IDM_TEXTURE_LOAD:{
+        Mesh* mesh = Main::GetMesh();
+        if (!mesh)
+            break;
         if (!ShellFileSelectWindowW(Main::hWnd, inputText, MAX_PATH, L"任意图片格式(*.*)\0*.*\0", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER)){
             DebugLog("Stop Loading");
             break;
         }
         inputText[MAX_PATH] = '\0';
-        Main::data->mesh->SetTexture(new GLTexture2D(inputText));
+        mesh->SetTexture(new GLTexture2D(inputText));
+    }
         break;
     }
     // 当前操作的命令
@@ -1179,6 +1209,8 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         curOp->OnCommand(id);
     if (curTool)
         curTool->OnCommand(id);
+    if (Main::data->curObject)
+        Main::data->curObject->OnMenuAccel(id, accel);
 }
 
 void MainWindow::OnDropFileA(const char* path){
@@ -1193,7 +1225,7 @@ void MainWindow::OnDropFileA(const char* path){
             return;
         }
     }
-    LoadMeshA(Main::data->mesh, path);
+    LoadMeshA(Main::GetMesh(), path);
 }
 
 bool MainWindow::IsFocus(){
@@ -1218,11 +1250,12 @@ Vector2 MainWindow::GetScreenPosition(Vector3 pos){
 }
 
 MainData::MainData(){
-    mesh = new Mesh();
+    scene = new MeshObject();
+    curObject = scene;
 }
 
 MainData::~MainData(){
-    if (mesh) delete mesh;
+    if (scene) delete scene;
 }
 
 void MainData::UpdateCursor(int x, int y){
@@ -1463,6 +1496,14 @@ void Main::SetMenu(Menu* m){
     data->SetMenu(m);
 }
 
+Mesh* Main::GetMesh(){
+    if (!data->curObject)
+        return NULL;
+    if (!data->curObject->GetMesh())
+        return NULL;
+    return data->curObject->GetMesh();
+}
+
 void Main::OnRender(){
     ViewportManager::inst->Reset(hWnd);
     ViewportManager::inst->EnableScissor();
@@ -1479,8 +1520,6 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     MSG Msg;
 
     hInst = hInstance;
-
-    AudioUtils::InitOpenAL();
 
     mainFrame = new SelectionWindow(new MainWindow());
 

@@ -60,14 +60,9 @@ UVEditWindow::EmptyTool::EmptyTool(UVEditWindow* window) : window(window) {}
 UVEditWindow::EmptyTool::~EmptyTool(){}
 
 void UVEditWindow::EmptyTool::OnLeftDown(){
-    Vertex* v = Main::data->mesh->FindUV(Vector2((window->cursorPos.x + 1.0f) * 0.5f, (window->cursorPos.y + 1.0f) * 0.5f), 5.0f / window->cliSize.y);
-    if (v == NULL){
-        Main::data->selPoints.Clear();
-        DebugLog("No Point Selected");
-    }else{
-        Main::data->selPoints.Add(v);
-        DebugLog("Select Point %f %f", v->uv.x, v->uv.y);
-    }
+    if (!Main::data->curObject)
+        return;
+    Main::data->curObject->OnSelectUV(Vector2((window->cursorPos.x + 1.0f) * 0.5f, (window->cursorPos.y + 1.0f) * 0.5f), 5.0f / window->cliSize.y);
 }
 
 UVEditWindow::SelectTool::SelectTool(UVEditWindow* window) : window(window) {}
@@ -86,10 +81,11 @@ void UVEditWindow::SelectTool::OnLeftUp(){
         return;
     }
     //TODO 等待实现范围框选
-    Main::data->mesh->FindUVRect(
+    if (!Main::data->curObject)
+        return;
+    Main::data->curObject->OnSelectUV(
         Vector2((start.x + 1.0f) * 0.5f, (start.y + 1.0f) * 0.5f),
-        Vector2((end.x + 1.0f) * 0.5f, (end.y + 1.0f) * 0.5f),
-        Main::data->selPoints
+        Vector2((end.x + 1.0f) * 0.5f, (end.y + 1.0f) * 0.5f)
     );
 }
 
@@ -141,7 +137,8 @@ void UVEditWindow::OnRender(){
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-    if (Main::data->mesh->EnableTexture()){
+    Mesh* mesh = Main::GetMesh();
+    if (mesh && mesh->EnableTexture()){
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         // V坐标反转
@@ -156,7 +153,7 @@ void UVEditWindow::OnRender(){
         glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f);
         glTexCoord2f(0.0f, 1.0f); glVertex2f(-1.0f, 1.0f);
         glEnd();
-        Main::data->mesh->DisableTexture();
+        mesh->DisableTexture();
     }
 
     glMatrixMode(GL_PROJECTION);
@@ -165,7 +162,7 @@ void UVEditWindow::OnRender(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    Main::data->mesh->RenderUVMap();
+    Main::data->scene->OnRenderUVMap();
 
     // 已选择点绘制
     glDisable(GL_LIGHTING);
@@ -270,7 +267,10 @@ void UVEditWindow::OnMenuAccel(int id, bool accel){
 }
 
 void UVEditWindow::OnDropFileW(const wchar_t* path){
-    Main::data->mesh->SetTexture(new GLTexture2D(path));
+    Mesh* mesh = Main::GetMesh();
+    if (!mesh)
+        return;
+    mesh->SetTexture(new GLTexture2D(path));
 }
 
 void UVEditWindow::UpdateCursor(int x, int y){
@@ -611,8 +611,12 @@ void PaintWindow::OnKillFocus(){
 
 void PaintWindow::OnMenuAccel(int id, bool accel){
     switch (id){
-    case IDM_TEXTURE_USE_PAINT:
-        Main::data->mesh->SetTexture(new GLTexture2D(paintTex));
+    case IDM_TEXTURE_USE_PAINT:{
+        Mesh* mesh = Main::GetMesh();
+        if (!mesh)
+            return;
+        mesh->SetTexture(new GLTexture2D(paintTex));
+    }
         break;
     case IDM_BRUSH_CLEAR:
         SetBrush(new ClearBrush(this));

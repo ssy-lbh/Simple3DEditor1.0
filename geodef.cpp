@@ -61,6 +61,31 @@ Edge* Vertex::EdgeRelateTo(Vertex* v){
     return pack.res;
 }
 
+bool Vertex::Hit(Vector3 ori, Vector3 dir){
+    return Vector3::Cosine(dir, pos - ori) > 0.9997f;
+}
+
+bool Vertex::Hit(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
+    Vector3 lookPos = (-camDir) * (pos - camPos);
+    if (lookPos.y < zBound.x || lookPos.y > zBound.y){
+        return false;
+    }
+    float inv = 1.0f / lookPos.y;
+    float x = lookPos.x * inv;
+    float z = lookPos.z * inv;
+    Sort(p1.x, p2.x); Sort(p1.y, p2.y);
+    return x >= p1.x && x <= p2.x && z >= p1.y && z <= p2.y;
+}
+
+bool Vertex::HitUV(Vector2 uv, float err){
+    return (this->uv - uv).SqrMagnitude() <= err * err;
+}
+
+bool Vertex::HitUV(Vector2 uv1, Vector2 uv2){
+    Sort(uv1.x, uv2.x); Sort(uv1.y, uv2.y);
+    return uv.x >= uv1.x && uv.x <= uv2.x && uv.y >= uv1.y && uv.y <= uv2.y;
+}
+
 Edge::Edge(){}
 
 Edge::Edge(Vertex* v1, Vertex* v2) : v1(v1), v2(v2) {

@@ -17,20 +17,25 @@
 #include "colorboard.h"
 #include "viewobject.h"
 
+class IUndo;
 class MainWindow;
 class MainData;
 class Main;
 
-class MainWindow : public IWindow {
+//TODO 补全撤销功能
+class IUndo {
 public:
+    virtual void Execute() = 0;
+};
+
+class MainWindow : public IWindow {
+private:
+    bool focus = false;
     Vector2 cursorPos = Vector2::zero;
     Vector3 cursorDir = Vector3::zero;
     Vector2 cliSize, cliInvSize;
     float aspect;
 
-    bool focus = false;
-
-private:
     Vector3 camLookat = Vector3::up;
     Quaternion camDir = Quaternion::one;
     float camDis = 5.0f;
@@ -275,10 +280,15 @@ public:
     Vector2 cliSize;
     float aspect;
 
-    Mesh* mesh;
-
     Menu* menu = NULL;
     Vector2 menuPos;
+
+    // 总场景对象
+    //TODO 做出一个树状图窗口，显示场景中各个对象
+    AViewObject* scene;
+
+    // 当前选中的对象
+    AViewObject* curObject;
 
     // 选择部分
     SelectionType selType = SELECT_VERTICES;
@@ -330,6 +340,8 @@ public:
 
     static void RequestRender();
     static void SetMenu(Menu* m);
+
+    static Mesh* GetMesh();
 
     int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
 };

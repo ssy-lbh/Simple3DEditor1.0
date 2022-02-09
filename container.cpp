@@ -24,16 +24,24 @@ void LRContainer::InitMenu(){
 
     joinMenu->AddItem(new MenuItem(L"归并为左窗口", MENUITEM_LAMBDA_TRANS(LRContainer)[](LRContainer* window){
         if (window->selWindow){
-            if (window->rWindow)
+            if (window->rWindow){
                 delete window->rWindow;
-            window->selWindow->SetWindow(window->lWindow, true);
+                window->rWindow = NULL;
+            }
+            IWindow* curWindow = window->lWindow;
+            window->lWindow = NULL;
+            window->selWindow->SetWindow(curWindow, true);
         }
     }, this));
     joinMenu->AddItem(new MenuItem(L"归并为右窗口", MENUITEM_LAMBDA_TRANS(LRContainer)[](LRContainer* window){
         if (window->selWindow){
-            if (window->lWindow)
+            if (window->lWindow){
                 delete window->lWindow;
-            window->selWindow->SetWindow(window->rWindow, true);
+                window->lWindow = NULL;
+            }
+            IWindow* curWindow = window->rWindow;
+            window->rWindow = NULL;
+            window->selWindow->SetWindow(curWindow, true);
         }
     }, this));
 }
@@ -273,16 +281,24 @@ void UDContainer::InitMenu(){
 
     joinMenu->AddItem(new MenuItem(L"归并为上窗口", MENUITEM_LAMBDA_TRANS(UDContainer)[](UDContainer* window){
         if (window->selWindow){
-            if (window->dWindow)
+            if (window->dWindow){
                 delete window->dWindow;
-            window->selWindow->SetWindow(window->uWindow, true);
+                window->dWindow = NULL;
+            }
+            IWindow* curWindow = window->uWindow;
+            window->uWindow = NULL;
+            window->selWindow->SetWindow(curWindow, true);
         }
     }, this));
     joinMenu->AddItem(new MenuItem(L"归并为下窗口", MENUITEM_LAMBDA_TRANS(UDContainer)[](UDContainer* window){
         if (window->selWindow){
-            if (window->uWindow)
+            if (window->uWindow){
                 delete window->uWindow;
-            window->selWindow->SetWindow(window->dWindow, true);
+                window->uWindow = NULL;
+            }
+            IWindow* curWindow = window->dWindow;
+            window->dWindow = NULL;
+            window->selWindow->SetWindow(curWindow, true);
         }
     }, this));
 }

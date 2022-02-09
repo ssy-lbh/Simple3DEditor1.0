@@ -18,6 +18,8 @@ class AudioCaptureWindow;
 
 class AudioUtils {
 public:
+    static bool init;
+
     static ALCdevice* alDev;
     static ALCcontext* alCtx;
 

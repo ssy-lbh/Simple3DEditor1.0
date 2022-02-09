@@ -797,3 +797,12 @@ float Clamp(float x, float a, float b){
     }
     return x;
 }
+
+void Sort(float& x, float& y){
+    float t;
+    if (x > y){
+        t = x;
+        x = y;
+        y = t;
+    }
+}

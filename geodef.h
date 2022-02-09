@@ -32,6 +32,11 @@ public:
     bool DeleteEdge(Edge* e);
     bool DeleteFace(Face* f);
     Edge* EdgeRelateTo(Vertex* v);
+
+    bool Hit(Vector3 ori, Vector3 dir);
+    bool Hit(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2);
+    bool HitUV(Vector2 uv, float err);
+    bool HitUV(Vector2 uv1, Vector2 uv2);
 };
 
 class Edge {
