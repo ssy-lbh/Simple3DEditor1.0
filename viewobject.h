@@ -21,6 +21,7 @@ public:
         ROT_EULER_ZYX
     };
 
+    //TODO 先就只使用这一种，其他的以后补齐
     RotationMode rotationMode = ROT_QUATERNION;
 
     Vector3 position = Vector3::zero;
@@ -51,7 +52,7 @@ public:
     void EnumChildren(void(*func)(AViewObject*, void*), void* user);
     List<AViewObject*>& GetChildren();
 
-    virtual AViewObject* OnSelectObject(Vector3 origin, Vector3 direction, float* distance);
+    // 具体选择什么应取决于选择模式，计划放置于全局数据中
     virtual void OnSelect(Vector3 ori, Vector3 dir);
     virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2);
     virtual void OnSelectUV(Vector2 uv);
@@ -74,7 +75,6 @@ public:
     MeshObject();
     virtual ~MeshObject() override;
 
-    virtual AViewObject* OnSelectObject(Vector3 origin, Vector3 direction, float* distance) override;
     virtual void OnSelect(Vector3 ori, Vector3 dir) override;
     virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
     virtual void OnSelectUV(Vector2 uv) override;

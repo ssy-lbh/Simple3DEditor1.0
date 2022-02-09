@@ -208,7 +208,7 @@ Face* Mesh::AddTriFace(Vertex* v1, Vertex* v2, Vertex* v3){
 }
 
 void Mesh::DeleteVertex(Vertex* v){
-    DebugLog("Mesh::DeleteVertex %p", v);
+    //DebugLog("Mesh::DeleteVertex %p", v);
     struct {
         Mesh* m;
         Vertex* v;
@@ -216,13 +216,13 @@ void Mesh::DeleteVertex(Vertex* v){
     pack.m = this;
     pack.v = v;
     v->faces.Foreach<decltype(pack)*>([](Face* f, decltype(pack)* p){
-        DebugLog("Face::DeleteSelfReferenceExcept %p", f);
+        //DebugLog("Face::DeleteSelfReferenceExcept %p", f);
         f->DeleteSelfReferenceExcept(p->v);
         p->m->faces.Remove(f);
         delete f;
     }, &pack);
     v->edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* p){
-        DebugLog("Edge::DeleteSelfReferenceExcept %p", e);
+        //DebugLog("Edge::DeleteSelfReferenceExcept %p", e);
         e->DeleteSelfReferenceExcept(p->v);
         p->m->edges.Remove(e);
         delete e;

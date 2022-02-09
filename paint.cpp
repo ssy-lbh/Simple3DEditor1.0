@@ -15,8 +15,8 @@ void UVEditWindow::MoveOperation::OnEnter(){
     DebugLog("MoveOperation OnEnter");
     x = y = true;
     start = main->cursorPos;
-    if (Main::data->selectedPoints.Size() > 0){
-        Main::data->selectedPoints.Foreach<MoveOperation*>([](Vertex* v, MoveOperation* op){
+    if (Main::data->selPoints.Size() > 0){
+        Main::data->selPoints.Foreach<MoveOperation*>([](Vertex* v, MoveOperation* op){
             op->moveInfo.Add({v, v->uv});
         }, this);
     }
@@ -62,10 +62,10 @@ UVEditWindow::EmptyTool::~EmptyTool(){}
 void UVEditWindow::EmptyTool::OnLeftDown(){
     Vertex* v = Main::data->mesh->FindUV(Vector2((window->cursorPos.x + 1.0f) * 0.5f, (window->cursorPos.y + 1.0f) * 0.5f), 5.0f / window->cliSize.y);
     if (v == NULL){
-        Main::data->selectedPoints.Clear();
+        Main::data->selPoints.Clear();
         DebugLog("No Point Selected");
     }else{
-        Main::data->selectedPoints.Add(v);
+        Main::data->selPoints.Add(v);
         DebugLog("Select Point %f %f", v->uv.x, v->uv.y);
     }
 }
@@ -82,14 +82,14 @@ void UVEditWindow::SelectTool::OnLeftDown(){
 void UVEditWindow::SelectTool::OnLeftUp(){
     leftDown = false;
     if (start.x == end.x && start.y == end.y){
-        Main::data->selectedPoints.Clear();
+        Main::data->selPoints.Clear();
         return;
     }
     //TODO 等待实现范围框选
     Main::data->mesh->FindUVRect(
         Vector2((start.x + 1.0f) * 0.5f, (start.y + 1.0f) * 0.5f),
         Vector2((end.x + 1.0f) * 0.5f, (end.y + 1.0f) * 0.5f),
-        Main::data->selectedPoints
+        Main::data->selPoints
     );
 }
 
@@ -110,11 +110,14 @@ void UVEditWindow::SelectTool::OnRender(){
 }
 
 UVEditWindow::UVEditWindow(){
+    DebugLog("UVEditWindow Launched");
     SetTool(new EmptyTool(this));
 }
 
 UVEditWindow::~UVEditWindow(){
+    DebugLog("UVEditWindow Destroyed");
     if (curOp) delete curOp;
+    if (curTool) delete curTool;
 }
 
 bool UVEditWindow::IsFocus(){
@@ -170,7 +173,7 @@ void UVEditWindow::OnRender(){
     glPointSize(8.0f);
     glColor3f(1.0f, 1.0f, 0.0f);
     glBegin(GL_POINTS);
-    Main::data->selectedPoints.Foreach([](Vertex* p){
+    Main::data->selPoints.Foreach([](Vertex* p){
         glVertex2f(p->uv.x, p->uv.y);
     });
     glEnd();
@@ -449,6 +452,7 @@ void PaintWindow::DefaultBrush::Draw(){
 }
 
 PaintWindow::PaintWindow(){
+    DebugLog("PaintWindow Launched");
     basicMenu = new Menu();
 
     Menu* brushMenu = new Menu();
@@ -483,7 +487,11 @@ PaintWindow::PaintWindow(){
 }
 
 PaintWindow::~PaintWindow(){
+    DebugLog("PaintWindow Destroyed");
     if (basicMenu) delete basicMenu;
+    if (brush) delete brush;
+
+    if (paintTex) glDeleteTextures(1, &paintTex);
 }
 
 bool PaintWindow::IsFocus(){

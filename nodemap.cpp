@@ -92,6 +92,7 @@ void NodeMapWindow::Node::Disconnect(Node* node){
 }
 
 NodeMapWindow::NodeMapWindow(){
+    DebugLog("NodeMapWindow Launched");
     uiMgr = new UIManager();
     nodeMgr = new UIManager();
 
@@ -141,6 +142,7 @@ NodeMapWindow::NodeMapWindow(){
 }
 
 NodeMapWindow::~NodeMapWindow(){
+    DebugLog("NodeMapWindow Destroyed");
     if (uiMgr) delete uiMgr;
     if (nodeMgr) delete nodeMgr;
     if (basicMenu) delete basicMenu;

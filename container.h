@@ -4,6 +4,10 @@
 #include "uimgr.h"
 #include "menu.h"
 
+class LRContainer;
+class UDContainer;
+class SelectionWindow;
+
 //TODO 容器期望集成选择夹、拆分窗口、属性窗口等容器
 class LRContainer : public IWindow {
 private:
@@ -17,8 +21,15 @@ private:
     bool adjustPos = false;
     bool dragEnable = true;
 
+    // 以下对象用于窗口归并
+    SelectionWindow* selWindow = NULL;
+    Menu* joinMenu = NULL;
+
+    void InitMenu();
+
 public:
     LRContainer(IWindow* lWindow, IWindow* rWindow);
+    LRContainer(IWindow* lWindow, IWindow* rWindow, SelectionWindow* selWindow);
     ~LRContainer();
 
     virtual bool IsFocus() override;
@@ -64,8 +75,15 @@ private:
     bool adjustPos = false;
     bool dragEnable = true;
 
+    // 以下对象用于窗口归并
+    SelectionWindow* selWindow = NULL;
+    Menu* joinMenu = NULL;
+
+    void InitMenu();
+
 public:
     UDContainer(IWindow* uWindow, IWindow* dWindow);
+    UDContainer(IWindow* uWindow, IWindow* dWindow, SelectionWindow* selWindow);
     virtual ~UDContainer() override;
 
     virtual bool IsFocus() override;

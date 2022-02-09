@@ -74,8 +74,8 @@ void MainWindow::MoveOperation::OnEnter(){
     DebugLog("MoveOperation OnEnter");
     x = y = z = true;
     start = main->cursorPos;
-    if (Main::data->selectedPoints.Size() > 0){
-        Main::data->selectedPoints.Foreach<MoveOperation*>([](Vertex* v, MoveOperation* op){
+    if (Main::data->selPoints.Size() > 0){
+        Main::data->selPoints.Foreach<MoveOperation*>([](Vertex* v, MoveOperation* op){
             op->moveInfo.Add({v, v->pos});
         }, this);
     }
@@ -125,22 +125,22 @@ void MainWindow::ExcludeOperation::OnEnter(){
     x = y = z = true;
     start = main->cursorPos;
     List<Vertex*> copies;
-    size_t cnt = Main::data->selectedPoints.Size();
+    size_t cnt = Main::data->selPoints.Size();
     for (size_t i = 0; i < cnt; i++){
-        copies.Add(Main::data->selectedPoints[i]);
-        Main::data->selectedPoints[i] = Main::data->mesh->AddVertex(Main::data->selectedPoints[i]->pos);
-        Main::data->mesh->AddEdge(copies[i], Main::data->selectedPoints[i]);
+        copies.Add(Main::data->selPoints[i]);
+        Main::data->selPoints[i] = Main::data->mesh->AddVertex(Main::data->selPoints[i]->pos);
+        Main::data->mesh->AddEdge(copies[i], Main::data->selPoints[i]);
     }
     for (size_t i = 0; i < cnt; i++){
         for (size_t j = i + 1; j < cnt; j++){
             if (copies[i]->EdgeRelateTo(copies[j])){
-                Main::data->mesh->AddTriFace(copies[i], copies[j], Main::data->selectedPoints[j]);
-                Main::data->mesh->AddTriFace(copies[i], Main::data->selectedPoints[i], Main::data->selectedPoints[j]);
+                Main::data->mesh->AddTriFace(copies[i], copies[j], Main::data->selPoints[j]);
+                Main::data->mesh->AddTriFace(copies[i], Main::data->selPoints[i], Main::data->selPoints[j]);
             }
         }
     }
-    if (Main::data->selectedPoints.Size() > 0){
-        Main::data->selectedPoints.Foreach<ExcludeOperation*>([](Vertex* v, ExcludeOperation* op){
+    if (Main::data->selPoints.Size() > 0){
+        Main::data->selPoints.Foreach<ExcludeOperation*>([](Vertex* v, ExcludeOperation* op){
             op->moveInfo.Add({v, v->pos});
         }, this);
     }
@@ -166,7 +166,7 @@ void MainWindow::ExcludeOperation::OnConfirm(){
 
 void MainWindow::ExcludeOperation::OnUndo(){
     DebugLog("ExcludeOperation OnUndo");
-    Main::data->selectedPoints.Clear();
+    Main::data->selPoints.Clear();
     moveInfo.Foreach<Mesh*>([](MoveInfo info, Mesh* mesh){
         mesh->DeleteVertex(info.vert);
     }, Main::data->mesh);
@@ -191,12 +191,12 @@ void MainWindow::RotateOperation::OnEnter(){
     x = y = z = true;
     start = main->cursorPos;
     center = Vector3::zero;
-    if (Main::data->selectedPoints.Size() > 0){
-        Main::data->selectedPoints.Foreach<RotateOperation*>([](Vertex* v, RotateOperation* op){
+    if (Main::data->selPoints.Size() > 0){
+        Main::data->selPoints.Foreach<RotateOperation*>([](Vertex* v, RotateOperation* op){
             op->rotateInfo.Add({v, v->pos});
             op->center += v->pos;
         }, this);
-        center /= Main::data->selectedPoints.Size();
+        center /= Main::data->selPoints.Size();
         screenCenter = main->GetScreenPosition(center);
         dis = (main->cursorPos - screenCenter).Magnitude();
     }
@@ -248,12 +248,12 @@ void MainWindow::SizeOperation::OnEnter(){
     x = y = z = true;
     start = main->cursorPos;
     center = Vector3::zero;
-    if (Main::data->selectedPoints.Size() > 0){
-        Main::data->selectedPoints.Foreach<SizeOperation*>([](Vertex* v, SizeOperation* op){
+    if (Main::data->selPoints.Size() > 0){
+        Main::data->selPoints.Foreach<SizeOperation*>([](Vertex* v, SizeOperation* op){
             op->sizeInfo.Add({v, v->pos});
             op->center += v->pos;
         }, this);
-        center /= Main::data->selectedPoints.Size();
+        center /= Main::data->selPoints.Size();
         screenCenter = main->GetScreenPosition(center);
         startSize = (main->cursorPos - screenCenter).Magnitude();
     }
@@ -302,10 +302,10 @@ MainWindow::EmptyTool::~EmptyTool(){}
 void MainWindow::EmptyTool::OnLeftDown(){
     Vertex* v = Main::data->mesh->Find(window->camPos, window->cursorDir);
     if (v == NULL){
-        Main::data->selectedPoints.Clear();
+        Main::data->selPoints.Clear();
         DebugLog("No Point Selected");
     }else{
-        Main::data->selectedPoints.Add(v);
+        Main::data->selPoints.Add(v);
         DebugLog("Select Point %f %f %f", v->pos.x, v->pos.y, v->pos.z);
     }
 }
@@ -322,7 +322,7 @@ void MainWindow::SelectTool::OnLeftDown(){
 void MainWindow::SelectTool::OnLeftUp(){
     leftDown = false;
     if (start.x == end.x && start.y == end.y){
-        Main::data->selectedPoints.Clear();
+        Main::data->selPoints.Clear();
         return;
     }
     //TODO 等待实现范围框选
@@ -335,7 +335,7 @@ void MainWindow::SelectTool::OnLeftUp(){
         end.x * window->aspect,
         start.y,
         end.y,
-        Main::data->selectedPoints
+        Main::data->selPoints
     );
 }
 
@@ -351,6 +351,7 @@ void MainWindow::SelectTool::OnRender(){
 }
 
 MainWindow::MainWindow(){
+    DebugLog("MainWindow Launched");
     uiMgr = new UIManager();
     SetTool(new EmptyTool(this));
 
@@ -421,6 +422,7 @@ MainWindow::MainWindow(){
 }
 
 MainWindow::~MainWindow(){
+    DebugLog("MainWindow Destroyed");
     if(basicMenu) delete basicMenu;
     if(uiMgr) delete uiMgr;
     if(curOp) delete curOp;
@@ -517,7 +519,7 @@ void MainWindow::RenderModelView(){
     glPointSize(8.0f);
     glColor3f(1.0f, 1.0f, 0.0f);
     glBegin(GL_POINTS);
-    Main::data->selectedPoints.Foreach([](Vertex* p){
+    Main::data->selPoints.Foreach([](Vertex* p){
         glVertex3f(p->pos.x, p->pos.y, p->pos.z);
     });
     glEnd();
@@ -660,10 +662,10 @@ void MainWindow::AddPoint(){
 }
 
 void MainWindow::DeletePoint(){
-    Main::data->selectedPoints.Foreach<Mesh*>([](Vertex* v, Mesh* m){
+    Main::data->selPoints.Foreach<Mesh*>([](Vertex* v, Mesh* m){
         m->DeleteVertex(v);
     }, Main::data->mesh);
-    Main::data->selectedPoints.Clear();
+    Main::data->selPoints.Clear();
 }
 
 bool MainWindow::SaveMesh(Mesh* mesh){
@@ -885,22 +887,22 @@ void MainWindow::OnInsLoad(){
 
 void MainWindow::OnInsSelectColor(){
     Vector3 color = ColorBoard::GetColor();
-    Main::data->selectedPoints.Foreach<Vector3*>([](Vertex* v, Vector3* c){
+    Main::data->selPoints.Foreach<Vector3*>([](Vertex* v, Vector3* c){
         v->color = *c;
     }, &color);
 }
 
 void MainWindow::OnInsTopology(){
-    switch (Main::data->selectedPoints.Size()){
+    switch (Main::data->selPoints.Size()){
     case 0:
         break;
     case 1:
         break;
     case 2:
-        Main::data->mesh->AddEdge(Main::data->selectedPoints[0], Main::data->selectedPoints[1]);
+        Main::data->mesh->AddEdge(Main::data->selPoints[0], Main::data->selPoints[1]);
         break;
     case 3:
-        Main::data->mesh->AddTriFace(Main::data->selectedPoints[0], Main::data->selectedPoints[1], Main::data->selectedPoints[2]);
+        Main::data->mesh->AddTriFace(Main::data->selPoints[0], Main::data->selPoints[1], Main::data->selPoints[2]);
         break;
     default:
         break;
@@ -1480,33 +1482,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     AudioUtils::InitOpenAL();
 
-    IWindow* mainWnd;
-    IWindow* mainWnd2;
-    IWindow* mainWnd3;
-    IWindow* mainWnd4;
-    IWindow* mainWnd5;
-    IWindow* mainWnd6;
-
-    LRContainer* lrCont1;
-
-    UDContainer* udCont1;
-    UDContainer* udCont2;
-    UDContainer* udCont3;
-
-    // mainWnd = new MainWindow();
-    // mainWnd2 = new AudioPlayerWindow();
-    // mainWnd3 = new PaintWindow();
-    // mainWnd4 = new UVEditWindow();
-    // mainWnd5 = new AudioCaptureWindow();
-    // mainWnd6 = new NodeMapWindow();
-
-    // udCont1 = new UDContainer(mainWnd, mainWnd3);
-    // udCont2 = new UDContainer(mainWnd2, mainWnd4);
-    // udCont3 = new UDContainer(mainWnd5, mainWnd6);
-    // lrCont1 = new LRContainer(udCont2, udCont3);
-    // mainFrame = new LRContainer(udCont1, lrCont1);
-
-    mainFrame = new SelectionWindow();
+    mainFrame = new SelectionWindow(new MainWindow());
 
     RegClass();
     ColorBoard::Init(hInstance);
@@ -1551,6 +1527,8 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
             }
         }
     }
+
+    delete mainFrame;
 
     GLUtils::DisableOpenGL(hWnd, hDC, hRC);
 

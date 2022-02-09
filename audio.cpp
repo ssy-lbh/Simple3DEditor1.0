@@ -214,6 +214,7 @@ void AudioPlayerWindow::LoopOption::Render(){
 }
 
 AudioPlayerWindow::AudioPlayerWindow(){
+    DebugLog("AudioPlayerWindow Launched");
     uiMgr = new UIManager();
 
     uiMgr->AddButton(new PlayButton(this));
@@ -233,6 +234,7 @@ AudioPlayerWindow::AudioPlayerWindow(){
 }
 
 AudioPlayerWindow::~AudioPlayerWindow(){
+    DebugLog("AudioPlayerWindow Destroyed");
     if (uiMgr) delete uiMgr;
     if (alAudioData) delete[] (char*)alAudioData;
 
@@ -673,6 +675,7 @@ void AudioCaptureWindow::ProgressBar::Render(){
 }
 
 AudioCaptureWindow::AudioCaptureWindow(){
+    DebugLog("AudioCaptureWindow Launched");
     //SoundTouch 貌似在我的电脑上性能有限，不能很好做到实时变音
     soundTouch = new soundtouch::SoundTouch();
     soundTouch->setChannels(1);
@@ -693,6 +696,7 @@ AudioCaptureWindow::AudioCaptureWindow(){
 }
 
 AudioCaptureWindow::~AudioCaptureWindow(){
+    DebugLog("AudioCaptureWindow Destroyed");
     if (uiMgr) delete uiMgr;
     if (capBuf) delete (short*)capBuf;
     if (freqBuf) delete freqBuf;

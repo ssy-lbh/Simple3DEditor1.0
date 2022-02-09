@@ -9,7 +9,34 @@
 #include "paint.h"
 
 LRContainer::LRContainer(IWindow* lWindow, IWindow* rWindow) : lWindow(lWindow), rWindow(rWindow) {}
-LRContainer::~LRContainer(){}
+
+LRContainer::LRContainer(IWindow* lWindow, IWindow* rWindow, SelectionWindow* selWindow) : lWindow(lWindow), rWindow(rWindow), selWindow(selWindow) {
+    InitMenu();
+}
+
+LRContainer::~LRContainer(){
+    if (joinMenu) delete joinMenu;
+    FreeWindow();
+}
+
+void LRContainer::InitMenu(){
+    joinMenu = new Menu();
+
+    joinMenu->AddItem(new MenuItem(L"归并为左窗口", MENUITEM_LAMBDA_TRANS(LRContainer)[](LRContainer* window){
+        if (window->selWindow){
+            if (window->rWindow)
+                delete window->rWindow;
+            window->selWindow->SetWindow(window->lWindow, true);
+        }
+    }, this));
+    joinMenu->AddItem(new MenuItem(L"归并为右窗口", MENUITEM_LAMBDA_TRANS(LRContainer)[](LRContainer* window){
+        if (window->selWindow){
+            if (window->lWindow)
+                delete window->lWindow;
+            window->selWindow->SetWindow(window->rWindow, true);
+        }
+    }, this));
+}
 
 bool LRContainer::IsFocus(){
     return focus != NULL;
@@ -113,6 +140,14 @@ void LRContainer::OnLeftUp(int x, int y){
 void LRContainer::OnRightDown(int x, int y){
     cursorPos.x = x;
     cursorPos.y = y;
+    if (selWindow && Abs(x - dis) < 4.0f){
+        if (joinMenu){
+            Main::SetMenu(joinMenu);
+        }else{
+            DebugError("LRContainer::OnRightDown Main::SetMenu NullPointerException");
+        }
+        return;
+    }
     UpdateFocus();
     if (focus)
         focus->OnRightDown(right ? x - dis : x, y);
@@ -223,7 +258,34 @@ bool LRContainer::DragEnabled(){
 }
 
 UDContainer::UDContainer(IWindow* uWindow, IWindow* dWindow) : uWindow(uWindow), dWindow(dWindow) {}
-UDContainer::~UDContainer(){}
+
+UDContainer::UDContainer(IWindow* uWindow, IWindow* dWindow, SelectionWindow* selWindow) : uWindow(uWindow), dWindow(dWindow), selWindow(selWindow) {
+    InitMenu();
+}
+
+UDContainer::~UDContainer(){
+    if (joinMenu) delete joinMenu;
+    FreeWindow();
+}
+
+void UDContainer::InitMenu(){
+    joinMenu = new Menu();
+
+    joinMenu->AddItem(new MenuItem(L"归并为上窗口", MENUITEM_LAMBDA_TRANS(UDContainer)[](UDContainer* window){
+        if (window->selWindow){
+            if (window->dWindow)
+                delete window->dWindow;
+            window->selWindow->SetWindow(window->uWindow, true);
+        }
+    }, this));
+    joinMenu->AddItem(new MenuItem(L"归并为下窗口", MENUITEM_LAMBDA_TRANS(UDContainer)[](UDContainer* window){
+        if (window->selWindow){
+            if (window->uWindow)
+                delete window->uWindow;
+            window->selWindow->SetWindow(window->dWindow, true);
+        }
+    }, this));
+}
 
 bool UDContainer::IsFocus(){
     return focus != NULL;
@@ -327,6 +389,14 @@ void UDContainer::OnLeftUp(int x, int y){
 void UDContainer::OnRightDown(int x, int y){
     cursorPos.x = x;
     cursorPos.y = y;
+    if (selWindow && Abs(y - dis) < 4.0f){
+        if (joinMenu){
+            Main::SetMenu(joinMenu);
+        }else{
+            DebugError("LRContainer::OnRightDown Main::SetMenu NullPointerException");
+        }
+        return;
+    }
     UpdateFocus();
     if (focus)
         focus->OnRightDown(x, up ? y - dis : y);
@@ -437,15 +507,19 @@ bool UDContainer::DragEnabled(){
 }
 
 SelectionWindow::SelectionWindow() : curWindow(NULL) {
+    DebugLog("SelectionWindow %p Created", this);
     InitMenu();
 }
 
 SelectionWindow::SelectionWindow(IWindow* initialWnd) : curWindow(initialWnd) {
+    DebugLog("SelectionWindow %p Created", this);
     InitMenu();
 }
 
 SelectionWindow::~SelectionWindow(){
+    DebugLog("SelectionWindow %p Destroyed", this);
     if (selMenu) delete selMenu;
+    if (curWindow) delete curWindow;
 }
 
 void SelectionWindow::InitMenu(){
@@ -471,10 +545,10 @@ void SelectionWindow::InitMenu(){
     }, this));
     selMenu->AddItem(new MenuItem());
     selMenu->AddItem(new MenuItem(L"左右分割", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new LRContainer(window->curWindow, new SelectionWindow()), false);
+        window->SetWindow(new LRContainer(window->curWindow, new SelectionWindow(), window), false);
     }, this));
     selMenu->AddItem(new MenuItem(L"上下分割", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new UDContainer(window->curWindow, new SelectionWindow()), false);
+        window->SetWindow(new UDContainer(window->curWindow, new SelectionWindow(), window), false);
     }, this));
 }
 

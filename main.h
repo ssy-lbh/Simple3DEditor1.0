@@ -15,6 +15,7 @@
 #include "mesh.h"
 #include "container.h"
 #include "colorboard.h"
+#include "viewobject.h"
 
 class MainWindow;
 class MainData;
@@ -263,6 +264,13 @@ public:
 
 class MainData {
 public:
+    enum SelectionType {
+        SELECT_OBJECT,
+        SELECT_VERTICES,
+        SELECT_EDGES,
+        SELECT_FACES
+    };
+
     Vector2 cursorPos;
     Vector2 cliSize;
     float aspect;
@@ -272,7 +280,13 @@ public:
     Menu* menu = NULL;
     Vector2 menuPos;
 
-    List<Vertex*> selectedPoints;
+    // 选择部分
+    SelectionType selType = SELECT_VERTICES;
+
+    List<AViewObject*> selObjects;
+    List<Vertex*> selPoints;
+    List<Edge*> selEdges;
+    List<Face*> selFaces;
 
     MainData();
     ~MainData();
