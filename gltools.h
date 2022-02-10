@@ -81,6 +81,8 @@ public:
 
     void BindTexture(GLuint texture);
     void BindTexture(GLuint texture, int x, int y);
+    void BindTexture(GLuint texture, GLenum attachment);
+    void BindTexture(GLuint texture, GLenum attachment, int x, int y);
     void Enable();
     void Disable();
 };

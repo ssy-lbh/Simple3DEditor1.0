@@ -3,7 +3,11 @@
 #include "main.h"
 #include "res.h"
 
-AViewObject::AViewObject(){}
+AViewObject::AViewObject() : name(L"Object"){}
+
+AViewObject::AViewObject(const wchar_t* name) : name(name){}
+
+AViewObject::AViewObject(WString name) : name(name){}
 
 AViewObject::~AViewObject(){
     Free(children);
@@ -25,6 +29,10 @@ void AViewObject::EnumChildren(void(*func)(AViewObject*)){
 
 void AViewObject::EnumChildren(void(*func)(AViewObject*, void*), void* user){
     children.Foreach<void*>(func, user);
+}
+
+List<AViewObject*>& AViewObject::GetChildren(){
+    return children;
 }
 
 void AViewObject::OnSelect(Vector3 ori, Vector3 dir){}
@@ -53,7 +61,7 @@ void AViewObject::OnMenuAccel(int id, bool accel){}
 
 void AViewObject::OnAnimationFrame(int frame){}
 
-MeshObject::MeshObject(){
+MeshObject::MeshObject() : AViewObject(L"Mesh"){
     mesh = new Mesh();
 }
 
@@ -112,7 +120,7 @@ void MeshObject::OnRenderUVMap(){
     mesh->RenderUVMap();
 }
 
-BezierCurveObject::BezierCurveObject(){
+BezierCurveObject::BezierCurveObject() : AViewObject(L"BezierCurve"){
     v[0].pos = Vector3(-5.0f, 0.0f, 0.0f);
     v[1].pos = Vector3(0.0f, 0.0f, 0.0f);
     v[2].pos = Vector3(0.0f, 0.0f, 5.0f);

@@ -412,6 +412,23 @@ void GLFrameBuffer::BindTexture(GLuint texture, int x, int y){
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
+void GLFrameBuffer::BindTexture(GLuint texture, GLenum attachment){
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, attachment, GL_TEXTURE_2D, texture, 0);
+    glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_WIDTH, &x);
+    glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_HEIGHT, &y);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void GLFrameBuffer::BindTexture(GLuint texture, GLenum attachment, int x, int y){
+    this->x = x; this->y = y;
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, attachment, GL_TEXTURE_2D, texture, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
 void GLFrameBuffer::Enable(){
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame);
     ViewportManager::inst->PushViewport({0, y, x, 0});

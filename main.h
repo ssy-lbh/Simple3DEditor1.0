@@ -305,6 +305,7 @@ public:
     void UpdateWindowSize(int x, int y);
 
     void SetMenu(Menu* m);
+    void SelectObject(AViewObject* o);
 
     void OnLeftDown(int x, int y);
     void OnLeftUp(int x, int y);
@@ -340,6 +341,7 @@ public:
 
     static void RequestRender();
     static void SetMenu(Menu* m);
+    static void SelectObject(AViewObject* o);
 
     static Mesh* GetMesh();
 

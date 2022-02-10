@@ -409,6 +409,15 @@ MainWindow::MainWindow(){
     }, this));
     basicMenu->AddItem(new MenuItem(L"纹理", texMenu));
 
+    Menu* objectMenu = new Menu();
+    objectMenu->AddItem(new MenuItem(L"网格体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::data->scene->AddChild(new MeshObject());
+    }, this));
+    objectMenu->AddItem(new MenuItem(L"三次贝塞尔曲线", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::data->scene->AddChild(new BezierCurveObject());
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"添加对象", objectMenu));
+
     uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
     uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
 
@@ -1250,8 +1259,9 @@ Vector2 MainWindow::GetScreenPosition(Vector3 pos){
 }
 
 MainData::MainData(){
-    scene = new MeshObject();
-    curObject = scene;
+    curObject = new MeshObject();
+    scene = new AViewObject(L"Scene");
+    scene->AddChild(curObject);
 }
 
 MainData::~MainData(){
@@ -1283,6 +1293,14 @@ void MainData::SetMenu(Menu* m){
         menu->CursorMove(cursorPos);
         menuPos = cursorPos;
     }
+}
+
+void MainData::SelectObject(AViewObject* o){
+    curObject = o;
+    selObjects.Clear();
+    selPoints.Clear();
+    selEdges.Clear();
+    selFaces.Clear();
 }
 
 void MainData::OnLeftDown(int x, int y){
@@ -1496,10 +1514,12 @@ void Main::SetMenu(Menu* m){
     data->SetMenu(m);
 }
 
+void Main::SelectObject(AViewObject* o){
+    data->SelectObject(o);
+}
+
 Mesh* Main::GetMesh(){
     if (!data->curObject)
-        return NULL;
-    if (!data->curObject->GetMesh())
         return NULL;
     return data->curObject->GetMesh();
 }

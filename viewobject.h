@@ -4,6 +4,7 @@
 #include "list.h"
 #include "vecmath.h"
 #include "mesh.h"
+#include "utils.h"
 
 class Transform;
 class AViewObject;
@@ -36,6 +37,9 @@ public:
 class AViewObject {
 public:
     Transform transform;
+    WString name;
+
+    bool unfold = true;
 
 protected:
     AViewObject* parent = NULL;
@@ -44,6 +48,8 @@ protected:
 
 public:
     AViewObject();
+    AViewObject(const wchar_t* name);
+    AViewObject(WString name);
     virtual ~AViewObject();
 
     void AddChild(AViewObject* o);
