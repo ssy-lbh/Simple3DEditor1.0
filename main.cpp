@@ -345,6 +345,18 @@ void MainWindow::SelectTool::OnRender(){
     }
 }
 
+MainWindow::LightItem::LightItem(MainWindow* window) : window(window) {}
+MainWindow::LightItem::~LightItem(){}
+
+const wchar_t* MainWindow::LightItem::GetName(){
+    return Main::data->lightEnabled ? L"光照:开" : L"光照:关";
+}
+
+void MainWindow::LightItem::OnClick(){
+    Main::data->lightEnabled = !Main::data->lightEnabled;
+    DebugLog("MainWindow::LightItem Light State %s", Main::data->lightEnabled ? "On" : "Off");
+}
+
 MainWindow::MainWindow(){
     DebugLog("MainWindow Launched");
     uiMgr = new UIManager();
@@ -416,7 +428,16 @@ MainWindow::MainWindow(){
     objectMenu->AddItem(new MenuItem(L"三次贝塞尔曲线", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
         Main::data->scene->AddChild(new BezierCurveObject());
     }, this));
+    objectMenu->AddItem(new MenuItem(L"点光源", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::data->scene->AddChild(new PointLightObject());
+    }, this));
+    objectMenu->AddItem(new MenuItem(L"音频收听者", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::data->scene->AddChild(new AudioListenerObject());
+    }, this));
     basicMenu->AddItem(new MenuItem(L"添加对象", objectMenu));
+
+    basicMenu->AddItem(new MenuItem());
+    basicMenu->AddItem(new LightItem(this));
 
     uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
     uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
@@ -449,14 +470,14 @@ void MainWindow::InitCamera(){
 }
 
 void MainWindow::InitLight0(){
-    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat mat_shininess[] = { 50.0 };
+    GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat mat_shininess[] = {50.0};
 
-    GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };  //最后一个参数为0表示该光源是directional的
+    GLfloat light_position[] = {0.0, 0.0, 2.0, 1.0};// 最后一个参数为0.0表示该光源是directional的
 
-    GLfloat light_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
-    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_ambient[] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat light_specular[] = {0.0, 0.0, 0.0, 1.0};
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
@@ -479,6 +500,8 @@ void MainWindow::RenderModelView(){
     //glDisable(GL_FOG);
     //glDisable(GL_LOGIC_OP);
 
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     InitCamera();
@@ -511,10 +534,7 @@ void MainWindow::RenderModelView(){
     }
     glEnd();
 
-    InitLight0(); //TODO 后续光照设置法线
-    glEnable(GL_LIGHTING);     //开启光照系统
-    glEnable(GL_LIGHT0);       //开启GL_LIGHT0光源
-
+    //TODO 后续光照设置法线
     Main::data->scene->OnRender();
 
     // 已选择点绘制
@@ -528,6 +548,20 @@ void MainWindow::RenderModelView(){
     });
     glEnd();
     glDisable(GL_POINT_SMOOTH);
+
+    // 已选择边绘制
+    glDisable(GL_LIGHTING);
+    glEnable(GL_LINE_SMOOTH);
+    glLineWidth(8.0f);
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glBegin(GL_LINES);
+    Main::data->selEdges.Foreach([](Edge* p){
+        glVertex3f(p->v1->pos.x, p->v1->pos.y, p->v1->pos.z);
+        glVertex3f(p->v2->pos.x, p->v2->pos.y, p->v2->pos.z);
+    });
+    glEnd();
+    glLineWidth(1.0f);
+    glDisable(GL_LINE_SMOOTH);
 }
 
 void MainWindow::OnRender(){

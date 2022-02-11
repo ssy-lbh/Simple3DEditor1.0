@@ -2,6 +2,7 @@
 
 #include "opengl/gl/gl.h"
 
+#include "main.h"
 #include "res.h"
 #include "log.h"
 
@@ -81,6 +82,23 @@ size_t Mesh::FindScreenRect(Vector3 camPos, Quaternion camDir, float zNear, floa
         }
     }, &pack);
     return pack.cnt;
+}
+
+Edge* Mesh::FindEdge(Vector3 ori, Vector3 dir){
+    struct {
+        Vector3 start;
+        Vector3 forward;
+        Edge* res;
+    }pack;
+    pack.start = ori;
+    pack.forward = dir;
+    pack.res = NULL;
+    edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* m){
+        if (e->Hit(m->start, m->forward)){
+            m->res = e;
+        }
+    }, &pack);
+    return pack.res;
 }
 
 Vertex* Mesh::FindUV(Vector2 uv, float err){
@@ -262,10 +280,12 @@ void Mesh::Render(){
     glEnd();
     glDisable(GL_LINE_SMOOTH);
 
+    glDisable(GL_LIGHTING);
+    if (Main::data->lightEnabled)
+        glEnable(GL_LIGHTING);// 开启光照系统
+    glShadeModel(GL_SMOOTH);
     if (modeltex){
         modeltex->Enable();
-        glDisable(GL_LIGHTING);
-        glShadeModel(GL_SMOOTH);
         glColor3f(1.0f, 1.0f, 1.0f);
         glBegin(GL_TRIANGLES);
         faces.Foreach([](Face* f){
@@ -282,9 +302,6 @@ void Mesh::Render(){
         glShadeModel(GL_FLAT);
         modeltex->Disable();
     }else{
-        glDisable(GL_LIGHTING);
-        glShadeModel(GL_SMOOTH);
-        glColor3f(1.0f, 1.0f, 1.0f);
         glBegin(GL_TRIANGLES);
         faces.Foreach([](Face* f){
             Vertex* v;

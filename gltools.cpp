@@ -438,3 +438,34 @@ void GLFrameBuffer::Disable(){
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     ViewportManager::inst->PopViewport();
 }
+
+bool GLLights::use[8] = {false, false, false, false,
+                         false, false, false, false};
+GLenum GLLights::idx[8] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3,
+                           GL_LIGHT4, GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
+                        
+GLenum GLLights::CreateLight(){
+    for (int i = 0; i < 8; i++){
+        if (!use[i]){
+            use[i] = true;
+            glEnable(idx[i]);
+            return idx[i];
+        }
+    }
+    return GL_NONE;
+}
+
+bool GLLights::DestroyLight(GLenum light){
+    for (int i = 0; i < 8; i++){
+        if (light == idx[i]){
+            if (!use[i]){
+                DebugError("Light %d Has Already Been Destroyed", i);
+                return false;
+            }
+            use[i] = false;
+            glDisable(idx[i]);
+            return true;
+        }
+    }
+    return false;
+}

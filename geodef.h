@@ -9,7 +9,7 @@ class Vertex;
 class Edge;
 class Face;
 
-class Vertex {
+class Vertex : public Object {
 public:
     Vector3 pos;
     Vector3 normal = Vector3::forward;
@@ -39,7 +39,7 @@ public:
     bool HitUV(Vector2 uv1, Vector2 uv2);
 };
 
-class Edge {
+class Edge : public Object {
 public:
     Vertex* v1;
     Vertex* v2;
@@ -55,9 +55,11 @@ public:
     void DeleteSelfReference();
     void DeleteSelfReferenceExcept(Vertex* v);
     Face* FaceRelateTo(Vertex* v);
+
+    bool Hit(Vector3 ori, Vector3 dir);
 };
 
-class Face {
+class Face : public Object {
 public:
     Vector3 normal;
     List<Vertex*> vertices;

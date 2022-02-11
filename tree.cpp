@@ -112,8 +112,13 @@ void TreeWindow::OnLeftDown(int x, int y){
     size_t selected = (size_t)((1.0f - cursorPos.y) / (30.0f * cliInvSize.y));
     if (selected < objectList.Size()){
         AViewObject* o = objectList[selected];
-        DebugLog("TreeWindow Select Object %S", o->name.GetString());
-        Main::SelectObject(o);
+        if (Main::data->curObject == o){
+            o->unfold = !o->unfold;
+            DebugLog("TreeWindow %s Object %S", o->unfold ? "Unfold" : "Fold", o->name.GetString());
+        }else{
+            DebugLog("TreeWindow Select Object %S", o->name.GetString());
+            Main::SelectObject(o);
+        }
     }
 }
 

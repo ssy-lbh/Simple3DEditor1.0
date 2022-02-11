@@ -1,6 +1,8 @@
 #ifndef __VECMATH__
 #define __VECMATH__
 
+#include "define.h"
+
 #define PI 3.1415926535897932384626433832795
 
 #define Sqrt(x) (__builtin_sqrt(x))
@@ -34,7 +36,7 @@ class Vector4;
 class Quaternion;
 class Matrix4x4;
 
-class Vector2 {
+class Vector2 : public Object {
 public:
     float x;
     float y;
@@ -88,7 +90,7 @@ public:
     Vector2 Rotate(float) const;
 };
 
-class Vector3 {
+class Vector3 : public Object {
 public:
     float x;
     float y;
@@ -136,6 +138,8 @@ public:
     static float Cosine(Vector3, Vector3);
     static float Sine(Vector3, Vector3);
     static float Tangent(Vector3, Vector3);
+    static float Determinant(Vector3, Vector3, Vector3);
+    static Vector3 Decompose(Vector3 vec, Vector3 x, Vector3 y, Vector3 z);
 
     Vector3 Normal() const;
     Vector3 &Normalize();
@@ -149,7 +153,7 @@ public:
 };
 
 // 齐次三维坐标向量
-class Vector4 {
+class Vector4 : public Object {
 public:
     float x;
     float y;
@@ -220,7 +224,7 @@ public:
     Vector4 RotateZ(float) const;
 };
 
-class Quaternion {
+class Quaternion : public Object {
 public:
     float x;
     float y;
@@ -263,7 +267,7 @@ public:
     Vector3 GetAxis() const;
 };
 
-class Matrix4x4 {
+class Matrix4x4 : public Object {
 public:
     float _11; float _12; float _13; float _14;
     float _21; float _22; float _23; float _24;

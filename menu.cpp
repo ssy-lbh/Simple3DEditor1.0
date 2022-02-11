@@ -4,6 +4,15 @@
 #include "gltools.h"
 #include "log.h"
 
+IMenuItem::IMenuItem(){}
+IMenuItem::~IMenuItem(){}
+
+IMenuItem::ItemType IMenuItem::GetType(){ return ItemType::DEFAULT; }
+const wchar_t* IMenuItem::GetName(){ return L""; }
+Menu* IMenuItem::GetMenu(){ return NULL; }
+
+void IMenuItem::OnClick(){}
+
 MenuItem::MenuItem() : type(ItemType::SEPERATOR) {}
 
 MenuItem::MenuItem(const wchar_t* name) : type(ItemType::DEFAULT), name(name) {}
@@ -18,13 +27,30 @@ MenuItem::~MenuItem(){
     if (menu) delete menu;
 }
 
+IMenuItem::ItemType MenuItem::GetType(){
+    return type;
+}
+
+const wchar_t* MenuItem::GetName(){
+    return name;
+}
+
+Menu* MenuItem::GetMenu(){
+    return menu;
+}
+
+void MenuItem::OnClick(){
+    if (click)
+        click(userData);
+}
+
 Menu::Menu(){}
 
 Menu::~Menu(){
     Free(items);
 }
 
-void Menu::AddItem(MenuItem* item){
+void Menu::AddItem(IMenuItem* item){
     items.Add(item);
 }
 
@@ -67,17 +93,15 @@ void Menu::Click(){
         curMenu->Click();
     }
     if (selected >= 0 && selected < items.Size()){
-        MenuItem* item = items.GetItem(selected);
-        if (item->click != NULL){
-            item->click(item->userData);
-        }
+        IMenuItem* item = items.GetItem(selected);
+        item->OnClick();
     }
 }
 
-void Menu::RenderItem(MenuItem* item){
+void Menu::RenderItem(IMenuItem* item){
     minPos.y -= 30.0f * cliInvSize.y;
-    switch (item->type){
-    case MenuItem::ItemType::DEFAULT:{
+    switch (item->GetType()){
+    case IMenuItem::ItemType::DEFAULT:{
         if (drawCounter == selected){
             curMenu = NULL;
             float height = 30.0f * cliInvSize.y, width = 250.0f * cliInvSize.y;
@@ -89,10 +113,10 @@ void Menu::RenderItem(MenuItem* item){
         }
         glColor3f(1.0f, 0.5f, 0.0f);
         glRasterPos2f(minPos.x + 5.0f * cliInvSize.y, minPos.y + 6.0f * cliInvSize.y);
-        glDrawCNString(item->name);
+        glDrawCNString(item->GetName());
     }
         break;
-    case MenuItem::ItemType::SEPERATOR:
+    case IMenuItem::ItemType::SEPERATOR:
         if (drawCounter == selected){
             curMenu = NULL;
         }
@@ -104,30 +128,31 @@ void Menu::RenderItem(MenuItem* item){
         glEnd();
         glLineWidth(1.0f);
         break;
-    case MenuItem::ItemType::GROUP:{
+    case IMenuItem::ItemType::GROUP:{
         float height = 30.0f * cliInvSize.y, width = 250.0f * cliInvSize.y;
+        Menu* itemMenu = item->GetMenu();
         if (drawCounter == selected){
             glColor3f(0.1f, 0.4f, 1.0f);
             glBegin(GL_TRIANGLES);
             glVertex2f(minPos.x, minPos.y); glVertex2f(minPos.x + width, minPos.y); glVertex2f(minPos.x + width, minPos.y + height);
             glVertex2f(minPos.x, minPos.y); glVertex2f(minPos.x, minPos.y + height); glVertex2f(minPos.x + width, minPos.y + height);
             glEnd();
-            if (item->menu == NULL){
+            if (itemMenu == NULL){
                 DebugError("Menu::RenderItem %p NullPointerException", item);
             }else{
-                if (curMenu != item->menu){
-                    curMenu = item->menu;
+                if (curMenu != itemMenu){
+                    curMenu = itemMenu;
                     menuPos = Vector2(width + 10.0f * cliInvSize.y, -(drawCounter * 30.0f * cliInvSize.y) - 10.0f * cliInvSize.y);
                     // size_t drawCounter; 无正负号，需要先与浮点数相乘再取负
-                    item->menu->SetClientSize(cliSize);
-                    item->menu->CursorMove(cursorPos - menuPos);
+                    itemMenu->SetClientSize(cliSize);
+                    itemMenu->CursorMove(cursorPos - menuPos);
                 }
-                item->menu->Render(minPos.x + width + 10.0f * cliInvSize.y, minPos.y + 40.0f * cliInvSize.y);
+                itemMenu->Render(minPos.x + width + 10.0f * cliInvSize.y, minPos.y + 40.0f * cliInvSize.y);
             }
         }
         glColor3f(1.0f, 0.5f, 0.0f);
         glRasterPos2f(minPos.x + 5.0f * cliInvSize.y, minPos.y + 6.0f * cliInvSize.y);
-        glDrawCNString(item->name);
+        glDrawCNString(item->GetName());
         glColor3f(1.0f, 1.0f, 1.0f);
         glBegin(GL_TRIANGLES);
         glVertex2f(minPos.x + width * 0.9f, minPos.y + height * 0.2f);
@@ -171,7 +196,7 @@ void Menu::Render(float x, float y){
     minPos = Vector2(xmin, ymax);
     drawCounter = 0;
 
-    items.Foreach<Menu*>([](MenuItem* item, Menu* menu){
+    items.Foreach<Menu*>([](IMenuItem* item, Menu* menu){
         menu->RenderItem(item);
     }, this);
 

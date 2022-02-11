@@ -23,7 +23,7 @@ class MainData;
 class Main;
 
 //TODO 补全撤销功能
-class IUndo {
+class IUndo : public Object {
 public:
     virtual void Execute() = 0;
 };
@@ -214,6 +214,19 @@ private:
         virtual void OnRender() override;
     };
 
+    class LightItem : public IMenuItem {
+    private:
+        MainWindow* window;
+    
+    public:
+        LightItem(MainWindow* window);
+        virtual ~LightItem() override;
+
+        virtual const wchar_t* GetName() override;
+
+        virtual void OnClick() override;
+    };
+
 public:
     MainWindow();
     virtual ~MainWindow() override;
@@ -267,7 +280,7 @@ public:
     Vector2 GetScreenPosition(Vector3 pos);
 };
 
-class MainData {
+class MainData : public Object {
 public:
     enum SelectionType {
         SELECT_OBJECT,
@@ -282,6 +295,10 @@ public:
 
     Menu* menu = NULL;
     Vector2 menuPos;
+
+    bool lightEnabled = false;
+
+    Vector3 audioPos = Vector3::zero;
 
     // 总场景对象
     //TODO 做出一个树状图窗口，显示场景中各个对象
@@ -313,7 +330,7 @@ public:
     void OnRightUp(int x, int y);
 };
 
-class Main {
+class Main : public Object {
 public:
     static HINSTANCE hInst;
     static HWND hWnd;

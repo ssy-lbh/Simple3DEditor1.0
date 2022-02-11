@@ -16,7 +16,7 @@ class AudioUtils;
 class AudioPlayerWindow;
 class AudioCaptureWindow;
 
-class AudioUtils {
+class AudioUtils : public Object {
 public:
     static bool init;
 
@@ -50,7 +50,6 @@ private:
     UIManager* uiMgr;
 
     Menu* basicMenu;
-    MenuItem* loopItem;
 
     wchar_t path[MAX_PATH];
 
@@ -120,6 +119,19 @@ private:
         virtual void Render() override;
     };
 
+    class LoopItem : public IMenuItem {
+    private:
+        AudioPlayerWindow* window;
+
+    public:
+        LoopItem(AudioPlayerWindow* window);
+        virtual ~LoopItem() override;
+
+        virtual const wchar_t* GetName() override;
+
+        virtual void OnClick() override;
+    };
+
 public:
     AudioPlayerWindow();
     virtual ~AudioPlayerWindow() override;
@@ -177,7 +189,6 @@ private:
     UIManager* uiMgr;
 
     Menu* basicMenu;
-    MenuItem* captureItem;
 
     ALCdevice* capDev = NULL;
     ALvoid* capBuf = NULL;
@@ -209,6 +220,19 @@ private:
         virtual void Hover() override;
         virtual void Leave() override;
         virtual void Render() override;
+    };
+
+    class CaptureItem : public IMenuItem {
+    private:
+        AudioCaptureWindow* window;
+
+    public:
+        CaptureItem(AudioCaptureWindow* window);
+        virtual ~CaptureItem() override;
+
+        virtual const wchar_t* GetName() override;
+
+        virtual void OnClick() override;
     };
 
 public:

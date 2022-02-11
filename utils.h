@@ -6,7 +6,7 @@
 class String;
 class WString;
 
-class String {
+class String : public Object {
 protected:
     char* str;
     size_t len;
@@ -61,7 +61,7 @@ public:
     size_t Split(const String s, String* arr, size_t len) const;
 };
 
-class WString {
+class WString : public Object {
 protected:
     wchar_t* str;
     size_t len;

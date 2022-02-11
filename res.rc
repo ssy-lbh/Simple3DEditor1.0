@@ -48,6 +48,7 @@ IDS_BRUSH_RGB_ADD SHADER        "res/shader/brush_rgb_add.comp"
 IDS_BRUSH_CMK_ADD SHADER        "res/shader/brush_cmk_add.comp"
 IDS_BRUSH_WATERCOLOR SHADER     "res/shader/brush_watercolor.comp"
 IDS_BRUSH_RGB_MUL SHADER        "res/shader/brush_rgb_mul.comp"
+IDS_BRUSH_RGB_AVERAGE SHADER    "res/shader/brush_rgb_average.comp"
 
 IDB_EARTH_WATER BITMAP          "res/texture/earth_water.bmp"
 IDB_NODEMAP_BACKGROUND BITMAP   "res/texture/nodemap_background.bmp"

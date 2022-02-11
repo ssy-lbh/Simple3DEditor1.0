@@ -8,7 +8,7 @@
 class GLUtils;
 class GLTexture2D;
 
-class GLUtils {
+class GLUtils : public Object {
 public:
     // 画圆弧角
     static void DrawCorner(float x, float y, float start, float end, float radius, float step);
@@ -31,7 +31,7 @@ public:
     static void DrawRect(float x1, float y1, float x2, float y2);
 };
 
-class GLTexture2D {
+class GLTexture2D : public Object {
 private:
     GLuint tex;
     bool delTex = true;
@@ -46,7 +46,7 @@ public:
     static void Disable();
 };
 
-class GLComputeProgram {
+class GLComputeProgram : public Object {
 private:
     GLuint prog;
     GLuint shader;
@@ -69,7 +69,7 @@ public:
     void BindTexture(GLuint unit, GLuint texture, GLenum access, GLenum format);
 };
 
-class GLFrameBuffer {
+class GLFrameBuffer : public Object {
 private:
     GLuint frame = 0;
     int x = 0, y = 0;
@@ -85,6 +85,16 @@ public:
     void BindTexture(GLuint texture, GLenum attachment, int x, int y);
     void Enable();
     void Disable();
+};
+
+class GLLights : public Object {
+private:
+    static bool use[8];
+    static GLenum idx[8];
+
+public:
+    static GLenum CreateLight();
+    static bool DestroyLight(GLenum light);
 };
 
 #endif

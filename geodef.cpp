@@ -123,6 +123,15 @@ void Edge::DeleteSelfReferenceExcept(Vertex* v){
     }, this);
 }
 
+bool Edge::Hit(Vector3 ori, Vector3 dir){
+    Vector3 v1 = (this->v1->pos - ori);
+    Vector3 v2 = (this->v2->pos - this->v1->pos);
+    Vector3 v3 = Vector3::Cross(v1, v2);
+    Vector3 res = Vector3::Decompose(dir, v1, v2, v3);
+    res /= res.x;
+    return res.y >= 0.0f && res.y <= 1.0f && Vector3::Cosine(v1, v1 + v3 * res.z) > 0.9997f;
+}
+
 Face::Face(){}
 
 Face::~Face(){}

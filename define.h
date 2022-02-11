@@ -1,3 +1,6 @@
+#ifndef __DEFINE__
+#define __DEFINE__
+
 #ifndef NULL
 #define NULL __null
 #endif
@@ -6,4 +9,10 @@
 typedef unsigned long long size_t;
 #else
 typedef unsigned int size_t;
+#endif
+
+class Object;
+
+class Object {};
+
 #endif

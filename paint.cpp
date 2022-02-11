@@ -471,6 +471,9 @@ PaintWindow::PaintWindow(){
     brushMenu->AddItem(new MenuItem(L"乘色", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
         window->OnMenuAccel(IDM_BRUSH_RGB_MUL, false);
     }, this));
+    brushMenu->AddItem(new MenuItem(L"平均色", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
+        window->OnMenuAccel(IDM_BRUSH_RGB_AVERAGE, false);
+    }, this));
     brushMenu->AddItem(new MenuItem());
     brushMenu->AddItem(new MenuItem(L"清空", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
         window->OnMenuAccel(IDM_BRUSH_CLEAR, false);
@@ -635,6 +638,9 @@ void PaintWindow::OnMenuAccel(int id, bool accel){
         break;
     case IDM_BRUSH_RGB_MUL:
         SetBrush(new DefaultBrush(this, IDS_BRUSH_RGB_MUL));
+        break;
+    case IDM_BRUSH_RGB_AVERAGE:
+        SetBrush(new DefaultBrush(this, IDS_BRUSH_RGB_AVERAGE));
         break;
     }
     if (brush)

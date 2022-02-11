@@ -258,6 +258,19 @@ float Vector3::Tangent(Vector3 v1, Vector3 v2){
     return Sqrt(1.0F - val * val) / val;
 }
 
+float Vector3::Determinant(Vector3 v1, Vector3 v2, Vector3 v3){
+    return v1.x * (v2.y * v3.z - v2.z * v3.y) +
+           v1.y * (v2.z * v3.x - v2.x * v3.z) +
+           v1.z * (v2.x * v3.y - v2.y * v3.x);
+}
+
+Vector3 Vector3::Decompose(Vector3 vec, Vector3 x, Vector3 y, Vector3 z){
+    float detinv = 1.0f / Determinant(x, y, z);
+    return Vector3(Determinant(vec, y, z) * detinv,
+                   Determinant(x, vec, z) * detinv,
+                   Determinant(x, y, vec) * detinv);
+}
+
 float Vector3::Magnitude() const{
     return Sqrt(x * x + y * y + z * z);
 }

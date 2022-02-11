@@ -99,6 +99,8 @@ void AudioUtils::InitOpenAL(){
     alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
     alListener3f(AL_VELOCITY, 0.0f, 0.0f, 0.0f);
     alListener3f(AL_ORIENTATION, 0.0f, 1.0f, 0.0f);
+
+    alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 }
 
 void AudioUtils::UninitOpenAL(){
@@ -220,6 +222,20 @@ void AudioPlayerWindow::LoopOption::Render(){
     GLUtils::DrawRect(0.7f, -0.2f, 0.9f, 0.0f);
 }
 
+AudioPlayerWindow::LoopItem::LoopItem(AudioPlayerWindow* window) : window(window) {}
+AudioPlayerWindow::LoopItem::~LoopItem(){}
+
+const wchar_t* AudioPlayerWindow::LoopItem::GetName(){
+    return window->IsLoop() ? L"循环:开" : L"循环:关";
+}
+
+void AudioPlayerWindow::LoopItem::OnClick(){
+    bool loop = window->IsLoop();
+    loop = !loop;
+    window->SetLoop(loop);
+    DebugLog("AudioPlayerWindow::LoopItem State %s", loop ? "Looping" : "Default");
+}
+
 AudioPlayerWindow::AudioPlayerWindow(){
     DebugLog("AudioPlayerWindow Launched");
 
@@ -235,10 +251,7 @@ AudioPlayerWindow::AudioPlayerWindow(){
     basicMenu->AddItem(new MenuItem(L"加载", MENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](AudioPlayerWindow* window){
         window->OnMenuAccel(IDM_LOAD, false);
     }, this));
-    loopItem = new MenuItem(IsLoop() ? L"循环:开" : L"循环:关", MENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](AudioPlayerWindow* window){
-        window->SetLoop(!window->IsLoop());
-    }, this);
-    basicMenu->AddItem(loopItem);
+    basicMenu->AddItem(new LoopItem(this));
 
     path[0] = L'\0';
 }
@@ -276,6 +289,8 @@ void AudioPlayerWindow::RenderFreqGraph(){
             samples[i] = ((short*)alAudioData)[(i + offset) << 1];
         }
         AudioUtils::FFT(samples, bit, false);
+        glDisable(GL_LINE_SMOOTH);
+        glLineWidth(1.0f);
         glBegin(GL_LINES);
         for (int i = 0; i < 1024; i++){
             float rate = i / 1024.0f;
@@ -319,6 +334,12 @@ void AudioPlayerWindow::OnRender(){
     RenderFreqGraph();
 
     uiMgr->Render();
+
+    if (IsLaunched()){
+        //TODO 不知道为什么，设置无效
+        Vector3 pos = Main::data->audioPos;
+        alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
+    }
 }
 
 void AudioPlayerWindow::OnClose(){}
@@ -482,6 +503,10 @@ void AudioPlayerWindow::LoadFileW(const wchar_t* file){
     alGenSources(1, &alSrc);
     alGenBuffers(1, &alBuf);
 
+    alSourcef(alSrc, AL_REFERENCE_DISTANCE, 1.0f);
+    alSourcef(alSrc, AL_ROLLOFF_FACTOR, 2.0f);
+    alSourcef(alSrc, AL_MAX_DISTANCE, 100.0f);
+
     // analyse data segment
     DWORD specNum;
     DWORD readLen;
@@ -553,7 +578,6 @@ void AudioPlayerWindow::LoadFileW(const wchar_t* file){
     DebugLog("AudioPlayerWindow::LoadFileW Success");
 
     loaded = true;
-    loopItem->name = L"循环:关";
 }
 
 bool AudioPlayerWindow::IsLoaded(){
@@ -611,7 +635,6 @@ bool AudioPlayerWindow::IsLoop(){
 
 void AudioPlayerWindow::SetLoop(bool loop){
     alSourcei(alSrc, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
-    loopItem->name = loop ? L"循环:开" : L"循环:关";
 }
 
 ALint AudioPlayerWindow::GetWaveFormat(PWAVEFORMATEX lpwav){
@@ -684,6 +707,18 @@ void AudioCaptureWindow::ProgressBar::Render(){
     }
 }
 
+AudioCaptureWindow::CaptureItem::CaptureItem(AudioCaptureWindow* window) : window(window) {}
+AudioCaptureWindow::CaptureItem::~CaptureItem(){}
+
+const wchar_t* AudioCaptureWindow::CaptureItem::GetName(){
+    return window->capture ? L"录音:开" : L"录音:关";
+}
+
+void AudioCaptureWindow::CaptureItem::OnClick(){
+    window->capture ? window->Stop() : window->Launch();
+    DebugLog("AudioCaptureWindow::CaptureItem State %s", window->capture ? "Capturing" : "Stopped");
+}
+
 AudioCaptureWindow::AudioCaptureWindow(){
     DebugLog("AudioCaptureWindow Launched");
 
@@ -702,10 +737,7 @@ AudioCaptureWindow::AudioCaptureWindow(){
     uiMgr->AddButton(new ProgressBar(this));
 
     basicMenu = new Menu();
-    captureItem = new MenuItem(capture ? L"录音:开" : L"录音:关", MENUITEM_LAMBDA_TRANS(AudioCaptureWindow)[](AudioCaptureWindow* window){
-        window->capture ? window->Stop() : window->Launch();
-    }, this);
-    basicMenu->AddItem(captureItem);
+    basicMenu->AddItem(new CaptureItem(this));
 }
 
 AudioCaptureWindow::~AudioCaptureWindow(){
@@ -767,6 +799,8 @@ void AudioCaptureWindow::OnRender(){
         glLoadIdentity();
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+        glDisable(GL_LINE_SMOOTH);
+        glLineWidth(1.0f);
         glBegin(GL_LINES);
         for (int i = 0; i < 1024; i++){
             float rate = i / 1024.0f;
@@ -873,7 +907,6 @@ void AudioCaptureWindow::Launch(){
 
     alcCaptureStart(capDev);
     capture = true;
-    captureItem->name = L"录音:开";
 
     DebugLog("AudioCaptureWindow::Launch Success");
 }
@@ -881,7 +914,6 @@ void AudioCaptureWindow::Launch(){
 void AudioCaptureWindow::Stop(){
     alcCaptureStop(capDev);
     capture = false;
-    captureItem->name = L"录音:关";
 }
 
 void AudioCaptureWindow::UpdateBuffer(ALvoid* buf, ALsizei size){

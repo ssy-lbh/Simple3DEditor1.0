@@ -18,7 +18,7 @@ class ITool;
 
 class IWindow;
 
-class UIManager {
+class UIManager : public Object {
 private:
     List<IButton*> buttons;
     IButton* cur = NULL;
@@ -46,7 +46,7 @@ public:
     void Foreach(void(*func)(IButton*, void*), void* user);
 };
 
-class ViewportManager {
+class ViewportManager : public Object {
 private:
     List<RECT> rects;
     RECT curRect;
@@ -72,7 +72,7 @@ public:
 };
 
 //TODO 按钮在触发按下后持续生效到停止
-class IButton {
+class IButton : public Object {
 public:
     IButton();
     virtual ~IButton();
@@ -146,7 +146,7 @@ public:
     Vector3 GetSelectionColor();
 };
 
-class IOperation {
+class IOperation : public Object {
 public:
     IOperation();
     virtual ~IOperation();
@@ -160,7 +160,7 @@ public:
     virtual void OnCommand(int id);
 };
 
-class ITool {
+class ITool : public Object {
 public:
     ITool();
     virtual ~ITool();
@@ -176,7 +176,7 @@ public:
     virtual void OnCommand(int id);
 };
 
-class IWindow {
+class IWindow : public Object {
 public:
     IWindow();
     virtual ~IWindow();

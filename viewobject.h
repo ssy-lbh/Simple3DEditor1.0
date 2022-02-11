@@ -11,7 +11,7 @@ class AViewObject;
 class MeshObject;
 class BezierCurveObject;
 
-class Transform {
+class Transform : public Object {
 public:
     enum RotationMode {
         ROT_QUATERNION,
@@ -34,7 +34,7 @@ public:
 
 //TODO 3D视口中的可视对象，内部继承后可作为网格体、声源、曲线等
 //TODO 正在设计中
-class AViewObject {
+class AViewObject : public Object {
 public:
     Transform transform;
     WString name;
@@ -58,6 +58,9 @@ public:
     void EnumChildren(void(*func)(AViewObject*));
     void EnumChildren(void(*func)(AViewObject*, void*), void* user);
     List<AViewObject*>& GetChildren();
+
+    AViewObject* GetParent();
+    void SetParent(AViewObject* o);
 
     // 具体选择什么应取决于选择模式，计划放置于全局数据中
     // 除了网格体，也应有其它类型对象被选中
@@ -114,6 +117,37 @@ public:
 
     virtual void OnRender() override;
     virtual void OnRenderUVMap() override;
+};
+
+class PointLightObject : public AViewObject {
+private:
+    Vertex v;
+    GLenum light;
+
+public:
+    PointLightObject();
+    virtual ~PointLightObject() override;
+
+    virtual void OnSelect(Vector3 ori, Vector3 dir) override;
+    virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
+
+    virtual void OnRender() override;
+
+    void UpdateLight();
+};
+
+class AudioListenerObject : public AViewObject {
+private:
+    Vertex v;
+
+public:
+    AudioListenerObject();
+    virtual ~AudioListenerObject() override;
+
+    virtual void OnSelect(Vector3 ori, Vector3 dir) override;
+    virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
+
+    virtual void OnRender() override;
 };
 
 #endif

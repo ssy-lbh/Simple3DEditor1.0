@@ -10,7 +10,7 @@
 
 class ColorBoard;
 
-class ColorBoard {
+class ColorBoard : public Object {
 private:
     HWND hWnd;
     HDC hDC;

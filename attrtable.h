@@ -41,7 +41,7 @@ public:
     virtual void Render() override;
 };
 
-class AttributeTable {
+class AttributeTable : public Object {
 private:
     List<Attribute*> attrs;
     UIManager* uiMgr = NULL;

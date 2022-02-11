@@ -6,7 +6,7 @@
 #include "log.h"
 
 template <typename T>
-class List {
+class List : public Object {
 private:
     T* data;
     size_t size;
