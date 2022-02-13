@@ -96,7 +96,7 @@ void UVEditWindow::SelectTool::OnMove(){
 void UVEditWindow::SelectTool::OnRender(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
+    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     if (leftDown){
@@ -143,7 +143,7 @@ void UVEditWindow::OnRender(){
         glLoadIdentity();
         // V坐标反转
         // 变换矩阵会以(0.5,0.5)为中心对纹理坐标产生相应变换
-        glOrtho(-1.0, 1.0, 1.0, -1.0, 0.0, 100.0);
+        glOrtho(-1.0, 1.0, 1.0, -1.0, 0.0, 2.0);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glColor3f(1.0f, 1.0f, 1.0f);
@@ -158,7 +158,7 @@ void UVEditWindow::OnRender(){
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.0, 1.0, 0.0, 1.0, 0.0, 100.0);
+    glOrtho(0.0, 1.0, 0.0, 1.0, 0.0, 2.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 

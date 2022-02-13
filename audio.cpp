@@ -307,9 +307,19 @@ void AudioPlayerWindow::RenderFreqGraph(){
 
 void AudioPlayerWindow::OnRender(){
     glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
-    glClearDepth(1.0);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glEnable(GL_ALPHA_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
     if (path[0] == L'\0'){
         glColor3f(1.0f, 0.5f, 0.0f);
@@ -319,17 +329,6 @@ void AudioPlayerWindow::OnRender(){
         glDrawCNString(L"可以将文件拖拽至此处");
         return;
     }
-
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glEnable(GL_ALPHA_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
 
     RenderFreqGraph();
 

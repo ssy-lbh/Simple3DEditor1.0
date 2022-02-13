@@ -8,6 +8,7 @@
 #include "nodemap.h"
 #include "paint.h"
 #include "tree.h"
+#include "anim.h"
 
 LRContainer::LRContainer(IWindow* lWindow, IWindow* rWindow) : lWindow(lWindow), rWindow(rWindow) {}
 
@@ -558,6 +559,9 @@ void SelectionWindow::InitMenu(){
     }, this));
     selMenu->AddItem(new MenuItem(L"节点编辑器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
         window->SetWindow(new NodeMapWindow());
+    }, this));
+    selMenu->AddItem(new MenuItem(L"动画控制器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
+        window->SetWindow(new AnimationWindow());
     }, this));
     selMenu->AddItem(new MenuItem());
     selMenu->AddItem(new MenuItem(L"左右分割至左侧", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){

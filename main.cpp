@@ -581,7 +581,7 @@ void MainWindow::OnRender(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
+    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     if (curTool)
@@ -1496,10 +1496,15 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     switch (uMsg){
     case WM_CREATE:
         DragAcceptFiles(hWnd, TRUE);
-        SetTimer(hWnd, 0, 10, NULL);
+        // 非零ID才有效
+        // 传入TimerProc时可能不同步但是实时性好
+        SetTimer(hWnd, 1, 10, TimerProc);
         break;
     case WM_CLOSE:
         PostQuitMessage(0);
+        break;
+    case WM_TIMER:
+        data->scene->OnTimer(wParam);
         break;
     case WM_SIZE:
         data->UpdateWindowSize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -1522,9 +1527,23 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     case WM_RBUTTONUP:
         data->OnRightUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
+    case WM_CHAR:
+        data->scene->OnChar(wParam);
+        break;
     case WM_UNICHAR:
         if (wParam == UNICODE_NOCHAR){
             return TRUE;
+        }
+        data->scene->OnUnichar(wParam);
+        break;
+    case WM_COMMAND:
+        switch (HIWORD(wParam)){
+        case 0:
+            data->scene->OnMenuAccel(LOWORD(wParam), false);
+            break;
+        case 1:
+            data->scene->OnMenuAccel(LOWORD(wParam), true);
+            break;
         }
         break;
     }
@@ -1537,7 +1556,7 @@ LRESULT CALLBACK Main::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 }
 
 void CALLBACK Main::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR wParam, DWORD lParam){
-    return;
+    Main::inst->LocalWndProc(hWnd, uMsg, wParam, lParam);
 }
 
 void Main::RequestRender(){

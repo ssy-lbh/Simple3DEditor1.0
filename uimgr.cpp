@@ -52,7 +52,7 @@ void UIManager::Render(float aspect){
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
-    glOrtho(-aspect, aspect, -1.0, 1.0, 0.0, 100.0);
+    glOrtho(-aspect, aspect, -1.0, 1.0, 0.0, 2.0);// OpenGL 深度[-1,1]，变换后比例不变
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -67,7 +67,7 @@ void UIManager::Render(){
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
+    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -90,7 +90,7 @@ void UIManager::RenderTransform(float aspect){
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
-    glOrtho(-aspect, aspect, -1.0, 1.0, 0.0, 100.0);
+    glOrtho(-aspect, aspect, -1.0, 1.0, 0.0, 2.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -101,7 +101,7 @@ void UIManager::RenderTransform(){
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 100.0);
+    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }

@@ -16,7 +16,7 @@ MKDIR   	= mkdir
 BUILD_PATH	= build
 PROGOBJ		= main.o log.o vecmath.o font.o menu.o gltools.o uimgr.o mesh.o\
 				geodef.o colorboard.o nodemap.o shell.o container.o attrtable.o\
-				audio.o paint.o glfunc.o viewobject.o utils.o tree.o\
+				audio.o paint.o glfunc.o viewobject.o utils.o tree.o anim.o\
 				soundtouch\SoundTouch.o soundtouch\TDStretch.o soundtouch\RateTransposer.o\
 				soundtouch\AAFilter.o soundtouch\FIRFilter.o soundtouch\FIFOSampleBuffer.o\
 				soundtouch\PeakFinder.o soundtouch\BPMDetect.o

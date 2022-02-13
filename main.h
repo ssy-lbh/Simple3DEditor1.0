@@ -300,6 +300,8 @@ public:
 
     Vector3 audioPos = Vector3::zero;
 
+    float animFrame = 0.0f;
+
     // 总场景对象
     //TODO 做出一个树状图窗口，显示场景中各个对象
     AViewObject* scene;

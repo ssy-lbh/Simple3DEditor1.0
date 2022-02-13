@@ -133,6 +133,8 @@ public:
 
     virtual void OnRender() override;
 
+    virtual void OnTimer(int id) override;
+
     void UpdateLight();
 };
 
@@ -148,6 +150,8 @@ public:
     virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
 
     virtual void OnRender() override;
+
+    virtual void OnTimer(int id) override;
 };
 
 #endif
