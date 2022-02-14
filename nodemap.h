@@ -35,7 +35,7 @@ private:
         virtual ~MoveButton() override;
         virtual bool Trigger(Vector2 pos) override;
         virtual void Render() override;
-        virtual void Click() override;
+        virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
     };
 
@@ -53,7 +53,7 @@ private:
         virtual ~Node() override;
         virtual bool Trigger(Vector2 pos) override;
         virtual void Render() override;
-        virtual void Click() override;
+        virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
         void Connect(Node* node);
         void Connect(Node* node, Vector2 offset);

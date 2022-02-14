@@ -26,10 +26,18 @@ public:
     //TODO 先就只使用这一种，其他的以后补齐
     RotationMode rotationMode = ROT_QUATERNION;
 
+    // 变换顺序: 大小、旋转、位置
     Vector3 position = Vector3::zero;
     Quaternion rotation = Quaternion::one;
     Vector3 rotationXYZ = Vector3::zero;
     Vector3 scale = Vector3::one;
+
+    Transform();
+    ~Transform();
+
+    Matrix4x4 GetTransformMatrix();
+    void PushTransformMatrix();
+    void PopTransformMatrix();
 };
 
 //TODO 3D视口中的可视对象，内部继承后可作为网格体、声源、曲线等
@@ -64,6 +72,7 @@ public:
 
     // 具体选择什么应取决于选择模式，计划放置于全局数据中
     // 除了网格体，也应有其它类型对象被选中
+    // 已实现的父类方法中，都是对子对象的遍历调用
     virtual void OnSelect(Vector3 ori, Vector3 dir);
     virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2);
     virtual void OnSelectUV(Vector2 uv, float err = 0.01f);

@@ -109,7 +109,7 @@ void UIManager::RenderTransform(){
 bool UIManager::LeftDown(){
     if (cur){
         leftDown = true;
-        cur->Click();
+        cur->Click(cursorPos);
         return true;
     }
     return false;
@@ -153,7 +153,7 @@ IButton::IButton(){}
 IButton::~IButton(){}
 bool IButton::Trigger(Vector2 pos){ return false; }
 void IButton::Hover(){}
-void IButton::Click(){}
+void IButton::Click(Vector2 pos){}
 void IButton::Drag(Vector2 dir){}
 void IButton::ClickEnd(){}
 void IButton::Leave(){}
@@ -175,7 +175,7 @@ void UIEditA::Hover(){
     SetCursor(LoadCursor(NULL, IDC_IBEAM));
 }
 
-void UIEditA::Click(){
+void UIEditA::Click(Vector2 pos){
     editing = true;
     editPos = 0;
 }

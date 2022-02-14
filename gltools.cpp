@@ -169,6 +169,27 @@ void GLUtils::DrawRect(float x1, float y1, float x2, float y2){
     glEnd();
 }
 
+void GLUtils::PushMatrix(Matrix4x4 mat){
+    glPushMatrix();
+    glMultMatrixf((float*)&mat);
+}
+
+void GLUtils::PopMatrix(){
+    glPopMatrix();
+}
+
+Matrix4x4 GLUtils::GetProjectionMatrix(){
+    Matrix4x4 mat;
+    glGetFloatv(GL_PROJECTION_MATRIX, (float*)&mat);
+    return mat;
+}
+
+Matrix4x4 GLUtils::GetModelViewMatrix(){
+    Matrix4x4 mat;
+    glGetFloatv(GL_MODELVIEW_MATRIX, (float*)&mat);
+    return mat;
+}
+
 GLTexture2D::GLTexture2D(const char* path){
     int x, y, channel;
     stbi_uc* image;

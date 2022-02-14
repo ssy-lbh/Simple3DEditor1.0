@@ -79,7 +79,7 @@ public:
 
     virtual bool Trigger(Vector2 pos);
     virtual void Hover();
-    virtual void Click();
+    virtual void Click(Vector2 pos);
     virtual void Drag(Vector2 dir);
     virtual void ClickEnd();
     virtual void Leave();
@@ -104,7 +104,7 @@ public:
     virtual ~IconButton() override;
 
     virtual bool Trigger(Vector2 pos) override;
-    virtual void Click() override;
+    virtual void Click(Vector2 pos) override;
     virtual void Render() override;
 
     void OnClick(void(*func)(void*));
@@ -133,7 +133,7 @@ public:
 
     virtual bool Trigger(Vector2 pos) override;
     virtual void Hover() override;
-    virtual void Click() override;
+    virtual void Click(Vector2 pos) override;
     virtual void Leave() override;
     virtual bool Char(char c) override;
     virtual void Render() override;

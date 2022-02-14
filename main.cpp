@@ -23,7 +23,7 @@ void MainWindow::MoveButton::Render(){
     GLUtils::DrawCorner(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
 }
 
-void MainWindow::MoveButton::Click(){
+void MainWindow::MoveButton::Click(Vector2 pos){
     DebugLog("MoveButton Click");
     start = main->camLookat;
 }
@@ -51,7 +51,7 @@ void MainWindow::RotateButton::Render(){
     GLUtils::DrawCorner(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
 }
 
-void MainWindow::RotateButton::Click(){
+void MainWindow::RotateButton::Click(Vector2 pos){
     DebugLog("RotateButton Click");
     start = main->camDir;
 }
@@ -1490,9 +1490,6 @@ void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 }
 
 LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    //将事件发送至对应整个窗口的组件容器
-    FireEvent(mainFrame, hWnd, uMsg, wParam, lParam);
-
     switch (uMsg){
     case WM_CREATE:
         DragAcceptFiles(hWnd, TRUE);
@@ -1501,6 +1498,7 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
         SetTimer(hWnd, 1, 10, TimerProc);
         break;
     case WM_CLOSE:
+        KillTimer(hWnd, 1);
         PostQuitMessage(0);
         break;
     case WM_TIMER:
@@ -1547,6 +1545,9 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
         }
         break;
     }
+
+    //将事件发送至对应整个窗口的组件容器
+    FireEvent(mainFrame, hWnd, uMsg, wParam, lParam);
 
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

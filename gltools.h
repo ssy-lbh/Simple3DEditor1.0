@@ -29,6 +29,10 @@ public:
     static float Clamp(float x, float a, float b);
     static void DrawRect(Vector2 p1, Vector2 p2);
     static void DrawRect(float x1, float y1, float x2, float y2);
+    static void PushMatrix(Matrix4x4 mat);
+    static void PopMatrix();
+    static Matrix4x4 GetProjectionMatrix();
+    static Matrix4x4 GetModelViewMatrix();
 };
 
 class GLTexture2D : public Object {

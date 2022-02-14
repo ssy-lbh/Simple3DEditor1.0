@@ -3,6 +3,67 @@
 #include "main.h"
 #include "res.h"
 
+Transform::Transform(){}
+Transform::~Transform(){}
+
+Matrix4x4 Transform::GetTransformMatrix(){
+    Matrix4x4 mat = Matrix4x4::identity;
+
+    mat._11 = scale.x;
+    mat._22 = scale.y;
+    mat._33 = scale.z;
+
+    if (rotationMode == ROT_QUATERNION){
+        mat *= rotation.Normal();
+    }else{
+        Quaternion rotX = Quaternion::AxisAngle(Vector3::right, rotationXYZ.x);
+        Quaternion rotY = Quaternion::AxisAngle(Vector3::forward, rotationXYZ.y);
+        Quaternion rotZ = Quaternion::AxisAngle(Vector3::up, rotationXYZ.z);
+
+        switch (rotationMode){
+        case ROT_EULER_XYZ:
+            mat *= (rotZ * rotY * rotX);
+            break;
+        case ROT_EULER_XZY:
+            mat *= (rotY * rotZ * rotX);
+            break;
+        case ROT_EULER_YXZ:
+            mat *= (rotZ * rotX * rotY);
+            break;
+        case ROT_EULER_YZX:
+            mat *= (rotX * rotZ * rotY);
+            break;
+        case ROT_EULER_ZXY:
+            mat *= (rotY * rotX * rotZ);
+            break;
+        case ROT_EULER_ZYX:
+            mat *= (rotX * rotY * rotZ);
+            break;
+        }
+    }
+
+    mat._14 = position.x;
+    mat._24 = position.y;
+    mat._34 = position.z;
+
+    // 调试输出矩阵
+    // DebugLog("%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f",
+    //          mat._11, mat._12, mat._13, mat._14,
+    //          mat._21, mat._22, mat._23, mat._24,
+    //          mat._31, mat._32, mat._33, mat._34,
+    //          mat._41, mat._42, mat._43, mat._44);
+
+    return mat;
+}
+
+void Transform::PushTransformMatrix(){
+    GLUtils::PushMatrix(GetTransformMatrix());
+}
+
+void Transform::PopTransformMatrix(){
+    GLUtils::PopMatrix();
+}
+
 AViewObject::AViewObject() : name(L"Object"){}
 
 AViewObject::AViewObject(const wchar_t* name) : name(name){}
@@ -103,7 +164,9 @@ MeshObject::MeshObject() : AViewObject(L"Mesh"){
 }
 
 MeshObject::~MeshObject(){
-    AViewObject::~AViewObject();
+    // 子类析构器在返回前会自动调用父类析构器
+    // 因此不要再这里调用AViewObject::~AViewObject，不然会导致多次delete使程序崩溃
+    Free(children);
     if (mesh) delete mesh;
 }
 
@@ -172,15 +235,12 @@ Mesh* MeshObject::GetMesh(){
 }
 
 void MeshObject::OnRender(){
+    transform.PushTransformMatrix();
     AViewObject::OnRender();
-    
-    // 测试代码
-    // glPushMatrix();
-    // glTranslatef(Main::data->animFrame * 0.01f, 0.0f, 0.0f);
-    // mesh->Render();
-    // glPopMatrix();
 
     mesh->Render();
+
+    transform.PopTransformMatrix();
 }
 
 void MeshObject::OnRenderUVMap(){
@@ -196,7 +256,7 @@ BezierCurveObject::BezierCurveObject() : AViewObject(L"BezierCurve"){
 }
 
 BezierCurveObject::~BezierCurveObject(){
-    AViewObject::~AViewObject();
+    Free(children);
 }
 
 void BezierCurveObject::OnSelect(Vector3 ori, Vector3 dir){
@@ -298,7 +358,7 @@ PointLightObject::PointLightObject() : AViewObject(L"PointLight"){
 }
 
 PointLightObject::~PointLightObject(){
-    AViewObject::~AViewObject();
+    Free(children);
     GLLights::DestroyLight(light);
 }
 
@@ -357,7 +417,7 @@ void PointLightObject::UpdateLight(){
 AudioListenerObject::AudioListenerObject() : AViewObject(L"AudioListener"){}
 
 AudioListenerObject::~AudioListenerObject(){
-    AViewObject::~AViewObject();
+    Free(children);
 }
 
 void AudioListenerObject::OnSelect(Vector3 ori, Vector3 dir){

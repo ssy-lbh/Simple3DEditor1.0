@@ -119,7 +119,7 @@ void AudioPlayerWindow::PlayButton::Hover(){
     hover = true;
 }
 
-void AudioPlayerWindow::PlayButton::Click(){
+void AudioPlayerWindow::PlayButton::Click(Vector2 pos){
     if (window->IsLaunched()){
         window->Stop();
     }else{
@@ -153,8 +153,8 @@ bool AudioPlayerWindow::ProgressBar::Trigger(Vector2 pos){
     return pos.x >= this->pos - 0.05f && pos.x <= this->pos + 0.05f && pos.y >= -0.2f && pos.y <= 0.0f;
 }
 
-void AudioPlayerWindow::ProgressBar::Click(){
-    origin = pos;
+void AudioPlayerWindow::ProgressBar::Click(Vector2 pos){
+    origin = this->pos;
 }
 
 void AudioPlayerWindow::ProgressBar::Drag(Vector2 dir){
@@ -205,7 +205,7 @@ bool AudioPlayerWindow::LoopOption::Trigger(Vector2 pos){
     return pos.x >= 0.7f && pos.x <= 0.9f && pos.y >= -0.2f && pos.y <= 0.0f;
 }
 
-void AudioPlayerWindow::LoopOption::Click(){
+void AudioPlayerWindow::LoopOption::Click(Vector2 pos){
     loop = window->IsLoop();
     loop = !loop;
     window->SetLoop(loop);
@@ -670,8 +670,8 @@ bool AudioCaptureWindow::ProgressBar::Trigger(Vector2 pos){
     return pos.x >= 0.8f && pos.x <= 1.0f && pos.y >= this->pos - 0.05f && pos.y <= this->pos + 0.05f;
 }
 
-void AudioCaptureWindow::ProgressBar::Click(){
-    origin = pos;
+void AudioCaptureWindow::ProgressBar::Click(Vector2 pos){
+    origin = this->pos;
 }
 
 void AudioCaptureWindow::ProgressBar::Drag(Vector2 dir){

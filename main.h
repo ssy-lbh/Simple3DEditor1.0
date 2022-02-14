@@ -70,7 +70,7 @@ private:
         virtual ~MoveButton() override;
         virtual bool Trigger(Vector2 pos) override;
         virtual void Render() override;
-        virtual void Click() override;
+        virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
         virtual void ClickEnd() override;
     };
@@ -87,7 +87,7 @@ private:
         virtual ~RotateButton() override;
         virtual bool Trigger(Vector2 pos) override;
         virtual void Render() override;
-        virtual void Click() override;
+        virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
         virtual void ClickEnd() override;
     };

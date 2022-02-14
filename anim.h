@@ -3,46 +3,25 @@
 
 #include "list.h"
 #include "uimgr.h"
+#include "menu.h"
 
-class AnimationCurve;
-class IAnimationInterp;
-class IAnimationModifier;
+class IAnimationFunction;
 class AnimationWindow;
 
-class AnimationCurve {
-private:
-    List<IAnimationInterp*> interp;
-    List<int> nodes;
-
+class IAnimationFunction {
 public:
-    AnimationCurve();
-    ~AnimationCurve();
+    IAnimationFunction();
+    virtual ~IAnimationFunction();
 
-    float GetValue(int frame);
-    void Reset(float value, int frameLen);
-    void SetLength(int frameLen);
-    int InsertNode(int frame);
-    void OnRender();
+    virtual float GetValue(Vector2 p1, Vector2 p2, float val);
 };
 
-class IAnimationInterp {
+class LinearFunc : public IAnimationFunction {
 public:
-    IAnimationInterp();
-    IAnimationInterp(int start, int end);
-    virtual ~IAnimationInterp();
+    LinearFunc();
+    virtual ~LinearFunc() override;
 
-    void SetStartFrame(int frame);
-    void SetEndFrame(int frame);
-    float GetValue(int frame);
-    void OnRender();
-};
-
-class IAnimationModifier {
-public:
-    IAnimationModifier(int start, int end);
-    virtual ~IAnimationModifier();
-
-    float GetValue(int frame);
+    virtual float GetValue(Vector2 p1, Vector2 p2, float val) override;
 };
 
 class AnimationWindow : public IWindow {
@@ -54,6 +33,8 @@ private:
     Vector2 cursorPos;
 
     UIManager* uiMgr;
+
+    Menu* basicMenu = NULL;
 
     float startFrame = 0.0f;
     float endFrame = 250.0f;
@@ -72,7 +53,7 @@ private:
         virtual ~FrameIndicator() override;
 
         virtual bool Trigger(Vector2 pos) override;
-        virtual void Click() override;
+        virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
         virtual void Render() override;
     };
@@ -94,9 +75,46 @@ private:
         virtual ~PlayButton() override;
 
         virtual bool Trigger(Vector2 pos) override;
-        virtual void Click() override;
+        virtual void Click(Vector2 pos) override;
         virtual void Render() override;
     };
+
+    class AnimationCurve : public IButton {
+    private:
+        enum SelectTarget {
+            NONE,
+            POINT,
+            SEGMENT
+        };
+
+        AnimationWindow* window;
+        
+        List<IAnimationFunction*> functions;
+        List<Vector2> points;
+
+        SelectTarget selTarget = NONE;
+        size_t selIndex;
+        float lastTime;
+        Vector2 initialPos;
+
+        Menu* funcMenu;
+
+    public:
+        AnimationCurve(AnimationWindow* window);
+        ~AnimationCurve();
+
+        virtual bool Trigger(Vector2 pos) override;
+        virtual void Click(Vector2 pos) override;
+        virtual void Drag(Vector2 dir) override;
+        virtual void Render() override;
+
+        size_t GetSegment(float pos);
+        float GetValue(float pos);
+        void OnChangeRange(float start, float end);
+        void SetFunc(size_t seg, IAnimationFunction* func);
+    };
+
+    AnimationCurve* curve;
 
 public:
     AnimationWindow();

@@ -581,6 +581,10 @@ Quaternion &Quaternion::Normalize(){
     return (*this /= this->Magnitude());
 }
 
+Quaternion &Quaternion::Rotate(Vector3 axis, float angle){
+    return (*this *= AxisAngle(-*this * axis, angle) * *this);
+}
+
 float Quaternion::Magnitude() const{
     return Sqrt(x * x + y * y + z * z + w * w);
 }
@@ -601,7 +605,7 @@ Matrix4x4::Matrix4x4(Quaternion &&q){
     float xz = q.x * q.z, yw = q.y * q.w, xw = q.x * q.w;
     _11 = 1.0f - 2.0f * (y2 + z2); _12 = 2.0f * (xy - zw); _13 = 2.0f * (xz - yw); _14 = 0.0f;
     _21 = 2.0f * (xy + zw); _22 = 1.0f - 2.0f * (z2 + x2); _23 = 2.0f * (yz - xw); _24 = 0.0f;
-    _31 = 2.0f * (xz - yw); _32 = 2.0f * (yz + xw); _33 = 1.0f - 2.0f * (x2 + y2); _34 = 0.0f;
+    _31 = 2.0f * (xz + yw); _32 = 2.0f * (yz + xw); _33 = 1.0f - 2.0f * (x2 + y2); _34 = 0.0f;
     _41 = 0.0f; _42 = 0.0f; _43 = 0.0f; _44 = 1.0f;
 }
 
@@ -611,7 +615,7 @@ Matrix4x4::Matrix4x4(const Quaternion &q){
     float xz = q.x * q.z, yw = q.y * q.w, xw = q.x * q.w;
     _11 = 1.0f - 2.0f * (y2 + z2); _12 = 2.0f * (xy - zw); _13 = 2.0f * (xz - yw); _14 = 0.0f;
     _21 = 2.0f * (xy + zw); _22 = 1.0f - 2.0f * (z2 + x2); _23 = 2.0f * (yz - xw); _24 = 0.0f;
-    _31 = 2.0f * (xz - yw); _32 = 2.0f * (yz + xw); _33 = 1.0f - 2.0f * (x2 + y2); _34 = 0.0f;
+    _31 = 2.0f * (xz + yw); _32 = 2.0f * (yz + xw); _33 = 1.0f - 2.0f * (x2 + y2); _34 = 0.0f;
     _41 = 0.0f; _42 = 0.0f; _43 = 0.0f; _44 = 1.0f;
 }
 
@@ -621,7 +625,7 @@ Matrix4x4 &Matrix4x4::operator=(Quaternion &&q){
     float xz = q.x * q.z, yw = q.y * q.w, xw = q.x * q.w;
     _11 = 1.0f - 2.0f * (y2 + z2); _12 = 2.0f * (xy - zw); _13 = 2.0f * (xz - yw); _14 = 0.0f;
     _21 = 2.0f * (xy + zw); _22 = 1.0f - 2.0f * (z2 + x2); _23 = 2.0f * (yz - xw); _24 = 0.0f;
-    _31 = 2.0f * (xz - yw); _32 = 2.0f * (yz + xw); _33 = 1.0f - 2.0f * (x2 + y2); _34 = 0.0f;
+    _31 = 2.0f * (xz + yw); _32 = 2.0f * (yz + xw); _33 = 1.0f - 2.0f * (x2 + y2); _34 = 0.0f;
     _41 = 0.0f; _42 = 0.0f; _43 = 0.0f; _44 = 1.0f;
     return *this;
 }
@@ -632,7 +636,7 @@ Matrix4x4 &Matrix4x4::operator=(const Quaternion &q){
     float xz = q.x * q.z, yw = q.y * q.w, xw = q.x * q.w;
     _11 = 1.0f - 2.0f * (y2 + z2); _12 = 2.0f * (xy - zw); _13 = 2.0f * (xz - yw); _14 = 0.0f;
     _21 = 2.0f * (xy + zw); _22 = 1.0f - 2.0f * (z2 + x2); _23 = 2.0f * (yz - xw); _24 = 0.0f;
-    _31 = 2.0f * (xz - yw); _32 = 2.0f * (yz + xw); _33 = 1.0f - 2.0f * (x2 + y2); _34 = 0.0f;
+    _31 = 2.0f * (xz + yw); _32 = 2.0f * (yz + xw); _33 = 1.0f - 2.0f * (x2 + y2); _34 = 0.0f;
     _41 = 0.0f; _42 = 0.0f; _43 = 0.0f; _44 = 1.0f;
     return *this;
 }
@@ -739,7 +743,8 @@ Matrix4x4 Matrix4x4::operator*(Matrix4x4 m) const{
 }
 
 Matrix4x4 &Matrix4x4::operator*=(Matrix4x4 m){
-    return (*this = *this * m);
+    // 将矩阵视作变换，*=操作是加上变换的意思，对于矩阵来说应为左乘
+    return (*this = m * *this);
 }
 
 Matrix4x4 Matrix4x4::operator-() const{
@@ -771,6 +776,10 @@ Vector4 Matrix4x4::operator*(Vector4 v) const{
         _31 * v.x + _32 * v.y + _33 * v.z + _34 * v.w,
         _41 * v.x + _42 * v.y + _43 * v.z + _44 * v.w
     );
+}
+
+float GetRate(float x, float a, float b){
+    return (x - a) / (b - a);
 }
 
 float Lerp(float a, float b, float t){

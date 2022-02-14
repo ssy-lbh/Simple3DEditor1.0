@@ -81,7 +81,7 @@ private:
 
         virtual bool Trigger(Vector2 pos) override;
         virtual void Hover() override;
-        virtual void Click() override;
+        virtual void Click(Vector2 pos) override;
         virtual void Leave() override;
         virtual void Render() override;
     };
@@ -98,7 +98,7 @@ private:
         virtual ~ProgressBar() override;
 
         virtual bool Trigger(Vector2 pos) override;
-        virtual void Click() override;
+        virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
         virtual void Hover() override;
         virtual void Leave() override;
@@ -115,7 +115,7 @@ private:
         virtual ~LoopOption() override;
 
         virtual bool Trigger(Vector2 pos) override;
-        virtual void Click() override;
+        virtual void Click(Vector2 pos) override;
         virtual void Render() override;
     };
 
@@ -215,7 +215,7 @@ private:
         virtual ~ProgressBar() override;
 
         virtual bool Trigger(Vector2 pos) override;
-        virtual void Click() override;
+        virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
         virtual void Hover() override;
         virtual void Leave() override;

@@ -20,7 +20,7 @@ void NodeMapWindow::MoveButton::Render(){
     GLUtils::DrawCorner(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
 }
 
-void NodeMapWindow::MoveButton::Click(){
+void NodeMapWindow::MoveButton::Click(Vector2 pos){
     start = window->viewPos;
 }
 
@@ -60,7 +60,7 @@ void NodeMapWindow::Node::Render(){
     }
 }
 
-void NodeMapWindow::Node::Click(){
+void NodeMapWindow::Node::Click(Vector2 pos){
     start = position;
     if (!window->selectedNodes.HasValue(this))
         window->selectedNodes.Add(this);

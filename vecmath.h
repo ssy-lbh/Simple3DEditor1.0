@@ -226,6 +226,7 @@ public:
 
 class Quaternion : public Object {
 public:
+    // 四元数的旋转轴即为(x,y,z)方向
     float x;
     float y;
     float z;
@@ -262,6 +263,7 @@ public:
     Quaternion Inverse() const;
     Quaternion Normal() const;
     Quaternion &Normalize();
+    Quaternion &Rotate(Vector3, float);
     float Magnitude() const;
     float SqrMagnitude() const;
     Vector3 GetAxis() const;
@@ -269,10 +271,27 @@ public:
 
 class Matrix4x4 : public Object {
 public:
-    float _11; float _12; float _13; float _14;
-    float _21; float _22; float _23; float _24;
-    float _31; float _32; float _33; float _34;
-    float _41; float _42; float _43; float _44;
+    // OpenGL为列优先顺序
+    // 此矩阵变量命名使用行优先顺序
+    float _11;
+    float _21;
+    float _31;
+    float _41;
+
+    float _12;
+    float _22;
+    float _32;
+    float _42;
+
+    float _13;
+    float _23;
+    float _33;
+    float _43;
+
+    float _14;
+    float _24;
+    float _34;
+    float _44;
 
     static const Matrix4x4 zero;
     static const Matrix4x4 identity;
@@ -306,6 +325,8 @@ public:
     Vector3 operator*(Vector3) const;
     Vector4 operator*(Vector4) const;
 };
+
+float GetRate(float x, float a, float b);
 
 float Lerp(float a, float b, float t);
 Vector2 Lerp(Vector2 a, Vector2 b, float t);

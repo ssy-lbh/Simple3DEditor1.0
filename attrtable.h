@@ -35,7 +35,7 @@ public:
     void SetAttrTableReference(AttributeTable* tab, int index);
 
     virtual bool Trigger(Vector2 pos) override;
-    virtual void Click() override;
+    virtual void Click(Vector2 pos) override;
     virtual void Drag(Vector2 dir) override;
     virtual void ClickEnd() override;
     virtual void Render() override;

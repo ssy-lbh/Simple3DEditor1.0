@@ -37,7 +37,7 @@ bool Attribute::Trigger(Vector2 pos){
     return false;
 }
 
-void Attribute::Click(){
+void Attribute::Click(Vector2 pos){
     if (type == AttributeType::BOOLEAN){
         current.boolData = ~origin.boolData;
         return;

@@ -92,8 +92,22 @@ public:
 
     List<T>& Add(T val){
         //DebugLog("Add");
-        Check(10);
+        Check(5);
         data[ptr++] = val;
+        return *this;
+    }
+
+    List<T>& Insert(size_t index, T val){
+        if (index > ptr){
+            DebugError("Critical: List<T>::Insert(%llu) When Index Overflow", index);
+            return *this;
+        }
+        Check(5);
+        for (size_t i = ptr; i > index; i--){
+            data[i] = data[i - 1];
+        }
+        ptr++;
+        data[index] = val;
         return *this;
     }
 
@@ -101,6 +115,7 @@ public:
         //DebugLog("Clear");
         if (ptr == 0){
             DebugError("Critical: List<T>::RemoveBack When Size Is 0");
+            return *data;
         }
         return data[--ptr];
     }
@@ -121,6 +136,7 @@ public:
         //DebugLog("GetBack");
         if (ptr == 0){
             DebugError("Critical: List<T>::GetBack When Size Is 0");
+            return *data;
         }
         return data[ptr - 1];
     }
@@ -147,12 +163,24 @@ public:
     void Clear(){
         //DebugLog("Clear");
         delete data;
-        size = 32;
+        size = 8;
         data = new T[size];
         ptr = 0;
         if (data == NULL){
             DebugError("Critical: List<T>::Clear Allocate Memory Failed");
         }
+    }
+
+    List<T>& RemoveAt(size_t index){
+        if (index >= ptr){
+            DebugError("Critical: List<T>::RemoveAt(%llu) When Index Overflow", index);
+            return *this;
+        }
+        ptr--;
+        for (size_t i = index; i < ptr; i++){
+            data[i] = data[i + 1];
+        }
+        return *this;
     }
 
     bool Remove(T val){
