@@ -375,12 +375,40 @@ void Mesh::WriteToOBJ(HANDLE hFile, bool uv, bool normal){
         }, hFile);
     }
     // 片元
-    faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
-        char tmp[MAX_PATH + 1];
-        DWORD len;
-        len = __builtin_snprintf(tmp, MAX_PATH, "f %d %d %d\n", f->vertices.GetItem(0)->index, f->vertices.GetItem(1)->index, f->vertices.GetItem(2)->index);
-        WriteFile(hFile, tmp, len, &len, NULL);
-    }, hFile);
+    if (!uv && !normal){
+        faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
+            char tmp[MAX_PATH + 1];
+            DWORD len;
+            int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
+            len = __builtin_snprintf(tmp, MAX_PATH, "f %d %d %d\n", idx1, idx2, idx3);
+            WriteFile(hFile, tmp, len, &len, NULL);
+        }, hFile);
+    }else if (uv && !normal){
+        faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
+            char tmp[MAX_PATH + 1];
+            DWORD len;
+            int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
+            len = __builtin_snprintf(tmp, MAX_PATH, "f %d/%d %d/%d %d/%d\n", idx1, idx1, idx2, idx2, idx3, idx3);
+            WriteFile(hFile, tmp, len, &len, NULL);
+        }, hFile);
+    }else if (!uv && normal){
+        faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
+            char tmp[MAX_PATH + 1];
+            DWORD len;
+            int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
+            len = __builtin_snprintf(tmp, MAX_PATH, "f %d//%d %d//%d %d//%d\n", idx1, idx1, idx2, idx2, idx3, idx3);
+            WriteFile(hFile, tmp, len, &len, NULL);
+        }, hFile);
+    }else{
+        faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
+            char tmp[MAX_PATH + 1];
+            DWORD len;
+            int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
+            len = __builtin_snprintf(tmp, MAX_PATH, "f %d/%d/%d %d/%d/%d %d/%d/%d\n", idx1, idx1, idx1, idx2, idx2, idx2, idx3, idx3, idx3);
+            WriteFile(hFile, tmp, len, &len, NULL);
+        }, hFile);
+    }
+    
 }
 
 void Mesh::SetTexture(int resid){
