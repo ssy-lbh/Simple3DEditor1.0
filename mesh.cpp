@@ -8,6 +8,8 @@
 
 Mesh::Mesh(){}
 
+Mesh::Mesh(AViewObject* object) : object(object) {}
+
 Mesh::~Mesh(){
     Free(vertices);
     Free(edges);
@@ -153,6 +155,7 @@ size_t Mesh::FindUVRect(Vector2 uv1, Vector2 uv2, List<Vertex*>& result){
 
 Vertex* Mesh::AddVertex(Vector3 pos){
     Vertex* v = new Vertex(pos);
+    v->object = object;
     vertices.Add(v);
     return v;
 }
@@ -161,6 +164,7 @@ Vertex* Mesh::AddVertex(Vertex* v){
     if (vertices.HasValue(v)){
         return v;
     }
+    v->object = object;
     vertices.Add(v);
     return v;
 }
@@ -192,6 +196,7 @@ Edge* Mesh::AddEdge(Vertex* v1, Vertex* v2){
     AddVertex(v1);
     AddVertex(v2);
     Edge* e = new Edge(v1, v2);
+    e->object = object;
     edges.Add(e);
     return e;
 }
@@ -221,6 +226,7 @@ Face* Mesh::AddTriFace(Vertex* v1, Vertex* v2, Vertex* v3){
     e1->AddFace(f);
     e2->AddFace(f);
     e3->AddFace(f);
+    f->object = object;
     faces.Add(f);
     return NULL;
 }
@@ -250,11 +256,27 @@ void Mesh::DeleteVertex(Vertex* v){
 }
 
 void Mesh::DeleteEdge(Edge* e){
-    DebugLog("Mesh::DeleteEdge %p [Unimplemented]", e);
+    struct {
+        Mesh* m;
+        Edge* e;
+    } pack;
+    pack.m = this;
+    pack.e = e;
+    e->faces.Foreach<decltype(pack)*>([](Face* f, decltype(pack)* p){
+        f->DeleteSelfReferenceExcept(p->e);
+        p->m->faces.Remove(f);
+        delete f;
+    }, &pack);
+    e->faces.Clear();
+    e->DeleteSelfReference();
+    edges.Remove(e);
+    delete e;
 }
 
 void Mesh::DeleteTriFace(Face* f){
-    DebugLog("Mesh::DeleteTriFace %p [Unimplemented]", f);
+    f->DeleteSelfReference();
+    faces.Remove(f);
+    delete f;
 }
 
 void Mesh::Render(){
@@ -291,11 +313,11 @@ void Mesh::Render(){
         faces.Foreach([](Face* f){
             Vertex* v;
             // V坐标已经反转
-            v = f->vertices.GetItem(0);
+            v = f->vertices[0];
             glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
-            v = f->vertices.GetItem(1);
+            v = f->vertices[1];
             glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
-            v = f->vertices.GetItem(2);
+            v = f->vertices[2];
             glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
         });
         glEnd();
@@ -305,11 +327,11 @@ void Mesh::Render(){
         glBegin(GL_TRIANGLES);
         faces.Foreach([](Face* f){
             Vertex* v;
-            v = f->vertices.GetItem(0);
+            v = f->vertices[0];
             glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
-            v = f->vertices.GetItem(1);
+            v = f->vertices[1];
             glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
-            v = f->vertices.GetItem(2);
+            v = f->vertices[2];
             glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
         });
         glEnd();

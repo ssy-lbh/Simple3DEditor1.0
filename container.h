@@ -4,10 +4,6 @@
 #include "uimgr.h"
 #include "menu.h"
 
-class LRContainer;
-class UDContainer;
-class SelectionWindow;
-
 //TODO 容器期望集成选择夹、拆分窗口、属性窗口等容器
 class LRContainer : public IWindow {
 private:

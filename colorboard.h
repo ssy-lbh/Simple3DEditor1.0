@@ -8,8 +8,6 @@
 
 #include <gl/gl.h>
 
-class ColorBoard;
-
 class ColorBoard : public Object {
 private:
     HWND hWnd;

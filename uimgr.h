@@ -9,15 +9,6 @@
 #include "vecmath.h"
 #include "gltools.h"
 
-class UIManager;
-class ViewportManager;
-
-class IButton;
-class IOperation;
-class ITool;
-
-class IWindow;
-
 class UIManager : public Object {
 private:
     List<IButton*> buttons;

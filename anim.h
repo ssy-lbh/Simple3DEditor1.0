@@ -5,9 +5,6 @@
 #include "uimgr.h"
 #include "menu.h"
 
-class IAnimationFunction;
-class AnimationWindow;
-
 class IAnimationFunction {
 public:
     IAnimationFunction();
@@ -20,6 +17,14 @@ class LinearFunc : public IAnimationFunction {
 public:
     LinearFunc();
     virtual ~LinearFunc() override;
+
+    virtual float GetValue(Vector2 p1, Vector2 p2, float val) override;
+};
+
+class SquareFunc : public IAnimationFunction {
+public:
+    SquareFunc();
+    virtual ~SquareFunc() override;
 
     virtual float GetValue(Vector2 p1, Vector2 p2, float val) override;
 };
@@ -94,7 +99,6 @@ private:
 
         SelectTarget selTarget = NONE;
         size_t selIndex;
-        float lastTime;
         Vector2 initialPos;
 
         Menu* funcMenu;

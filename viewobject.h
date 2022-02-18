@@ -2,14 +2,10 @@
 #define __VIEWOBJECT__
 
 #include "list.h"
+#include "geodef.h"
 #include "vecmath.h"
 #include "mesh.h"
 #include "utils.h"
-
-class Transform;
-class AViewObject;
-class MeshObject;
-class BezierCurveObject;
 
 class Transform : public Object {
 public:
@@ -35,9 +31,12 @@ public:
     Transform();
     ~Transform();
 
-    Matrix4x4 GetTransformMatrix();
-    void PushTransformMatrix();
-    void PopTransformMatrix();
+    Quaternion GetRotation();
+    Matrix4x4 GetMatrix();
+    Matrix4x4 GetInvMatrix();
+    void PushMatrix();
+    void PushInvMatrix();
+    void PopMatrix();
 };
 
 //TODO 3D视口中的可视对象，内部继承后可作为网格体、声源、曲线等
@@ -69,6 +68,9 @@ public:
 
     AViewObject* GetParent();
     void SetParent(AViewObject* o);
+
+    Matrix4x4 GetObjectToWorldMatrix();
+    Matrix4x4 GetWorldToObjectMatrix();
 
     // 具体选择什么应取决于选择模式，计划放置于全局数据中
     // 除了网格体，也应有其它类型对象被选中

@@ -541,7 +541,8 @@ Vector3 Quaternion::operator*(Vector3 v) const{
 Quaternion Quaternion::FromTo(Vector3 from, Vector3 to){
     from.Normalize();
     to.Normalize();
-    return Quaternion((from + to).Normal(), 0.0F) / Quaternion(from, 0.0F);
+    //TODO 这地方原理不太明白
+    return -(Quaternion((from + to).Normal(), 0.0F) / Quaternion(from, 0.0F));
 }
 
 Quaternion Quaternion::Reflection(Vector3 axis, Vector3 v){
@@ -563,6 +564,13 @@ Quaternion Quaternion::EulerZXY(float x, float y, float z){
     return  Quaternion::AxisAngle(Vector3::up, y) *
             Quaternion::AxisAngle(Vector3::right, x) *
             Quaternion::AxisAngle(Vector3::forward, z);
+}
+
+Quaternion Quaternion::LookAt(Vector3 dir, Vector3 up){
+    dir.Normalize();
+    Quaternion res = Quaternion::FromTo(Vector3::forward, dir);
+    up -= dir * Vector3::Dot(dir, up);
+    return Quaternion::FromTo(res * Vector3::up, up) * res;
 }
 
 Quaternion Quaternion::Conjugate() const{

@@ -6,7 +6,29 @@
 Transform::Transform(){}
 Transform::~Transform(){}
 
-Matrix4x4 Transform::GetTransformMatrix(){
+Quaternion Transform::GetRotation(){
+    if (rotationMode == ROT_QUATERNION)
+        return rotation.Normal();
+
+    Quaternion rotX = Quaternion::AxisAngle(Vector3::right, rotationXYZ.x);
+    Quaternion rotY = Quaternion::AxisAngle(Vector3::forward, rotationXYZ.y);
+    Quaternion rotZ = Quaternion::AxisAngle(Vector3::up, rotationXYZ.z);
+
+    switch (rotationMode){
+    case ROT_EULER_XYZ: return rotZ * rotY * rotX;
+    case ROT_EULER_XZY: return rotY * rotZ * rotX;
+    case ROT_EULER_YXZ: return rotZ * rotX * rotY;
+    case ROT_EULER_YZX: return rotX * rotZ * rotY;
+    case ROT_EULER_ZXY: return rotY * rotX * rotZ;
+    case ROT_EULER_ZYX: return rotX * rotY * rotZ;
+    }
+
+    DebugError("Transform::GetRotation Unknown Rotation Mode %d", rotationMode);
+
+    return Quaternion::one;
+}
+
+Matrix4x4 Transform::GetMatrix(){
     Matrix4x4 mat = Matrix4x4::identity;
 
     mat._11 = scale.x;
@@ -56,11 +78,60 @@ Matrix4x4 Transform::GetTransformMatrix(){
     return mat;
 }
 
-void Transform::PushTransformMatrix(){
-    GLUtils::PushMatrix(GetTransformMatrix());
+Matrix4x4 Transform::GetInvMatrix(){
+    Matrix4x4 mat = Matrix4x4::identity;
+
+    mat._14 = -position.x;
+    mat._24 = -position.y;
+    mat._34 = -position.z;
+
+    if (rotationMode == ROT_QUATERNION){
+        mat *= -rotation.Normal();
+    }else{
+        Quaternion rotX = Quaternion::AxisAngle(Vector3::right, rotationXYZ.x);
+        Quaternion rotY = Quaternion::AxisAngle(Vector3::forward, rotationXYZ.y);
+        Quaternion rotZ = Quaternion::AxisAngle(Vector3::up, rotationXYZ.z);
+
+        switch (rotationMode){
+        case ROT_EULER_XYZ:
+            mat *= -(rotZ * rotY * rotX);
+            break;
+        case ROT_EULER_XZY:
+            mat *= -(rotY * rotZ * rotX);
+            break;
+        case ROT_EULER_YXZ:
+            mat *= -(rotZ * rotX * rotY);
+            break;
+        case ROT_EULER_YZX:
+            mat *= -(rotX * rotZ * rotY);
+            break;
+        case ROT_EULER_ZXY:
+            mat *= -(rotY * rotX * rotZ);
+            break;
+        case ROT_EULER_ZYX:
+            mat *= -(rotX * rotY * rotZ);
+            break;
+        }
+    }
+
+    float tmp;
+
+    tmp = 1.0f / scale.x; mat._11 *= tmp; mat._12 *= tmp; mat._13 *= tmp;
+    tmp = 1.0f / scale.y; mat._21 *= tmp; mat._22 *= tmp; mat._23 *= tmp;
+    tmp = 1.0f / scale.z; mat._31 *= tmp; mat._32 *= tmp; mat._33 *= tmp;
+
+    return mat;
 }
 
-void Transform::PopTransformMatrix(){
+void Transform::PushMatrix(){
+    GLUtils::PushMatrix(GetMatrix());
+}
+
+void Transform::PushInvMatrix(){
+    GLUtils::PushMatrix(GetInvMatrix());
+}
+
+void Transform::PopMatrix(){
     GLUtils::PopMatrix();
 }
 
@@ -108,6 +179,18 @@ void AViewObject::SetParent(AViewObject* o){
 
 List<AViewObject*>& AViewObject::GetChildren(){
     return children;
+}
+
+Matrix4x4 AViewObject::GetObjectToWorldMatrix(){
+    if (parent)
+        return transform.GetMatrix() * parent->GetObjectToWorldMatrix();
+    return transform.GetMatrix();
+}
+
+Matrix4x4 AViewObject::GetWorldToObjectMatrix(){
+    if (parent)
+        return transform.GetInvMatrix() * parent->GetWorldToObjectMatrix();
+    return transform.GetInvMatrix();
 }
 
 void AViewObject::OnSelect(Vector3 ori, Vector3 dir){}
@@ -160,7 +243,7 @@ void AViewObject::OnAnimationFrame(int frame){
 }
 
 MeshObject::MeshObject() : AViewObject(L"Mesh"){
-    mesh = new Mesh();
+    mesh = new Mesh(this);
 }
 
 MeshObject::~MeshObject(){
@@ -171,7 +254,12 @@ MeshObject::~MeshObject(){
 }
 
 void MeshObject::OnSelect(Vector3 ori, Vector3 dir){
+    Matrix4x4 curMat = transform.GetInvMatrix();
+
+    ori = curMat * Vector4(ori, 1.0f);
+    dir = curMat * Vector4(dir, 0.0f);
     AViewObject::OnSelect(ori, dir);
+
     switch (Main::data->selType){
     case MainData::SELECT_VERTICES:{
         Vertex* v = mesh->Find(ori, dir);
@@ -199,7 +287,12 @@ void MeshObject::OnSelect(Vector3 ori, Vector3 dir){
 }
 
 void MeshObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
+    Matrix4x4 curMat = transform.GetInvMatrix();
+
+    camPos = curMat * Vector4(camPos, 1.0f);
+    camDir = transform.GetRotation() * camDir;
     AViewObject::OnSelect(camPos, camDir, zBound, p1, p2);
+
     switch (Main::data->selType){
     case MainData::SELECT_VERTICES:
         mesh->FindScreenRect(
@@ -235,12 +328,12 @@ Mesh* MeshObject::GetMesh(){
 }
 
 void MeshObject::OnRender(){
-    transform.PushTransformMatrix();
+    transform.PushMatrix();
     AViewObject::OnRender();
 
     mesh->Render();
 
-    transform.PopTransformMatrix();
+    transform.PopMatrix();
 }
 
 void MeshObject::OnRenderUVMap(){
@@ -260,7 +353,12 @@ BezierCurveObject::~BezierCurveObject(){
 }
 
 void BezierCurveObject::OnSelect(Vector3 ori, Vector3 dir){
+    Matrix4x4 curMat = transform.GetInvMatrix();
+
+    ori = curMat * Vector4(ori, 1.0f);
+    dir = curMat * Vector4(dir, 0.0f);
     AViewObject::OnSelect(ori, dir);
+
     bool hit = false;
     for (int i = 0; i < 4; i++){
         if (v[i].Hit(ori, dir)){
@@ -275,7 +373,12 @@ void BezierCurveObject::OnSelect(Vector3 ori, Vector3 dir){
     }
 }
 void BezierCurveObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
+    Matrix4x4 curMat = transform.GetInvMatrix();
+
+    camPos = curMat * Vector4(camPos, 1.0f);
+    camDir = transform.GetRotation() * camDir;
     AViewObject::OnSelect(camPos, camDir, zBound, p1, p2);
+
     bool hit = false;
     for (int i = 0; i < 4; i++){
         if (v[i].Hit(camPos, camDir, zBound, p1, p2)){
@@ -363,7 +466,12 @@ PointLightObject::~PointLightObject(){
 }
 
 void PointLightObject::OnSelect(Vector3 ori, Vector3 dir){
+    Matrix4x4 curMat = transform.GetInvMatrix();
+
+    ori = curMat * Vector4(ori, 1.0f);
+    dir = curMat * Vector4(dir, 0.0f);
     AViewObject::OnSelect(ori, dir);
+
     if (v.Hit(ori, dir)){
         Main::data->selPoints.Add(&v);
         DebugLog("Select Point %f %f %f", v.pos.x, v.pos.y, v.pos.z);
@@ -374,7 +482,12 @@ void PointLightObject::OnSelect(Vector3 ori, Vector3 dir){
 }
 
 void PointLightObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
+    Matrix4x4 curMat = transform.GetInvMatrix();
+
+    camPos = curMat * Vector4(camPos, 1.0f);
+    camDir = transform.GetRotation() * camDir;
     AViewObject::OnSelect(camPos, camDir, zBound, p1, p2);
+
     if (v.Hit(camPos, camDir, zBound, p1, p2)){
         Main::data->selPoints.Add(&v);
         DebugLog("Select Point %f %f %f", v.pos.x, v.pos.y, v.pos.z);
@@ -421,7 +534,12 @@ AudioListenerObject::~AudioListenerObject(){
 }
 
 void AudioListenerObject::OnSelect(Vector3 ori, Vector3 dir){
+    Matrix4x4 curMat = transform.GetInvMatrix();
+
+    ori = curMat * Vector4(ori, 1.0f);
+    dir = curMat * Vector4(dir, 0.0f);
     AViewObject::OnSelect(ori, dir);
+    
     if (v.Hit(ori, dir)){
         Main::data->selPoints.Add(&v);
         DebugLog("Select Point %f %f %f", v.pos.x, v.pos.y, v.pos.z);
@@ -432,7 +550,12 @@ void AudioListenerObject::OnSelect(Vector3 ori, Vector3 dir){
 }
 
 void AudioListenerObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
+    Matrix4x4 curMat = transform.GetInvMatrix();
+
+    camPos = curMat * Vector4(camPos, 1.0f);
+    camDir = transform.GetRotation() * camDir;
     AViewObject::OnSelect(camPos, camDir, zBound, p1, p2);
+
     if (v.Hit(camPos, camDir, zBound, p1, p2)){
         Main::data->selPoints.Add(&v);
         DebugLog("Select Point %f %f %f", v.pos.x, v.pos.y, v.pos.z);

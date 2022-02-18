@@ -1,8 +1,7 @@
 #ifndef __TIMETOOLS__
 #define __TIMETOOLS__
 
-class TimeUtils;
-class TimerManager;
+#include "define.h"
 
 class TimeUtils {
 public:

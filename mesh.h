@@ -3,11 +3,8 @@
 
 #include <windef.h>
 
-#include "geodef.h"
-
 #include "gltools.h"
-
-class Mesh;
+#include "viewobject.h"
 
 class Mesh : public Object {
 private:
@@ -16,9 +13,12 @@ private:
     List<Face*> faces;
 
     GLTexture2D* modeltex = NULL;
+
+    AViewObject* object = NULL;
     
 public:
     Mesh();
+    Mesh(AViewObject* object);
     ~Mesh();
 
     Vertex* Find(Vector3 ori, Vector3 dir);

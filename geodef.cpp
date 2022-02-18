@@ -1,12 +1,29 @@
 #include "geodef.h"
 
 #include "log.h"
+#include "viewobject.h"
 
 Vertex::Vertex(){}
 
 Vertex::Vertex(Vector3 pos) : pos(pos) {}
 
 Vertex::~Vertex(){}
+
+Vector3 Vertex::GetWorldPos(){
+    if (!object)
+        return pos;
+    
+    return object->GetObjectToWorldMatrix() * Vector4(pos, 1.0f);
+}
+
+void Vertex::SetWorldPos(Vector3 pos){
+    if (!object){
+        this->pos = pos;
+        return;
+    }
+
+    this->pos = object->GetWorldToObjectMatrix() * Vector4(pos, 1.0f);
+}
 
 void Vertex::UpdateNormal(){
     Vector3 dir = Vector3::zero;
@@ -197,4 +214,19 @@ void Face::DeleteSelfReferenceExcept(Vertex* v){
     edges.Foreach<Face*>([](Edge* e, Face* f){
         e->DeleteFace(f);
     }, this);
+}
+
+void Face::DeleteSelfReferenceExcept(Edge* e){
+    struct {
+        Edge* e;
+        Face* f;
+    } pack;
+    pack.f = this;
+    pack.e = e;
+    vertices.Foreach<Face*>([](Vertex* v, Face* f){
+        v->DeleteFace(f);
+    }, this);
+    edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* p){
+        if (e != p->e) e->DeleteFace(p->f);
+    }, &pack);
 }

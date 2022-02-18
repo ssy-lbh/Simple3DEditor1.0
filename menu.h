@@ -8,10 +8,6 @@
 
 #define MENUITEM_LAMBDA_TRANS(t) (void(*)(void*))(void(*)(t*))
 
-class IMenuItem;
-class Menu;
-class MenuItem;
-
 class IMenuItem : public Object {
 public:
     enum class ItemType {

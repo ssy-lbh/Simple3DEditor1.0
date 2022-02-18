@@ -2,7 +2,6 @@
 
 #include "main.h"
 #include "font.h"
-#include "timetools.h"
 
 IAnimationFunction::IAnimationFunction(){}
 IAnimationFunction::~IAnimationFunction(){}
@@ -14,6 +13,14 @@ LinearFunc::~LinearFunc(){}
 
 float LinearFunc::GetValue(Vector2 p1, Vector2 p2, float val){
     return Lerp(p1.y, p2.y, GetRate(val, p1.x, p2.x));
+}
+
+SquareFunc::SquareFunc(){}
+SquareFunc::~SquareFunc(){}
+
+float SquareFunc::GetValue(Vector2 p1, Vector2 p2, float val){
+    float rate = GetRate(val, p1.x, p2.x);
+    return Lerp(p1.y, p2.y, rate <= 0.5f ? 2.0f * rate * rate : rate * (-2.0f * rate + 4.0f) - 1.0f);
 }
 
 AnimationWindow::FrameIndicator::FrameIndicator(AnimationWindow* window) : window(window) {
@@ -133,6 +140,9 @@ AnimationWindow::AnimationCurve::AnimationCurve(AnimationWindow* window) : windo
     funcMenu->AddItem(new MenuItem(L"线性", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
         curve->SetFunc(curve->selIndex, new LinearFunc());
     }, this));
+    funcMenu->AddItem(new MenuItem(L"平方", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
+        curve->SetFunc(curve->selIndex, new SquareFunc());
+    }, this));
 }
 
 AnimationWindow::AnimationCurve::~AnimationCurve(){
@@ -163,17 +173,12 @@ void AnimationWindow::AnimationCurve::Click(Vector2 pos){
     seg = GetSegment(Lerp(window->startFrame, window->endFrame, (pos.x + 1.0f) * 0.5f));
     if (seg != -1){
         if (selTarget == SEGMENT && selIndex == seg){
-            if (TimeUtils::GetTime() - lastTime <= 0.5f){
-                // 双击操作
-                Main::SetMenu(funcMenu);
-                return;
-            }
+            Main::SetMenu(funcMenu);
             selTarget = NONE;
             return;
         }
         selTarget = SEGMENT;
         selIndex = seg;
-        lastTime = TimeUtils::GetTime();
         DebugLog("AnimationCurve::Click Select Segment %d", selIndex);
         return;
     }
@@ -328,11 +333,12 @@ void AnimationWindow::OnTimer(int id){
     Main::data->animFrame = frame;
 
     // 测试代码
+    float val = curve->GetValue(frame);
     Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_XYZ;
     Main::data->curObject->transform.rotationXYZ.x = 0.0f;
-    Main::data->curObject->transform.rotationXYZ.y = curve->GetValue(frame) * 360.0f;
+    Main::data->curObject->transform.rotationXYZ.y = val * 360.0f;
     Main::data->curObject->transform.rotationXYZ.z = 0.0f;
-    Main::data->curObject->transform.position.x = 0.0f;
+    Main::data->curObject->transform.position.x = val * 5.0f;
 }
 
 void AnimationWindow::OnResize(int x, int y){

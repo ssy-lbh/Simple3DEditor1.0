@@ -5,8 +5,6 @@
 #include "menu.h"
 #include "gltools.h"
 
-class NodeMapWindow;
-
 class NodeMapWindow : public IWindow {
 private:
     bool focus = false;

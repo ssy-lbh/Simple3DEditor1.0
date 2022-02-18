@@ -2,12 +2,8 @@
 #define __GEODEF__
 
 #include "define.h"
-#include "vecmath.h"
 #include "list.h"
-
-class Vertex;
-class Edge;
-class Face;
+#include "vecmath.h"
 
 class Vertex : public Object {
 public:
@@ -17,12 +13,17 @@ public:
     Vector3 color = Vector3::one;
     List<Edge*> edges;
     List<Face*> faces;
+    AViewObject* object = NULL;
+
+    // 保留的数据，可局部功能使用
     size_t index;
 
     Vertex();
     Vertex(Vector3 pos);
     ~Vertex();
 
+    Vector3 GetWorldPos();
+    void SetWorldPos(Vector3 pos);
     void UpdateNormal();
     void AddEdge(Edge* e);
     void AddFace(Face* f);
@@ -44,6 +45,7 @@ public:
     Vertex* v1;
     Vertex* v2;
     List<Face*> faces;
+    AViewObject* object = NULL;
 
     Edge();
     Edge(Vertex* v1, Vertex* v2);
@@ -64,6 +66,7 @@ public:
     Vector3 normal;
     List<Vertex*> vertices;
     List<Edge*> edges;
+    AViewObject* object = NULL;
 
     Face();
     ~Face();
@@ -77,6 +80,7 @@ public:
     bool DeleteEdge(Edge* e);
     void DeleteSelfReference();
     void DeleteSelfReferenceExcept(Vertex* v);
+    void DeleteSelfReferenceExcept(Edge* e);
 };
 
 #endif

@@ -76,7 +76,7 @@ void MainWindow::MoveOperation::OnEnter(){
     start = main->cursorPos;
     if (Main::data->selPoints.Size() > 0){
         Main::data->selPoints.Foreach<MoveOperation*>([](Vertex* v, MoveOperation* op){
-            op->moveInfo.Add({v, v->pos});
+            op->moveInfo.Add({v, v->GetWorldPos()});
         }, this);
     }
 }
@@ -89,7 +89,7 @@ void MainWindow::MoveOperation::OnMove(){
         delta = main->camRight * mov.x * main->aspect + main->camUp * mov.y;
         delta = Vector3(x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
         moveInfo.Foreach<Vector3*>([](MoveInfo info, Vector3* offset){
-            info.vert->pos = info.pos + *offset;
+            info.vert->SetWorldPos(info.pos + *offset);
         }, &delta);
         DebugLog("MoveOperation OnMove %f %f %f", x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
     }
@@ -102,7 +102,7 @@ void MainWindow::MoveOperation::OnConfirm(){
 void MainWindow::MoveOperation::OnUndo(){
     DebugLog("MoveOperation OnUndo");
     moveInfo.Foreach([](MoveInfo info){
-        info.vert->pos = info.pos;
+        info.vert->SetWorldPos(info.pos);
     });
 }
 
@@ -144,7 +144,7 @@ void MainWindow::ExcludeOperation::OnEnter(){
     }
     if (Main::data->selPoints.Size() > 0){
         Main::data->selPoints.Foreach<ExcludeOperation*>([](Vertex* v, ExcludeOperation* op){
-            op->moveInfo.Add({v, v->pos});
+            op->moveInfo.Add({v, v->GetWorldPos()});
         }, this);
     }
 }
@@ -157,7 +157,7 @@ void MainWindow::ExcludeOperation::OnMove(){
         delta = main->camRight * mov.x * main->aspect + main->camUp * mov.y;
         delta = Vector3(x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
         moveInfo.Foreach<Vector3*>([](MoveInfo info, Vector3* offset){
-            info.vert->pos = info.pos + *offset;
+            info.vert->SetWorldPos(info.pos + *offset);
         }, &delta);
         DebugLog("ExcludeOperation OnMove %f %f %f", x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
     }
@@ -194,13 +194,14 @@ MainWindow::RotateOperation::~RotateOperation(){}
 
 void MainWindow::RotateOperation::OnEnter(){
     DebugLog("RotateOperation OnEnter");
-    x = y = z = true;
+    mode = MODE_CAMERA;
     start = main->cursorPos;
     center = Vector3::zero;
     if (Main::data->selPoints.Size() > 0){
         Main::data->selPoints.Foreach<RotateOperation*>([](Vertex* v, RotateOperation* op){
-            op->rotateInfo.Add({v, v->pos});
-            op->center += v->pos;
+            Vector3 pos = v->GetWorldPos();
+            op->rotateInfo.Add({v, pos});
+            op->center += pos;
         }, this);
         center /= Main::data->selPoints.Size();
         screenCenter = main->GetScreenPosition(center);
@@ -210,17 +211,25 @@ void MainWindow::RotateOperation::OnEnter(){
 
 void MainWindow::RotateOperation::OnMove(){
     if (rotateInfo.Size() > 0){
-        Vector3 rotateVec = main->camForward * ((main->cursorPos - screenCenter).Magnitude() - dis);
-        rotateVec = Vector3(x ? rotateVec.x : 0.0f, y ? rotateVec.y : 0.0f, z ? rotateVec.z : 0.0f);
-        if (rotateVec.SqrMagnitude() > 0.0f){
+        Vector3 rotateVec;
+        float delta = (main->cursorPos - screenCenter).Magnitude() - dis;
+        
+        switch (mode){
+        case MODE_CAMERA: rotateVec = main->camForward * delta; break;
+        case MODE_X: rotateVec = Vector3(delta, 0.0f, 0.0f); break;
+        case MODE_Y: rotateVec = Vector3(0.0f, delta, 0.0f); break;
+        case MODE_Z: rotateVec = Vector3(0.0f, 0.0f, delta); break;
+        }
+
+        if (Abs(delta) > 0.0f){
             rotate = Quaternion::AxisAngle(rotateVec.Normal(), rotateVec.Magnitude() * 360.0f);
         }else{
             rotate = Quaternion::one;
         }
         rotateInfo.Foreach<RotateOperation*>([](RotateInfo info, RotateOperation* op){
-            info.vert->pos = op->center + op->rotate * (info.pos - op->center);
+            info.vert->SetWorldPos(op->center + op->rotate * (info.pos - op->center));
         }, this);
-        DebugLog("RotateOperation Rotate %f %f %f", x ? rotateVec.x : 0.0f, y ? rotateVec.y : 0.0f, z ? rotateVec.z : 0.0f);
+        DebugLog("RotateOperation Rotate %f %f %f", rotateVec.x, rotateVec.y, rotateVec.z);
     }
 }
 
@@ -231,18 +240,18 @@ void MainWindow::RotateOperation::OnConfirm(){
 void MainWindow::RotateOperation::OnUndo(){
     DebugLog("RotateOperation OnUndo");
     rotateInfo.Foreach([](RotateInfo info){
-        info.vert->pos = info.pos;
+        info.vert->SetWorldPos(info.pos);
     });
 }
 
 void MainWindow::RotateOperation::OnCommand(int id){
     switch (id){
-    case IDM_OP_X: x = true; y = z = false; break;
-    case IDM_OP_Y: y = true; z = x = false; break;
-    case IDM_OP_Z: z = true; x = y = false; break;
-    case IDM_OP_PLANE_X: x = false; y = z = true; break;
-    case IDM_OP_PLANE_Y: y = false; z = x = true; break;
-    case IDM_OP_PLANE_Z: z = false; x = y = true; break;
+    case IDM_OP_X: mode = MODE_X; break;
+    case IDM_OP_Y: mode = MODE_Y; break;
+    case IDM_OP_Z: mode = MODE_Z; break;
+    case IDM_OP_PLANE_X: mode = MODE_X; break;
+    case IDM_OP_PLANE_Y: mode = MODE_Y; break;
+    case IDM_OP_PLANE_Z: mode = MODE_Z; break;
     }
 }
 
@@ -256,8 +265,9 @@ void MainWindow::SizeOperation::OnEnter(){
     center = Vector3::zero;
     if (Main::data->selPoints.Size() > 0){
         Main::data->selPoints.Foreach<SizeOperation*>([](Vertex* v, SizeOperation* op){
-            op->sizeInfo.Add({v, v->pos});
-            op->center += v->pos;
+            Vector3 pos = v->GetWorldPos();
+            op->sizeInfo.Add({v, pos});
+            op->center += pos;
         }, this);
         center /= Main::data->selPoints.Size();
         screenCenter = main->GetScreenPosition(center);
@@ -270,11 +280,11 @@ void MainWindow::SizeOperation::OnMove(){
         scale = (main->cursorPos - screenCenter).Magnitude() / startSize;
         sizeInfo.Foreach<SizeOperation*>([](SizeInfo info, SizeOperation* op){
             Vector3 res = op->center + (info.pos - op->center) * op->scale;
-            info.vert->pos = Vector3(
+            info.vert->SetWorldPos(Vector3(
                 op->x ? res.x : info.pos.x,
                 op->y ? res.y : info.pos.y,
                 op->z ? res.z : info.pos.z
-            );
+            ));
         }, this);
         DebugLog("SizeOperation Scale %f", scale);
     }
@@ -287,7 +297,7 @@ void MainWindow::SizeOperation::OnConfirm(){
 void MainWindow::SizeOperation::OnUndo(){
     DebugLog("SizeOperation OnUndo");
     sizeInfo.Foreach([](SizeInfo info){
-        info.vert->pos = info.pos;
+        info.vert->SetWorldPos(info.pos);
     });
 }
 
@@ -306,8 +316,9 @@ MainWindow::EmptyTool::EmptyTool(MainWindow* window) : window(window) {}
 MainWindow::EmptyTool::~EmptyTool(){}
 
 void MainWindow::EmptyTool::OnLeftDown(){
-    if (Main::data->curObject)
+    if (Main::data->curObject){
         Main::data->curObject->OnSelect(window->camPos, window->cursorDir);
+    }
 }
 
 MainWindow::SelectTool::SelectTool(MainWindow* window) : window(window) {}
@@ -325,13 +336,14 @@ void MainWindow::SelectTool::OnLeftUp(){
         Main::data->selPoints.Clear();
         return;
     }
-    //TODO 等待实现范围框选
-    Main::data->curObject->OnSelect(
-        window->camPos, window->camDir,
-        Vector2(window->camDis * 0.02, window->camDis * 20.0),
-        Vector2(start.x * window->aspect, start.y),
-        Vector2(end.x * window->aspect, end.y)
-    );
+    if (Main::data->curObject){
+        Main::data->curObject->OnSelect(
+            window->camPos, window->camDir,
+            Vector2(window->camDis * 0.02, window->camDis * 20.0),
+            Vector2(start.x * window->aspect, start.y),
+            Vector2(end.x * window->aspect, end.y)
+        );
+    }
 }
 
 void MainWindow::SelectTool::OnMove(){
@@ -544,7 +556,8 @@ void MainWindow::RenderModelView(){
     glColor3f(1.0f, 1.0f, 0.0f);
     glBegin(GL_POINTS);
     Main::data->selPoints.Foreach([](Vertex* p){
-        glVertex3f(p->pos.x, p->pos.y, p->pos.z);
+        Vector3 pos = p->GetWorldPos();
+        glVertex3f(pos.x, pos.y, pos.z);
     });
     glEnd();
     glDisable(GL_POINT_SMOOTH);
@@ -556,8 +569,10 @@ void MainWindow::RenderModelView(){
     glColor3f(1.0f, 1.0f, 0.0f);
     glBegin(GL_LINES);
     Main::data->selEdges.Foreach([](Edge* p){
-        glVertex3f(p->v1->pos.x, p->v1->pos.y, p->v1->pos.z);
-        glVertex3f(p->v2->pos.x, p->v2->pos.y, p->v2->pos.z);
+        Vector3 pos = p->v1->GetWorldPos();
+        glVertex3f(pos.x, pos.y, pos.z);
+        pos = p->v2->GetWorldPos();
+        glVertex3f(pos.x, pos.y, pos.z);
     });
     glEnd();
     glLineWidth(1.0f);

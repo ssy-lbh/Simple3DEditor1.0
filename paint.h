@@ -5,13 +5,11 @@
 #include "menu.h"
 #include "geodef.h"
 
-class Texture1D;
-class Texture2D;
-class Texture3D;
-class RenderTexture;
-
-class UVEditWindow;
-class PaintWindow;
+//TODO 待实现
+// class Texture1D;
+// class Texture2D;
+// class Texture3D;
+// class RenderTexture;
 
 class UVEditWindow : public IWindow {
 private:

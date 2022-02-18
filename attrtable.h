@@ -10,9 +10,6 @@ enum class AttributeType {
     BOOLEAN
 };
 
-class Attribute;
-class AttributeTable;
-
 class Attribute : public IButton {
 private:
     AttributeType type;

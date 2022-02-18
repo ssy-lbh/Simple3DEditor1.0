@@ -30,12 +30,6 @@
 #define ToRadian(x) ((x) * 0.017453292519f)
 #define ToAngle(x) ((x) * 57.29577951308f)
 
-class Vector2;
-class Vector3;
-class Vector4;
-class Quaternion;
-class Matrix4x4;
-
 class Vector2 : public Object {
 public:
     float x;
@@ -253,11 +247,12 @@ public:
     Quaternion operator-() const;
     Vector3 operator*(Vector3) const;
 
-    static Quaternion FromTo(Vector3, Vector3);
-    static Quaternion Reflection(Vector3, Vector3);
+    static Quaternion FromTo(Vector3 from, Vector3 to);
+    static Quaternion Reflection(Vector3 axis, Vector3 v);
     static Quaternion AxisAngle(Vector3, float);
     static Quaternion EulerZXY(float, float, float);
     static Quaternion EulerZXY(Vector3);
+    static Quaternion LookAt(Vector3 dir, Vector3 up);
 
     Quaternion Conjugate() const;
     Quaternion Inverse() const;

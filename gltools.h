@@ -5,9 +5,6 @@
 
 #include "vecmath.h"
 
-class GLUtils;
-class GLTexture2D;
-
 class GLUtils : public Object {
 public:
     // 画圆弧角

@@ -3,9 +3,6 @@
 
 #include "define.h"
 
-class String;
-class WString;
-
 class String : public Object {
 protected:
     char* str;

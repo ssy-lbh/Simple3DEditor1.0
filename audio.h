@@ -12,10 +12,6 @@
 
 #include "soundtouch/SoundTouch.h"
 
-class AudioUtils;
-class AudioPlayerWindow;
-class AudioCaptureWindow;
-
 class AudioUtils : public Object {
 public:
     static bool init;

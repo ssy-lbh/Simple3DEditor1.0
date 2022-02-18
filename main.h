@@ -10,17 +10,10 @@
 #include <gl/gl.h>
 #include <gl/glu.h>
 
-#include "geodef.h"
 #include "menu.h"
-#include "mesh.h"
 #include "container.h"
 #include "colorboard.h"
 #include "viewobject.h"
-
-class IUndo;
-class MainWindow;
-class MainData;
-class Main;
 
 //TODO 补全撤销功能
 class IUndo : public Object {
@@ -143,9 +136,16 @@ private:
             Vector3 pos;
         };
 
+        enum RotateMode {
+            MODE_CAMERA,
+            MODE_X,
+            MODE_Y,
+            MODE_Z
+        };
+
         Vector2 start;
         List<RotateInfo> rotateInfo;
-        bool x, y, z;
+        RotateMode mode;
         MainWindow* main;
         Vector3 center;
         Vector2 screenCenter;
