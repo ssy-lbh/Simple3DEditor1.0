@@ -807,17 +807,11 @@ AudioCaptureWindow::~AudioCaptureWindow(){
     DebugLog("AudioCaptureWindow Destroyed");
     if (uiMgr) delete uiMgr;
     if (capBuf) delete (short*)capBuf;
+    if (recBuf) delete (short*)recBuf;
     if (freqBuf) delete freqBuf;
 
     if (capDev){
         alcCaptureCloseDevice(capDev);
-    }
-
-    if (playBuf){
-        alSourceStop(alSrc);
-        alDeleteSources(1, &alSrc);
-        alDeleteBuffers(1 << queueBit, alBuf);
-        delete[] playBuf;
     }
 
     if (soundTouch){
@@ -1040,15 +1034,12 @@ void AudioCaptureWindow::Launch(){
     if (!recBuf){
         recBuf = new short[1 << bit];
         memset(recBuf, 0, 1 << (bit + 1));
-    }
-    if (!freqBuf) freqBuf = new _Complex float[1 << bit];
-    if (!playBuf){
+
         alGenSources(1, &alSrc);
         alGenBuffers(1 << queueBit, alBuf);
-        playBuf = new short[1 << bit];
-
         alSourcePlay(alSrc);
     }
+    if (!freqBuf) freqBuf = new _Complex float[1 << bit];
 
     alcCaptureStart(capDev);
     capture = true;

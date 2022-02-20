@@ -211,7 +211,6 @@ private:
     ALvoid* recBuf = NULL;
     ALint recOffset = 0;
     _Complex float* freqBuf = NULL;
-    soundtouch::SAMPLETYPE* playBuf = NULL;
 
     bool capture = false;
 
