@@ -468,8 +468,6 @@ bool Mesh::EnableTexture(){
 }
 
 bool Mesh::DisableTexture(){
-    if (!modeltex)
-        return false;
-    modeltex->Disable();
+    GLTexture2D::Disable();
     return true;
 }

@@ -3,6 +3,8 @@
 
 #include "define.h"
 
+#include <handleapi.h>
+
 class String : public Object {
 protected:
     char* str;
@@ -111,6 +113,33 @@ public:
     size_t Spilt(wchar_t c, WString* arr, size_t len) const;
     size_t Split(const wchar_t* s, WString* arr, size_t len) const;
     size_t Split(const WString s, WString* arr, size_t len) const;
+};
+
+// 设计中
+class File : public Object {
+private:
+    HANDLE hFile = INVALID_HANDLE_VALUE;
+
+public:
+    File();
+    File(File &&);
+    File(const File &);
+    File &operator=(File &&);
+    File &operator=(const File &);
+    File(const char* path);
+    File(const wchar_t* path);
+    File(String path);
+    File(WString path);
+    ~File();
+
+    bool Exist();
+    bool Create();
+    bool Delete();
+    size_t Read(void* buffer, size_t size);
+    size_t Write(const void* buffer, size_t size);
+    size_t GetPointer();
+    void SetPointer();
+    size_t GetSize();
 };
 
 #endif

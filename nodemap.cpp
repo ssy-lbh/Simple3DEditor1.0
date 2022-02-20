@@ -173,9 +173,8 @@ void NodeMapWindow::OnRender(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    if (!bktex){
+    if (!bktex)
         bktex = new GLTexture2D(IDB_NODEMAP_BACKGROUND);
-    }
     bktex->Enable();
     glColor3f(0.5f, 0.5f, 0.5f);
     glBegin(GL_TRIANGLE_FAN);
@@ -202,11 +201,13 @@ void NodeMapWindow::OnRender(){
 void NodeMapWindow::OnClose(){}
 
 void NodeMapWindow::OnChar(char c){
+    //DebugLog("NodeMapWindow::OnChar");
     uiMgr->Char(c);
     nodeMgr->Char(c);
 }
 
 void NodeMapWindow::OnUnichar(wchar_t c){
+    //DebugLog("NodeMapWindow::OnUnichar");
     uiMgr->Unichar(c);
     nodeMgr->Unichar(c);
 }

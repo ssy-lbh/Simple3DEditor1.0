@@ -57,6 +57,7 @@ private:
         float radius;
         Vector3 start;
         MainWindow* main;
+        GLTexture2D* texture = NULL;
 
     public:
         MoveButton(Vector2 center, float radius, MainWindow* main);
@@ -345,6 +346,9 @@ public:
     IWindow* mainFrame = NULL;
 
     bool reqRender = false;
+    bool cursorSelected = false;
+
+    char leadChar = 0;
 
     Main();
     ~Main();

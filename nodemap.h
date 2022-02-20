@@ -19,7 +19,7 @@ private:
 
     Menu* basicMenu;
 
-    GLTexture2D* bktex;
+    GLTexture2D* bktex = NULL;
 
     class MoveButton : public IButton {
     private:

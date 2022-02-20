@@ -52,6 +52,7 @@ IDS_BRUSH_RGB_AVERAGE SHADER    "res/shader/brush_rgb_average.comp"
 
 IDB_EARTH_WATER BITMAP          "res/texture/earth_water.bmp"
 IDB_NODEMAP_BACKGROUND BITMAP   "res/texture/nodemap_background.bmp"
+IDB_BUTTON_MOVE BITMAP          "res/texture/btn_move.bmp"
 
 IDC_MENU MENU
 BEGIN

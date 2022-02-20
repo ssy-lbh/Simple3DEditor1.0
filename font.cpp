@@ -34,10 +34,10 @@ void glDrawCNString(const char* text){
     size_t wlen = 0;
     wchar_t* wstr;
 
-    wlen = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, text, -1, NULL, 0);
+    wlen = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, text, -1, NULL, 0);
 
     wstr = new wchar_t[wlen + 1];
-    MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, text, -1, wstr, wlen);
+    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, text, -1, wstr, wlen);
     wstr[wlen] = L'\0';
 
     glDrawCNString(wstr);
@@ -60,22 +60,42 @@ void glDrawCNString(const wchar_t* text){
     glDeleteLists(font, 1);
 }
 
-int glGetStringWidth(const char* text){
+float glGetStringWidth(const char* text){
     HDC hDC = wglGetCurrentDC();
     size_t len = strlen(text);
     SIZE size;
     
     GetTextExtentPoint32A(hDC, text, len, &size);
 
-    return size.cx;
+    return (float)size.cx;
 }
 
-int glGetCNStringWidth(const wchar_t* text){
+float glGetCNStringWidth(const wchar_t* text){
     HDC hDC = wglGetCurrentDC();
     size_t len = wcslen(text);
     SIZE size;
     
     GetTextExtentPoint32W(hDC, text, len, &size);
 
-    return size.cx;
+    return (float)size.cx;
+}
+
+float glGetStringHeight(const char* text){
+    HDC hDC = wglGetCurrentDC();
+    size_t len = strlen(text);
+    SIZE size;
+    
+    GetTextExtentPoint32A(hDC, text, len, &size);
+
+    return (float)size.cy;
+}
+
+float glGetCNStringHeight(const wchar_t* text){
+    HDC hDC = wglGetCurrentDC();
+    size_t len = wcslen(text);
+    SIZE size;
+    
+    GetTextExtentPoint32W(hDC, text, len, &size);
+
+    return (float)size.cy;
 }

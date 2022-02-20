@@ -12,6 +12,8 @@
 
 #include "soundtouch/SoundTouch.h"
 
+#define alCheckError(tag) AudioUtils::CheckALError(tag, __FILE__, __LINE__)
+
 class AudioUtils : public Object {
 public:
     static bool init;
@@ -65,6 +67,8 @@ private:
     int alChannels;
     /* audio data */
     void* alAudioData;
+
+    bool displayWave = false;
 
     class PlayButton : public IButton {
     private:
@@ -128,11 +132,26 @@ private:
         virtual void OnClick() override;
     };
 
+    class DisplayModeItem : public IMenuItem {
+    private:
+        AudioPlayerWindow* window;
+
+    public:
+        DisplayModeItem(AudioPlayerWindow* window);
+        virtual ~DisplayModeItem() override;
+
+        virtual const wchar_t* GetName() override;
+
+        virtual void OnClick() override;
+    };
+
 public:
     AudioPlayerWindow();
     virtual ~AudioPlayerWindow() override;
 
-    void RenderFreqGraph();
+    void DrawLineGraph(float* height, size_t size);
+    void DrawAmplitudeGraph(float* height, size_t size);
+    void RenderGraph();
 
     virtual bool IsFocus() override;
     virtual void OnRender() override;
@@ -188,6 +207,9 @@ private:
 
     ALCdevice* capDev = NULL;
     ALvoid* capBuf = NULL;
+    ALint capOffset = 0;
+    ALvoid* recBuf = NULL;
+    ALint recOffset = 0;
     _Complex float* freqBuf = NULL;
     soundtouch::SAMPLETYPE* playBuf = NULL;
 
@@ -198,6 +220,9 @@ private:
     int head = 0, tail = 0;
 
     soundtouch::SoundTouch* soundTouch = NULL;
+
+    bool displayWave = false;
+    int ratio = 1;
 
     class ProgressBar : public IButton {
     private:
@@ -231,9 +256,25 @@ private:
         virtual void OnClick() override;
     };
 
+    class DisplayModeItem : public IMenuItem {
+    private:
+        AudioCaptureWindow* window;
+
+    public:
+        DisplayModeItem(AudioCaptureWindow* window);
+        virtual ~DisplayModeItem() override;
+
+        virtual const wchar_t* GetName() override;
+
+        virtual void OnClick() override;
+    };
+
 public:
     AudioCaptureWindow();
     virtual ~AudioCaptureWindow() override;
+
+    void ProcessInput();
+    void ProcessOutput();
 
     virtual bool IsFocus() override;
     virtual void OnRender() override;

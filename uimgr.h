@@ -60,6 +60,9 @@ public:
     Vector2 GetClientSize();
     RECT CalculateChildRect(float left, float right, float bottom, float top);
     void PushChildViewport(float left, float right, float bottom, float top);
+    void SetScissor(RECT rect);
+    void SetChildScissor(float left, float right, float bottom, float top);
+    void ResetScissor();
 };
 
 //TODO 按钮在触发按下后持续生效到停止
@@ -87,7 +90,7 @@ private:
 
     GLTexture2D* texture = NULL;
     void(*onClick)(void*) = NULL;
-    void* user = NULL;
+    void* userData = NULL;
 
 public:
     IconButton(Vector2 position, Vector2 size);
@@ -110,6 +113,8 @@ private:
     // 左上角位置
     Vector2 position;
     Vector2 size;
+    // 意为半径占高度的比例
+    float radius = 0.0f;
     Vector3 bkColor = Vector3::zero;
     Vector3 fontColor = Vector3::one;
     Vector3 selColor = Vector3(0.0f, 0.0f, 1.0f);
@@ -118,8 +123,13 @@ private:
     bool editing = false;
     size_t editPos;
 
+    void(*onEdit)(char*, void*) = NULL;
+    void* userData = NULL;
+
 public:
-    UIEditA(Vector2 pos, Vector2 size);
+    UIEditA(Vector2 pos, float width);
+    UIEditA(Vector2 pos, float width, void(*onEdit)(char*, void*));
+    UIEditA(Vector2 pos, float width, void(*onEdit)(char*, void*), void* userData);
     virtual ~UIEditA();
 
     virtual bool Trigger(Vector2 pos) override;
@@ -129,12 +139,61 @@ public:
     virtual bool Char(char c) override;
     virtual void Render() override;
 
+    char* GetText();
+    size_t GetTextMaxLength();
+
     void SetBackgroundColor(Vector3 color);
     void SetFontColor(Vector3 color);
     void SetSelectionColor(Vector3 color);
+    void SetCornerRadius(float radius);
     Vector3 GetBackgroundColor();
     Vector3 GetFontColor();
     Vector3 GetSelectionColor();
+    float GetCornerRadius();
+};
+
+class UIEditW : public IButton {
+private:
+    // 左上角位置
+    Vector2 position;
+    Vector2 size;
+    // 意为半径占高度的比例
+    float radius = 0.0f;
+    Vector3 bkColor = Vector3::zero;
+    Vector3 fontColor = Vector3::one;
+    Vector3 selColor = Vector3(0.0f, 0.0f, 1.0f);
+
+    wchar_t text[MAX_PATH + 1];
+    bool editing = false;
+    size_t editPos;
+
+    void(*onEdit)(wchar_t*, void*) = NULL;
+    void* userData = NULL;
+
+public:
+    UIEditW(Vector2 pos, float width);
+    UIEditW(Vector2 pos, float width, void(*onEdit)(wchar_t*, void*));
+    UIEditW(Vector2 pos, float width, void(*onEdit)(wchar_t*, void*), void* userData);
+    virtual ~UIEditW();
+
+    virtual bool Trigger(Vector2 pos) override;
+    virtual void Hover() override;
+    virtual void Click(Vector2 pos) override;
+    virtual void Leave() override;
+    virtual bool Unichar(wchar_t c) override;
+    virtual void Render() override;
+
+    wchar_t* GetText();
+    size_t GetTextMaxLength();
+
+    void SetBackgroundColor(Vector3 color);
+    void SetFontColor(Vector3 color);
+    void SetSelectionColor(Vector3 color);
+    void SetCornerRadius(float radius);
+    Vector3 GetBackgroundColor();
+    Vector3 GetFontColor();
+    Vector3 GetSelectionColor();
+    float GetCornerRadius();
 };
 
 class IOperation : public Object {

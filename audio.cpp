@@ -30,14 +30,14 @@ bool AudioUtils::CheckALError(const char* tag, const char* file, int line){
 	for (ALenum error = alGetError(); loopCnt < 32 && error != AL_NO_ERROR; error = alGetError(), ++loopCnt){
 		const char* pMsg;
 		switch (error){
-		case AL_INVALID_NAME: pMsg = "invalid name"; break;
-		case AL_INVALID_ENUM: pMsg = "invalid enum"; break;
-		case AL_INVALID_VALUE: pMsg = "invalid value"; break;
-		case AL_INVALID_OPERATION: pMsg = "invalid operation"; break;
-		case AL_OUT_OF_MEMORY: pMsg = "out of memory"; break;
-		default: pMsg = "unknown error";
+		case AL_INVALID_NAME: pMsg = "Invalid name"; break;
+		case AL_INVALID_ENUM: pMsg = "Invalid enum"; break;
+		case AL_INVALID_VALUE: pMsg = "Invalid value"; break;
+		case AL_INVALID_OPERATION: pMsg = "Invalid operation"; break;
+		case AL_OUT_OF_MEMORY: pMsg = "Out of memory"; break;
+		default: pMsg = "Unknown Error";
 		}
-		__builtin_printf("[OpenAL Error] %s %s(0x%x) at %s:%d\n", tag, pMsg, error, file, line);
+		DebugError("[OpenAL Error] %s %s(0x%x) at %s:%d\n", tag, pMsg, error, file, line);
 	}
 	return loopCnt != 0;
 }
@@ -236,6 +236,18 @@ void AudioPlayerWindow::LoopItem::OnClick(){
     DebugLog("AudioPlayerWindow::LoopItem State %s", loop ? "Looping" : "Default");
 }
 
+AudioPlayerWindow::DisplayModeItem::DisplayModeItem(AudioPlayerWindow* window) : window(window) {}
+AudioPlayerWindow::DisplayModeItem::~DisplayModeItem(){}
+
+const wchar_t* AudioPlayerWindow::DisplayModeItem::GetName(){
+    return window->displayWave ? L"显示模式:波形" : L"显示模式:频谱";
+}
+
+void AudioPlayerWindow::DisplayModeItem::OnClick(){
+    window->displayWave = !window->displayWave;
+    DebugLog("AudioPlayerWindow::DisplayModeItem State %s", window->displayWave ? "Wave" : "Frequency");
+}
+
 AudioPlayerWindow::AudioPlayerWindow(){
     DebugLog("AudioPlayerWindow Launched");
 
@@ -252,6 +264,7 @@ AudioPlayerWindow::AudioPlayerWindow(){
         window->OnMenuAccel(IDM_LOAD, false);
     }, this));
     basicMenu->AddItem(new LoopItem(this));
+    basicMenu->AddItem(new DisplayModeItem(this));
 
     path[0] = L'\0';
 }
@@ -273,35 +286,75 @@ bool AudioPlayerWindow::IsFocus(){
     return focus;
 }
 
-void AudioPlayerWindow::RenderFreqGraph(){
+void AudioPlayerWindow::DrawLineGraph(float* height, size_t size){
+    glDisable(GL_LINE_SMOOTH);
+    glLineWidth(1.0f);
+    glBegin(GL_LINE_STRIP);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    for (int i = 0; i < size; i++){
+        float rate = i / (float)size;
+        glVertex2f(rate * 2.0f - 1.0f, height[i]);
+    }
+    glEnd();
+}
+
+void AudioPlayerWindow::DrawAmplitudeGraph(float* height, size_t size){
+    glDisable(GL_LINE_SMOOTH);
+    glLineWidth(1.0f);
+    glBegin(GL_LINES);
+    for (int i = 0; i < size; i++){
+        float rate = i / (float)size;
+        if (height[i] > 0.0f){
+            glColor3f(rate, 1.0f - rate, 0.0f);
+            glVertex2f(rate * 2.0f - 1.0f, 0.0f);
+            glVertex2f(rate * 2.0f - 1.0f, height[i]);
+        }
+    }
+    glEnd();
+}
+
+void AudioPlayerWindow::RenderGraph(){
     const int bit = 12;
     int offset;
 
+    _Complex float samples[1 << bit];
+    float height[1 << 10];
+
     alGetSourcei(alSrc, AL_SAMPLE_OFFSET, &offset);
 
-    if (alSampleSize == 4 && alChannels == 2){
-        if (offset + (1 << bit) >= alAudioSize){
-            return;
-        }
-        _Complex float samples[1 << bit];
+    if (offset + (1 << bit) >= alAudioSize){
+        return;
+    }
 
+    if (alSampleSize == 4 && alChannels == 2){
         for (int i = 0; i < (1 << bit); i++){
             samples[i] = ((short*)alAudioData)[(i + offset) << 1];
         }
-        AudioUtils::FFT(samples, bit, false);
-        glDisable(GL_LINE_SMOOTH);
-        glLineWidth(1.0f);
-        glBegin(GL_LINES);
-        for (int i = 0; i < 1024; i++){
-            float rate = i / 1024.0f;
-            float amp = __builtin_log(AudioUtils::Complex(samples[i << (bit - 10)]).MagnitudeSqr()) * 0.1f;
-            if (amp > 0.0f){
-                glColor3f(rate, 1.0f - rate, 0.0f);
-                glVertex2f(rate * 2.0f - 1.0f, 0.0f);
-                glVertex2f(rate * 2.0f - 1.0f, amp);
-            }
+    }else if (alSampleSize == 2 && alChannels == 1){
+        for (int i = 0; i < (1 << bit); i++){
+            samples[i] = ((short*)alAudioData)[i + offset];
         }
-        glEnd();
+    }else if (alSampleSize == 2 && alChannels == 2){
+        for (int i = 0; i < (1 << bit); i++){
+            samples[i] = ((short)(((char*)alAudioData)[(i + offset) << 1] - 0x80) << 8);
+        }
+    }else if (alSampleSize == 1 && alChannels == 1){
+        for (int i = 0; i < (1 << bit); i++){
+            samples[i] = ((short)(((char*)alAudioData)[i + offset] - 0x80) << 8);
+        }
+    }
+
+    if (displayWave){
+        for (int i = 0; i < (1 << 10); i++){
+            height[i] = AudioUtils::Complex(samples[i << (bit - 10)]).real * 0.0000152587890625f + 0.5f;
+        }
+        DrawLineGraph(height, 1 << 10);
+    }else{
+        AudioUtils::FFT(samples, bit, false);
+        for (int i = 0; i < (1 << 10); i++){
+            height[i] = __builtin_log(AudioUtils::Complex(samples[i << (bit - 10)]).MagnitudeSqr()) * 0.1f;
+        }
+        DrawAmplitudeGraph(height, 1 << 10);
     }
 }
 
@@ -330,7 +383,7 @@ void AudioPlayerWindow::OnRender(){
         return;
     }
 
-    RenderFreqGraph();
+    RenderGraph();
 
     uiMgr->Render();
 
@@ -688,22 +741,20 @@ void AudioCaptureWindow::ProgressBar::Leave(){
 }
 
 void AudioCaptureWindow::ProgressBar::Render(){
-    if (window->capture){
-        glLineWidth(10.0f);
-        glColor3f(0.6f, 0.6f, 0.6f);
-        glBegin(GL_LINES);
-        glVertex2f(0.9f, -0.8f);
-        glVertex2f(0.9f, 0.8f);
-        glEnd();
-        glLineWidth(1.0f);
+    glLineWidth(10.0f);
+    glColor3f(0.6f, 0.6f, 0.6f);
+    glBegin(GL_LINES);
+    glVertex2f(0.9f, -0.8f);
+    glVertex2f(0.9f, 0.8f);
+    glEnd();
+    glLineWidth(1.0f);
 
-        if (hover){
-            glColor3f(0.0f, 0.0f, 0.3f);
-        }else{
-            glColor3f(0.0f, 0.0f, 0.5f);
-        }
-        GLUtils::DrawRect(0.8f, pos - 0.05f, 1.0f, pos + 0.05f);
+    if (hover){
+        glColor3f(0.0f, 0.0f, 0.3f);
+    }else{
+        glColor3f(0.0f, 0.0f, 0.5f);
     }
+    GLUtils::DrawRect(0.8f, pos - 0.05f, 1.0f, pos + 0.05f);
 }
 
 AudioCaptureWindow::CaptureItem::CaptureItem(AudioCaptureWindow* window) : window(window) {}
@@ -716,6 +767,18 @@ const wchar_t* AudioCaptureWindow::CaptureItem::GetName(){
 void AudioCaptureWindow::CaptureItem::OnClick(){
     window->capture ? window->Stop() : window->Launch();
     DebugLog("AudioCaptureWindow::CaptureItem State %s", window->capture ? "Capturing" : "Stopped");
+}
+
+AudioCaptureWindow::DisplayModeItem::DisplayModeItem(AudioCaptureWindow* window) : window(window) {}
+AudioCaptureWindow::DisplayModeItem::~DisplayModeItem(){}
+
+const wchar_t* AudioCaptureWindow::DisplayModeItem::GetName(){
+    return window->displayWave ? L"显示模式:波形" : L"显示模式:频谱";
+}
+
+void AudioCaptureWindow::DisplayModeItem::OnClick(){
+    window->displayWave = !window->displayWave;
+    DebugLog("AudioCaptureWindow::DisplayModeItem State %s", window->displayWave ? "Wave" : "Frequency");
 }
 
 AudioCaptureWindow::AudioCaptureWindow(){
@@ -737,6 +800,7 @@ AudioCaptureWindow::AudioCaptureWindow(){
 
     basicMenu = new Menu();
     basicMenu->AddItem(new CaptureItem(this));
+    basicMenu->AddItem(new DisplayModeItem(this));
 }
 
 AudioCaptureWindow::~AudioCaptureWindow(){
@@ -762,6 +826,105 @@ AudioCaptureWindow::~AudioCaptureWindow(){
     }
 }
 
+void AudioCaptureWindow::ProcessInput(){
+    ALint cnt;
+    ALint offset = (capOffset & ((1 << bit) - 1));
+    float sum;
+
+    alcGetIntegerv(capDev, ALC_CAPTURE_SAMPLES, 1, &cnt);
+    cnt = Min(cnt, (1 << bit) - offset);
+
+    alcCaptureSamples(capDev, (soundtouch::SAMPLETYPE*)capBuf + offset, cnt);
+
+    if (soundTouch->numUnprocessedSamples() <= (1 << (bit + queueBit)) && tail - head < (1 << queueBit) - 1){
+        soundTouch->putSamples((soundtouch::SAMPLETYPE*)capBuf + offset, cnt);
+    }
+
+    capOffset += cnt;
+
+    for (int i = 0; i < (1 << bit); i++){
+        short val = ((short*)capBuf)[(i + capOffset) & ((1 << bit) - 1)];
+        freqBuf[i] = val;
+        sum += Abs((float)val);
+    }
+    if (sum * ratio < (1ll << (bit + 15)) * 0.01f){
+        if (ratio < 100)
+            ratio *= 10;
+    }else if (sum * ratio > (1ll << (bit + 15))){
+        if (ratio > 1)
+            ratio /= 10;
+    }
+
+    AudioUtils::FFT(freqBuf, bit, false);
+
+    if (displayWave){
+        glDisable(GL_LINE_SMOOTH);
+        glLineWidth(1.0f);
+        glBegin(GL_LINE_STRIP);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        for (int i = 0; i < 1024; i++){
+            float rate = i / 1024.0f;
+            float amp = Clamp(((short*)capBuf)[((i << (bit - 10)) + capOffset) & ((1 << bit) - 1)] * 0.000030517578125f * ratio, -1.0f, 1.0f);
+            glVertex2f(rate * 2.0f - 1.0f, (amp + 1.0f) * 0.5f);
+        }
+        glEnd();
+    }else{
+        glDisable(GL_LINE_SMOOTH);
+        glLineWidth(1.0f);
+        glBegin(GL_LINES);
+        for (int i = 0; i < 1024; i++){
+            float rate = i / 1024.0f;
+            float amp = Clamp(__builtin_log(AudioUtils::Complex(freqBuf[i << (bit - 10)]).MagnitudeSqr()) * 0.1f, 2.0f / size.y, 1.0f);
+            glColor3f(rate, 1.0f - rate, 0.0f);
+            glVertex2f(rate * 2.0f - 1.0f, (-amp + 1.0f) * 0.5f);
+            glVertex2f(rate * 2.0f - 1.0f, (amp + 1.0f) * 0.5f);
+        }
+        glEnd();
+    }
+}
+
+void AudioCaptureWindow::ProcessOutput(){
+    ALint cnt;
+    ALint offset = (recOffset & ((1 << bit) - 1));
+
+    cnt = Min((ALint)soundTouch->numSamples(), (1 << bit) - offset);
+
+    soundTouch->receiveSamples((soundtouch::SAMPLETYPE*)recBuf + offset, cnt);
+    if (cnt == (1 << bit) - offset)
+        UpdateBuffer(recBuf, 1 << (bit + 1));
+    
+    recOffset += cnt;
+
+    for (int i = 0; i < (1 << bit); i++)
+        freqBuf[i] = ((short*)recBuf)[(i + recOffset) & ((1 << bit) - 1)];
+    AudioUtils::FFT(freqBuf, bit, false);
+
+    if (displayWave){
+        glDisable(GL_LINE_SMOOTH);
+        glLineWidth(1.0f);
+        glBegin(GL_LINE_STRIP);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        for (int i = 0; i < 1024; i++){
+            float rate = i / 1024.0f;
+            float amp = Clamp(((short*)recBuf)[((i << (bit - 10)) + recOffset) & ((1 << bit) - 1)] * 0.000030517578125f * ratio, -1.0f, 1.0f);
+            glVertex2f(rate * 2.0f - 1.0f, (amp - 1.0f) * 0.5f);
+        }
+        glEnd();
+    }else{
+        glDisable(GL_LINE_SMOOTH);
+        glLineWidth(1.0f);
+        glBegin(GL_LINES);
+        for (int i = 0; i < 1024; i++){
+            float rate = i / 1024.0f;
+            float amp = Clamp(__builtin_log(AudioUtils::Complex(freqBuf[i << (bit - 10)]).MagnitudeSqr()) * 0.1f, 2.0f / size.y, 1.0f);
+            glColor3f(rate, 1.0f - rate, 0.0f);
+            glVertex2f(rate * 2.0f - 1.0f, (-amp - 1.0f) * 0.5f);
+            glVertex2f(rate * 2.0f - 1.0f, (amp - 1.0f) * 0.5f);
+        }
+        glEnd();
+    }
+}
+
 bool AudioCaptureWindow::IsFocus(){
     return focus;
 }
@@ -772,46 +935,22 @@ void AudioCaptureWindow::OnRender(){
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_LINES);
+    glVertex2f(-1.0f, 0.0f); glVertex2f(1.0f, 0.0f);
+    glEnd();
+
     if (capture){
-        alcGetIntegerv(capDev, ALC_CAPTURE_SAMPLES, 1, &cnt);
-
-        if (cnt >= (1 << bit)){
-            alcCaptureSamples(capDev, capBuf, 1 << bit);
-
-            if (soundTouch->numUnprocessedSamples() <= (1 << (bit + queueBit)) && tail - head < (1 << queueBit) - 1){
-                //DebugLog("SoundTouch::putSamples");
-                soundTouch->putSamples((soundtouch::SAMPLETYPE*)capBuf, 1 << bit);
-            }
-            if (soundTouch->numSamples() >= (1 << bit) && playBuf){
-                //DebugLog("SoundTouch::receiveSamples");
-                soundTouch->receiveSamples(playBuf, 1 << bit);
-                UpdateBuffer(playBuf, 1 << (bit + 1));
-            }
-
-            for (int i = 0; i < (1 << bit); i++){
-                freqBuf[i] = ((short*)capBuf)[i];
-            }
-            AudioUtils::FFT(freqBuf, bit, false);
-        }
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        glDisable(GL_LINE_SMOOTH);
-        glLineWidth(1.0f);
-        glBegin(GL_LINES);
-        for (int i = 0; i < 1024; i++){
-            float rate = i / 1024.0f;
-            float amp = Clamp(__builtin_log(AudioUtils::Complex(freqBuf[i << (bit - 10)]).MagnitudeSqr()) * 0.1f, 0.01f, 1.0f);
-            glColor3f(rate, 1.0f - rate, 0.0f);
-            glVertex2f(rate * 2.0f - 1.0f, -amp);
-            glVertex2f(rate * 2.0f - 1.0f, amp);
-        }
-        glEnd();
-
-        uiMgr->Render();
+        ProcessInput();
+        ProcessOutput();
     }
+
+    uiMgr->Render();
 }
 
 void AudioCaptureWindow::OnCreate(){
@@ -894,7 +1033,14 @@ void AudioCaptureWindow::Launch(){
 
     capDev = alcCaptureOpenDevice(NULL, freq, AL_FORMAT_MONO16, 1 << (bit + 2));
 
-    if (!capBuf) capBuf = new short[1 << bit];
+    if (!capBuf){
+        capBuf = new short[1 << bit];
+        memset(capBuf, 0, 1 << (bit + 1));
+    }
+    if (!recBuf){
+        recBuf = new short[1 << bit];
+        memset(recBuf, 0, 1 << (bit + 1));
+    }
     if (!freqBuf) freqBuf = new _Complex float[1 << bit];
     if (!playBuf){
         alGenSources(1, &alSrc);

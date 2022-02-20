@@ -16,6 +16,11 @@ class Object;
 
 class Object {};
 
+// utils.h
+class String;
+class WString;
+class File;
+
 // geodef.h
 class Vertex;
 class Edge;
@@ -100,9 +105,5 @@ class UIEditA;
 class IOperation;
 class ITool;
 class IWindow;
-
-// utils.h
-class String;
-class WString;
 
 #endif

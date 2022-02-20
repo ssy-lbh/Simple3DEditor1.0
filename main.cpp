@@ -5,6 +5,7 @@
 #include "log.h"
 #include "font.h"
 #include "gltools.h"
+#include "glfunc.h"
 #include "nodemap.h"
 #include "audio.h"
 #include "paint.h"
@@ -12,15 +13,22 @@
 #include "shell.h"
 
 MainWindow::MoveButton::MoveButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
-MainWindow::MoveButton::~MoveButton(){}
+
+MainWindow::MoveButton::~MoveButton(){
+    if (texture) delete texture;
+}
 
 bool MainWindow::MoveButton::Trigger(Vector2 pos){
     return (pos - center).SqrMagnitude() <= radius * radius;
 }
 
 void MainWindow::MoveButton::Render(){
-    glColor3f(0.3f, 0.3f, 0.3f);
-    GLUtils::DrawCorner(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    if (!texture)
+        texture = new GLTexture2D(IDB_BUTTON_MOVE);
+    texture->Enable();
+    GLUtils::DrawCornerWithUV(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
+    GLTexture2D::Disable();
 }
 
 void MainWindow::MoveButton::Click(Vector2 pos){
@@ -453,9 +461,6 @@ MainWindow::MainWindow(){
 
     uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
     uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
-
-    // 该组件测试未通过，实现未完成
-    //uiMgr->AddButton(new UIEditA(Vector2(0.0f, 0.0f), Vector2(0.5f, 0.1f)));
 }
 
 MainWindow::~MainWindow(){
@@ -1467,14 +1472,11 @@ void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
         break;
     case WM_CHAR:
         window->OnChar(wParam);
+        // UTF-16格式字符(GB2312)
         break;
     case WM_UNICHAR:
-        // 当其他软件试图使用UNICODE_NOCHAR测试本软件是否处理unicode字符时
-        // 给予TRUE作为回应并忽视此消息
-        if (wParam == UNICODE_NOCHAR){
-            break;
-        }
-        window->OnUnichar(wParam);
+        // UTF-32格式字符
+        window->OnUnichar((leadChar << 8) | wParam);
         break;
     case WM_COMMAND:
         switch (HIWORD(wParam)){
@@ -1527,7 +1529,6 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
         break;
     case WM_LBUTTONDOWN:
         data->OnLeftDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        SetCursor(LoadCursor(hInst, MAKEINTRESOURCE(IDC_CLICKED)));
         SetCapture(hWnd);
         break;
     case WM_LBUTTONUP:
@@ -1544,9 +1545,8 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
         data->scene->OnChar(wParam);
         break;
     case WM_UNICHAR:
-        if (wParam == UNICODE_NOCHAR){
-            return TRUE;
-        }
+        if (wParam == UNICODE_NOCHAR)
+            break;
         data->scene->OnUnichar(wParam);
         break;
     case WM_COMMAND:
@@ -1563,6 +1563,22 @@ LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 
     //将事件发送至对应整个窗口的组件容器
     FireEvent(mainFrame, hWnd, uMsg, wParam, lParam);
+
+    switch (uMsg){
+    case WM_LBUTTONDOWN:
+        if (!cursorSelected)
+            SetCursor(LoadCursor(hInst, MAKEINTRESOURCE(IDC_CLICKED)));
+        break;
+    case WM_UNICHAR:
+        // 当其他软件试图使用UNICODE_NOCHAR测试本软件是否处理unicode字符时
+        // 给予TRUE作为回应并忽视此消息
+        if (wParam == UNICODE_NOCHAR){
+            return TRUE;
+        }
+        break;
+    }
+
+    cursorSelected = false;
 
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
@@ -1631,9 +1647,16 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     DebugLog("OpenGL Vendor %s", glGetString(GL_VENDOR));
     //DebugLog("OpenGL Extensions %s", glGetString(GL_EXTENSIONS));
 
-    glInitASCIIFont();
-    glSelectFont(12, GB2312_CHARSET, "微软雅黑");
+    // 开启多重采样
+    //glEnable(GL_MULTISAMPLE);
+
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+
     // 楷体_GB2312
+    glSelectFont(12, GB2312_CHARSET, "微软雅黑");
+    glInitASCIIFont();
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 

@@ -11,7 +11,8 @@
 #define Exp(x) (__builtin_exp(x))
 #define Pow(x, y) (__builtin_pow(x, y))
 #define Abs(x) (__builtin_fabs(x))
-#define Max(x, y) (__builtin_fmax(x, y))
+#define Maxf(x, y) (__builtin_fmax(x, y))
+#define Minf(x, y) (__builtin_fmin(x, y))
 #define Floor(x) (__builtin_floor(x))
 #define Ceil(x) (__builtin_ceil(x))
 #define Round(x) (__builtin_round(x))
@@ -331,6 +332,12 @@ Quaternion Slerp(Quaternion a, Quaternion b, float t);
 int Clamp(int x, int a, int b);
 float Clamp(float x, float a, float b);
 
+// 排序为前小后大
 void Sort(float& x, float& y);
+
+template <typename T>
+inline T Min(T a, T b){ return a < b ? a : b; }
+template <typename T>
+inline T Max(T a, T b){ return a > b ? a : b; }
 
 #endif

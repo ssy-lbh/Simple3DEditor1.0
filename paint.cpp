@@ -494,7 +494,7 @@ PaintWindow::~PaintWindow(){
     if (basicMenu) delete basicMenu;
     if (brush) delete brush;
 
-    if (paintTex) glDeleteTextures(1, &paintTex);
+    if (glIsTexture(paintTex)) glDeleteTextures(1, &paintTex);
 }
 
 bool PaintWindow::IsFocus(){

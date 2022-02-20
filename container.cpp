@@ -29,18 +29,22 @@ void LRContainer::InitMenu(){
     joinMenu->AddItem(new MenuItem(L"归并为左窗口", MENUITEM_LAMBDA_TRANS(LRContainer)[](LRContainer* window){
         if (window->selWindow){
             delete window->rWindow;
+            window->rWindow = NULL;
             IWindow* curWindow = ((SelectionWindow*)window->lWindow)->GetWindow();
             ((SelectionWindow*)window->lWindow)->SetWindow(NULL, false);
             delete window->lWindow;
+            window->lWindow = NULL;
             window->selWindow->SetWindow(curWindow, true);
         }
     }, this));
     joinMenu->AddItem(new MenuItem(L"归并为右窗口", MENUITEM_LAMBDA_TRANS(LRContainer)[](LRContainer* window){
         if (window->selWindow){
             delete window->lWindow;
+            window->lWindow = NULL;
             IWindow* curWindow = ((SelectionWindow*)window->rWindow)->GetWindow();
             ((SelectionWindow*)window->rWindow)->SetWindow(NULL, false);
             delete window->rWindow;
+            window->rWindow = NULL;
             window->selWindow->SetWindow(curWindow, true);
         }
     }, this));
@@ -284,18 +288,22 @@ void UDContainer::InitMenu(){
     joinMenu->AddItem(new MenuItem(L"归并为上窗口", MENUITEM_LAMBDA_TRANS(UDContainer)[](UDContainer* window){
         if (window->selWindow){
             delete window->dWindow;
+            window->dWindow = NULL;
             IWindow* curWindow = ((SelectionWindow*)window->uWindow)->GetWindow();
             ((SelectionWindow*)window->uWindow)->SetWindow(NULL, false);
             delete window->uWindow;
+            window->uWindow = NULL;
             window->selWindow->SetWindow(curWindow, true);
         }
     }, this));
     joinMenu->AddItem(new MenuItem(L"归并为下窗口", MENUITEM_LAMBDA_TRANS(UDContainer)[](UDContainer* window){
         if (window->selWindow){
             delete window->uWindow;
+            window->uWindow = NULL;
             IWindow* curWindow = ((SelectionWindow*)window->dWindow)->GetWindow();
             ((SelectionWindow*)window->dWindow)->SetWindow(NULL, false);
             delete window->dWindow;
+            window->dWindow = NULL;
             window->selWindow->SetWindow(curWindow, true);
         }
     }, this));

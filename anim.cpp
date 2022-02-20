@@ -44,7 +44,7 @@ void AnimationWindow::FrameIndicator::Drag(Vector2 dir){
 
 void AnimationWindow::FrameIndicator::Render(){
     char frame[10];
-    int width;
+    float width;
 
     pos = Clamp(((window->frame - window->startFrame) / (window->endFrame - window->startFrame)) * 2.0f - 1.0f, -1.0f, 1.0f);
 

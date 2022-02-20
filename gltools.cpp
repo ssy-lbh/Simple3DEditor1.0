@@ -8,6 +8,107 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
 
+GLRect::GLRect(){}
+GLRect::GLRect(Vector2 p1, Vector2 p2) : left(p1.x), right(p2.x), top(p1.y), bottom(p2.y) { Sort(left, right); Sort(bottom, top); }
+GLRect::GLRect(float left, float right, float bottom, float top) : left(left), right(right), bottom(bottom), top(top) {}
+GLRect::~GLRect(){}
+
+float GLRect::GetAspect(){
+    return (right - left) / (top - bottom);
+}
+
+float GLRect::GetWidth(){
+    return right - left;
+}
+
+float GLRect::GetHeight(){
+    return top - bottom;
+}
+
+Vector2 GLRect::GetSize(){
+    return Vector2(right - left, top - bottom);
+}
+
+float GLRect::GetXRatio(float x){
+    return GetRate(x, left, right);
+}
+
+float GLRect::GetYRatio(float y){
+    return GetRate(y, bottom, top);
+}
+
+Vector2 GLRect::GetRatio(float x, float y){
+    return Vector2(GetRate(x, left, right), GetRate(y, bottom, top));
+}
+
+Vector2 GLRect::GetRatio(Vector2 pos){
+    return GetRatio(pos.x, pos.y);
+}
+
+float GLRect::GetXRatioPos(float ratio){
+    return Lerp(left, right, ratio);
+}
+
+float GLRect::GetYRatioPos(float ratio){
+    return Lerp(bottom, top, ratio);
+}
+
+Vector2 GLRect::GetRatioPos(float ratioX, float ratioY){
+    return Vector2(Lerp(left, right, ratioX), Lerp(bottom, top, ratioY));
+}
+
+Vector2 GLRect::GetRatioPos(Vector2 ratio){
+    return GetRatioPos(ratio.x, ratio.y);
+}
+
+float GLRect::MapXPos(GLRect rect, float x){
+    return GetXRatioPos(rect.GetXRatio(x));
+}
+
+float GLRect::MapYPos(GLRect rect, float y){
+    return GetYRatioPos(rect.GetYRatio(y));
+}
+
+Vector2 GLRect::MapPos(GLRect rect, Vector2 pos){
+    return GetRatioPos(rect.GetRatio(pos));
+}
+
+Vector2 GLRect::MapPos(GLRect rect, float x, float y){
+    return GetRatioPos(rect.GetRatio(x, y));
+}
+
+GLRect GLRect::ChildRect(float left, float right, float bottom, float top){
+    GLRect rect;
+    Vector2 size;
+
+    size = GetSize();
+
+    rect.left = this->left + Round(size.x * Clamp(left, 0.0f, 1.0f));
+    rect.right = this->left + Round(size.x * Clamp(right, 0.0f, 1.0f));
+    rect.bottom = this->bottom + Round(size.y * Clamp(bottom, 0.0f, 1.0f));
+    rect.top = this->bottom + Round(size.y * Clamp(top, 0.0f, 1.0f));
+
+    return rect;
+}
+
+bool GLUtils::CheckGLError(const char* tag, const char* file, int line){
+    int loopCnt = 0;
+	for (GLenum error = glGetError(); loopCnt < 32 && error != GL_NO_ERROR; error = glGetError(), ++loopCnt){
+		const char* pMsg;
+		switch (error){
+		case GL_INVALID_ENUM: pMsg = "Invalid enum"; break;
+		case GL_INVALID_VALUE: pMsg = "Invalid value"; break;
+		case GL_INVALID_OPERATION: pMsg = "Invalid operation"; break;
+        case GL_STACK_OVERFLOW: pMsg = "Stack overflow"; break;
+        case GL_STACK_UNDERFLOW: pMsg = "Stack underflow"; break;
+		case GL_OUT_OF_MEMORY: pMsg = "Out of memory"; break;
+		default: pMsg = "Unknown error";
+		}
+		DebugError("[OpenGL Error] %s %s(0x%x) at %s:%d\n", tag, pMsg, error, file, line);
+	}
+	return loopCnt != 0;
+}
+
 void GLUtils::DrawCorner(float x, float y, float start, float end, float radius, float step){
     start = ToRadian(start);
     end = ToRadian(end);
@@ -18,6 +119,58 @@ void GLUtils::DrawCorner(float x, float y, float start, float end, float radius,
         glVertex2f(x + radius * Cos(i), y + radius * Sin(i));
     }
     glVertex2f(x + radius * Cos(end), y + radius * Sin(end));
+    glEnd();
+}
+
+void GLUtils::DrawCorner(Vector2 center, float start, float end, float radius, float step){
+    DrawCorner(center.x, center.y, start, end, radius, step);
+}
+
+void GLUtils::DrawCornerWithUV(float x, float y, float start, float end, float radius, float step){
+    float vsin, vcos;
+
+    start = ToRadian(start);
+    end = ToRadian(end);
+
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.5f, 0.5f);
+    glVertex2f(x, y);
+    for (float i = start; i < end; i += step){
+        vsin = Sin(i), vcos = Cos(i);
+        glTexCoord2f((vcos + 1.0f) * 0.5f, (-vsin + 1.0f) * 0.5f);
+        glVertex2f(x + radius * vcos, y + radius * vsin);
+    }
+    vsin = Sin(end), vcos = Cos(end);
+    glTexCoord2f((vcos + 1.0f) * 0.5f, (-vsin + 1.0f) * 0.5f);
+    glVertex2f(x + radius * vcos, y + radius * vsin);
+    glEnd();
+}
+
+void GLUtils::DrawCornerWithUV(Vector2 center, float start, float end, float radius, float step){
+    DrawCornerWithUV(center.x, center.y, start, end, radius, step);
+}
+
+void GLUtils::DrawCornerWithUV(float x, float y, float start, float end, float radius, float step, GLRect uvBound){
+    DrawCornerWithUV(Vector2(x, y), start, end, radius, step, uvBound);
+}
+
+void GLUtils::DrawCornerWithUV(Vector2 center, float start, float end, float radius, float step, GLRect uvBound){
+    float vsin, vcos;
+
+    start = ToRadian(start);
+    end = ToRadian(end);
+
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.5f, 0.5f);
+    glVertex2f(center.x, center.y);
+    for (float i = start; i < end; i += step){
+        vsin = Sin(i), vcos = Cos(i);
+        glTexCoord2f(uvBound.GetXRatioPos((vcos + 1.0f) * 0.5f), uvBound.GetYRatioPos((vsin + 1.0f) * 0.5f));
+        glVertex2f(center.x + radius * vcos, center.y + radius * vsin);
+    }
+    vsin = Sin(end), vcos = Cos(end);
+    glTexCoord2f(uvBound.GetXRatioPos((vcos + 1.0f) * 0.5f), uvBound.GetYRatioPos((vsin + 1.0f) * 0.5f));
+    glVertex2f(center.x + radius * vcos, center.y + radius * vsin);
     glEnd();
 }
 
@@ -70,7 +223,15 @@ RECT GLUtils::MakeRect(LONG left, LONG right, LONG bottom, LONG top){
 }
 
 bool GLUtils::InRect(int x, int y, RECT rect){
-    return x >= rect.left && x < rect.right && y >= rect.bottom && y < rect.top;
+    return x >= rect.left && x <= rect.right && y >= rect.bottom && y <= rect.top;
+}
+
+bool GLUtils::InRect(float x, float y, GLRect rect){
+    return x >= rect.left && x <= rect.right && y >= rect.bottom && y <= rect.top;
+}
+
+bool GLUtils::InRect(Vector2 v, GLRect rect){
+    return v.x >= rect.left && v.x <= rect.right && v.y >= rect.bottom && v.y <= rect.top;
 }
 
 void GLUtils::DrawBezier(Vector2 p1, Vector2 p2, Vector2 p3, float step){
@@ -126,10 +287,10 @@ void GLUtils::DrawRoundRect(float x, float y, float width, float height, float r
     float ymax = y + height - radius, ymin = y + radius;
     float xr = x + width, yr = y + height;
 
-    GLUtils::DrawCorner(xmin, ymax, 90.0f, 180.0f, radius, 0.05f);
-    GLUtils::DrawCorner(xmax, ymax, 0.0f, 90.0f, radius, 0.05f);
-    GLUtils::DrawCorner(xmin, ymin, 180.0f, 270.0f, radius, 0.05f);
-    GLUtils::DrawCorner(xmax, ymin, 270.0f, 360.0f, radius, 0.05f);
+    GLUtils::DrawCorner(xmin, ymax, 90.0f, 180.0f, radius, step);
+    GLUtils::DrawCorner(xmax, ymax, 0.0f, 90.0f, radius, step);
+    GLUtils::DrawCorner(xmin, ymin, 180.0f, 270.0f, radius, step);
+    GLUtils::DrawCorner(xmax, ymin, 270.0f, 360.0f, radius, step);
 
     glBegin(GL_TRIANGLES);
     glVertex2f(xmin, yr); glVertex2f(xmin, y); glVertex2f(xmax, y);
@@ -141,6 +302,78 @@ void GLUtils::DrawRoundRect(float x, float y, float width, float height, float r
     glEnd();
 }
 
+void GLUtils::DrawRoundRect(GLRect rect, float radius, float step){
+    DrawRoundRect(rect.left, rect.bottom, rect.GetWidth(), rect.GetHeight(), radius, step);
+}
+
+void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, float step){
+    float width = rect.GetWidth(), height = rect.GetHeight();
+    float xmin = rect.left + radius, xmax = rect.left + width - radius;
+    float ymax = rect.bottom + height - radius, ymin = rect.bottom + radius;
+    float xr = rect.left + width, yr = rect.bottom + height;
+
+    float xminUV = rect.GetXRatio(xmin);
+    float xmaxUV = rect.GetXRatio(xmax);
+    float yminUV = 1.0f - rect.GetYRatio(ymin);
+    float ymaxUV = 1.0f - rect.GetYRatio(ymax);
+
+    GLUtils::DrawCornerWithUV(xmin, ymax, 90.0f, 180.0f, radius, step,
+        GLRect(0.0f, xminUV, ymaxUV, 0.0f));
+    GLUtils::DrawCornerWithUV(xmax, ymax, 0.0f, 90.0f, radius, step,
+        GLRect(xmaxUV, 1.0f, ymaxUV, 0.0f));
+    GLUtils::DrawCornerWithUV(xmin, ymin, 180.0f, 270.0f, radius, step,
+        GLRect(0.0f, xminUV, 1.0f, yminUV));
+    GLUtils::DrawCornerWithUV(xmax, ymin, 270.0f, 360.0f, radius, step,
+        GLRect(xmaxUV, 1.0f, 1.0f, yminUV));
+
+    GLUtils::DrawRectWithUV(
+        GLRect(xmin, xmax, rect.bottom, rect.top),
+        GLRect(xminUV, xmaxUV, 1.0f, 0.0f)
+    );
+    GLUtils::DrawRectWithUV(
+        GLRect(rect.left, xmin, ymin, ymax),
+        GLRect(0.0f, xminUV, yminUV, ymaxUV)
+    );
+    GLUtils::DrawRectWithUV(
+        GLRect(xmax, rect.right, ymin, ymax),
+        GLRect(xmaxUV, 1.0f, yminUV, ymaxUV)
+    );
+}
+
+void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, float step, GLRect uvBound){
+    float width = rect.GetWidth(), height = rect.GetHeight();
+    float xmin = rect.left + radius, xmax = rect.left + width - radius;
+    float ymax = rect.bottom + height - radius, ymin = rect.bottom + radius;
+    float xr = rect.left + width, yr = rect.bottom + height;
+
+    float xminUV = uvBound.GetXRatioPos(rect.GetXRatio(xmin));
+    float xmaxUV = uvBound.GetXRatioPos(rect.GetXRatio(xmax));
+    float yminUV = uvBound.GetYRatioPos(rect.GetYRatio(ymin));
+    float ymaxUV = uvBound.GetYRatioPos(rect.GetYRatio(ymax));
+
+    GLUtils::DrawCornerWithUV(xmin, ymax, 90.0f, 180.0f, radius, step,
+        GLRect(uvBound.left, xminUV, ymaxUV, uvBound.top));
+    GLUtils::DrawCornerWithUV(xmax, ymax, 0.0f, 90.0f, radius, step,
+        GLRect(xmaxUV, uvBound.right, ymaxUV, uvBound.top));
+    GLUtils::DrawCornerWithUV(xmin, ymin, 180.0f, 270.0f, radius, step,
+        GLRect(uvBound.left, xminUV, uvBound.bottom, yminUV));
+    GLUtils::DrawCornerWithUV(xmax, ymin, 270.0f, 360.0f, radius, step,
+        GLRect(xmaxUV, uvBound.right, uvBound.bottom, yminUV));
+
+    GLUtils::DrawRectWithUV(
+        GLRect(xmin, xmax, rect.bottom, rect.top),
+        GLRect(xminUV, xmaxUV, uvBound.bottom, uvBound.top)
+    );
+    GLUtils::DrawRectWithUV(
+        GLRect(rect.left, xmin, ymin, ymax),
+        GLRect(uvBound.left, xminUV, yminUV, ymaxUV)
+    );
+    GLUtils::DrawRectWithUV(
+        GLRect(xmax, rect.right, ymin, ymax),
+        GLRect(xmaxUV, uvBound.right, yminUV, ymaxUV)
+    );
+}
+
 float GLUtils::Clamp(float x, float a, float b){
     if (x <= a){
         return a;
@@ -149,6 +382,15 @@ float GLUtils::Clamp(float x, float a, float b){
         return b;
     }
     return x;
+}
+
+void GLUtils::DrawRect(GLRect rect){
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(rect.left, rect.bottom);
+    glVertex2f(rect.left, rect.top);
+    glVertex2f(rect.right, rect.top);
+    glVertex2f(rect.right, rect.bottom);
+    glEnd();
 }
 
 void GLUtils::DrawRect(Vector2 p1, Vector2 p2){
@@ -166,6 +408,24 @@ void GLUtils::DrawRect(float x1, float y1, float x2, float y2){
     glVertex2f(x1, y2);
     glVertex2f(x2, y2);
     glVertex2f(x2, y1);
+    glEnd();
+}
+
+void GLUtils::DrawRectWithUV(GLRect rect){
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.0f, 1.0f); glVertex2f(rect.left, rect.bottom);
+    glTexCoord2f(0.0f, 0.0f); glVertex2f(rect.left, rect.top);
+    glTexCoord2f(1.0f, 0.0f); glVertex2f(rect.right, rect.top);
+    glTexCoord2f(1.0f, 1.0f); glVertex2f(rect.right, rect.bottom);
+    glEnd();
+}
+
+void GLUtils::DrawRectWithUV(GLRect rect, GLRect uvBound){
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(uvBound.left, uvBound.bottom); glVertex2f(rect.left, rect.bottom);
+    glTexCoord2f(uvBound.left, uvBound.top); glVertex2f(rect.left, rect.top);
+    glTexCoord2f(uvBound.right, uvBound.top); glVertex2f(rect.right, rect.top);
+    glTexCoord2f(uvBound.right, uvBound.bottom); glVertex2f(rect.right, rect.bottom);
     glEnd();
 }
 
@@ -207,6 +467,8 @@ GLTexture2D::GLTexture2D(const char* path){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       //缩小纹理过滤方式
 	
     glTexImage2D(GL_TEXTURE_2D, 0, channel, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
     
     stbi_image_free(image);
 }
@@ -252,6 +514,8 @@ GLTexture2D::GLTexture2D(const wchar_t* path){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       //缩小纹理过滤方式
 	
     glTexImage2D(GL_TEXTURE_2D, 0, channel, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
     
     stbi_image_free(image);
 }
@@ -273,16 +537,19 @@ GLTexture2D::GLTexture2D(int resid){
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
 
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); //支持4字节对齐
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);// 纹理数据上传的对齐像素数
+    //glPixelStorei(GL_UNPACK_ROW_LENGTH, bitmap.bmWidthBytes / channel);// 指定像素数据中原图的宽度
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);      //S方向上贴图
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);      //T方向上贴图
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       //放大纹理过滤方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       //缩小纹理过滤方式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);// S方向上贴图
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);// T方向上贴图
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);// 放大纹理过滤方式
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);// 缩小纹理过滤方式
 	
     glTexImage2D(GL_TEXTURE_2D, 0, channel, bitmap.bmWidth, bitmap.bmHeight, 0,
                 (channel == 4 ? GL_BGRA_EXT : (channel == 3 ? GL_BGR_EXT : GL_R))
                 , GL_UNSIGNED_BYTE, pBits);
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
     
     delete[] pBits;
 }
@@ -290,13 +557,19 @@ GLTexture2D::GLTexture2D(int resid){
 GLTexture2D::GLTexture2D(GLuint texture, bool delTex) : tex(texture), delTex(delTex) {}
 
 GLTexture2D::~GLTexture2D(){
-    if (delTex)
+    if (glIsTexture(delTex))
         glDeleteTextures(1, &tex);
 }
 
-void GLTexture2D::Enable(){
+bool GLTexture2D::Enable(){
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    if (glIsTexture(tex)){
+        glBindTexture(GL_TEXTURE_2D, tex);
+        return true;
+    }
+    DebugError("GLTexture2D::Enable %d Is Not A Texture", tex);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    return false;
 }
 
 void GLTexture2D::Disable(){

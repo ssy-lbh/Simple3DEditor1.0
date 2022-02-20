@@ -1,11 +1,11 @@
 #include "uimgr.h"
 
 #include <windows.h>
-#include <windowsx.h>
 
 #include "opengl/gl/gl.h"
 
 #include "font.h"
+#include "main.h"
 
 UIManager::UIManager(){}
 
@@ -161,7 +161,70 @@ bool IButton::Char(char c){ return false; }
 bool IButton::Unichar(wchar_t c){ return false; }
 void IButton::Render(){}
 
-UIEditA::UIEditA(Vector2 pos, Vector2 size) : position(pos), size(size) {
+IconButton::IconButton(Vector2 position, Vector2 size) : position(position), size(size) {}
+IconButton::IconButton(Vector2 position, Vector2 size, float radius) : position(position), size(size), radius(radius) {}
+
+IconButton::~IconButton(){
+    if (texture) delete texture;
+}
+
+bool IconButton::Trigger(Vector2 pos){
+    return pos.x >= position.x && pos.x <= position.x + size.x && pos.y >= position.y && pos.y <= position.y + size.y;
+}
+
+void IconButton::Click(Vector2 pos){
+    if (onClick)
+        onClick(userData);
+}
+
+void IconButton::Render(){
+    if (texture)
+        texture->Enable();
+    GLUtils::DrawRoundRectWithUV(
+        GLRect(
+            position.x, position.y,
+            position.x + size.x, position.y + size.y
+        ),
+        radius, 0.05f
+    );
+    GLTexture2D::Disable();
+}
+
+void IconButton::OnClick(void(*func)(void*)){
+    onClick = func;
+}
+
+void IconButton::SetUserData(void* data){
+    userData = data;
+}
+
+void IconButton::SetIcon(const char* texPath){
+    if (texture)
+        delete texture;
+    texture = new GLTexture2D(texPath);
+}
+
+void IconButton::SetIcon(int iconRes){
+    if (texture)
+        delete texture;
+    texture = new GLTexture2D(iconRes);
+}
+
+void IconButton::SetIcon(GLTexture2D* tex){
+    if (texture)
+        delete texture;
+    texture = tex;
+}
+
+UIEditA::UIEditA(Vector2 pos, float width) : position(pos), size(Vector2(width, 0.0f)) {
+    text[0] = '\0';
+}
+
+UIEditA::UIEditA(Vector2 pos, float width, void(*onEdit)(char*, void*)) : position(pos), size(Vector2(width, 0.0f)), onEdit(onEdit) {
+    text[0] = '\0';
+}
+
+UIEditA::UIEditA(Vector2 pos, float width, void(*onEdit)(char*, void*), void* userData) : position(pos), size(Vector2(width, 0.0f)), onEdit(onEdit), userData(userData) {
     text[0] = '\0';
 }
 
@@ -173,16 +236,23 @@ bool UIEditA::Trigger(Vector2 pos){
 
 void UIEditA::Hover(){
     SetCursor(LoadCursor(NULL, IDC_IBEAM));
+    Main::inst->cursorSelected = true;
 }
 
 void UIEditA::Click(Vector2 pos){
+    SetCursor(LoadCursor(NULL, IDC_IBEAM));
+    Main::inst->cursorSelected = true;
+
     editing = true;
-    editPos = 0;
 }
 
 void UIEditA::Leave(){
-    editing = false;
-    text[editPos] = '\0';
+    if (editing){
+        editing = false;
+        text[editPos] = '\0';
+        if (onEdit)
+            onEdit(text, userData);
+    }
 }
 
 bool UIEditA::Char(char c){
@@ -191,9 +261,12 @@ bool UIEditA::Char(char c){
     }
     switch (c){
     case '\r':
-        editing = false;
-        return true;
     case '\n':
+        if (editing){
+            editing = false;
+            if (onEdit)
+                onEdit(text, userData);
+        }
         return true;
     case '\b':
         if (editPos == 0)
@@ -210,22 +283,150 @@ bool UIEditA::Char(char c){
 }
 
 void UIEditA::Render(){
-    glColor3f(bkColor.x, bkColor.y, bkColor.z);
-    GLUtils::DrawRect(position, position + size);
+    Vector2 cliSize = ViewportManager::inst->GetClientSize();
+    Vector2 cliInvSize = Vector2(1.0f / cliSize.x, 1.0f / cliSize.y);
+    float strWidth;
 
-    //TODO 补全图形功能
+    size.y = cliInvSize.y * 30.0f;
+
+    glEnable(GL_SCISSOR_TEST);
+    ViewportManager::inst->SetChildScissor(position.x, position.x + size.x, position.y, position.y + size.y);
+
+    glColor3f(bkColor.x, bkColor.y, bkColor.z);
+    if (radius == 0.0f){
+        GLUtils::DrawRect(position, position + size);
+    }else{
+        GLUtils::DrawRoundRect(GLRect(position, position + size), radius * size.y, 0.05f);
+    }
 
     glColor3f(fontColor.x, fontColor.y, fontColor.z);
-    glRasterPos2f(position.x, position.y);
-    glDrawString(text);
+    glRasterPos2f(position.x, position.y + 6.0f * cliInvSize.y);
+    glDrawCNString(text);
+
+    if (editing){
+        strWidth = glGetStringWidth(text);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        GLUtils::DrawRect(position.x + (strWidth - 1.0f) * cliInvSize.x * 2.0f, position.y, position.x + (strWidth + 1.0f) * cliInvSize.x * 2.0f, position.y + size.y);
+    }
+
+    ViewportManager::inst->ResetScissor();
 }
+
+char* UIEditA::GetText(){ return text; }
+size_t UIEditA::GetTextMaxLength(){ return MAX_PATH; }
 
 void UIEditA::SetBackgroundColor(Vector3 color){ bkColor = color; }
 void UIEditA::SetFontColor(Vector3 color){ fontColor = color; }
 void UIEditA::SetSelectionColor(Vector3 color){ selColor = color; }
+void UIEditA::SetCornerRadius(float radius){ this->radius = radius; }
 Vector3 UIEditA::GetBackgroundColor(){ return bkColor; }
 Vector3 UIEditA::GetFontColor(){ return fontColor; }
 Vector3 UIEditA::GetSelectionColor(){ return selColor; }
+float UIEditA::GetCornerRadius(){ return radius; }
+
+UIEditW::UIEditW(Vector2 pos, float width) : position(pos), size(Vector2(width, 0.0f)) {
+    text[0] = L'\0';
+}
+
+UIEditW::UIEditW(Vector2 pos, float width, void(*onEdit)(wchar_t*, void*)) : position(pos), size(Vector2(width, 0.0f)), onEdit(onEdit) {
+    text[0] = L'\0';
+}
+
+UIEditW::UIEditW(Vector2 pos, float width, void(*onEdit)(wchar_t*, void*), void* userData) : position(pos), size(Vector2(width, 0.0f)), onEdit(onEdit), userData(userData) {
+    text[0] = L'\0';
+}
+
+UIEditW::~UIEditW(){}
+
+bool UIEditW::Trigger(Vector2 pos){
+    return pos.x >= position.x && pos.x <= position.x + size.x && pos.y >= position.y && pos.y <= position.y + size.y;
+}
+
+void UIEditW::Hover(){
+    SetCursor(LoadCursor(NULL, IDC_IBEAM));
+    Main::inst->cursorSelected = true;
+}
+
+void UIEditW::Click(Vector2 pos){
+    SetCursor(LoadCursor(NULL, IDC_IBEAM));
+    Main::inst->cursorSelected = true;
+
+    editing = true;
+}
+
+void UIEditW::Leave(){
+    editing = false;
+    text[editPos] = L'\0';
+}
+
+bool UIEditW::Unichar(wchar_t c){
+    if (!editing){
+        return false;
+    }
+    switch (c){
+    case '\r':
+    case '\n':
+        if (editing){
+            editing = false;
+            if (onEdit)
+                onEdit(text, userData);
+        }
+        return true;
+    case L'\b':
+        if (editPos == 0)
+            return true;
+        text[--editPos] = L'\0';
+        return true;
+    }
+    if (editPos >= MAX_PATH){
+        return true;
+    }
+    text[editPos++] = c;
+    text[editPos] = L'\0';
+    return true;
+}
+
+void UIEditW::Render(){
+    Vector2 cliSize = ViewportManager::inst->GetClientSize();
+    Vector2 cliInvSize = Vector2(1.0f / cliSize.x, 1.0f / cliSize.y);
+    float strWidth;
+
+    size.y = cliInvSize.y * 30.0f;
+
+    glEnable(GL_SCISSOR_TEST);
+    ViewportManager::inst->SetChildScissor(position.x, position.x + size.x, position.y, position.y + size.y);
+
+    glColor3f(bkColor.x, bkColor.y, bkColor.z);
+    if (radius == 0.0f){
+        GLUtils::DrawRect(position, position + size);
+    }else{
+        GLUtils::DrawRoundRect(GLRect(position, position + size), radius * size.y, 0.05f);
+    }
+
+    glColor3f(fontColor.x, fontColor.y, fontColor.z);
+    glRasterPos2f(position.x, position.y + 6.0f * cliInvSize.y);
+    glDrawCNString(text);
+
+    if (editing){
+        strWidth = glGetCNStringWidth(text);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        GLUtils::DrawRect(position.x + (strWidth - 1.0f) * cliInvSize.x * 2.0f, position.y, position.x + (strWidth + 1.0f) * cliInvSize.x * 2.0f, position.y + size.y);
+    }
+
+    ViewportManager::inst->ResetScissor();
+}
+
+wchar_t* UIEditW::GetText(){ return text; }
+size_t UIEditW::GetTextMaxLength(){ return MAX_PATH; }
+
+void UIEditW::SetBackgroundColor(Vector3 color){ bkColor = color; }
+void UIEditW::SetFontColor(Vector3 color){ fontColor = color; }
+void UIEditW::SetSelectionColor(Vector3 color){ selColor = color; }
+void UIEditW::SetCornerRadius(float radius){ this->radius = radius; }
+Vector3 UIEditW::GetBackgroundColor(){ return bkColor; }
+Vector3 UIEditW::GetFontColor(){ return fontColor; }
+Vector3 UIEditW::GetSelectionColor(){ return selColor; }
+float UIEditW::GetCornerRadius(){ return radius; }
 
 IOperation::IOperation(){}
 IOperation::~IOperation(){}
@@ -308,19 +509,36 @@ RECT ViewportManager::CalculateChildRect(float left, float right, float bottom, 
     RECT rect;
     LONG height, width;
 
+    left = (left + 1.0f) * 0.5f;
+    right = (right + 1.0f) * 0.5f;
+    bottom = (bottom + 1.0f) * 0.5f;
+    top = (top + 1.0f) * 0.5f;
+
     height = GetCurrentHeight();
     width = GetCurrentWidth();
 
-    rect.left = curRect.left + __builtin_roundf(width * Clamp(left, 0.0f, 1.0f));
-    rect.right = curRect.left + __builtin_roundf(width * Clamp(right, 0.0f, 1.0f));
-    rect.bottom = curRect.bottom + __builtin_roundf(height * Clamp(bottom, 0.0f, 1.0f));
-    rect.top = curRect.bottom + __builtin_roundf(height * Clamp(top, 0.0f, 1.0f));
+    rect.left = curRect.left + Round(width * Clamp(left, 0.0f, 1.0f));
+    rect.right = curRect.left + Round(width * Clamp(right, 0.0f, 1.0f));
+    rect.bottom = curRect.bottom + Round(height * Clamp(bottom, 0.0f, 1.0f));
+    rect.top = curRect.bottom + Round(height * Clamp(top, 0.0f, 1.0f));
 
     return rect;
 }
 
 void ViewportManager::PushChildViewport(float left, float right, float bottom, float top){
     PushViewport(CalculateChildRect(left, right, bottom, top));
+}
+
+void ViewportManager::SetScissor(RECT rect){
+    glScissor(rect.left, rect.bottom, rect.right - rect.left, rect.top - rect.bottom);
+}
+
+void ViewportManager::SetChildScissor(float left, float right, float bottom, float top){
+    SetScissor(CalculateChildRect(left, right, bottom, top));
+}
+
+void ViewportManager::ResetScissor(){
+    SetScissor(curRect);
 }
 
 ITool::ITool(){}
