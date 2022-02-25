@@ -8,7 +8,7 @@
 
 #define MENUITEM_LAMBDA_TRANS(t) (void(*)(void*))(void(*)(t*))
 
-class IMenuItem : public Object {
+interface IMenuItem : public Object {
 public:
     enum class ItemType {
         DEFAULT,
@@ -49,10 +49,10 @@ public:
     virtual void OnClick() override;
 };
 
+// 可以继承以实现多种样式的菜单
 class Menu : public Object {
-private:
+protected:
     List<IMenuItem*> items;
-    size_t size = 0;
 
     Vector2 minPos;
     size_t drawCounter;

@@ -7,6 +7,7 @@
 #include "openal/al.h"
 #include "openal/alc.h"
 
+#include "utils.h"
 #include "uimgr.h"
 #include "menu.h"
 
@@ -14,7 +15,7 @@
 
 #define alCheckError(tag) AudioUtils::CheckALError(tag, __FILE__, __LINE__)
 
-class AudioUtils : public Object {
+class AudioUtils {
 public:
     static bool init;
 
@@ -38,7 +39,7 @@ public:
     static void UninitOpenAL();
 };
 
-class AudioPlayerWindow : public IWindow {
+class AudioPlayerWindow final : public IWindow {
 private:
     bool focus = false;
 
@@ -49,7 +50,7 @@ private:
 
     Menu* basicMenu;
 
-    wchar_t path[MAX_PATH];
+    WString path;
 
     bool loaded = false;
     bool launched = false;
@@ -70,7 +71,7 @@ private:
 
     bool displayWave = false;
 
-    class PlayButton : public IButton {
+    class PlayButton final : public IButton {
     private:
         AudioPlayerWindow* window;
         bool hover = false;
@@ -86,7 +87,7 @@ private:
         virtual void Render() override;
     };
 
-    class ProgressBar : public IButton {
+    class ProgressBar final : public IButton {
     private:
         AudioPlayerWindow* window;
         bool hover = false;
@@ -105,7 +106,7 @@ private:
         virtual void Render() override;
     };
 
-    class LoopOption : public IButton {
+    class LoopOption final : public IButton {
     private:
         AudioPlayerWindow* window;
         bool loop;
@@ -119,7 +120,7 @@ private:
         virtual void Render() override;
     };
 
-    class LoopItem : public IMenuItem {
+    class LoopItem final : public IMenuItem {
     private:
         AudioPlayerWindow* window;
 
@@ -132,7 +133,7 @@ private:
         virtual void OnClick() override;
     };
 
-    class DisplayModeItem : public IMenuItem {
+    class DisplayModeItem final : public IMenuItem {
     private:
         AudioPlayerWindow* window;
 
@@ -176,8 +177,8 @@ public:
 
     void OnInsLoad();
 
-    void PreloadFileW(const wchar_t* file);
-    void LoadFileW(const wchar_t* file);
+    void PreloadFile(WString file);
+    void LoadFile(WString file);
     bool IsLoaded();
     void Launch();
     void Stop();
@@ -188,7 +189,7 @@ public:
     ALint GetWaveFormat(PWAVEFORMATEX lpwav);
 };
 
-class AudioCaptureWindow : public IWindow {
+class AudioCaptureWindow final : public IWindow {
 private:
     static const int bit = 14;
     static const int queueBit = 2;
@@ -223,7 +224,7 @@ private:
     bool displayWave = false;
     int ratio = 1;
 
-    class ProgressBar : public IButton {
+    class ProgressBar final : public IButton {
     private:
         AudioCaptureWindow* window;
         bool hover = false;
@@ -242,7 +243,7 @@ private:
         virtual void Render() override;
     };
 
-    class CaptureItem : public IMenuItem {
+    class CaptureItem final : public IMenuItem {
     private:
         AudioCaptureWindow* window;
 
@@ -255,7 +256,7 @@ private:
         virtual void OnClick() override;
     };
 
-    class DisplayModeItem : public IMenuItem {
+    class DisplayModeItem final : public IMenuItem {
     private:
         AudioCaptureWindow* window;
 

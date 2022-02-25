@@ -5,7 +5,7 @@
 #include "list.h"
 #include "vecmath.h"
 
-class Vertex : public Object {
+class Vertex final : public Object {
 public:
     Vector3 pos;
     Vector3 normal = Vector3::forward;
@@ -40,7 +40,7 @@ public:
     bool HitUV(Vector2 uv1, Vector2 uv2);
 };
 
-class Edge : public Object {
+class Edge final : public Object {
 public:
     Vertex* v1;
     Vertex* v2;
@@ -61,7 +61,7 @@ public:
     bool Hit(Vector3 ori, Vector3 dir);
 };
 
-class Face : public Object {
+class Face final : public Object {
 public:
     Vector3 normal;
     List<Vertex*> vertices;

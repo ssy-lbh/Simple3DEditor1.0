@@ -5,7 +5,7 @@
 
 #include "vecmath.h"
 
-class GLRect : public Object {
+class GLRect final : public Object {
 public:
     float left;
     float right;
@@ -39,7 +39,7 @@ public:
 
 #define glCheckError(tag) GLUtils::CheckGLError(tag, __FILE__, __LINE__)
 
-class GLUtils : public Object {
+class GLUtils {
 public:
     static bool CheckGLError(const char* tag, const char* file, int line);
     // 画圆弧角
@@ -79,7 +79,7 @@ public:
     static Matrix4x4 GetModelViewMatrix();
 };
 
-class GLTexture2D : public Object {
+class GLTexture2D final : public Object {
 private:
     GLuint tex;
     bool delTex = true;
@@ -94,7 +94,7 @@ public:
     static void Disable();
 };
 
-class GLComputeProgram : public Object {
+class GLComputeProgram final : public Object {
 private:
     GLuint prog;
     GLuint shader;
@@ -117,7 +117,7 @@ public:
     void BindTexture(GLuint unit, GLuint texture, GLenum access, GLenum format);
 };
 
-class GLFrameBuffer : public Object {
+class GLFrameBuffer final : public Object {
 private:
     GLuint frame = 0;
     int x = 0, y = 0;
@@ -135,7 +135,7 @@ public:
     void Disable();
 };
 
-class GLLights : public Object {
+class GLLights final : public Object {
 private:
     static bool use[8];
     static GLenum idx[8];
@@ -143,6 +143,51 @@ private:
 public:
     static GLenum CreateLight();
     static bool DestroyLight(GLenum light);
+};
+
+class GLProgram final : public Object {
+private:
+    GLuint prog;
+
+public:
+    GLProgram();
+    ~GLProgram();
+};
+
+class GLShader final : public Object {
+private:
+    GLuint shader;
+
+public:
+    GLShader(GLenum stage);
+    ~GLShader();
+};
+
+class GLVertexArray final : public Object {
+private:
+    GLuint array;
+
+public:
+    GLVertexArray();
+    ~GLVertexArray();
+};
+
+class GLVertexBuffer final : public Object {
+private:
+    GLuint buffer;
+
+public:
+    GLVertexBuffer();
+    ~GLVertexBuffer();
+};
+
+class GLIndexBuffer final : public Object {
+private:
+    GLuint buffer;
+
+public:
+    GLIndexBuffer();
+    ~GLIndexBuffer();
 };
 
 #endif

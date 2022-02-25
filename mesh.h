@@ -6,7 +6,7 @@
 #include "gltools.h"
 #include "viewobject.h"
 
-class Mesh : public Object {
+class Mesh final : public Object {
 private:
     List<Vertex*> vertices;
     List<Edge*> edges;

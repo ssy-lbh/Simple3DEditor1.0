@@ -9,7 +9,7 @@
 #include "vecmath.h"
 #include "gltools.h"
 
-class UIManager : public Object {
+class UIManager final : public Object {
 private:
     List<IButton*> buttons;
     IButton* cur = NULL;
@@ -37,7 +37,7 @@ public:
     void Foreach(void(*func)(IButton*, void*), void* user);
 };
 
-class ViewportManager : public Object {
+class ViewportManager final : public Object {
 private:
     List<RECT> rects;
     RECT curRect;
@@ -66,7 +66,7 @@ public:
 };
 
 //TODO 按钮在触发按下后持续生效到停止
-class IButton : public Object {
+interface IButton : public Object {
 public:
     IButton();
     virtual ~IButton();
@@ -82,7 +82,7 @@ public:
     virtual void Render();
 };
 
-class IconButton : public IButton {
+class IconButton final : public IButton {
 private:
     Vector2 position;
     Vector2 size;
@@ -108,7 +108,7 @@ public:
     void SetIcon(GLTexture2D* tex);
 };
 
-class UIEditA : public IButton {
+class UIEditA final : public IButton {
 private:
     // 左上角位置
     Vector2 position;
@@ -152,7 +152,7 @@ public:
     float GetCornerRadius();
 };
 
-class UIEditW : public IButton {
+class UIEditW final : public IButton {
 private:
     // 左上角位置
     Vector2 position;
@@ -196,7 +196,7 @@ public:
     float GetCornerRadius();
 };
 
-class IOperation : public Object {
+interface IOperation : public Object {
 public:
     IOperation();
     virtual ~IOperation();
@@ -210,7 +210,7 @@ public:
     virtual void OnCommand(int id);
 };
 
-class ITool : public Object {
+interface ITool : public Object {
 public:
     ITool();
     virtual ~ITool();
@@ -226,7 +226,7 @@ public:
     virtual void OnCommand(int id);
 };
 
-class IWindow : public Object {
+interface IWindow : public Object {
 public:
     IWindow();
     virtual ~IWindow();

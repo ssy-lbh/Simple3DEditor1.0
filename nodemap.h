@@ -5,7 +5,7 @@
 #include "menu.h"
 #include "gltools.h"
 
-class NodeMapWindow : public IWindow {
+class NodeMapWindow final : public IWindow {
 private:
     bool focus = false;
 
@@ -21,7 +21,7 @@ private:
 
     GLTexture2D* bktex = NULL;
 
-    class MoveButton : public IButton {
+    class MoveButton final : public IButton {
     private:
         Vector2 center;
         float radius;
@@ -37,7 +37,7 @@ private:
         virtual void Drag(Vector2 dir) override;
     };
 
-    class Node : public IButton {
+    class Node final : public IButton {
     private:
         NodeMapWindow* window;
         Vector2 start;

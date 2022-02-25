@@ -4,8 +4,6 @@
 #include <gl/gl.h>
 #include <gl/glext.h>
 
-#define GL_GETFUNC(x) (x = (decltype(x))wglGetProcAddress(#x))
-
 /* OpenGL 1.3 */
 #define GL_TEXTURE0                       0x84C0
 #define GL_TEXTURE1                       0x84C1

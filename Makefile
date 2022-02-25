@@ -5,6 +5,11 @@
 # 可能加入的依赖库:
 # OpenAL ffmpeg stb_image glfw glm glew
 
+# 大小写平台名称
+# 关于跨平台方面，以后将资源部分进行抽象后将完成
+PLATFORM 	= windows
+PLATFORM_U	= WINDOWS
+
 GCC			= g++.exe
 RM			= del
 CFLAGS 		= -I"openal\\" -I"opengl\\" -m64
@@ -15,11 +20,12 @@ MKDIR   	= mkdir
 
 BUILD_PATH	= build
 PROGOBJ		= main.o log.o vecmath.o font.o menu.o gltools.o uimgr.o mesh.o\
-				geodef.o colorboard.o nodemap.o shell.o container.o attrtable.o\
-				audio.o paint.o glfunc.o viewobject.o utils.o tree.o anim.o timetools.o\
+				geodef.o colorboard.o nodemap.o container.o attrtable.o\
+				audio.o paint.o viewobject.o tree.o anim.o timetools.o\
 				soundtouch\SoundTouch.o soundtouch\TDStretch.o soundtouch\RateTransposer.o\
 				soundtouch\AAFilter.o soundtouch\FIRFilter.o soundtouch\FIFOSampleBuffer.o\
 				soundtouch\PeakFinder.o soundtouch\BPMDetect.o
+PLATOBJ		= utils.o glfunc.o appframe.o shell.o
 EXTRAOBJ	= soundtouch\mmx_optimized.o soundtouch\sse_optimized.o soundtouch\cpu_detect_x86.o
 RESOBJ		= res.o string.o
 OUTPUT 		= main.exe
@@ -39,6 +45,7 @@ TIMESTAMP 	= "http://timestamp.digicert.com"
 #TIMESTAMP 	= "http://tsa.swisssign.net"
 
 PROGOBJ 	:= $(addprefix $(BUILD_PATH)\, $(PROGOBJ))
+PLATOBJ 	:= $(addprefix $(BUILD_PATH)\, $(PLATOBJ))
 EXTRAOBJ 	:= $(addprefix $(BUILD_PATH)\, $(EXTRAOBJ))
 RESOBJ		:= $(addprefix $(BUILD_PATH)\, $(RESOBJ))
 
@@ -55,14 +62,17 @@ rebuild: clean build
 
 reexec: clean run
 
-$(OUTPUT): $(PROGOBJ) $(RESOBJ) $(EXTRAOBJ)
-	$(GCC) $(PROGOBJ) $(RESOBJ) $(EXTRAOBJ) -o $(OUTPUT) $(LIB) $(OFLAGS)
+$(OUTPUT): $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
+	$(GCC) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ) -o $(OUTPUT) $(LIB) $(OFLAGS)
 
 $(PROGOBJ): $(BUILD_PATH)\\%.o: %.cpp %.h
-	$(GCC) -c $< -o $@ $(CFLAGS)
+	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
+
+$(PLATOBJ): $(BUILD_PATH)\\%.o: platform\\$(PLATFORM)\\%.cpp %.h
+	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
 
 $(EXTRAOBJ): $(BUILD_PATH)\\%.o: %.cpp
-	$(GCC) -c $< -o $@ $(CFLAGS)
+	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
 
 $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 	$(RES) -i $< -o $@
@@ -106,5 +116,5 @@ sign: $(OUTPUT)
 	$(SIGNTOOL) timestamp /t $(TIMESTAMP) $(OUTPUT)
 
 clean:
-	$(RM) $(OUTPUT) $(PROGOBJ) $(RESOBJ) $(EXTRAOBJ)
+	$(RM) $(OUTPUT) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
 	-$(MKDIR) build

@@ -513,9 +513,10 @@ void MainWindow::RenderModelView(){
     glEnable(GL_ALPHA_TEST);
     glDisable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
-    //glDisable(GL_DITHER);
-    //glDisable(GL_FOG);
-    //glDisable(GL_LOGIC_OP);
+
+    glDisable(GL_DITHER);
+    glDisable(GL_FOG);
+    glDisable(GL_LOGIC_OP);
 
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
@@ -679,7 +680,7 @@ void MainWindow::UpdateDistance(){
 void MainWindow::GetTextInput(){
     static MainWindow* window;
     window = this;
-    DialogBox(Main::hInst, MAKEINTRESOURCE(IDD_TEXT), Main::hWnd,
+    DialogBox(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDD_TEXT), NULL,
         (DLGPROC)[]
 #if (!_WIN64) && _WIN32
         __attribute__((__stdcall__))
@@ -694,11 +695,16 @@ void MainWindow::GetTextInput(){
                 return (INT_PTR)TRUE;
             case WM_COMMAND:
                 switch (LOWORD(wParam)){
-                case IDOK:
+                case IDOK:{
+                    wchar_t text[DEFAULT_STRING_LENGTH + 1];
+                    text[DEFAULT_STRING_LENGTH] = L'\0';
+                    
                     window->inputConfirm = true;
-                    GetDlgItemTextW(hDlg, IDC_TEXT_EDIT, window->inputText, MAX_PATH);
+                    GetDlgItemTextW(hDlg, IDC_TEXT_EDIT, text, DEFAULT_STRING_LENGTH);
+                    window->inputText = text;
                     EndDialog(hDlg, LOWORD(wParam));
                     break;
+                }
                 case IDCANCEL:
                     window->inputConfirm = false;
                     EndDialog(hDlg, LOWORD(wParam));
@@ -708,9 +714,8 @@ void MainWindow::GetTextInput(){
             }
             return (INT_PTR)FALSE;
     });
-    if (inputConfirm == false){
-        *inputText = L'\0';
-    }
+    if (!inputConfirm)
+        inputText = String();
 }
 
 void MainWindow::AddPoint(){
@@ -735,16 +740,15 @@ void MainWindow::DeletePoint(){
 bool MainWindow::SaveMesh(Mesh* mesh){
     if (!mesh)
         return false;
-    if (!ShellFileSelectWindowW(Main::hWnd, inputText, MAX_PATH, L"3D对象(*.obj)\0*.obj\0", OFN_PATHMUSTEXIST | OFN_EXPLORER)){
+    WString file = ShellFileSelectWindow(WString(IDS_OBJFILE_FILTER), OFN_PATHMUSTEXIST | OFN_EXPLORER);
+    if (file.GetLength() == 0){
         DebugError("Stop Saving");
         return false;
     }
-    inputText[MAX_PATH] = '\0';
-    if (wcsncmp(inputText + wcslen(inputText) - 4, L".obj", 4)){
-        wcsncat_s(inputText, MAX_PATH, L".obj", 4);
-    }
+    if (!file.EndsWith(L".obj"))
+        file = file + L".obj";
     HANDLE hFile = CreateFileW(
-        inputText,
+        file.GetString(),
         GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL,
@@ -753,7 +757,7 @@ bool MainWindow::SaveMesh(Mesh* mesh){
         NULL
     );
     if (hFile == INVALID_HANDLE_VALUE){
-        DebugError("OpenFile Error!");
+        DebugError("OpenFile %S Error!", file.GetString());
         return false;
     }
     DebugLog("Saving Object");
@@ -765,15 +769,12 @@ bool MainWindow::SaveMesh(Mesh* mesh){
 bool MainWindow::LoadMesh(Mesh* mesh){
     if (!mesh)
         return false;
-    if (!ShellFileSelectWindowW(Main::hWnd, inputText, MAX_PATH, L"3D对象(*.obj)\0*.obj\0", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER)){
+    WString file = ShellFileSelectWindow(WString(IDS_OBJFILE_FILTER), OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER);
+    if (file.GetLength() == 0){
         DebugLog("Stop Loading");
         return false;
     }
-    inputText[MAX_PATH] = '\0';
-    if (wcsncmp(inputText + wcslen(inputText) - 4, L".obj", 4)){
-        wcsncat_s(inputText, MAX_PATH, L".obj", 4);
-    }
-    return LoadMeshW(mesh, inputText);
+    return LoadMesh(mesh, file);
 }
 
 bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
@@ -841,35 +842,7 @@ bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
     return true;
 }
 
-bool MainWindow::LoadMeshA(Mesh* mesh, const char* path){
-    BY_HANDLE_FILE_INFORMATION fileInfo;
-    char* fileData;
-    size_t fileLen, filePtr = 0;
-    List<Vertex*> vert;
-
-    if (!mesh)
-        return false;
-    HANDLE hFile = CreateFileA(
-        path,
-        GENERIC_READ,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
-    if (hFile == INVALID_HANDLE_VALUE){
-        DebugError("OpenFile Error!");
-        return false;
-    }
-    bool res = LoadMesh(mesh, hFile);
-
-    CloseHandle(hFile);
-
-    return res;
-}
-
-bool MainWindow::LoadMeshW(Mesh* mesh, const wchar_t* path){
+bool MainWindow::LoadMesh(Mesh* mesh, WString file){
     BY_HANDLE_FILE_INFORMATION fileInfo;
     char* fileData;
     size_t fileLen, filePtr = 0;
@@ -878,7 +851,7 @@ bool MainWindow::LoadMeshW(Mesh* mesh, const wchar_t* path){
     if (!mesh)
         return false;
     HANDLE hFile = CreateFileW(
-        path,
+        file.GetString(),
         GENERIC_READ,
         FILE_SHARE_READ,
         NULL,
@@ -887,7 +860,7 @@ bool MainWindow::LoadMeshW(Mesh* mesh, const wchar_t* path){
         NULL
     );
     if (hFile == INVALID_HANDLE_VALUE){
-        DebugError("OpenFile Error!");
+        DebugError("OpenFile %S Error!", file.GetString());
         return false;
     }
     bool res = LoadMesh(mesh, hFile);
@@ -898,7 +871,7 @@ bool MainWindow::LoadMeshW(Mesh* mesh, const wchar_t* path){
 }
 
 void MainWindow::AboutBox(){
-    DialogBox(Main::hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), Main::hWnd,
+    DialogBox(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDD_ABOUTBOX), NULL,
         (DLGPROC)[]
 #if (!_WIN64) && _WIN32
         __attribute__((__stdcall__))
@@ -1258,12 +1231,13 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         Mesh* mesh = Main::GetMesh();
         if (!mesh)
             break;
-        if (!ShellFileSelectWindowW(Main::hWnd, inputText, MAX_PATH, L"任意图片格式(*.*)\0*.*\0", OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER)){
+        WString file = ShellFileSelectWindow(WString(IDS_PICFILE_FILTER), OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER);
+        if (file.GetLength() == 0){
             DebugLog("Stop Loading");
             break;
         }
-        inputText[MAX_PATH] = '\0';
-        mesh->SetTexture(new GLTexture2D(inputText));
+        DebugLog("Load Texture %S", file.GetString());
+        mesh->SetTexture(new GLTexture2D(file.GetString()));
     }
         break;
     }
@@ -1276,19 +1250,17 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         Main::data->curObject->OnMenuAccel(id, accel);
 }
 
-void MainWindow::OnDropFileA(const char* path){
-    char* suffix = strrchr(path, '.');
-    char message[60];
-    char caption[20];
-    LoadString(Main::hInst, IDS_OBJFILE_FORM_WARNING, message, 60);
-    LoadString(Main::hInst, IDS_OBJFILE_FORM_WARNING_CAPTION, caption, 20);
-    if (strcmp(suffix, ".obj")){
-        if (MessageBox(Main::hWnd, message, caption, MB_OKCANCEL | MB_ICONWARNING) == IDCANCEL){
-            DebugLog("MainWindow::OnDropFileA Stop Load File");
+void MainWindow::OnDropFileW(const wchar_t* path){
+    wchar_t* suffix = wcsrchr(path, L'.');
+    if (wcscmp(suffix, L".obj")){
+        String message(IDS_OBJFILE_FORM_WARNING);
+        String caption(IDS_OBJFILE_FORM_WARNING_CAPTION);
+        if (MessageBoxA(NULL, message.GetString(), caption.GetString(), MB_OKCANCEL | MB_ICONWARNING) == IDCANCEL){
+            DebugLog("MainWindow::OnDropFileW Stop Load File");
             return;
         }
     }
-    LoadMeshA(Main::GetMesh(), path);
+    LoadMesh(Main::GetMesh(), path);
 }
 
 bool MainWindow::IsFocus(){
@@ -1380,6 +1352,11 @@ void MainData::OnRightUp(int x, int y){
     UpdateCursor(x, y);
 }
 
+void MainData::Render(){
+    if (menu)
+        menu->Render(menuPos.x, menuPos.y);
+}
+
 Main::Main(){
     data = new MainData();
 }
@@ -1388,211 +1365,12 @@ Main::~Main(){
     if (data) delete data;
 }
 
-ATOM Main::RegClass(){
-    WNDCLASSEXA wc;
-
-    wc.cbSize = sizeof(WNDCLASSEXA);
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.hCursor = LoadCursor(hInst, MAKEINTRESOURCEA(IDC_NORMAL));
-    wc.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
-    wc.hIconSm = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
-    wc.hInstance = hInst;
-    wc.lpfnWndProc = WndProc;
-    wc.lpszClassName = "ModelView.MainWindow";
-    wc.lpszMenuName = "";
-    wc.style = 0;
-
-    return RegisterClassExA(&wc);
-}
-
-HWND Main::CreateWnd(){
-    return CreateWindowEx(
-        0,
-        "ModelView.MainWindow",
-        "ModelView",
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        1250, 750,
-        NULL,
-        LoadMenu(hInst, MAKEINTRESOURCE(IDC_MENU)),
-        hInst,
-        NULL
-    );
-}
-
-void Main::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    RECT cliRect;
-    GetClientRect(hWnd, &cliRect);
-    // 事件中鼠标坐标上下需反转
-    int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
-    switch (uMsg){
-    case WM_CREATE:
-        window->OnCreate();
-        break;
-    case WM_CLOSE:
-        window->OnClose();
-        break;
-    case WM_TIMER:
-        window->OnTimer(wParam);
-        break;
-    case WM_SIZE:
-        window->OnResize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_MOUSEMOVE:
-        window->OnMouseMove(x, y);
-        break;
-    case WM_MOUSEWHEEL:
-        window->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
-        break;
-    case WM_MOUSELEAVE:
-        window->OnMouseLeave();
-        break;
-    case WM_MOUSEHOVER:
-        window->OnMouseHover(wParam, x, y);
-        break;
-    case WM_SETFOCUS:
-        window->OnFocus();
-        break;
-    case WM_KILLFOCUS:
-        window->OnKillFocus();
-        break;
-    case WM_LBUTTONDOWN:
-        window->OnLeftDown(x, y);
-        break;
-    case WM_LBUTTONUP:
-        window->OnLeftUp(x, y);
-        break;
-    case WM_RBUTTONDOWN:
-        window->OnRightDown(x, y);
-        break;
-    case WM_RBUTTONUP:
-        window->OnRightUp(x, y);
-        break;
-    case WM_CHAR:
-        window->OnChar(wParam);
-        // UTF-16格式字符(GB2312)
-        break;
-    case WM_UNICHAR:
-        // UTF-32格式字符
-        window->OnUnichar((leadChar << 8) | wParam);
-        break;
-    case WM_COMMAND:
-        switch (HIWORD(wParam)){
-        case 0:
-            window->OnMenuAccel(LOWORD(wParam), false);
-            break;
-        case 1:
-            window->OnMenuAccel(LOWORD(wParam), true);
-            break;
-        }
-        break;
-    case WM_DROPFILES:{
-        UINT cnt;
-        char path[MAX_PATH];
-        wchar_t wpath[MAX_PATH];
-
-        cnt = DragQueryFile((HDROP)wParam, 0xFFFFFFFF, NULL, 0);
-        for (UINT i = 0; i < cnt; i++){
-            DragQueryFileA((HDROP)wParam, i, path, MAX_PATH);
-            window->OnDropFileA(path);
-            DragQueryFileW((HDROP)wParam, i, wpath, MAX_PATH);
-            window->OnDropFileW(wpath);
-        }
-        DragFinish((HDROP)wParam);
-    }
-        break;
-    }
-}
-
-LRESULT Main::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    switch (uMsg){
-    case WM_CREATE:
-        DragAcceptFiles(hWnd, TRUE);
-        // 非零ID才有效
-        // 传入TimerProc时可能不同步但是实时性好
-        SetTimer(hWnd, 1, 10, TimerProc);
-        break;
-    case WM_CLOSE:
-        KillTimer(hWnd, 1);
-        PostQuitMessage(0);
-        break;
-    case WM_TIMER:
-        data->scene->OnTimer(wParam);
-        break;
-    case WM_SIZE:
-        data->UpdateWindowSize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_MOUSEMOVE:
-        data->UpdateCursor(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_LBUTTONDOWN:
-        data->OnLeftDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        SetCapture(hWnd);
-        break;
-    case WM_LBUTTONUP:
-        data->OnLeftUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        ReleaseCapture();
-        break;
-    case WM_RBUTTONDOWN:
-        data->OnRightDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_RBUTTONUP:
-        data->OnRightUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-        break;
-    case WM_CHAR:
-        data->scene->OnChar(wParam);
-        break;
-    case WM_UNICHAR:
-        if (wParam == UNICODE_NOCHAR)
-            break;
-        data->scene->OnUnichar(wParam);
-        break;
-    case WM_COMMAND:
-        switch (HIWORD(wParam)){
-        case 0:
-            data->scene->OnMenuAccel(LOWORD(wParam), false);
-            break;
-        case 1:
-            data->scene->OnMenuAccel(LOWORD(wParam), true);
-            break;
-        }
-        break;
-    }
-
-    //将事件发送至对应整个窗口的组件容器
-    FireEvent(mainFrame, hWnd, uMsg, wParam, lParam);
-
-    switch (uMsg){
-    case WM_LBUTTONDOWN:
-        if (!cursorSelected)
-            SetCursor(LoadCursor(hInst, MAKEINTRESOURCE(IDC_CLICKED)));
-        break;
-    case WM_UNICHAR:
-        // 当其他软件试图使用UNICODE_NOCHAR测试本软件是否处理unicode字符时
-        // 给予TRUE作为回应并忽视此消息
-        if (wParam == UNICODE_NOCHAR){
-            return TRUE;
-        }
-        break;
-    }
-
-    cursorSelected = false;
-
-    return DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK Main::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    return Main::inst->LocalWndProc(hWnd, uMsg, wParam, lParam);
-}
-
-void CALLBACK Main::TimerProc(HWND hWnd, UINT uMsg, UINT_PTR wParam, DWORD lParam){
-    Main::inst->LocalWndProc(hWnd, uMsg, wParam, lParam);
-}
-
 void Main::RequestRender(){
     inst->reqRender = true;
+}
+
+void Main::SetWindowCursor(int id){
+    SetCursor(LoadCursorA(GetModuleHandleA(NULL), MAKEINTRESOURCE(id)));
 }
 
 void Main::SetMenu(Menu* m){
@@ -1609,97 +1387,59 @@ Mesh* Main::GetMesh(){
     return data->curObject->GetMesh();
 }
 
-void Main::OnRender(){
-    ViewportManager::inst->Reset(hWnd);
-    ViewportManager::inst->EnableScissor();
-
-    mainFrame->OnRender();
-
-    ViewportManager::inst->Reset(hWnd);
-
-    if (data->menu)
-        data->menu->Render(data->menuPos.x, data->menuPos.y);
-}
-
+#ifdef PLATFORM_WINDOWS
 int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
-    MSG Msg;
-
-    hInst = hInstance;
-
     mainFrame = new SelectionWindow(new MainWindow());
 
-    RegClass();
-    ColorBoard::Init(hInstance);
-
-    hWnd = CreateWnd();
-
-    ShowWindow(hWnd, SW_SHOW);
-    UpdateWindow(hWnd);
+    ColorBoard::Init(GetModuleHandleA(NULL));
+    appFrame = new AppFrame("ModelView", mainFrame, 750, 1250);
 
     DebugLog("Main Window Created");
 
-    GLUtils::EnableOpenGL(hWnd, &hDC, &hRC);
-    GLUtils::EnableOpenGLEXT();
+    appFrame->EnableOpenGL();
+    appFrame->EnableOpenGLEXT();
 
     DebugLog("OpenGL Enabled");
     DebugLog("OpenGL Version %s", glGetString(GL_VERSION));
     DebugLog("OpenGL Renderer %s", glGetString(GL_RENDERER));
     DebugLog("OpenGL Vendor %s", glGetString(GL_VENDOR));
-    //DebugLog("OpenGL Extensions %s", glGetString(GL_EXTENSIONS));
-
-    // 开启多重采样
-    //glEnable(GL_MULTISAMPLE);
 
     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
-    // 楷体_GB2312
     glSelectFont(12, GB2312_CHARSET, "微软雅黑");
     glInitASCIIFont();
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 
-    HACCEL hAccelTable = LoadAccelerators(hInst, MAKEINTRESOURCE(IDC_MENU));
-
-    while (GetMessage(&Msg, NULL, 0, 0)){
-        if (!TranslateAccelerator(Msg.hwnd, hAccelTable, &Msg)){
-            if (Msg.message == WM_QUIT){
-                break;
-            } else {
-                TranslateMessage(&Msg);
-                DispatchMessage(&Msg);
-                if (reqRender || Msg.message != WM_TIMER){
-                    reqRender = false;
-                    wglMakeCurrent(hDC, hRC);
-                    OnRender();
-                    SwapBuffers(hDC);
-                }
-            }
+    appFrame->Show();
+    while (appFrame->WaitHandleEvent()){
+        if (reqRender || appFrame->GetLastMessageType() != AppFrame::MESSAGE_TIMER){
+            reqRender = false;
+            appFrame->Render();
+            appFrame->SwapBuffer();
         }
     }
 
-    delete mainFrame;
+    int code = appFrame->GetExitCode();
 
-    GLUtils::DisableOpenGL(hWnd, hDC, hRC);
-
-    DestroyWindow(hWnd);
+    delete appFrame;
 
     AudioUtils::UninitOpenAL();
-    
-    return Msg.wParam;
-}
 
-HINSTANCE Main::hInst;
+    return code;
+}
+#endif
+
 Main* Main::inst;
 MainData* Main::data;
-HWND Main::hWnd;
-HDC Main::hDC;
-HGLRC Main::hRC;
 
+#ifdef PLATFORM_WINDOWS
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
     Main::inst = new Main();
     int ret = Main::inst->WinMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
     delete Main::inst;
     return ret;
 }
+#endif

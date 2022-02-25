@@ -31,7 +31,7 @@
 #define ToRadian(x) ((x) * 0.017453292519f)
 #define ToAngle(x) ((x) * 57.29577951308f)
 
-class Vector2 : public Object {
+class Vector2 final : public Object {
 public:
     float x;
     float y;
@@ -85,7 +85,7 @@ public:
     Vector2 Rotate(float) const;
 };
 
-class Vector3 : public Object {
+class Vector3 final : public Object {
 public:
     float x;
     float y;
@@ -148,7 +148,7 @@ public:
 };
 
 // 齐次三维坐标向量
-class Vector4 : public Object {
+class Vector4 final : public Object {
 public:
     float x;
     float y;
@@ -219,7 +219,7 @@ public:
     Vector4 RotateZ(float) const;
 };
 
-class Quaternion : public Object {
+class Quaternion final : public Object {
 public:
     // 四元数的旋转轴即为(x,y,z)方向
     float x;
@@ -265,7 +265,7 @@ public:
     Vector3 GetAxis() const;
 };
 
-class Matrix4x4 : public Object {
+class Matrix4x4 final : public Object {
 public:
     // OpenGL为列优先顺序
     // 此矩阵变量命名使用行优先顺序

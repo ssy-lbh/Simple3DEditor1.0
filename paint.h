@@ -5,13 +5,7 @@
 #include "menu.h"
 #include "geodef.h"
 
-//TODO 待实现
-// class Texture1D;
-// class Texture2D;
-// class Texture3D;
-// class RenderTexture;
-
-class UVEditWindow : public IWindow {
+class UVEditWindow final : public IWindow {
 private:
     bool focus = false;
 
@@ -22,7 +16,7 @@ private:
     IOperation* curOp = NULL;
     ITool* curTool;
 
-    class MoveOperation : public IOperation {
+    class MoveOperation final : public IOperation {
     private:
         struct MoveInfo {
             Vertex* vert;
@@ -44,7 +38,7 @@ private:
         virtual void OnUndo() override;
     };
 
-    class EmptyTool : public ITool {
+    class EmptyTool final : public ITool {
     private:
         UVEditWindow* window;
 
@@ -54,7 +48,7 @@ private:
         virtual void OnLeftDown() override;
     };
 
-    class SelectTool : public ITool {
+    class SelectTool final : public ITool {
     private:
         UVEditWindow* window;
         Vector2 start;
@@ -94,7 +88,7 @@ public:
     void SetTool(ITool* tool);
 };
 
-class PaintWindow : public IWindow {
+class PaintWindow final : public IWindow {
 private:
     bool focus = false;
 
@@ -110,7 +104,7 @@ private:
     GLuint paintTex = 0;
     GLint width, height;
 
-    class ClearBrush : public ITool {
+    class ClearBrush final : public ITool {
     private:
         PaintWindow* window;
         GLuint colorLoc;
@@ -127,7 +121,7 @@ private:
         virtual void OnCommand(int id) override;
     };
 
-    class DefaultBrush : public ITool {
+    class DefaultBrush final : public ITool {
     private:
         PaintWindow* window;
         bool draw = false;

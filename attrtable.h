@@ -10,7 +10,7 @@ enum class AttributeType {
     BOOLEAN
 };
 
-class Attribute : public IButton {
+class Attribute final : public IButton {
 private:
     AttributeType type;
     const wchar_t* name;
@@ -38,7 +38,7 @@ public:
     virtual void Render() override;
 };
 
-class AttributeTable : public Object {
+class AttributeTable final : public Object {
 private:
     List<Attribute*> attrs;
     UIManager* uiMgr = NULL;

@@ -7,7 +7,7 @@
 #include "mesh.h"
 #include "utils.h"
 
-class Transform : public Object {
+class Transform final : public Object {
 public:
     enum RotationMode {
         ROT_QUATERNION,
@@ -93,7 +93,7 @@ public:
     virtual void OnAnimationFrame(int frame);
 };
 
-class MeshObject : public AViewObject {
+class MeshObject final : public AViewObject {
 private:
     Mesh* mesh;
 
@@ -113,7 +113,7 @@ public:
 };
 
 // 大概只是一个测试对象
-class BezierCurveObject : public AViewObject {
+class BezierCurveObject final : public AViewObject {
 private:
     Vertex v[4];
 
@@ -130,7 +130,7 @@ public:
     virtual void OnRenderUVMap() override;
 };
 
-class PointLightObject : public AViewObject {
+class PointLightObject final : public AViewObject {
 private:
     Vertex v;
     GLenum light;
@@ -149,7 +149,7 @@ public:
     void UpdateLight();
 };
 
-class AudioListenerObject : public AViewObject {
+class AudioListenerObject final : public AViewObject {
 private:
     Vertex v;
 

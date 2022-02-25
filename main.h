@@ -1,4 +1,3 @@
-#include <windows.h>
 #ifndef __MAIN__
 #define __MAIN__
 
@@ -10,18 +9,19 @@
 #include <gl/gl.h>
 #include <gl/glu.h>
 
+#include "appframe.h"
 #include "menu.h"
 #include "container.h"
 #include "colorboard.h"
 #include "viewobject.h"
 
 //TODO 补全撤销功能
-class IUndo : public Object {
+interface IUndo : public Object {
 public:
     virtual void Execute() = 0;
 };
 
-class MainWindow : public IWindow {
+class MainWindow final : public IWindow {
 private:
     bool focus = false;
     Vector2 cursorPos = Vector2::zero;
@@ -48,10 +48,10 @@ private:
 
     ITool* curTool = NULL;
 
-    wchar_t inputText[MAX_PATH + 1];
-    bool inputConfirm;
+    WString inputText;
+    bool inputConfirm = false;
 
-    class MoveButton : public IButton {
+    class MoveButton final : public IButton {
     private:
         Vector2 center;
         float radius;
@@ -69,7 +69,7 @@ private:
         virtual void ClickEnd() override;
     };
 
-    class RotateButton : public IButton {
+    class RotateButton final : public IButton {
     private:
         Vector2 center;
         float radius;
@@ -86,7 +86,7 @@ private:
         virtual void ClickEnd() override;
     };
 
-    class MoveOperation : public IOperation {
+    class MoveOperation final : public IOperation {
     private:
         struct MoveInfo {
             Vertex* vert;
@@ -108,7 +108,7 @@ private:
         virtual void OnUndo() override;
     };
 
-    class ExcludeOperation : public IOperation {
+    class ExcludeOperation final : public IOperation {
     private:
         struct MoveInfo {
             Vertex* vert;
@@ -130,7 +130,7 @@ private:
         virtual void OnUndo() override;
     };
 
-    class RotateOperation : public IOperation {
+    class RotateOperation final : public IOperation {
     private:
         struct RotateInfo {
             Vertex* vert;
@@ -163,7 +163,7 @@ private:
         virtual void OnUndo() override;
     };
 
-    class SizeOperation : public IOperation {
+    class SizeOperation final : public IOperation {
     private:
         struct SizeInfo {
             Vertex* vert;
@@ -189,7 +189,7 @@ private:
         virtual void OnUndo() override;
     };
 
-    class EmptyTool : public ITool {
+    class EmptyTool final : public ITool {
     private:
         MainWindow* window;
 
@@ -199,7 +199,7 @@ private:
         virtual void OnLeftDown() override;
     };
 
-    class SelectTool : public ITool {
+    class SelectTool final : public ITool {
     private:
         MainWindow* window;
         Vector2 start;
@@ -215,7 +215,7 @@ private:
         virtual void OnRender() override;
     };
 
-    class LightItem : public IMenuItem {
+    class LightItem final : public IMenuItem {
     private:
         MainWindow* window;
     
@@ -261,7 +261,7 @@ public:
     virtual void OnFocus() override;
     virtual void OnKillFocus() override;
     virtual void OnMenuAccel(int id, bool accel) override;
-    virtual void OnDropFileA(const char* path) override;
+    virtual void OnDropFileW(const wchar_t* path) override;
 
     void OnInsSave();
     void OnInsLoad();
@@ -274,14 +274,13 @@ public:
     bool SaveMesh(Mesh* mesh);
     bool LoadMesh(Mesh* mesh);
     bool LoadMesh(Mesh* mesh, HANDLE hFile);
-    bool LoadMeshA(Mesh* mesh, const char* path);
-    bool LoadMeshW(Mesh* mesh, const wchar_t* path);
+    bool LoadMesh(Mesh* mesh, WString file);
     void AboutBox();
     Vector3 GetLookPosition(Vector3 pos);
     Vector2 GetScreenPosition(Vector3 pos);
 };
 
-class MainData : public Object {
+class MainData final : public Object {
 public:
     enum SelectionType {
         SELECT_OBJECT,
@@ -331,16 +330,16 @@ public:
     void OnLeftUp(int x, int y);
     void OnRightDown(int x, int y);
     void OnRightUp(int x, int y);
+
+    void Render();
 };
 
-class Main : public Object {
+class Main final : public Object {
 public:
-    static HINSTANCE hInst;
-    static HWND hWnd;
-    static HDC hDC;
-    static HGLRC hRC;
     static Main* inst;
     static MainData* data;
+
+    AppFrame* appFrame;
 
     // 测试过面向对象的结果，成功实现多屏
     IWindow* mainFrame = NULL;
@@ -348,27 +347,21 @@ public:
     bool reqRender = false;
     bool cursorSelected = false;
 
-    char leadChar = 0;
-
     Main();
     ~Main();
-    
-    ATOM RegClass();
-    HWND CreateWnd();
-    static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    void FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    static void CALLBACK TimerProc(HWND hWnd, UINT uMsg, UINT_PTR wParam, DWORD lParam);
 
     void OnRender();
 
     static void RequestRender();
+    static void SetWindowCursor(int id);
     static void SetMenu(Menu* m);
     static void SelectObject(AViewObject* o);
 
     static Mesh* GetMesh();
 
+#ifdef PLATFORM_WINDOWS
     int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
+#endif
 };
 
 #endif

@@ -53,6 +53,9 @@ class LRContainer;
 class UDContainer;
 class SelectionWindow;
 
+// appframe.h
+class AppFrame;
+
 // colorboard.h
 class ColorBoard;
 
@@ -76,6 +79,11 @@ class GLTexture2D;
 class GLComputeProgram;
 class GLFrameBuffer;
 class GLLights;
+class GLProgram;
+class GLShader;
+class GLVertexArray;
+class GLVertexBuffer;
+class GLIndexBuffer;
 
 // menu.h
 class IMenuItem;

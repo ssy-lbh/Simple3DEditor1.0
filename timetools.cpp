@@ -15,9 +15,11 @@ float TimeUtils::GetTime(){
 }
 
 void TimerManager::CreateTimer(int id, int elapseMillis){
-    SetTimer(Main::hWnd, id, elapseMillis, NULL);
+    DebugError("TimerManager::CreateTimer [Unimplemented]");
+    //SetTimer(Main::hWnd, id, elapseMillis, NULL);
 }
 
 void TimerManager::DestroyTimer(int id){
-    KillTimer(Main::hWnd, id);
+    DebugError("TimerManager::DestroyTimer [Unimplemented]");
+    //KillTimer(Main::hWnd, id);
 }

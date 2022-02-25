@@ -1,11 +1,12 @@
 #ifndef __ANIM__
 #define __ANIM__
 
+#include "define.h"
 #include "list.h"
 #include "uimgr.h"
 #include "menu.h"
 
-class IAnimationFunction {
+interface IAnimationFunction {
 public:
     IAnimationFunction();
     virtual ~IAnimationFunction();
@@ -13,7 +14,7 @@ public:
     virtual float GetValue(Vector2 p1, Vector2 p2, float val);
 };
 
-class LinearFunc : public IAnimationFunction {
+class LinearFunc final : public IAnimationFunction {
 public:
     LinearFunc();
     virtual ~LinearFunc() override;
@@ -21,7 +22,7 @@ public:
     virtual float GetValue(Vector2 p1, Vector2 p2, float val) override;
 };
 
-class SquareFunc : public IAnimationFunction {
+class SquareFunc final : public IAnimationFunction {
 public:
     SquareFunc();
     virtual ~SquareFunc() override;

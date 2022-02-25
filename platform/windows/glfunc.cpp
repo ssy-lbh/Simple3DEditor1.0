@@ -1,4 +1,8 @@
-#include "glfunc.h"
+#include "../../glfunc.h"
+
+#include <gl/wgl.h>
+
+#define GL_GETFUNC(x) (x = (decltype(x))wglGetProcAddress(#x))
 
 PFNGLCOLORMASKIPROC glColorMaski;
 PFNGLGETBOOLEANI_VPROC glGetBooleani_v;

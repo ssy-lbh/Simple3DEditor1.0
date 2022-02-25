@@ -8,7 +8,7 @@
 
 #include <gl/gl.h>
 
-class ColorBoard : public Object {
+class ColorBoard final : public Object {
 private:
     HWND hWnd;
     HDC hDC;

@@ -5,7 +5,7 @@
 #include "menu.h"
 
 //TODO 容器期望集成选择夹、拆分窗口、属性窗口等容器
-class LRContainer : public IWindow {
+class LRContainer final : public IWindow {
 private:
     IWindow* lWindow;
     IWindow* rWindow;
@@ -59,7 +59,7 @@ public:
     bool DragEnabled();
 };
 
-class UDContainer : public IWindow {
+class UDContainer final : public IWindow {
 private:
     IWindow* uWindow;
     IWindow* dWindow;
@@ -113,7 +113,7 @@ public:
     bool DragEnabled();
 };
 
-class SelectionWindow : public IWindow {
+class SelectionWindow final : public IWindow {
 private:
     IWindow* curWindow;
     Menu* selMenu;

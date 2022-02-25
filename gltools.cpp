@@ -577,16 +577,17 @@ void GLTexture2D::Disable(){
 }
 
 GLComputeProgram::GLComputeProgram(int resid){
+    HINSTANCE hInst = GetModuleHandleA(NULL);
     HRSRC kernelSrc;
     HGLOBAL resIdx;
     LPVOID resPtr;
     DWORD resSize;
     char* srcData;
 
-    kernelSrc = FindResource(Main::hInst, MAKEINTRESOURCE(resid), MAKEINTRESOURCE(SHADER));
-    resIdx = LoadResource(Main::hInst, kernelSrc);
+    kernelSrc = FindResourceA(hInst, MAKEINTRESOURCE(resid), MAKEINTRESOURCE(SHADER));
+    resIdx = LoadResource(hInst, kernelSrc);
     resPtr = LockResource(resIdx);
-    resSize = SizeofResource(Main::hInst, kernelSrc);
+    resSize = SizeofResource(hInst, kernelSrc);
     srcData = new char[resSize];
     RtlCopyMemory(srcData, resPtr, resSize);
     FreeResource(resIdx);

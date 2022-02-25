@@ -4,7 +4,7 @@
 #include "uimgr.h"
 #include "viewobject.h"
 
-class TreeWindow : public IWindow {
+class TreeWindow final : public IWindow {
 private:
     bool focus = false;
 
