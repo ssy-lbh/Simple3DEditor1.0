@@ -1,12 +1,13 @@
-#include "colorboard.h"
+#include "../../colorboard.h"
 
-#include "gltools.h"
-#include "log.h"
+#include "../../gltools.h"
+#include "../../log.h"
 
 ColorBoard* ColorBoard::inst = NULL;
 
 ColorBoard::ColorBoard(){
     DebugLog("ColorBoard Created %p", this);
+
     //TODO 添加属性WS_POPUP时SetProp失效
     hWnd = CreateWindowExA(
         0,
@@ -51,6 +52,8 @@ void ColorBoard::Init(HINSTANCE hInstance){
 }
 
 ColorBoard* ColorBoard::GetInst(){
+    if (!inst)
+        Init(GetModuleHandleA(NULL));
     return inst;
 }
 
@@ -179,7 +182,7 @@ void ColorBoard::Render(){
 }
 
 Vector3 ColorBoard::GetColor(){
-    return inst->RunAndGetColor();
+    return GetInst()->RunAndGetColor();
 }
 
 Vector3 ColorBoard::RunAndGetColor(){
@@ -187,6 +190,8 @@ Vector3 ColorBoard::RunAndGetColor(){
 
     ShowWindow(hWnd, SW_SHOW);
     UpdateWindow(hWnd);
+
+    SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
     while (GetMessageA(&Msg, NULL, 0, 0)){
         if (Msg.message == WM_QUIT){

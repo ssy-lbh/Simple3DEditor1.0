@@ -20,12 +20,12 @@ MKDIR   	= mkdir
 
 BUILD_PATH	= build
 PROGOBJ		= main.o log.o vecmath.o font.o menu.o gltools.o uimgr.o mesh.o\
-				geodef.o colorboard.o nodemap.o container.o attrtable.o\
+				geodef.o nodemap.o container.o attrtable.o\
 				audio.o paint.o viewobject.o tree.o anim.o timetools.o\
 				soundtouch\SoundTouch.o soundtouch\TDStretch.o soundtouch\RateTransposer.o\
 				soundtouch\AAFilter.o soundtouch\FIRFilter.o soundtouch\FIFOSampleBuffer.o\
 				soundtouch\PeakFinder.o soundtouch\BPMDetect.o
-PLATOBJ		= utils.o glfunc.o appframe.o shell.o
+PLATOBJ		= utils.o glfunc.o appframe.o shell.o colorboard.o thread.o
 EXTRAOBJ	= soundtouch\mmx_optimized.o soundtouch\sse_optimized.o soundtouch\cpu_detect_x86.o
 RESOBJ		= res.o string.o
 OUTPUT 		= main.exe
@@ -68,7 +68,7 @@ $(OUTPUT): $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
 $(PROGOBJ): $(BUILD_PATH)\\%.o: %.cpp %.h
 	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
 
-$(PLATOBJ): $(BUILD_PATH)\\%.o: platform\\$(PLATFORM)\\%.cpp %.h
+$(PLATOBJ): $(BUILD_PATH)\\%.o: platform\$(PLATFORM)\\%.cpp %.h
 	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
 
 $(EXTRAOBJ): $(BUILD_PATH)\\%.o: %.cpp

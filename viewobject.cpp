@@ -200,10 +200,10 @@ void AViewObject::OnSelectUV(Vector2 uv1, Vector2 uv2){}
 
 Mesh* AViewObject::GetMesh(){ return NULL; }
 
-void AViewObject::OnRender(){
+void AViewObject::OnRender(const RenderOptions* options){
     size_t len = children.Size();
     for (size_t i = 0; i < len; i++)
-        children[i]->OnRender();
+        children[i]->OnRender(options);
 }
 
 void AViewObject::OnRenderUVMap(){
@@ -261,7 +261,7 @@ void MeshObject::OnSelect(Vector3 ori, Vector3 dir){
     AViewObject::OnSelect(ori, dir);
 
     switch (Main::data->selType){
-    case MainData::SELECT_VERTICES:{
+    case GlobalData::SELECT_VERTICES:{
         Vertex* v = mesh->Find(ori, dir);
         if (!v){
             Main::data->selPoints.Clear();
@@ -272,7 +272,7 @@ void MeshObject::OnSelect(Vector3 ori, Vector3 dir){
         }
     }
         break;
-    case MainData::SELECT_EDGES:{
+    case GlobalData::SELECT_EDGES:{
         Edge* e = mesh->FindEdge(ori, dir);
         if (!e){
             Main::data->selEdges.Clear();
@@ -294,7 +294,7 @@ void MeshObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vec
     AViewObject::OnSelect(camPos, camDir, zBound, p1, p2);
 
     switch (Main::data->selType){
-    case MainData::SELECT_VERTICES:
+    case GlobalData::SELECT_VERTICES:
         mesh->FindScreenRect(
             camPos, camDir,
             zBound.x, zBound.y,
@@ -327,11 +327,11 @@ Mesh* MeshObject::GetMesh(){
     return mesh;
 }
 
-void MeshObject::OnRender(){
+void MeshObject::OnRender(const RenderOptions* options){
     transform.PushMatrix();
-    AViewObject::OnRender();
+    AViewObject::OnRender(options);
 
-    mesh->Render();
+    mesh->Render(options->light);
 
     transform.PopMatrix();
 }
@@ -417,8 +417,8 @@ void BezierCurveObject::OnSelectUV(Vector2 uv1, Vector2 uv2){
     }
 }
 
-void BezierCurveObject::OnRender(){
-    AViewObject::OnRender();
+void BezierCurveObject::OnRender(const RenderOptions* options){
+    AViewObject::OnRender(options);
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
     glPointSize(4.0f);
@@ -497,8 +497,8 @@ void PointLightObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBoun
     }
 }
 
-void PointLightObject::OnRender(){
-    AViewObject::OnRender();
+void PointLightObject::OnRender(const RenderOptions* options){
+    AViewObject::OnRender(options);
     UpdateLight();
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
@@ -565,8 +565,8 @@ void AudioListenerObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zB
     }
 }
 
-void AudioListenerObject::OnRender(){
-    AViewObject::OnRender();
+void AudioListenerObject::OnRender(const RenderOptions* options){
+    AViewObject::OnRender(options);
     Main::data->audioPos = v.pos;
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);

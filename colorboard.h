@@ -3,16 +3,24 @@
 
 #include "vecmath.h"
 
+#ifdef PLATFORM_WINDOWS
 #include <windows.h>
 #include <windowsx.h>
+#endif
 
 #include <gl/gl.h>
 
 class ColorBoard final : public Object {
 private:
+#ifdef PLATFORM_WINDOWS
     HWND hWnd;
     HDC hDC;
     HGLRC hRC;
+
+    static void Init(HINSTANCE hInstance);
+    static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+#endif
     
     Vector3 color;
     Vector2 cursorPos;
@@ -21,14 +29,13 @@ private:
 
     static ColorBoard* inst;
 
+    void Render();
+
 public:
     ColorBoard();
     ~ColorBoard();
-    static void Init(HINSTANCE hInstance);
+    
     static ColorBoard* GetInst();
-    static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT CALLBACK LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    void Render();
     static Vector3 GetColor();
     Vector3 RunAndGetColor();
 };

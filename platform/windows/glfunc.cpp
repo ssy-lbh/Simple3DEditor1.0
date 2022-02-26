@@ -2,6 +2,8 @@
 
 #include <gl/wgl.h>
 
+static bool init = false;
+
 #define GL_GETFUNC(x) (x = (decltype(x))wglGetProcAddress(#x))
 
 PFNGLCOLORMASKIPROC glColorMaski;
@@ -330,6 +332,11 @@ PFNGLGETFLOATI_VPROC glGetFloati_v;
 PFNGLGETDOUBLEI_VPROC glGetDoublei_v;
 
 void glInitEXTFunctions(){
+    if (init)
+        return;
+
+    init = true;
+
     GL_GETFUNC(glColorMaski);
     GL_GETFUNC(glGetBooleani_v);
     GL_GETFUNC(glGetIntegeri_v);

@@ -9,6 +9,7 @@
 #include "nodemap.h"
 #include "audio.h"
 #include "paint.h"
+#include "thread.h"
 
 #include "shell.h"
 
@@ -369,12 +370,12 @@ MainWindow::LightItem::LightItem(MainWindow* window) : window(window) {}
 MainWindow::LightItem::~LightItem(){}
 
 const wchar_t* MainWindow::LightItem::GetName(){
-    return Main::data->lightEnabled ? L"光照:开" : L"光照:关";
+    return window->lightEnabled ? L"光照:开" : L"光照:关";
 }
 
 void MainWindow::LightItem::OnClick(){
-    Main::data->lightEnabled = !Main::data->lightEnabled;
-    DebugLog("MainWindow::LightItem Light State %s", Main::data->lightEnabled ? "On" : "Off");
+    window->lightEnabled = !window->lightEnabled;
+    DebugLog("MainWindow::LightItem Light State %s", window->lightEnabled ? "On" : "Off");
 }
 
 MainWindow::MainWindow(){
@@ -552,8 +553,10 @@ void MainWindow::RenderModelView(){
     }
     glEnd();
 
+    RenderOptions options;
+    options.light = lightEnabled;
     //TODO 后续光照设置法线
-    Main::data->scene->OnRender();
+    Main::data->scene->OnRender(&options);
 
     // 已选择点绘制
     glDisable(GL_LIGHTING);
@@ -1284,17 +1287,10 @@ Vector2 MainWindow::GetScreenPosition(Vector3 pos){
     return Vector2((lookPos.x / lookPos.y) / aspect, lookPos.z / lookPos.y);
 }
 
-MainData::MainData(){
-    curObject = new MeshObject();
-    scene = new AViewObject(L"Scene");
-    scene->AddChild(curObject);
-}
+LocalData::LocalData(){}
+LocalData::~LocalData(){}
 
-MainData::~MainData(){
-    if (scene) delete scene;
-}
-
-void MainData::UpdateCursor(int x, int y){
+void LocalData::UpdateCursor(int x, int y){
     // 坐标反转
     cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
     cursorPos.y = 1.0f - 2.0f * y / cliSize.y;
@@ -1302,7 +1298,7 @@ void MainData::UpdateCursor(int x, int y){
         menu->CursorMove(cursorPos - menuPos);
 }
 
-void MainData::UpdateWindowSize(int x, int y){
+void LocalData::UpdateWindowSize(int x, int y){
     cliSize.x = x;
     cliSize.y = y;
     aspect = cliSize.x / cliSize.y;
@@ -1310,7 +1306,7 @@ void MainData::UpdateWindowSize(int x, int y){
         menu->SetClientSize(cliSize);
 }
 
-void MainData::SetMenu(Menu* m){
+void LocalData::SetMenu(Menu* m){
     if (menu)
         menu->ResetSelect();
     menu = m;
@@ -1321,15 +1317,7 @@ void MainData::SetMenu(Menu* m){
     }
 }
 
-void MainData::SelectObject(AViewObject* o){
-    curObject = o;
-    selObjects.Clear();
-    selPoints.Clear();
-    selEdges.Clear();
-    selFaces.Clear();
-}
-
-void MainData::OnLeftDown(int x, int y){
+void LocalData::OnLeftDown(int x, int y){
     UpdateCursor(x, y);
     if (menu){
         if (menu->InChainMenu(cursorPos - menuPos)){
@@ -1340,25 +1328,43 @@ void MainData::OnLeftDown(int x, int y){
     }
 }
 
-void MainData::OnLeftUp(int x, int y){
+void LocalData::OnLeftUp(int x, int y){
     UpdateCursor(x, y);
 }
 
-void MainData::OnRightDown(int x, int y){
+void LocalData::OnRightDown(int x, int y){
     UpdateCursor(x, y);
 }
 
-void MainData::OnRightUp(int x, int y){
+void LocalData::OnRightUp(int x, int y){
     UpdateCursor(x, y);
 }
 
-void MainData::Render(){
+void LocalData::Render(){
     if (menu)
         menu->Render(menuPos.x, menuPos.y);
 }
 
+GlobalData::GlobalData(){
+    curObject = new MeshObject();
+    scene = new AViewObject(L"Scene");
+    scene->AddChild(curObject);
+}
+
+GlobalData::~GlobalData(){
+    if (scene) delete scene;
+}
+
+void GlobalData::SelectObject(AViewObject* o){
+    curObject = o;
+    selObjects.Clear();
+    selPoints.Clear();
+    selEdges.Clear();
+    selFaces.Clear();
+}
+
 Main::Main(){
-    data = new MainData();
+    data = new GlobalData();
 }
 
 Main::~Main(){
@@ -1366,15 +1372,31 @@ Main::~Main(){
 }
 
 void Main::RequestRender(){
-    inst->reqRender = true;
+    AppFrame* frame = (AppFrame*)ThreadLocal::Get(THREAD_LOCAL_APPFRAME);
+    if (frame)
+        frame->reqRender = true;
 }
 
+#ifdef PLATFORM_WINDOWS
 void Main::SetWindowCursor(int id){
-    SetCursor(LoadCursorA(GetModuleHandleA(NULL), MAKEINTRESOURCE(id)));
+    AppFrame* frame = (AppFrame*)ThreadLocal::Get(THREAD_LOCAL_APPFRAME);
+    SetCursor(LoadCursorA(GetModuleHandleA(NULL), MAKEINTRESOURCEA(id)));
+    if (frame)
+        frame->cursorSelected = true;
 }
+
+void Main::SetWindowCursor(const char* res){
+    AppFrame* frame = (AppFrame*)ThreadLocal::Get(THREAD_LOCAL_APPFRAME);
+    SetCursor(LoadCursorA(GetModuleHandleA(NULL), res));
+    if (frame)
+        frame->cursorSelected = true;
+}
+#endif
 
 void Main::SetMenu(Menu* m){
-    data->SetMenu(m);
+    LocalData* data = (LocalData*)ThreadLocal::Get(THREAD_LOCAL_LOCALDATA);
+    if (data)
+        data->SetMenu(m);
 }
 
 void Main::SelectObject(AViewObject* o){
@@ -1391,7 +1413,6 @@ Mesh* Main::GetMesh(){
 int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
     mainFrame = new SelectionWindow(new MainWindow());
 
-    ColorBoard::Init(GetModuleHandleA(NULL));
     appFrame = new AppFrame("ModelView", mainFrame, 750, 1250);
 
     DebugLog("Main Window Created");
@@ -1415,8 +1436,8 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     appFrame->Show();
     while (appFrame->WaitHandleEvent()){
-        if (reqRender || appFrame->GetLastMessageType() != AppFrame::MESSAGE_TIMER){
-            reqRender = false;
+        if (appFrame->reqRender || appFrame->GetLastMessageType() != AppFrame::MESSAGE_TIMER){
+            appFrame->reqRender = false;
             appFrame->Render();
             appFrame->SwapBuffer();
         }
@@ -1433,7 +1454,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 #endif
 
 Main* Main::inst;
-MainData* Main::data;
+GlobalData* Main::data;
 
 #ifdef PLATFORM_WINDOWS
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){

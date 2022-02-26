@@ -39,6 +39,11 @@ public:
     void PopMatrix();
 };
 
+class RenderOptions : public Object {
+public:
+    bool light = false;
+};
+
 //TODO 3D视口中的可视对象，内部继承后可作为网格体、声源、曲线等
 //TODO 正在设计中
 class AViewObject : public Object {
@@ -82,7 +87,7 @@ public:
 
     virtual Mesh* GetMesh();
 
-    virtual void OnRender();
+    virtual void OnRender(const RenderOptions* options);
     virtual void OnRenderUVMap();
 
     virtual void OnTimer(int id);
@@ -108,7 +113,7 @@ public:
 
     virtual Mesh* GetMesh() override;
 
-    virtual void OnRender() override;
+    virtual void OnRender(const RenderOptions* options) override;
     virtual void OnRenderUVMap() override;
 };
 
@@ -126,7 +131,7 @@ public:
     virtual void OnSelectUV(Vector2 uv, float err = 0.01f) override;
     virtual void OnSelectUV(Vector2 uv1, Vector2 uv2) override;
 
-    virtual void OnRender() override;
+    virtual void OnRender(const RenderOptions* options) override;
     virtual void OnRenderUVMap() override;
 };
 
@@ -142,7 +147,7 @@ public:
     virtual void OnSelect(Vector3 ori, Vector3 dir) override;
     virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
 
-    virtual void OnRender() override;
+    virtual void OnRender(const RenderOptions* options) override;
 
     virtual void OnTimer(int id) override;
 
@@ -160,7 +165,7 @@ public:
     virtual void OnSelect(Vector3 ori, Vector3 dir) override;
     virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
 
-    virtual void OnRender() override;
+    virtual void OnRender(const RenderOptions* options) override;
 
     virtual void OnTimer(int id) override;
 };

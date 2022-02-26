@@ -14,13 +14,9 @@ Menu* IMenuItem::GetMenu(){ return NULL; }
 void IMenuItem::OnClick(){}
 
 MenuItem::MenuItem() : type(ItemType::SEPERATOR) {}
-
 MenuItem::MenuItem(const wchar_t* name) : type(ItemType::DEFAULT), name(name) {}
-
 MenuItem::MenuItem(const wchar_t* name, void(*click)(void*)) : type(ItemType::DEFAULT), name(name), click(click) {}
-
 MenuItem::MenuItem(const wchar_t* name, void(*click)(void*), void* userData) : type(ItemType::DEFAULT), name(name), click(click), userData(userData) {}
-
 MenuItem::MenuItem(const wchar_t* name, Menu* menu) : type(ItemType::GROUP), name(name), menu(menu) {}
 
 MenuItem::~MenuItem(){
@@ -42,6 +38,25 @@ Menu* MenuItem::GetMenu(){
 void MenuItem::OnClick(){
     if (click)
         click(userData);
+}
+
+SwitchMenuItem::SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff) : nameOn(nameOn), nameOff(nameOff) {}
+SwitchMenuItem::SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, void(*click)(bool, void*)) : nameOn(nameOn), nameOff(nameOff), click(click) {}
+SwitchMenuItem::SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, void(*click)(bool, void*), void* userData) : nameOn(nameOn), nameOff(nameOff), click(click), userData(userData) {}
+SwitchMenuItem::~SwitchMenuItem(){}
+
+IMenuItem::ItemType SwitchMenuItem::GetType(){
+    return ItemType::DEFAULT;
+}
+
+const wchar_t* SwitchMenuItem::GetName(){
+    return state ? nameOn : nameOff;
+}
+
+void SwitchMenuItem::OnClick(){
+    state = !state;
+    if (click)
+        click(state, userData);
 }
 
 Menu::Menu(){}

@@ -235,14 +235,11 @@ bool UIEditA::Trigger(Vector2 pos){
 }
 
 void UIEditA::Hover(){
-    SetCursor(LoadCursor(NULL, IDC_IBEAM));
-    Main::inst->cursorSelected = true;
+    Main::SetWindowCursor(IDC_IBEAM);
 }
 
 void UIEditA::Click(Vector2 pos){
-    SetCursor(LoadCursor(NULL, IDC_IBEAM));
-    Main::inst->cursorSelected = true;
-
+    Main::SetWindowCursor(IDC_IBEAM);
     editing = true;
 }
 
@@ -343,14 +340,11 @@ bool UIEditW::Trigger(Vector2 pos){
 }
 
 void UIEditW::Hover(){
-    SetCursor(LoadCursor(NULL, IDC_IBEAM));
-    Main::inst->cursorSelected = true;
+    Main::SetWindowCursor(IDC_IBEAM);
 }
 
 void UIEditW::Click(Vector2 pos){
-    SetCursor(LoadCursor(NULL, IDC_IBEAM));
-    Main::inst->cursorSelected = true;
-
+    Main::SetWindowCursor(IDC_IBEAM);
     editing = true;
 }
 

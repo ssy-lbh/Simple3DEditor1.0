@@ -29,6 +29,8 @@ private:
     Vector2 cliSize, cliInvSize;
     float aspect;
 
+    bool lightEnabled = false;
+
     Vector3 camLookat = Vector3::up;
     Quaternion camDir = Quaternion::one;
     float camDis = 5.0f;
@@ -280,15 +282,8 @@ public:
     Vector2 GetScreenPosition(Vector3 pos);
 };
 
-class MainData final : public Object {
+class LocalData final : public Object {
 public:
-    enum SelectionType {
-        SELECT_OBJECT,
-        SELECT_VERTICES,
-        SELECT_EDGES,
-        SELECT_FACES
-    };
-
     Vector2 cursorPos;
     Vector2 cliSize;
     float aspect;
@@ -296,7 +291,30 @@ public:
     Menu* menu = NULL;
     Vector2 menuPos;
 
-    bool lightEnabled = false;
+    LocalData();
+    ~LocalData();
+
+    void UpdateCursor(int x, int y);
+    void UpdateWindowSize(int x, int y);
+
+    void SetMenu(Menu* m);
+
+    void OnLeftDown(int x, int y);
+    void OnLeftUp(int x, int y);
+    void OnRightDown(int x, int y);
+    void OnRightUp(int x, int y);
+
+    void Render();
+};
+
+class GlobalData final : public Object {
+public:
+    enum SelectionType {
+        SELECT_OBJECT,
+        SELECT_VERTICES,
+        SELECT_EDGES,
+        SELECT_FACES
+    };
 
     Vector3 audioPos = Vector3::zero;
 
@@ -317,43 +335,28 @@ public:
     List<Edge*> selEdges;
     List<Face*> selFaces;
 
-    MainData();
-    ~MainData();
+    GlobalData();
+    ~GlobalData();
 
-    void UpdateCursor(int x, int y);
-    void UpdateWindowSize(int x, int y);
-
-    void SetMenu(Menu* m);
     void SelectObject(AViewObject* o);
-
-    void OnLeftDown(int x, int y);
-    void OnLeftUp(int x, int y);
-    void OnRightDown(int x, int y);
-    void OnRightUp(int x, int y);
-
-    void Render();
 };
 
 class Main final : public Object {
 public:
     static Main* inst;
-    static MainData* data;
+    static GlobalData* data;
 
     AppFrame* appFrame;
 
     // 测试过面向对象的结果，成功实现多屏
     IWindow* mainFrame = NULL;
 
-    bool reqRender = false;
-    bool cursorSelected = false;
-
     Main();
     ~Main();
 
-    void OnRender();
-
     static void RequestRender();
     static void SetWindowCursor(int id);
+    static void SetWindowCursor(const char* res);
     static void SetMenu(Menu* m);
     static void SelectObject(AViewObject* o);
 

@@ -841,20 +841,20 @@ File::File(){}
 
 File::File(File &&f){
     this->path = f.path;
-    if (f.hFile != INVALID_HANDLE_VALUE)
+    if (f.isOpened())
         Open();
 }
 
 File::File(const File &f){
     this->path = f.path;
-    if (f.hFile != INVALID_HANDLE_VALUE)
+    if (f.isOpened())
         Open();
 }
 
 File &File::operator=(File &&f){
     Close();
     this->path = f.path;
-    if (f.hFile != INVALID_HANDLE_VALUE)
+    if (f.isOpened())
         Open();
     return *this;
 }
@@ -862,7 +862,7 @@ File &File::operator=(File &&f){
 File &File::operator=(const File &f){
     Close();
     this->path = f.path;
-    if (f.hFile != INVALID_HANDLE_VALUE)
+    if (f.isOpened())
         Open();
     return *this;
 }
@@ -919,7 +919,7 @@ bool File::Close(){
     return false;
 }
 
-bool File::isOpened(){
+bool File::isOpened() const{
     return hFile != INVALID_HANDLE_VALUE;
 }
 
@@ -955,14 +955,14 @@ bool File::Create(){
 }
 
 bool File::Delete(){
+    Close();
     return DeleteFileA(path.GetString()) == TRUE;
 }
 
 size_t File::Read(void* buffer, size_t size){
     DWORD readLen;
 
-    if (!isOpened())
-        Open();
+    Open();
     ReadFile(hFile, buffer, size, &readLen, NULL);
     return readLen;
 }
@@ -970,8 +970,7 @@ size_t File::Read(void* buffer, size_t size){
 size_t File::Write(const void* buffer, size_t size){
     DWORD writeLen;
 
-    if (!isOpened())
-        Open();
+    Open();
     WriteFile(hFile, buffer, size, &writeLen, NULL);
     return writeLen;
 }
@@ -990,8 +989,7 @@ size_t File::GetPointer(){
 void File::SetPointer(size_t ptr){
     LARGE_INTEGER pos;
 
-    if (!isOpened())
-        Open();
+    Open();
     pos.QuadPart = ptr;
     SetFilePointerEx(hFile, pos, NULL, FILE_BEGIN);
 }
@@ -999,8 +997,7 @@ void File::SetPointer(size_t ptr){
 size_t File::GetSize(){
     BY_HANDLE_FILE_INFORMATION Info;
 
-    if (!isOpened())
-        Open();
+    Open();
     GetFileInformationByHandle(hFile, &Info);
     return (((size_t)Info.nFileSizeHigh << 32) | (size_t)Info.nFileSizeLow);
 }

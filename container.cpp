@@ -9,6 +9,7 @@
 #include "paint.h"
 #include "tree.h"
 #include "anim.h"
+#include "appframe.h"
 
 LRContainer::LRContainer(IWindow* lWindow, IWindow* rWindow) : lWindow(lWindow), rWindow(rWindow) {}
 
@@ -118,7 +119,7 @@ void LRContainer::OnMouseMove(int x, int y){
     cursorPos.x = x;
     cursorPos.y = y;
     if (adjustPos){
-        SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+        Main::SetWindowCursor(IDC_SIZEWE);
         dis = x;
         if (lWindow) lWindow->OnResize(dis, size.y);
         if (rWindow) rWindow->OnResize(size.x - dis, size.y);
@@ -133,7 +134,7 @@ void LRContainer::OnLeftDown(int x, int y){
     cursorPos.y = y;
     if (dragEnable && Abs(x - dis) < 4.0f){
         adjustPos = true;
-        SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+        Main::SetWindowCursor(IDC_SIZEWE);
         return;
     }
     UpdateFocus();
@@ -377,7 +378,7 @@ void UDContainer::OnMouseMove(int x, int y){
     cursorPos.x = x;
     cursorPos.y = y;
     if (adjustPos){
-        SetCursor(LoadCursor(NULL, IDC_SIZENS));
+        Main::SetWindowCursor(IDC_SIZENS);
         dis = y;
         if (uWindow) uWindow->OnResize(size.x, size.y - dis);
         if (dWindow) dWindow->OnResize(size.x, dis);
@@ -392,7 +393,7 @@ void UDContainer::OnLeftDown(int x, int y){
     cursorPos.y = y;
     if (dragEnable && Abs(y - dis) < 4.0f){
         adjustPos = true;
-        SetCursor(LoadCursor(NULL, IDC_SIZENS));
+        Main::SetWindowCursor(IDC_SIZENS);
         return;
     }
     UpdateFocus();
@@ -583,6 +584,10 @@ void SelectionWindow::InitMenu(){
     }, this));
     selMenu->AddItem(new MenuItem(L"上下分割至下侧", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
         window->SetWindow(new UDContainer(NULL, window->curWindow, window), false);
+    }, this));
+    selMenu->AddItem(new MenuItem());
+    selMenu->AddItem(new MenuItem(L"新窗口", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
+        new AppFrame("ModelView New", new SelectionWindow(), 400, 400, true);
     }, this));
 }
 

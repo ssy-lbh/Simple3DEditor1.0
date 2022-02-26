@@ -2,23 +2,46 @@
 
 #include <windows.h>
 
-#include "../../main.h"
+#include "../../thread.h"
+#include "../../font.h"
 #include "../../res.h"
 #include "../../glfunc.h"
 
-AppFrame* AppFrame::inst = NULL;
-
 bool AppFrame::init = false;
 
-AppFrame::AppFrame(String name, IWindow* mainFrame, size_t height, size_t width) : name(name), mainFrame(mainFrame), height(height), width(width) {
-    HINSTANCE hInst = GetModuleHandleA(NULL);
+AppFrame::AppFrame(String name, IWindow* mainFrame, size_t height, size_t width, bool async) : name(name), mainFrame(mainFrame), height(height), width(width) {
+    Initialize();
 
-    inst = this;
+    if (async){
+        hThread = CreateThread(NULL, 0, []CALLBACK(LPVOID data)->DWORD{
+            AppFrame* frame = (AppFrame*)data;
+            frame->InitWindow();
+            DWORD ret = frame->MainLoop();
+            delete frame;
+            return ret;
+        }, this, 0, NULL);
+        CloseHandle(hThread);
+        return;
+    }
+
+    InitWindow();
+}
+
+AppFrame::~AppFrame(){
+    if (mainFrame) delete mainFrame;
+    if (data) delete data;
+    DestroyWindow(hWnd);
+}
+
+void AppFrame::Initialize(){
+    HINSTANCE hInst;
 
     if (!init){
         WNDCLASSEXA wc;
 
         init = true;
+
+        hInst = GetModuleHandleA(NULL);
 
         wc.cbSize = sizeof(WNDCLASSEXA);
         wc.cbClsExtra = 0;
@@ -34,27 +57,13 @@ AppFrame::AppFrame(String name, IWindow* mainFrame, size_t height, size_t width)
         wc.style = 0;
 
         RegisterClassExA(&wc);
+
+        ThreadLocal::Alloc(THREAD_LOCAL_APPFRAME);
     }
-
-    hWnd = CreateWindowExA(
-        0,
-        "ModelView.MainWindow",
-        "ModelView",
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        width, height,
-        NULL,
-        LoadMenuA(hInst, MAKEINTRESOURCE(IDC_MENU)),
-        hInst,
-        NULL
-    );
-
-    hAccel = LoadAcceleratorsA(hInst, MAKEINTRESOURCE(IDC_MENU));
 }
 
-AppFrame::~AppFrame(){
-    if (mainFrame) delete mainFrame;
-    DestroyWindow(hWnd);
+AppFrame* AppFrame::GetLocalInst(){
+    return (AppFrame*)ThreadLocal::Get(THREAD_LOCAL_APPFRAME);
 }
 
 String AppFrame::GetCaption(){
@@ -75,6 +84,10 @@ size_t AppFrame::GetWidth(){
 
 IWindow* AppFrame::GetMainFrame(){
     return mainFrame;
+}
+
+LocalData* AppFrame::GetLocalData(){
+    return data;
 }
 
 void AppFrame::Show(){
@@ -118,6 +131,7 @@ void AppFrame::DisableOpenGL(){
 
 bool AppFrame::WaitHandleEvent(){
     GetMessageA(&Msg, NULL, 0, 0);
+    //DebugLog("%p %d %d %d", Msg.hwnd, Msg.message, Msg.wParam, Msg.lParam);
     if (!TranslateAcceleratorA(Msg.hwnd, hAccel, &Msg)){
         if (Msg.message == WM_QUIT){
             return false;
@@ -153,7 +167,9 @@ void AppFrame::Render(){
 
     ViewportManager::inst->Reset(hWnd);
 
-    Main::data->Render();
+    LocalData* data = (LocalData*)ThreadLocal::Get(THREAD_LOCAL_LOCALDATA);
+    if (data)
+        data->Render();
 }
 
 void AppFrame::SwapBuffer(){
@@ -175,7 +191,45 @@ int AppFrame::GetExitCode(){
     return Msg.wParam;
 }
 
+int AppFrame::MainLoop(){
+    EnableOpenGL();
+    EnableOpenGLEXT();
+
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+
+    glSelectFont(12, GB2312_CHARSET, "微软雅黑");
+    glInitASCIIFont();
+
+    Show();
+    while (GetMessageA(&Msg, NULL, 0, 0)){
+        if (!TranslateAcceleratorA(Msg.hwnd, hAccel, &Msg)){
+            if (Msg.message == WM_QUIT){
+                break;
+            } else {
+                TranslateMessage(&Msg);
+                DispatchMessageA(&Msg);
+                if (reqRender || Msg.message != WM_TIMER){
+                    reqRender = false;
+                    Render();
+                    SwapBuffer();
+                }
+            }
+        }
+    }
+    DisableOpenGL();
+    return Msg.wParam;
+}
+
+bool AppFrame::WaitQuit(){
+    if (hThread == INVALID_HANDLE_VALUE)
+        return false;
+    return WaitForSingleObject(hThread, INFINITE) == WAIT_OBJECT_0;
+}
+
 LRESULT CALLBACK AppFrame::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
+    AppFrame* inst = (AppFrame*)ThreadLocal::Get(THREAD_LOCAL_APPFRAME);
     return inst->LocalWndProc(hWnd, uMsg, wParam, lParam);
 }
 
@@ -195,24 +249,24 @@ LRESULT CALLBACK AppFrame::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         Main::data->scene->OnTimer(wParam);
         break;
     case WM_SIZE:
-        Main::data->UpdateWindowSize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        data->UpdateWindowSize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_MOUSEMOVE:
-        Main::data->UpdateCursor(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        data->UpdateCursor(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_LBUTTONDOWN:
-        Main::data->OnLeftDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        data->OnLeftDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         SetCapture(hWnd);
         break;
     case WM_LBUTTONUP:
-        Main::data->OnLeftUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        data->OnLeftUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         ReleaseCapture();
         break;
     case WM_RBUTTONDOWN:
-        Main::data->OnRightDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        data->OnRightDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_RBUTTONUP:
-        Main::data->OnRightUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        data->OnRightUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_CHAR:
         Main::data->scene->OnChar(wParam);
@@ -338,4 +392,28 @@ void AppFrame::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, L
     }
         break;
     }
+}
+
+void AppFrame::InitWindow(){
+    HINSTANCE hInst = GetModuleHandleA(NULL);
+
+    data = new LocalData();
+
+    ThreadLocal::Set(THREAD_LOCAL_APPFRAME, this);
+    ThreadLocal::Set(THREAD_LOCAL_LOCALDATA, data);
+
+    hWnd = CreateWindowExA(
+        0,
+        "ModelView.MainWindow",
+        name.GetString(),
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT,
+        width, height,
+        NULL,
+        LoadMenuA(hInst, MAKEINTRESOURCE(IDC_MENU)),
+        hInst,
+        NULL
+    );
+
+    hAccel = LoadAcceleratorsA(hInst, MAKEINTRESOURCE(IDC_MENU));
 }

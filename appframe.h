@@ -3,6 +3,7 @@
 
 #include "define.h"
 
+#include "main.h"
 #include "uimgr.h"
 #include "utils.h"
 
@@ -12,27 +13,29 @@ class AppFrame final : public Object {
 private:
     static bool init;
 
-    bool cursorSelected = false;
-
 public:
     HWND hWnd;
     HACCEL hAccel;
     HDC hDC;
     HGLRC hRC;
     MSG Msg;
+    HANDLE hThread = INVALID_HANDLE_VALUE;
 
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT CALLBACK LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     void FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void InitWindow();
 #endif
-public:
-    static AppFrame* inst;
 
 private:
     String name;
     IWindow* mainFrame;
     size_t width;
     size_t height;
+
+    LocalData* data;
+
+    static void Initialize();
 
 public:
     enum MessageType {
@@ -44,14 +47,20 @@ public:
         MESSAGE_OTHERS
     };
 
-    AppFrame(String name, IWindow* mainFrame, size_t height, size_t width);
+    bool reqRender = false;
+    bool cursorSelected = false;
+
+    AppFrame(String name, IWindow* mainFrame, size_t height, size_t width, bool async = false);
     ~AppFrame();
+
+    static AppFrame* GetLocalInst();
 
     String GetCaption();
     void SetSize(size_t height, size_t width);
     size_t GetHeight();
     size_t GetWidth();
     IWindow* GetMainFrame();
+    LocalData* GetLocalData();
 
     void Show();
     void Hide();
@@ -63,6 +72,9 @@ public:
     bool HandleEvents();
     void Render();
     void SwapBuffer();
+
+    int MainLoop();
+    bool WaitQuit();
 
     MessageType GetLastMessageType();
     int GetExitCode();

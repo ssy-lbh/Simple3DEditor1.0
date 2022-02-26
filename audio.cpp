@@ -778,6 +778,18 @@ void AudioCaptureWindow::DisplayModeItem::OnClick(){
     DebugLog("AudioCaptureWindow::DisplayModeItem State %s", window->displayWave ? "Wave" : "Frequency");
 }
 
+AudioCaptureWindow::AdjushWaveItem::AdjushWaveItem(AudioCaptureWindow* window) : window(window) {}
+AudioCaptureWindow::AdjushWaveItem::~AdjushWaveItem(){}
+
+const wchar_t* AudioCaptureWindow::AdjushWaveItem::GetName(){
+    return window->adjustWave ? L"调整波形:开" : L"调整波形:关";
+}
+
+void AudioCaptureWindow::AdjushWaveItem::OnClick(){
+    window->adjustWave = !window->adjustWave;
+    DebugLog("AudioCaptureWindow::AdjushWaveItem State %s", window->adjustWave ? "On" : "Off");
+}
+
 AudioCaptureWindow::AudioCaptureWindow(){
     DebugLog("AudioCaptureWindow Launched");
 
@@ -798,6 +810,7 @@ AudioCaptureWindow::AudioCaptureWindow(){
     basicMenu = new Menu();
     basicMenu->AddItem(new CaptureItem(this));
     basicMenu->AddItem(new DisplayModeItem(this));
+    basicMenu->AddItem(new AdjushWaveItem(this));
 }
 
 AudioCaptureWindow::~AudioCaptureWindow(){
@@ -833,17 +846,24 @@ void AudioCaptureWindow::ProcessInput(){
 
     capOffset += cnt;
 
-    for (int i = 0; i < (1 << bit); i++){
-        short val = ((short*)capBuf)[(i + capOffset) & ((1 << bit) - 1)];
-        freqBuf[i] = val;
-        sum += Abs((float)val);
-    }
-    if (sum * ratio < (1ll << (bit + 15)) * 0.01f){
-        if (ratio < 100)
-            ratio *= 10;
-    }else if (sum * ratio > (1ll << (bit + 15))){
-        if (ratio > 1)
-            ratio /= 10;
+    
+    if (displayWave && adjustWave){
+        for (int i = 0; i < (1 << bit); i++){
+            short val = ((short*)capBuf)[(i + capOffset) & ((1 << bit) - 1)];
+            freqBuf[i] = val;
+            sum += Abs((float)val);
+        }
+        if (sum * ratio < (1ll << (bit + 15)) * 0.01f){
+            if (ratio < 100)
+                ratio *= 10;
+        }else if (sum * ratio > (1ll << (bit + 15))){
+            if (ratio > 1)
+                ratio /= 10;
+        }
+    }else{
+        for (int i = 0; i < (1 << bit); i++){
+            freqBuf[i] = ((short*)capBuf)[(i + capOffset) & ((1 << bit) - 1)];
+        }
     }
 
     AudioUtils::FFT(freqBuf, bit, false);
@@ -853,10 +873,18 @@ void AudioCaptureWindow::ProcessInput(){
         glLineWidth(1.0f);
         glBegin(GL_LINE_STRIP);
         glColor3f(1.0f, 1.0f, 1.0f);
-        for (int i = 0; i < 1024; i++){
-            float rate = i / 1024.0f;
-            float amp = Clamp(((short*)capBuf)[((i << (bit - 10)) + capOffset) & ((1 << bit) - 1)] * 0.000030517578125f * ratio, -1.0f, 1.0f);
-            glVertex2f(rate * 2.0f - 1.0f, (amp + 1.0f) * 0.5f);
+        if (adjustWave){
+            for (int i = 0; i < 1024; i++){
+                float rate = i / 1024.0f;
+                float amp = Clamp(((short*)capBuf)[((i << (bit - 10)) + capOffset) & ((1 << bit) - 1)] * 0.000030517578125f * ratio, -1.0f, 1.0f);
+                glVertex2f(rate * 2.0f - 1.0f, (amp + 1.0f) * 0.5f);
+            }
+        }else{
+            for (int i = 0; i < 1024; i++){
+                float rate = i / 1024.0f;
+                float amp = Clamp(((short*)capBuf)[((i << (bit - 10)) + capOffset) & ((1 << bit) - 1)] * 0.000030517578125f, -1.0f, 1.0f);
+                glVertex2f(rate * 2.0f - 1.0f, (amp + 1.0f) * 0.5f);
+            }
         }
         glEnd();
     }else{
@@ -895,10 +923,18 @@ void AudioCaptureWindow::ProcessOutput(){
         glLineWidth(1.0f);
         glBegin(GL_LINE_STRIP);
         glColor3f(1.0f, 1.0f, 1.0f);
-        for (int i = 0; i < 1024; i++){
-            float rate = i / 1024.0f;
-            float amp = Clamp(((short*)recBuf)[((i << (bit - 10)) + recOffset) & ((1 << bit) - 1)] * 0.000030517578125f * ratio, -1.0f, 1.0f);
-            glVertex2f(rate * 2.0f - 1.0f, (amp - 1.0f) * 0.5f);
+        if (adjustWave){
+            for (int i = 0; i < 1024; i++){
+                float rate = i / 1024.0f;
+                float amp = Clamp(((short*)recBuf)[((i << (bit - 10)) + recOffset) & ((1 << bit) - 1)] * 0.000030517578125f * ratio, -1.0f, 1.0f);
+                glVertex2f(rate * 2.0f - 1.0f, (amp - 1.0f) * 0.5f);
+            }
+        }else{
+            for (int i = 0; i < 1024; i++){
+                float rate = i / 1024.0f;
+                float amp = Clamp(((short*)recBuf)[((i << (bit - 10)) + recOffset) & ((1 << bit) - 1)] * 0.000030517578125f, -1.0f, 1.0f);
+                glVertex2f(rate * 2.0f - 1.0f, (amp - 1.0f) * 0.5f);
+            }
         }
         glEnd();
     }else{

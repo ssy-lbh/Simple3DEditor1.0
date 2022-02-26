@@ -36,6 +36,7 @@ public:
     void DeleteTriFace(Face* f);
 
     void Render();
+    void Render(bool light);
     void RenderUVMap();
 
     void WriteToOBJ(HANDLE hFile, bool uv = false, bool normal = false);

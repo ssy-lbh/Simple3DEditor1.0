@@ -45,7 +45,8 @@ class BezierCurveObject;
 // main.h
 class IUndo;
 class MainWindow;
-class MainData;
+class LocalData;
+class GlobalData;
 class Main;
 
 // container.h

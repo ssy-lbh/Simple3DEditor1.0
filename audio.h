@@ -222,6 +222,7 @@ private:
     soundtouch::SoundTouch* soundTouch = NULL;
 
     bool displayWave = false;
+    bool adjustWave = false;
     int ratio = 1;
 
     class ProgressBar final : public IButton {
@@ -263,6 +264,19 @@ private:
     public:
         DisplayModeItem(AudioCaptureWindow* window);
         virtual ~DisplayModeItem() override;
+
+        virtual const wchar_t* GetName() override;
+
+        virtual void OnClick() override;
+    };
+
+    class AdjushWaveItem final : public IMenuItem {
+    private:
+        AudioCaptureWindow* window;
+
+    public:
+        AdjushWaveItem(AudioCaptureWindow* window);
+        virtual ~AdjushWaveItem() override;
 
         virtual const wchar_t* GetName() override;
 

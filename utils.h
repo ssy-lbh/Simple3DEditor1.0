@@ -167,7 +167,7 @@ public:
 
     bool Open();
     bool Close();
-    bool isOpened();
+    bool isOpened() const;
     bool Exist();
     bool Create();
     bool Delete();

@@ -280,6 +280,10 @@ void Mesh::DeleteTriFace(Face* f){
 }
 
 void Mesh::Render(){
+    Render(false);
+}
+
+void Mesh::Render(bool light){
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
     glPointSize(4.0f);
@@ -302,8 +306,7 @@ void Mesh::Render(){
     glEnd();
     glDisable(GL_LINE_SMOOTH);
 
-    glDisable(GL_LIGHTING);
-    if (Main::data->lightEnabled)
+    if (light)
         glEnable(GL_LIGHTING);// 开启光照系统
     glShadeModel(GL_SMOOTH);
     if (modeltex){

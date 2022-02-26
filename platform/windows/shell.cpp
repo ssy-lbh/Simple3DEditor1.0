@@ -9,12 +9,13 @@
 String ShellFileSelectWindow(String filter, DWORD flags){
     OPENFILENAMEA ofn;
     char buffer[DEFAULT_STRING_LENGTH + 1];
+    AppFrame* frame = AppFrame::GetLocalInst();
     
     buffer[DEFAULT_STRING_LENGTH] = '\0';
 
     RtlZeroMemory(&ofn, sizeof(OPENFILENAMEA));
     ofn.lStructSize = sizeof(OPENFILENAMEA);
-    ofn.hwndOwner = AppFrame::inst->hWnd;
+    ofn.hwndOwner = (frame == NULL ? NULL : frame->hWnd);
     // 结尾为两个'\0'，每两个字符串构成描述、过滤对，增加过滤模板可用';'分隔多个模板
     ofn.lpstrFilter = filter.GetString();
     ofn.lpstrInitialDir = "./";
@@ -35,12 +36,13 @@ String ShellFileSelectWindow(String filter, DWORD flags){
 WString ShellFileSelectWindow(WString filter, DWORD flags){
     OPENFILENAMEW ofn;
     wchar_t buffer[DEFAULT_STRING_LENGTH + 1];
+    AppFrame* frame = AppFrame::GetLocalInst();
     
     buffer[DEFAULT_STRING_LENGTH] = L'\0';
 
     RtlZeroMemory(&ofn, sizeof(OPENFILENAMEW));
     ofn.lStructSize = sizeof(OPENFILENAMEW);
-    ofn.hwndOwner = AppFrame::inst->hWnd;
+    ofn.hwndOwner = (frame == NULL ? NULL : frame->hWnd);
     // 结尾为两个'\0'，每两个字符串构成描述、过滤对，增加过滤模板可用';'分隔多个模板
     ofn.lpstrFilter = filter.GetString();
     ofn.lpstrInitialDir = L"./";
