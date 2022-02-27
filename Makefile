@@ -12,23 +12,33 @@ PLATFORM_U	= WINDOWS
 
 GCC			= g++.exe
 RM			= del
-CFLAGS 		= -I"openal\\" -I"opengl\\" -I"." -m64
+CFLAGS 		= -I"." -m64
 OFLAGS		= -m64 -g
-LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 "openal\OpenAL32.lib"
+LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 "lib\openal\OpenAL32.lib"
 RES  		= windres.exe
 MKDIR   	= mkdir
 
 BUILD_PATH	= build
-PROGOBJ		= main.o vecmath.o menu.o gltools.o uimgr.o mesh.o utils\StringBuilder.o utils\DataBuffer.o\
-				geodef.o nodemap.o container.o attrtable.o\
-				audio.o paint.o viewobject.o tree.o anim.o\
-				soundtouch\SoundTouch.o soundtouch\TDStretch.o soundtouch\RateTransposer.o\
-				soundtouch\AAFilter.o soundtouch\FIRFilter.o soundtouch\FIFOSampleBuffer.o\
-				soundtouch\PeakFinder.o soundtouch\BPMDetect.o
-PLATOBJ		= utils\String.o utils\File.o colorboard.o thread.o log.o\
-			  viewmgr.o timetools.o font.o glfunc.o appframe.o shell.o
-EXTRAOBJ	= soundtouch\mmx_optimized.o soundtouch\sse_optimized.o soundtouch\cpu_detect_x86.o
-RESOBJ		= res.o string.o
+PROGOBJ		= main\
+				lib\soundtouch\SoundTouch lib\soundtouch\TDStretch lib\soundtouch\RateTransposer\
+				lib\soundtouch\AAFilter lib\soundtouch\FIRFilter lib\soundtouch\FIFOSampleBuffer\
+				lib\soundtouch\PeakFinder lib\soundtouch\BPMDetect\
+				utils\StringBuilder utils\DataBuffer utils\AudioUtils\
+				utils\math3d\Math utils\math3d\LinearAlgebra utils\math3d\Mesh\
+				utils\math3d\ViewObject utils\math3d\Geometry\
+				utils\gl\GLFrameBuffer utils\gl\GLIndexBuffer\
+				utils\gl\GLLights utils\gl\GLProgram utils\gl\GLShader\
+				utils\gl\GLUtils utils\gl\GLVertexArray utils\gl\glVertexBuffer\
+				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
+				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
+				editor\MainWindow editor\gui\Container editor\gui\UIManager editor\gui\Menu
+PLATOBJ		= utils\String utils\File\
+				utils\os\Shell utils\os\Log utils\os\GLFunc utils\os\Thread\
+				utils\os\Time utils\os\Font utils\os\Appframe\
+				utils\gl\GLComputeProgram utils\gl\glTexture2D\
+				editor\gui\ViewManager editor\dialog\ColorBoard
+EXTRAOBJ	= lib\soundtouch\mmx_optimized lib\soundtouch\sse_optimized lib\soundtouch\cpu_detect_x86
+RESOBJ		= res string
 OUTPUT 		= main.exe
 
 SIGNTOOL	= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe"
@@ -45,10 +55,10 @@ TIMESTAMP 	= "http://timestamp.digicert.com"
 #TIMESTAMP 	= "http://tsa.starfieldtech.com"
 #TIMESTAMP 	= "http://tsa.swisssign.net"
 
-PROGOBJ 	:= $(addprefix $(BUILD_PATH)\, $(PROGOBJ))
-PLATOBJ 	:= $(addprefix $(BUILD_PATH)\, $(PLATOBJ))
-EXTRAOBJ 	:= $(addprefix $(BUILD_PATH)\, $(EXTRAOBJ))
-RESOBJ		:= $(addprefix $(BUILD_PATH)\, $(RESOBJ))
+PROGOBJ 	:= $(addprefix $(BUILD_PATH)\, $(addsuffix .o, $(PROGOBJ)))
+PLATOBJ 	:= $(addprefix $(BUILD_PATH)\, $(addsuffix .o, $(PLATOBJ)))
+EXTRAOBJ 	:= $(addprefix $(BUILD_PATH)\, $(addsuffix .o, $(EXTRAOBJ)))
+RESOBJ		:= $(addprefix $(BUILD_PATH)\, $(addsuffix .o, $(RESOBJ)))
 
 .PHONY:all build clean run rebuild reexec commit merge sign
 
@@ -112,12 +122,10 @@ merge:
 # git gc --aggressive --prune=now
 
 # $(SIGNTOOL) sign /f $(CERT) /p $(PASSWORD) $(OUTPUT)
-# signtool.exe sign /f "D:\code\.Certificate\lin-boheng.pfx" /p ... main.exe
+# signtool.exe sign /f "D:/code/.Certificate/lin-boheng.pfx" /p ... main.exe
 sign: $(OUTPUT)
 	$(SIGNTOOL) timestamp /t $(TIMESTAMP) $(OUTPUT)
 
 clean:
-	$(RM) $(OUTPUT) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
-	-@$(MKDIR) build
-	-@$(MKDIR) build\soundtouch
-	-@$(MKDIR) build\utils
+	-$(RM) $(OUTPUT) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
+

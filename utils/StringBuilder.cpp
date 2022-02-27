@@ -3,7 +3,7 @@
 #include <windows.h>
 
 #include <utils/String.h>
-#include <log.h>
+#include <utils/os/Log.h>
 
 StringBuilder::StringBuilder(){
     data = new char[32];

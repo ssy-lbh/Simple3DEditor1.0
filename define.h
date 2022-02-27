@@ -11,6 +11,16 @@ typedef unsigned long long size_t;
 typedef unsigned int size_t;
 #endif
 
+#ifndef interface
+#define interface class
+#endif
+
+typedef unsigned char uchar;
+typedef unsigned short ushort;
+typedef unsigned int uint;
+
+typedef unsigned int uenum;
+
 // utils.h
 class String;
 class WString;

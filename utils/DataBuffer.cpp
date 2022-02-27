@@ -2,7 +2,7 @@
 
 #include <windows.h>
 
-#include <log.h>
+#include <utils/os/Log.h>
 
 DataBuffer::DataBuffer(){
     data = new char[32];
