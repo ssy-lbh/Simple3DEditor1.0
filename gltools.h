@@ -1,11 +1,11 @@
 #ifndef __GLTOOLS__
 #define __GLTOOLS__
 
-#include "define.h"
+#include <define.h>
 
 #include <gl/gl.h>
 
-#include "vecmath.h"
+#include <vecmath.h>
 
 class GLRect final : public Object {
 public:

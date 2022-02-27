@@ -1,17 +1,17 @@
-#include "main.h"
+#include <main.h>
 
-#include "res.h"
+#include <res.h>
 
-#include "log.h"
-#include "font.h"
-#include "gltools.h"
-#include "glfunc.h"
-#include "nodemap.h"
-#include "audio.h"
-#include "paint.h"
-#include "thread.h"
+#include <log.h>
+#include <font.h>
+#include <gltools.h>
+#include <glfunc.h>
+#include <nodemap.h>
+#include <audio.h>
+#include <paint.h>
+#include <thread.h>
 
-#include "shell.h"
+#include <shell.h>
 
 MainWindow::MoveButton::MoveButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
 

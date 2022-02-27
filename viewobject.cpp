@@ -1,7 +1,7 @@
-#include "viewobject.h"
+#include <viewobject.h>
 
-#include "main.h"
-#include "res.h"
+#include <main.h>
+#include <res.h>
 
 Transform::Transform(){}
 Transform::~Transform(){}

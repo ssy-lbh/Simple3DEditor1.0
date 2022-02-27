@@ -1,11 +1,11 @@
-#include "nodemap.h"
+#include <nodemap.h>
 
 #include "opengl/gl/gl.h"
 
-#include "main.h"
-#include "res.h"
-#include "gltools.h"
-#include "log.h"
+#include <main.h>
+#include <res.h>
+#include <gltools.h>
+#include <log.h>
 
 NodeMapWindow::MoveButton::MoveButton(Vector2 center, float radius, NodeMapWindow* window) : center(center), radius(radius), window(window) {}
 

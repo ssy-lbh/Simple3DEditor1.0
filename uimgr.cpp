@@ -1,11 +1,11 @@
-#include "uimgr.h"
+#include <uimgr.h>
 
 #include <windows.h>
 
 #include "opengl/gl/gl.h"
 
-#include "font.h"
-#include "main.h"
+#include <font.h>
+#include <main.h>
 
 UIManager::UIManager(){}
 

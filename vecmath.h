@@ -1,7 +1,7 @@
 #ifndef __VECMATH__
 #define __VECMATH__
 
-#include "define.h"
+#include <define.h>
 
 #define PI 3.1415926535897932384626433832795
 

@@ -1,12 +1,12 @@
-#include "gltools.h"
+#include <gltools.h>
 
-#include "vecmath.h"
-#include "glfunc.h"
-#include "res.h"
-#include "main.h"
+#include <vecmath.h>
+#include <glfunc.h>
+#include <res.h>
+#include <main.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image/stb_image.h"
+#include <stb_image/stb_image.h>
 
 GLRect::GLRect(){}
 GLRect::GLRect(Vector2 p1, Vector2 p2) : left(p1.x), right(p2.x), top(p1.y), bottom(p2.y) { Sort(left, right); Sort(bottom, top); }

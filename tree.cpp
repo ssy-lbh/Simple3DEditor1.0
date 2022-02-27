@@ -1,7 +1,7 @@
-#include "tree.h"
+#include <tree.h>
 
-#include "main.h"
-#include "font.h"
+#include <main.h>
+#include <font.h>
 
 TreeWindow::TreeWindow(){
     DebugLog("TreeWindow Launched");

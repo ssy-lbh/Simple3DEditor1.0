@@ -1,11 +1,11 @@
 #ifndef __PAINT__
 #define __PAINT__
 
-#include "define.h"
+#include <define.h>
 
-#include "uimgr.h"
-#include "menu.h"
-#include "geodef.h"
+#include <uimgr.h>
+#include <menu.h>
+#include <geodef.h>
 
 class UVEditWindow final : public IWindow {
 private:

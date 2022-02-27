@@ -1,10 +1,10 @@
 #ifndef __VIEWMGR__
 #define __VIEWMGR__
 
-#include "define.h"
+#include <define.h>
 
-#include "list.h"
-#include "gltools.h"
+#include <list.h>
+#include <gltools.h>
 
 class ViewManager final : public Object {
 private:

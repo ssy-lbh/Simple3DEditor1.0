@@ -1,15 +1,15 @@
-#include "container.h"
+#include <container.h>
 
-#include "gltools.h"
-#include "log.h"
-#include "res.h"
-#include "main.h"
-#include "audio.h"
-#include "nodemap.h"
-#include "paint.h"
-#include "tree.h"
-#include "anim.h"
-#include "appframe.h"
+#include <gltools.h>
+#include <log.h>
+#include <res.h>
+#include <main.h>
+#include <audio.h>
+#include <nodemap.h>
+#include <paint.h>
+#include <tree.h>
+#include <anim.h>
+#include <appframe.h>
 
 LRContainer::LRContainer(IWindow* lWindow, IWindow* rWindow) : lWindow(lWindow), rWindow(rWindow) {}
 

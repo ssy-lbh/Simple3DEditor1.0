@@ -1,7 +1,7 @@
-#include "anim.h"
+#include <anim.h>
 
-#include "main.h"
-#include "font.h"
+#include <main.h>
+#include <font.h>
 
 IAnimationFunction::IAnimationFunction(){}
 IAnimationFunction::~IAnimationFunction(){}

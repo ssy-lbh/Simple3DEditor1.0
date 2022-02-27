@@ -1,10 +1,10 @@
 #ifndef __MESH__
 #define __MESH__
 
-#include "define.h"
+#include <define.h>
 
-#include "gltools.h"
-#include "viewobject.h"
+#include <gltools.h>
+#include <viewobject.h>
 
 class Mesh final : public Object {
 private:

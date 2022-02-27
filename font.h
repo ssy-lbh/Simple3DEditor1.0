@@ -1,7 +1,7 @@
 #ifndef __FONT__
 #define __FONT__
 
-#include "define.h"
+#include <define.h>
 
 void glFontSize(int size);
 void glInitASCIIFont();

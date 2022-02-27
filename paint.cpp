@@ -1,12 +1,12 @@
-#include "paint.h"
+#include <paint.h>
 
 #include <gl/gl.h>
 
-#include "main.h"
-#include "res.h"
-#include "geodef.h"
-#include "glfunc.h"
-#include "colorboard.h"
+#include <main.h>
+#include <res.h>
+#include <geodef.h>
+#include <glfunc.h>
+#include <colorboard.h>
 
 UVEditWindow::MoveOperation::MoveOperation(UVEditWindow* main) : main(main) {}
 UVEditWindow::MoveOperation::~MoveOperation(){}

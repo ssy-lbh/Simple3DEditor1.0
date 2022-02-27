@@ -1,16 +1,16 @@
 #ifndef __MAIN__
 #define __MAIN__
 
-#include "define.h"
+#include <define.h>
 
 #include <gl/gl.h>
 #include <gl/glu.h>
 
-#include "appframe.h"
-#include "menu.h"
-#include "container.h"
-#include "colorboard.h"
-#include "viewobject.h"
+#include <appframe.h>
+#include <menu.h>
+#include <container.h>
+#include <colorboard.h>
+#include <viewobject.h>
 
 //TODO 补全撤销功能
 interface IUndo : public Object {

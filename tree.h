@@ -1,10 +1,10 @@
 #ifndef __TREE__
 #define __TREE__
 
-#include "define.h"
+#include <define.h>
 
-#include "uimgr.h"
-#include "viewobject.h"
+#include <uimgr.h>
+#include <viewobject.h>
 
 class TreeWindow final : public IWindow {
 private:

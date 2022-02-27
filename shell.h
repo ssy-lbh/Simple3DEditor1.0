@@ -1,7 +1,7 @@
 #ifndef __SHELL__
 #define __SHELL__
 
-#include "define.h"
+#include <define.h>
 
 #ifdef PLATFORM_WINDOWS
 #include <windef.h>

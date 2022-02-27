@@ -1,7 +1,7 @@
 #ifndef __UTILS__
 #define __UTILS__
 
-#include "define.h"
+#include <define.h>
 
 #include <utils/String.h>
 #include <utils/File.h>

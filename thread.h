@@ -1,7 +1,7 @@
 #ifndef __THREAD__
 #define __THREAD__
 
-#include "define.h"
+#include <define.h>
 
 #define THREAD_LOCAL_SIZE 20
 

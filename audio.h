@@ -1,14 +1,14 @@
 #ifndef __AUDIO__
 #define __AUDIO__
 
-#include "define.h"
+#include <define.h>
 
 #include "openal/al.h"
 #include "openal/alc.h"
 
-#include "utils.h"
-#include "uimgr.h"
-#include "menu.h"
+#include <utils.h>
+#include <uimgr.h>
+#include <menu.h>
 
 #include "soundtouch/SoundTouch.h"
 

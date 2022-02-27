@@ -1,13 +1,13 @@
 #ifndef __VIEWOBJECT__
 #define __VIEWOBJECT__
 
-#include "define.h"
+#include <define.h>
 
-#include "list.h"
-#include "geodef.h"
-#include "vecmath.h"
-#include "mesh.h"
-#include "utils.h"
+#include <list.h>
+#include <geodef.h>
+#include <vecmath.h>
+#include <mesh.h>
+#include <utils.h>
 
 class Transform final : public Object {
 public:

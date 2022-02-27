@@ -1,7 +1,7 @@
-#include "geodef.h"
+#include <geodef.h>
 
-#include "log.h"
-#include "viewobject.h"
+#include <log.h>
+#include <viewobject.h>
 
 Vertex::Vertex(){}
 

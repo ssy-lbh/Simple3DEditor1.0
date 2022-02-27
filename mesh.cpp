@@ -1,10 +1,10 @@
-#include "mesh.h"
+#include <mesh.h>
 
 #include "opengl/gl/gl.h"
 
-#include "main.h"
-#include "res.h"
-#include "log.h"
+#include <main.h>
+#include <res.h>
+#include <log.h>
 
 Mesh::Mesh(){}
 

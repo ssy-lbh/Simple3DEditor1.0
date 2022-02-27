@@ -1,9 +1,9 @@
 #ifndef __LIST__
 #define __LIST__
 
-#include "define.h"
+#include <define.h>
 
-#include "log.h"
+#include <log.h>
 
 template <typename T>
 class List : public Object {

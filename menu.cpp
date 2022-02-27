@@ -1,8 +1,8 @@
-#include "menu.h"
+#include <menu.h>
 
-#include "font.h"
-#include "gltools.h"
-#include "log.h"
+#include <font.h>
+#include <gltools.h>
+#include <log.h>
 
 IMenuItem::IMenuItem(){}
 IMenuItem::~IMenuItem(){}

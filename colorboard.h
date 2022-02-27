@@ -1,7 +1,7 @@
 #ifndef __COLORBOARD__
 #define __COLORBOARD__
 
-#include "vecmath.h"
+#include <vecmath.h>
 
 #ifdef PLATFORM_WINDOWS
 #include <windows.h>

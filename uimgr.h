@@ -1,11 +1,11 @@
 #ifndef __UIMGR__
 #define __UIMGR__
 
-#include "define.h"
+#include <define.h>
 
-#include "list.h"
-#include "vecmath.h"
-#include "gltools.h"
+#include <list.h>
+#include <vecmath.h>
+#include <gltools.h>
 
 class UIManager final : public Object {
 private:

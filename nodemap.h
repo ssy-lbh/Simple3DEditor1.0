@@ -1,11 +1,11 @@
 #ifndef __NODEMAP__
 #define __NODEMAP__
 
-#include "define.h"
+#include <define.h>
 
-#include "uimgr.h"
-#include "menu.h"
-#include "gltools.h"
+#include <uimgr.h>
+#include <menu.h>
+#include <gltools.h>
 
 class NodeMapWindow final : public IWindow {
 private:

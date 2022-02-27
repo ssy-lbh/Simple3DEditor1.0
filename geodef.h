@@ -1,10 +1,10 @@
 #ifndef __GEODEF__
 #define __GEODEF__
 
-#include "define.h"
+#include <define.h>
 
-#include "list.h"
-#include "vecmath.h"
+#include <list.h>
+#include <vecmath.h>
 
 class Vertex final : public Object {
 public:
