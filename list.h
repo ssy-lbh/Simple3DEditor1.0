@@ -64,22 +64,26 @@ public:
 
     List& operator=(List&& list){
         //DebugLog("List& operator=(List&& list)");
+        delete[] data;
         size = list.size;
         data = new T[size];
         ptr = list.ptr;
         for (size_t i = 0; i < ptr; i++){
             data[i] = list.data[i];
         }
+        return *this;
     }
 
     List& operator=(const List& list){
         //DebugLog("List& operator=(const List& list)");
+        delete[] data;
         size = list.size;
         data = new T[size];
         ptr = list.ptr;
         for (size_t i = 0; i < ptr; i++){
             data[i] = list.data[i];
         }
+        return *this;
     }
 
     ~List(){
@@ -162,7 +166,7 @@ public:
 
     void Clear(){
         //DebugLog("Clear");
-        delete data;
+        delete[] data;
         size = 8;
         data = new T[size];
         ptr = 0;

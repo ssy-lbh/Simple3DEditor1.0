@@ -366,74 +366,73 @@ void Mesh::RenderUVMap(){
     glDisable(GL_LINE_SMOOTH);
 }
 
-void Mesh::WriteToOBJ(HANDLE hFile, bool uv, bool normal){
+void Mesh::WriteToOBJ(File* file, bool uv, bool normal){
     size_t index = 0;
-    WriteFile(hFile, "# StereoVision 3D Editor\n", 25, NULL, NULL);
-    WriteFile(hFile, "# Author: lin-boheng@gitee.com\n", 31, NULL, NULL);
+    file->Write("# StereoVision 3D Editor\n", 25);
+    file->Write("# Author: lin-boheng@gitee.com\n", 31);
     // 顶点索引
     vertices.Foreach<size_t*>([](Vertex* v, size_t* i){
         v->index = ++*i;
     }, &index);
     // 顶点
-    vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
+    vertices.Foreach<File*>([](Vertex* v, File* file){
         char tmp[MAX_PATH + 1];
         DWORD len;
         len = __builtin_snprintf(tmp, MAX_PATH, "v %f %f %f\n", v->pos.x, v->pos.y, v->pos.z);
-        WriteFile(hFile, tmp, len, &len, NULL);
-    }, hFile);
+        file->Write(tmp, len);
+    }, file);
     // 纹理UV坐标
     if (uv){
-        vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
+        vertices.Foreach<File*>([](Vertex* v, File* file){
             char tmp[MAX_PATH + 1];
             DWORD len;
             len = __builtin_snprintf(tmp, MAX_PATH, "vt %f %f\n", v->uv.x, v->uv.y);
-            WriteFile(hFile, tmp, len, &len, NULL);
-        }, hFile);
+            file->Write(tmp, len);
+        }, file);
     }
     // 顶点法线
     if (normal){
-        vertices.Foreach<HANDLE>([](Vertex* v, HANDLE hFile){
+        vertices.Foreach<File*>([](Vertex* v, File* file){
             char tmp[MAX_PATH + 1];
             DWORD len;
             len = __builtin_snprintf(tmp, MAX_PATH, "vn %f %f %f\n", v->normal.x, v->normal.y, v->normal.z);
-            WriteFile(hFile, tmp, len, &len, NULL);
-        }, hFile);
+            file->Write(tmp, len);
+        }, file);
     }
     // 片元
     if (!uv && !normal){
-        faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
+        faces.Foreach<File*>([](Face* f, File* file){
             char tmp[MAX_PATH + 1];
             DWORD len;
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d %d %d\n", idx1, idx2, idx3);
-            WriteFile(hFile, tmp, len, &len, NULL);
-        }, hFile);
+            file->Write(tmp, len);
+        }, file);
     }else if (uv && !normal){
-        faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
+        faces.Foreach<File*>([](Face* f, File* file){
             char tmp[MAX_PATH + 1];
             DWORD len;
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d/%d %d/%d %d/%d\n", idx1, idx1, idx2, idx2, idx3, idx3);
-            WriteFile(hFile, tmp, len, &len, NULL);
-        }, hFile);
+            file->Write(tmp, len);
+        }, file);
     }else if (!uv && normal){
-        faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
+        faces.Foreach<File*>([](Face* f, File* file){
             char tmp[MAX_PATH + 1];
             DWORD len;
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d//%d %d//%d %d//%d\n", idx1, idx1, idx2, idx2, idx3, idx3);
-            WriteFile(hFile, tmp, len, &len, NULL);
-        }, hFile);
+            file->Write(tmp, len);
+        }, file);
     }else{
-        faces.Foreach<HANDLE>([](Face* f, HANDLE hFile){
+        faces.Foreach<File*>([](Face* f, File* file){
             char tmp[MAX_PATH + 1];
             DWORD len;
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d/%d/%d %d/%d/%d %d/%d/%d\n", idx1, idx1, idx1, idx2, idx2, idx2, idx3, idx3, idx3);
-            WriteFile(hFile, tmp, len, &len, NULL);
-        }, hFile);
+            file->Write(tmp, len);
+        }, file);
     }
-    
 }
 
 void Mesh::SetTexture(int resid){

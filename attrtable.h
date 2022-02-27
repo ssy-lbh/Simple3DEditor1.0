@@ -1,6 +1,8 @@
 #ifndef __ATTRTABLE__
 #define __ATTRTABLE__
 
+#include "define.h"
+
 #include "list.h"
 #include "uimgr.h"
 

@@ -280,14 +280,16 @@ bool UIEditA::Char(char c){
 }
 
 void UIEditA::Render(){
-    Vector2 cliSize = ViewportManager::inst->GetClientSize();
+    ViewManager* viewMgr = ViewManager::GetLocalInst();
+
+    Vector2 cliSize = viewMgr->GetSize();
     Vector2 cliInvSize = Vector2(1.0f / cliSize.x, 1.0f / cliSize.y);
     float strWidth;
 
     size.y = cliInvSize.y * 30.0f;
 
-    glEnable(GL_SCISSOR_TEST);
-    ViewportManager::inst->SetChildScissor(position.x, position.x + size.x, position.y, position.y + size.y);
+    viewMgr->EnableScissor();
+    viewMgr->SetChildScissor(GLRect(position, position + size));
 
     glColor3f(bkColor.x, bkColor.y, bkColor.z);
     if (radius == 0.0f){
@@ -306,7 +308,7 @@ void UIEditA::Render(){
         GLUtils::DrawRect(position.x + (strWidth - 1.0f) * cliInvSize.x * 2.0f, position.y, position.x + (strWidth + 1.0f) * cliInvSize.x * 2.0f, position.y + size.y);
     }
 
-    ViewportManager::inst->ResetScissor();
+    viewMgr->ResetScissor();
 }
 
 char* UIEditA::GetText(){ return text; }
@@ -381,14 +383,16 @@ bool UIEditW::Unichar(wchar_t c){
 }
 
 void UIEditW::Render(){
-    Vector2 cliSize = ViewportManager::inst->GetClientSize();
+    ViewManager* viewMgr = ViewManager::GetLocalInst();
+
+    Vector2 cliSize = viewMgr->GetSize();
     Vector2 cliInvSize = Vector2(1.0f / cliSize.x, 1.0f / cliSize.y);
     float strWidth;
 
     size.y = cliInvSize.y * 30.0f;
 
-    glEnable(GL_SCISSOR_TEST);
-    ViewportManager::inst->SetChildScissor(position.x, position.x + size.x, position.y, position.y + size.y);
+    viewMgr->EnableScissor();
+    viewMgr->SetChildScissor(GLRect(position, position + size));
 
     glColor3f(bkColor.x, bkColor.y, bkColor.z);
     if (radius == 0.0f){
@@ -407,7 +411,7 @@ void UIEditW::Render(){
         GLUtils::DrawRect(position.x + (strWidth - 1.0f) * cliInvSize.x * 2.0f, position.y, position.x + (strWidth + 1.0f) * cliInvSize.x * 2.0f, position.y + size.y);
     }
 
-    ViewportManager::inst->ResetScissor();
+    viewMgr->ResetScissor();
 }
 
 wchar_t* UIEditW::GetText(){ return text; }
@@ -431,109 +435,6 @@ void IOperation::OnRightDown(){}
 void IOperation::OnRightUp(){}
 void IOperation::OnMove(){}
 void IOperation::OnCommand(int id){}
-
-ViewportManager* ViewportManager::inst = new ViewportManager();
-
-ViewportManager::ViewportManager(){}
-
-ViewportManager::~ViewportManager(){}
-
-void ViewportManager::Reset(HWND hWnd){
-    RECT cliRect;
-    LONG tmp;
-    rects.Clear();
-    GetClientRect(hWnd, &cliRect);
-    tmp = cliRect.bottom; cliRect.bottom = cliRect.top; cliRect.top = tmp;
-    rects.Add(cliRect);
-    curRect = cliRect;
-    glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
-    glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
-}
-
-void ViewportManager::PushViewport(RECT rect){
-    rects.Add(rect);
-    curRect = rect;
-    glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
-    glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
-}
-
-void ViewportManager::PopViewport(){
-    rects.RemoveBack();
-    curRect = rects.GetBack();
-    glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
-    glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
-}
-
-void ViewportManager::SetViewport(RECT rect){
-    curRect = rect;
-    glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
-    glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
-}
-
-RECT ViewportManager::GetCurrentRect(){
-    return curRect;
-}
-
-LONG ViewportManager::GetCurrentWidth(){
-    return curRect.right - curRect.left;
-}
-
-LONG ViewportManager::GetCurrentHeight(){
-    return curRect.top - curRect.bottom;
-}
-
-float ViewportManager::GetAspect(){
-    return (float)(curRect.right - curRect.left) / (curRect.top - curRect.bottom);
-}
-
-void ViewportManager::EnableScissor(){
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
-}
-
-void ViewportManager::DisableScissor(){
-    glDisable(GL_SCISSOR_TEST);
-}
-
-Vector2 ViewportManager::GetClientSize(){
-    return Vector2(curRect.right - curRect.left, curRect.top - curRect.bottom);
-}
-
-RECT ViewportManager::CalculateChildRect(float left, float right, float bottom, float top){
-    RECT rect;
-    LONG height, width;
-
-    left = (left + 1.0f) * 0.5f;
-    right = (right + 1.0f) * 0.5f;
-    bottom = (bottom + 1.0f) * 0.5f;
-    top = (top + 1.0f) * 0.5f;
-
-    height = GetCurrentHeight();
-    width = GetCurrentWidth();
-
-    rect.left = curRect.left + Round(width * Clamp(left, 0.0f, 1.0f));
-    rect.right = curRect.left + Round(width * Clamp(right, 0.0f, 1.0f));
-    rect.bottom = curRect.bottom + Round(height * Clamp(bottom, 0.0f, 1.0f));
-    rect.top = curRect.bottom + Round(height * Clamp(top, 0.0f, 1.0f));
-
-    return rect;
-}
-
-void ViewportManager::PushChildViewport(float left, float right, float bottom, float top){
-    PushViewport(CalculateChildRect(left, right, bottom, top));
-}
-
-void ViewportManager::SetScissor(RECT rect){
-    glScissor(rect.left, rect.bottom, rect.right - rect.left, rect.top - rect.bottom);
-}
-
-void ViewportManager::SetChildScissor(float left, float right, float bottom, float top){
-    SetScissor(CalculateChildRect(left, right, bottom, top));
-}
-
-void ViewportManager::ResetScissor(){
-    SetScissor(curRect);
-}
 
 ITool::ITool(){}
 ITool::~ITool(){}

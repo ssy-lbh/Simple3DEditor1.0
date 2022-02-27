@@ -56,27 +56,28 @@ bool LRContainer::IsFocus(){
 }
 
 void LRContainer::OnRender(){
-    RECT tmp;
+    ViewManager* viewMgr = ViewManager::GetLocalInst();
+    GLRect rect;
 
-    tmp = ViewportManager::inst->GetCurrentRect();
-    tmp.right = tmp.left + dis;
-    ViewportManager::inst->PushViewport(tmp);
+    rect = viewMgr->GetRect();
+    rect.right = rect.left + dis;
+    viewMgr->PushView(rect);
     if (lWindow){
         lWindow->OnRender();
     }else{
         GLUtils::Clear3DViewport();
     }
-    ViewportManager::inst->PopViewport();
+    viewMgr->PopView();
 
-    tmp = ViewportManager::inst->GetCurrentRect();
-    tmp.left = tmp.left + dis;
-    ViewportManager::inst->PushViewport(tmp);
+    rect = viewMgr->GetRect();
+    rect.left = rect.left + dis;
+    viewMgr->PushView(rect);
     if (rWindow){
         rWindow->OnRender();
     }else{
         GLUtils::Clear3DViewport();
     }
-    ViewportManager::inst->PopViewport();
+    viewMgr->PopView();
 }
 
 void LRContainer::OnCreate(){
@@ -315,27 +316,28 @@ bool UDContainer::IsFocus(){
 }
 
 void UDContainer::OnRender(){
-    RECT tmp;
+    ViewManager* viewMgr = ViewManager::GetLocalInst();
+    GLRect rect;
 
-    tmp = ViewportManager::inst->GetCurrentRect();
-    tmp.bottom = tmp.bottom + dis;
-    ViewportManager::inst->PushViewport(tmp);
+    rect = viewMgr->GetRect();
+    rect.bottom = rect.bottom + dis;
+    viewMgr->PushView(rect);
     if (uWindow){
         uWindow->OnRender();
     }else{
         GLUtils::Clear3DViewport();
     }
-    ViewportManager::inst->PopViewport();
+    viewMgr->PopView();
 
-    tmp = ViewportManager::inst->GetCurrentRect();
-    tmp.top = tmp.bottom + dis;
-    ViewportManager::inst->PushViewport(tmp);
+    rect = viewMgr->GetRect();
+    rect.top = rect.bottom + dis;
+    viewMgr->PushView(rect);
     if (dWindow){
         dWindow->OnRender();
     }else{
         GLUtils::Clear3DViewport();
     }
-    ViewportManager::inst->PopViewport();
+    viewMgr->PopView();
 }
 
 void UDContainer::OnCreate(){
@@ -585,10 +587,12 @@ void SelectionWindow::InitMenu(){
     selMenu->AddItem(new MenuItem(L"上下分割至下侧", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
         window->SetWindow(new UDContainer(NULL, window->curWindow, window), false);
     }, this));
+#ifdef PLATFORM_WINDOWS
     selMenu->AddItem(new MenuItem());
     selMenu->AddItem(new MenuItem(L"新窗口", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
         new AppFrame("ModelView New", new SelectionWindow(), 400, 400, true);
     }, this));
+#endif
 }
 
 bool SelectionWindow::IsFocus(){

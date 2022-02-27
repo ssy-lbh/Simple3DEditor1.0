@@ -1,6 +1,8 @@
 #ifndef __GLTOOLS__
 #define __GLTOOLS__
 
+#include "define.h"
+
 #include <gl/gl.h>
 
 #include "vecmath.h"
@@ -34,6 +36,7 @@ public:
     // 把pos在rect中所在的位置比例映射到自身中位置
     Vector2 MapPos(GLRect rect, Vector2 pos);
     Vector2 MapPos(GLRect rect, float x, float y);
+    GLRect ChildRect(GLRect ratio);
     GLRect ChildRect(float left, float right, float bottom, float top);
 };
 

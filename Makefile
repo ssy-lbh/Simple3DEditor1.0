@@ -12,20 +12,21 @@ PLATFORM_U	= WINDOWS
 
 GCC			= g++.exe
 RM			= del
-CFLAGS 		= -I"openal\\" -I"opengl\\" -m64
-OFLAGS		= -m64 -s
+CFLAGS 		= -I"openal\\" -I"opengl\\" -I"." -m64
+OFLAGS		= -m64 -g
 LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 "openal\OpenAL32.lib"
 RES  		= windres.exe
 MKDIR   	= mkdir
 
 BUILD_PATH	= build
-PROGOBJ		= main.o log.o vecmath.o font.o menu.o gltools.o uimgr.o mesh.o\
+PROGOBJ		= main.o vecmath.o menu.o gltools.o uimgr.o mesh.o utils\StringBuilder.o utils\DataBuffer.o\
 				geodef.o nodemap.o container.o attrtable.o\
-				audio.o paint.o viewobject.o tree.o anim.o timetools.o\
+				audio.o paint.o viewobject.o tree.o anim.o\
 				soundtouch\SoundTouch.o soundtouch\TDStretch.o soundtouch\RateTransposer.o\
 				soundtouch\AAFilter.o soundtouch\FIRFilter.o soundtouch\FIFOSampleBuffer.o\
 				soundtouch\PeakFinder.o soundtouch\BPMDetect.o
-PLATOBJ		= utils.o glfunc.o appframe.o shell.o colorboard.o thread.o
+PLATOBJ		= utils\String.o utils\File.o colorboard.o thread.o log.o\
+			  viewmgr.o timetools.o font.o glfunc.o appframe.o shell.o
 EXTRAOBJ	= soundtouch\mmx_optimized.o soundtouch\sse_optimized.o soundtouch\cpu_detect_x86.o
 RESOBJ		= res.o string.o
 OUTPUT 		= main.exe
@@ -117,4 +118,6 @@ sign: $(OUTPUT)
 
 clean:
 	$(RM) $(OUTPUT) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
-	-$(MKDIR) build
+	-@$(MKDIR) build
+	-@$(MKDIR) build\soundtouch
+	-@$(MKDIR) build\utils

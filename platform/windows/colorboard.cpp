@@ -1,7 +1,7 @@
-#include "../../colorboard.h"
+#include <colorboard.h>
 
-#include "../../gltools.h"
-#include "../../log.h"
+#include <gltools.h>
+#include <log.h>
 
 ColorBoard* ColorBoard::inst = NULL;
 

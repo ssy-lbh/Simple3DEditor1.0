@@ -11,15 +11,15 @@ typedef unsigned long long size_t;
 typedef unsigned int size_t;
 #endif
 
-// 对象基类
-class Object;
-
-class Object {};
-
 // utils.h
 class String;
 class WString;
 class File;
+
+// 对象基类
+class Object;
+
+class Object {};
 
 // geodef.h
 class Vertex;
@@ -41,6 +41,7 @@ class Transform;
 class AViewObject;
 class MeshObject;
 class BezierCurveObject;
+class AudioListenerObject;
 
 // main.h
 class IUndo;
@@ -75,6 +76,7 @@ class IAnimationFunction;
 class AnimationWindow;
 
 // gltools.h
+class GLRect;
 class GLUtils;
 class GLTexture2D;
 class GLComputeProgram;
@@ -114,5 +116,11 @@ class UIEditA;
 class IOperation;
 class ITool;
 class IWindow;
+
+// appframe.h
+class AppFrame;
+
+// viewmgr.h
+class ViewManager;
 
 #endif

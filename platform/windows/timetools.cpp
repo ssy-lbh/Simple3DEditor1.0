@@ -1,8 +1,8 @@
-#include "timetools.h"
+#include <timetools.h>
 
 #include <windows.h>
 
-#include "main.h"
+#include <log.h>
 
 float TimeUtils::GetTime(){
     LARGE_INTEGER time;
@@ -16,10 +16,8 @@ float TimeUtils::GetTime(){
 
 void TimerManager::CreateTimer(int id, int elapseMillis){
     DebugError("TimerManager::CreateTimer [Unimplemented]");
-    //SetTimer(Main::hWnd, id, elapseMillis, NULL);
 }
 
 void TimerManager::DestroyTimer(int id){
     DebugError("TimerManager::DestroyTimer [Unimplemented]");
-    //KillTimer(Main::hWnd, id);
 }

@@ -77,6 +77,10 @@ Vector2 GLRect::MapPos(GLRect rect, float x, float y){
     return GetRatioPos(rect.GetRatio(x, y));
 }
 
+GLRect GLRect::ChildRect(GLRect ratio){
+    return ChildRect(ratio.left, ratio.right, ratio.bottom, ratio.top);
+}
+
 GLRect GLRect::ChildRect(float left, float right, float bottom, float top){
     GLRect rect;
     Vector2 size;
@@ -726,12 +730,12 @@ void GLFrameBuffer::BindTexture(GLuint texture, GLenum attachment, int x, int y)
 
 void GLFrameBuffer::Enable(){
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame);
-    ViewportManager::inst->PushViewport({0, y, x, 0});
+    ViewManager::GetLocalInst()->PushView(GLRect(0, x, 0, y));
 }
 
 void GLFrameBuffer::Disable(){
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    ViewportManager::inst->PopViewport();
+    ViewManager::GetLocalInst()->PopView();
 }
 
 bool GLLights::use[8] = {false, false, false, false,

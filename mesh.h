@@ -1,7 +1,7 @@
 #ifndef __MESH__
 #define __MESH__
 
-#include <windef.h>
+#include "define.h"
 
 #include "gltools.h"
 #include "viewobject.h"
@@ -39,7 +39,7 @@ public:
     void Render(bool light);
     void RenderUVMap();
 
-    void WriteToOBJ(HANDLE hFile, bool uv = false, bool normal = false);
+    void WriteToOBJ(File* file, bool uv = false, bool normal = false);
 
     // ID为-1时删除
     void SetTexture(int resid);

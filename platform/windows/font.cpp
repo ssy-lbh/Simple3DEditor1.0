@@ -1,15 +1,17 @@
-#include "font.h"
+#include <font.h>
 
-#include "opengl/gl/gl.h"
+#include <gl/gl.h>
+
+#include <vecmath.h>
 
 #define MAX_CHARS 128
 
 static GLuint font = 0;
 
-void glSelectFont(int size, int charset, const char* face) {
+void glFontSize(int size) {
     HFONT hFont = CreateFontA(size, 0, 0, 0, FW_MEDIUM, 0, 0, 0,
-        charset, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-        DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, face);
+        GB2312_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+        DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, "微软雅黑");
     HDC hDC = wglGetCurrentDC();
     HFONT hOldFont = (HFONT)SelectObject(hDC, hFont);
     DeleteObject(hOldFont);
@@ -21,7 +23,7 @@ void glInitASCIIFont(){
     if (font == 0){
         font = glGenLists(MAX_CHARS);
         hDC = wglGetCurrentDC();
-        wglUseFontBitmaps(hDC, 0, MAX_CHARS, font);
+        wglUseFontBitmapsA(hDC, 0, MAX_CHARS, font);
     }
 }
 
@@ -98,4 +100,24 @@ float glGetCNStringHeight(const wchar_t* text){
     GetTextExtentPoint32W(hDC, text, len, &size);
 
     return (float)size.cy;
+}
+
+Vector2 glGetStringSize(const char* text){
+    HDC hDC = wglGetCurrentDC();
+    size_t len = strlen(text);
+    SIZE size;
+    
+    GetTextExtentPoint32A(hDC, text, len, &size);
+
+    return Vector2(size.cx, size.cy);
+}
+
+Vector2 glGetCNStringSize(const wchar_t* text){
+    HDC hDC = wglGetCurrentDC();
+    size_t len = wcslen(text);
+    SIZE size;
+    
+    GetTextExtentPoint32W(hDC, text, len, &size);
+
+    return Vector2(size.cx, size.cy);
 }

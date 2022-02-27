@@ -1,12 +1,12 @@
-#include "../../shell.h"
+#include <shell.h>
 
 #include <windows.h>
 
-#include "../../appframe.h"
-#include "../../utils.h"
-#include "../../log.h"
+#include <appframe.h>
+#include <utils.h>
+#include <log.h>
 
-String ShellFileSelectWindow(String filter, DWORD flags){
+String ShellFileSelectWindow(String filter, int flags){
     OPENFILENAMEA ofn;
     char buffer[DEFAULT_STRING_LENGTH + 1];
     AppFrame* frame = AppFrame::GetLocalInst();
@@ -24,16 +24,19 @@ String ShellFileSelectWindow(String filter, DWORD flags){
     ofn.nFilterIndex = 0;
     //标志如果是多选要加上OFN_ALLOWMULTISELECT 
     ofn.Flags = flags;
+
     if (!GetOpenFileNameA(&ofn)){
         return String();
     }
+
     if (*buffer == '\0'){
         return String();
     }
+
     return String(buffer);
 }
 
-WString ShellFileSelectWindow(WString filter, DWORD flags){
+WString ShellFileSelectWindow(WString filter, int flags){
     OPENFILENAMEW ofn;
     wchar_t buffer[DEFAULT_STRING_LENGTH + 1];
     AppFrame* frame = AppFrame::GetLocalInst();
@@ -51,12 +54,15 @@ WString ShellFileSelectWindow(WString filter, DWORD flags){
     ofn.nFilterIndex = 0;
     //标志如果是多选要加上OFN_ALLOWMULTISELECT 
     ofn.Flags = flags;
+
     if (!GetOpenFileNameW(&ofn)){
         return WString();
     }
+
     if (*buffer == L'\0'){
         return WString();
     }
+
     return WString(buffer);
 }
 
@@ -65,7 +71,7 @@ bool ShellCommandLine(String s){
     size_t argsIdx = s.FindChar(' ');
     String args;
 
-    if (argsIdx == -1){
+    if (argsIdx != -1){
         args = s.SubString(argsIdx + 1);
         s = s.SubString(0, argsIdx);
 
@@ -90,7 +96,7 @@ bool ShellCommandLine(WString s){
     size_t argsIdx = s.FindChar(L' ');
     WString args;
 
-    if (argsIdx == -1){
+    if (argsIdx != -1){
         args = s.SubString(argsIdx + 1);
         s = s.SubString(0, argsIdx);
 
@@ -160,4 +166,14 @@ bool ShellFFmpeg(WString src, WString dst){
         Sleep(40);
     }
     return false;
+}
+
+int ShellMsgBox(String caption, String text){
+    AppFrame* frame = AppFrame::GetLocalInst();
+    return MessageBoxA((frame == NULL ? NULL : frame->hWnd), text.GetString(), caption.GetString(), MB_YESNOCANCEL | MB_ICONINFORMATION);
+}
+
+int ShellMsgBox(WString caption, WString text){
+    AppFrame* frame = AppFrame::GetLocalInst();
+    return MessageBoxW((frame == NULL ? NULL : frame->hWnd), text.GetString(), caption.GetString(), MB_YESNOCANCEL | MB_ICONINFORMATION);
 }

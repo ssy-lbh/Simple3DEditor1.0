@@ -3,8 +3,6 @@
 
 #include "define.h"
 
-#include <windef.h>
-
 #include "list.h"
 #include "vecmath.h"
 #include "gltools.h"
@@ -35,34 +33,6 @@ public:
     bool Unichar(wchar_t c);
     void Foreach(void(*func)(IButton*));
     void Foreach(void(*func)(IButton*, void*), void* user);
-};
-
-class ViewportManager final : public Object {
-private:
-    List<RECT> rects;
-    RECT curRect;
-
-public:
-    static ViewportManager* inst;
-
-    ViewportManager();
-    ~ViewportManager();
-    void Reset(HWND hWnd);
-    void SetViewport(RECT rect);
-    void PushViewport(RECT rect);
-    void PopViewport();
-    RECT GetCurrentRect();
-    LONG GetCurrentWidth();
-    LONG GetCurrentHeight();
-    float GetAspect();
-    void EnableScissor();
-    void DisableScissor();
-    Vector2 GetClientSize();
-    RECT CalculateChildRect(float left, float right, float bottom, float top);
-    void PushChildViewport(float left, float right, float bottom, float top);
-    void SetScissor(RECT rect);
-    void SetChildScissor(float left, float right, float bottom, float top);
-    void ResetScissor();
 };
 
 //TODO 按钮在触发按下后持续生效到停止

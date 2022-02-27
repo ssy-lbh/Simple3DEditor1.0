@@ -475,7 +475,7 @@ MainWindow::~MainWindow(){
 void MainWindow::InitCamera(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(90.0, ViewportManager::inst->GetAspect(), camDis * 0.02, camDis * 20.0);
+    gluPerspective(90.0, ViewManager::GetLocalInst()->GetAspect(), camDis * 0.02, camDis * 20.0);
 
     Vector3 camPos = camLookat - camDir * Vector3::forward * camDis;
     Vector3 camUp = camDir * Vector3::up;
@@ -750,22 +750,14 @@ bool MainWindow::SaveMesh(Mesh* mesh){
     }
     if (!file.EndsWith(L".obj"))
         file = file + L".obj";
-    HANDLE hFile = CreateFileW(
-        file.GetString(),
-        GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL,
-        CREATE_ALWAYS,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
-    if (hFile == INVALID_HANDLE_VALUE){
-        DebugError("OpenFile %S Error!", file.GetString());
+    File target(file);
+    if (!target.CreateNew()){
+        DebugError("CreateFile %S Error!", file.GetString());
         return false;
     }
     DebugLog("Saving Object");
-    mesh->WriteToOBJ(hFile, true, true);
-    CloseHandle(hFile);
+    mesh->WriteToOBJ(&target, true, true);
+    target.Close();
     return true;
 }
 
@@ -780,7 +772,7 @@ bool MainWindow::LoadMesh(Mesh* mesh){
     return LoadMesh(mesh, file);
 }
 
-bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
+bool MainWindow::LoadMesh(Mesh* mesh, WString path){
     BY_HANDLE_FILE_INFORMATION fileInfo;
     char* fileData;
     size_t fileLen, filePtr = 0;
@@ -790,14 +782,19 @@ bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
 
     if (!mesh)
         return false;
+    
+    File file(path);
+    if (!file.Open()){
+        DebugError("OpenFile %S Error!", path.GetString());
+        return false;
+    }
+
     DebugLog("Loading Object");
-    GetFileInformationByHandle(hFile, &fileInfo);
-    //fileLen = ((size_t)fileInfo.nFileSizeHigh << 32) | fileInfo.nFileSizeLow;
-    fileLen = fileInfo.nFileSizeLow;
+    fileLen = file.GetSize();
     fileData = new char[fileLen + 1];
     fileData[fileLen] = '\0';
 
-    ReadFile(hFile, fileData, fileLen, NULL, NULL);
+    file.Read(fileData, fileLen);
 
     for (size_t i = 0; i < fileLen; i++){
         Vector3 vec;
@@ -841,36 +838,9 @@ bool MainWindow::LoadMesh(Mesh* mesh, HANDLE hFile){
         }
     }
     delete[] fileData;
+    file.Close();
 
     return true;
-}
-
-bool MainWindow::LoadMesh(Mesh* mesh, WString file){
-    BY_HANDLE_FILE_INFORMATION fileInfo;
-    char* fileData;
-    size_t fileLen, filePtr = 0;
-    List<Vertex*> vert;
-
-    if (!mesh)
-        return false;
-    HANDLE hFile = CreateFileW(
-        file.GetString(),
-        GENERIC_READ,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
-    if (hFile == INVALID_HANDLE_VALUE){
-        DebugError("OpenFile %S Error!", file.GetString());
-        return false;
-    }
-    bool res = LoadMesh(mesh, hFile);
-
-    CloseHandle(hFile);
-
-    return res;
 }
 
 void MainWindow::AboutBox(){
@@ -1256,9 +1226,9 @@ void MainWindow::OnMenuAccel(int id, bool accel){
 void MainWindow::OnDropFileW(const wchar_t* path){
     wchar_t* suffix = wcsrchr(path, L'.');
     if (wcscmp(suffix, L".obj")){
-        String message(IDS_OBJFILE_FORM_WARNING);
-        String caption(IDS_OBJFILE_FORM_WARNING_CAPTION);
-        if (MessageBoxA(NULL, message.GetString(), caption.GetString(), MB_OKCANCEL | MB_ICONWARNING) == IDCANCEL){
+        WString message(IDS_OBJFILE_FORM_WARNING);
+        WString caption(IDS_OBJFILE_FORM_WARNING_CAPTION);
+        if (ShellMsgBox(caption, message) != MSGBOX_YES){
             DebugLog("MainWindow::OnDropFileW Stop Load File");
             return;
         }
@@ -1409,8 +1379,7 @@ Mesh* Main::GetMesh(){
     return data->curObject->GetMesh();
 }
 
-#ifdef PLATFORM_WINDOWS
-int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
+int Main::MainEntry(int argc, char** argv){
     mainFrame = new SelectionWindow(new MainWindow());
 
     appFrame = new AppFrame("ModelView", mainFrame, 750, 1250);
@@ -1429,7 +1398,7 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
-    glSelectFont(12, GB2312_CHARSET, "微软雅黑");
+    glFontSize(12);
     glInitASCIIFont();
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
@@ -1451,16 +1420,13 @@ int Main::WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     return code;
 }
-#endif
 
-Main* Main::inst;
-GlobalData* Main::data;
+Main* Main::inst = NULL;
+GlobalData* Main::data = NULL;
 
-#ifdef PLATFORM_WINDOWS
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
+int main(int argc, char** argv){
     Main::inst = new Main();
-    int ret = Main::inst->WinMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
+    int ret = Main::inst->MainEntry(argc, argv);
     delete Main::inst;
     return ret;
 }
-#endif

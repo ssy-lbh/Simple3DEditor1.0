@@ -1,8 +1,16 @@
-#include "../../thread.h"
+#include <thread.h>
 
 #include <windows.h>
 
-#include "../../log.h"
+#include <log.h>
+
+void ThreadUtils::ExitThread(int code){
+    ::ExitThread(code);
+}
+
+void ThreadUtils::ExitProcess(int code){
+    ::ExitProcess(code);
+}
 
 Thread::Thread(int(*func)(void*), void* user) : func(func), user(user) {}
 Thread::~Thread(){}

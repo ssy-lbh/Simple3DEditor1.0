@@ -3,9 +3,13 @@
 
 #include "define.h"
 
-#include "main.h"
-#include "uimgr.h"
 #include "utils.h"
+#include "viewmgr.h"
+
+#ifdef PLATFORM_WINDOWS
+#include <windef.h>
+#include <winuser.h>
+#endif
 
 // 应保证为单例
 class AppFrame final : public Object {
@@ -34,6 +38,7 @@ private:
     size_t height;
 
     LocalData* data;
+    ViewManager* viewMgr;
 
     static void Initialize();
 
@@ -61,6 +66,7 @@ public:
     size_t GetWidth();
     IWindow* GetMainFrame();
     LocalData* GetLocalData();
+    ViewManager* GetViewManager();
 
     void Show();
     void Hide();

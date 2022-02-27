@@ -6,10 +6,16 @@
         "PLATFORM_WINDOWS"
     ],
     "C_Cpp.default.browse.path": [
+        "{workspaceFolder}",
+        "{workspaceFolder}\\opengl",
+        "{workspaceFolder}\\openal",
         "C:\\Program Files (x86)\\OpenGL glew-2.2.0\\include",
         "C:\\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\\include"
     ],
     "C_Cpp.default.includePath": [
+        "{workspaceFolder}",
+        "{workspaceFolder}\\opengl",
+        "{workspaceFolder}\\openal",
         "C:\\Program Files (x86)\\OpenGL glew-2.2.0\\include",
         "C:\\ffmpeg-N-103095-g2323d3a923-win64-gpl-shared\\include"
     ],
@@ -35,6 +41,8 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "cstdint": "cpp",
-        "numbers": "cpp"
+        "numbers": "cpp",
+        "system_error": "cpp",
+        "ostream": "cpp"
     }
 }

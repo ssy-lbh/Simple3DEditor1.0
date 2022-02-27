@@ -2,6 +2,7 @@
 #define __GEODEF__
 
 #include "define.h"
+
 #include "list.h"
 #include "vecmath.h"
 

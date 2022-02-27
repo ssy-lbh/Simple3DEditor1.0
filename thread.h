@@ -7,10 +7,17 @@
 
 #define THREAD_LOCAL_APPFRAME 0
 #define THREAD_LOCAL_LOCALDATA 1
+#define THREAD_LOCAL_VIEWMGR 2
 
 #ifdef PLATFORM_WINDOWS
 #include <handleapi.h>
 #endif
+
+class ThreadUtils final {
+public:
+    static void ExitThread(int code);
+    static void ExitProcess(int code);
+};
 
 class Thread final : public Object {
 private:

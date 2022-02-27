@@ -1,11 +1,14 @@
-#include "../../appframe.h"
+#include <appframe.h>
 
+#ifdef PLATFORM_WINDOWS
 #include <windows.h>
+#endif
 
-#include "../../thread.h"
-#include "../../font.h"
-#include "../../res.h"
-#include "../../glfunc.h"
+#include <main.h>
+#include <thread.h>
+#include <font.h>
+#include <res.h>
+#include <glfunc.h>
 
 bool AppFrame::init = false;
 
@@ -13,11 +16,15 @@ AppFrame::AppFrame(String name, IWindow* mainFrame, size_t height, size_t width,
     Initialize();
 
     if (async){
-        hThread = CreateThread(NULL, 0, []CALLBACK(LPVOID data)->DWORD{
+        hThread = CreateThread(NULL, 0, [] CALLBACK (LPVOID data) -> DWORD {
             AppFrame* frame = (AppFrame*)data;
+            DWORD ret;
+
             frame->InitWindow();
-            DWORD ret = frame->MainLoop();
+            ret = frame->MainLoop();
+
             delete frame;
+
             return ret;
         }, this, 0, NULL);
         CloseHandle(hThread);
@@ -30,6 +37,7 @@ AppFrame::AppFrame(String name, IWindow* mainFrame, size_t height, size_t width,
 AppFrame::~AppFrame(){
     if (mainFrame) delete mainFrame;
     if (data) delete data;
+    if (viewMgr) delete viewMgr;
     DestroyWindow(hWnd);
 }
 
@@ -59,6 +67,8 @@ void AppFrame::Initialize(){
         RegisterClassExA(&wc);
 
         ThreadLocal::Alloc(THREAD_LOCAL_APPFRAME);
+        ThreadLocal::Alloc(THREAD_LOCAL_LOCALDATA);
+        ThreadLocal::Alloc(THREAD_LOCAL_VIEWMGR);
     }
 }
 
@@ -88,6 +98,10 @@ IWindow* AppFrame::GetMainFrame(){
 
 LocalData* AppFrame::GetLocalData(){
     return data;
+}
+
+ViewManager* AppFrame::GetViewManager(){
+    return viewMgr;
 }
 
 void AppFrame::Show(){
@@ -160,16 +174,14 @@ bool AppFrame::HandleEvents(){
 void AppFrame::Render(){
     wglMakeCurrent(hDC, hRC);
 
-    ViewportManager::inst->Reset(hWnd);
-    ViewportManager::inst->EnableScissor();
+    viewMgr->Reset();
+    viewMgr->EnableScissor();
 
     mainFrame->OnRender();
 
-    ViewportManager::inst->Reset(hWnd);
+    viewMgr->Reset();
 
-    LocalData* data = (LocalData*)ThreadLocal::Get(THREAD_LOCAL_LOCALDATA);
-    if (data)
-        data->Render();
+    data->Render();
 }
 
 void AppFrame::SwapBuffer(){
@@ -199,7 +211,7 @@ int AppFrame::MainLoop(){
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
-    glSelectFont(12, GB2312_CHARSET, "微软雅黑");
+    glFontSize(12);
     glInitASCIIFont();
 
     Show();
@@ -218,7 +230,9 @@ int AppFrame::MainLoop(){
             }
         }
     }
+
     DisableOpenGL();
+
     return Msg.wParam;
 }
 
@@ -398,9 +412,11 @@ void AppFrame::InitWindow(){
     HINSTANCE hInst = GetModuleHandleA(NULL);
 
     data = new LocalData();
+    viewMgr = new ViewManager(this);
 
     ThreadLocal::Set(THREAD_LOCAL_APPFRAME, this);
     ThreadLocal::Set(THREAD_LOCAL_LOCALDATA, data);
+    ThreadLocal::Set(THREAD_LOCAL_VIEWMGR, viewMgr);
 
     hWnd = CreateWindowExA(
         0,

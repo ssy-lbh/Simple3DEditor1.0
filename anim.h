@@ -2,6 +2,7 @@
 #define __ANIM__
 
 #include "define.h"
+
 #include "list.h"
 #include "uimgr.h"
 #include "menu.h"

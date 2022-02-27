@@ -1,8 +1,7 @@
 #ifndef __AUDIO__
 #define __AUDIO__
 
-#include <windef.h>
-#include <mmsystem.h>
+#include "define.h"
 
 #include "openal/al.h"
 #include "openal/alc.h"
@@ -37,6 +36,8 @@ public:
     static void FFT(_Complex float* input, int sizebit, bool inv);
     static void InitOpenAL();
     static void UninitOpenAL();
+    static void PrintOpenALInfo();
+    static void LoadOpenALPreset();
 };
 
 class AudioPlayerWindow final : public IWindow {
@@ -68,6 +69,7 @@ private:
     int alChannels;
     /* audio data */
     void* alAudioData;
+    ALint alAudioOffset;
 
     bool displayWave = false;
 
@@ -185,6 +187,7 @@ public:
     bool IsLaunched();
     bool IsLoop();
     void SetLoop(bool loop);
+    ALint GetOffset();
 
     ALint GetWaveFormat(PWAVEFORMATEX lpwav);
 };

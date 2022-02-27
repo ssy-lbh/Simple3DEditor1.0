@@ -80,8 +80,9 @@ void AudioUtils::FFT(_Complex float* input, int sizebit, bool inv){
 }
 
 void AudioUtils::InitOpenAL(){
-    if (init)
+    if (init){
         return;
+    }
 
     init = true;
 
@@ -90,17 +91,8 @@ void AudioUtils::InitOpenAL(){
 
     alcMakeContextCurrent(alCtx);
 
-    DebugLog("OpenAL Enabled");
-    DebugLog("OpenAL Version %s", alGetString(AL_VERSION));
-    DebugLog("OpenAL Renderer %s", alGetString(AL_RENDERER));
-    DebugLog("OpenAL Vendor %s", alGetString(AL_VENDOR));
-    //DebugLog("OpenAL Extensions %s", alGetString(AL_EXTENSIONS));
-
-    alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
-    alListener3f(AL_VELOCITY, 0.0f, 0.0f, 0.0f);
-    alListener3f(AL_ORIENTATION, 0.0f, 1.0f, 0.0f);
-
-    alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
+    PrintOpenALInfo();
+    LoadOpenALPreset();
 }
 
 void AudioUtils::UninitOpenAL(){
@@ -110,6 +102,22 @@ void AudioUtils::UninitOpenAL(){
         alcCloseDevice(alDev);
         alcDestroyContext(alCtx);
     }
+}
+
+void AudioUtils::PrintOpenALInfo(){
+    DebugLog("OpenAL Enabled");
+    DebugLog("OpenAL Version %s", alGetString(AL_VERSION));
+    DebugLog("OpenAL Renderer %s", alGetString(AL_RENDERER));
+    DebugLog("OpenAL Vendor %s", alGetString(AL_VENDOR));
+    //DebugLog("OpenAL Extensions %s", alGetString(AL_EXTENSIONS));
+}
+
+void AudioUtils::LoadOpenALPreset(){
+    alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+    alListener3f(AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+    alListener3f(AL_ORIENTATION, 0.0f, 1.0f, 0.0f);
+
+    alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 }
 
 AudioPlayerWindow::PlayButton::PlayButton(AudioPlayerWindow* window) : window(window) {}
@@ -168,6 +176,7 @@ void AudioPlayerWindow::ProgressBar::Drag(Vector2 dir){
     offset = Clamp((int)(((pos + 0.6f) / 1.2f) * window->alAudioSize), 0, window->alAudioSize);
 
     alSourcei(window->alSrc, AL_SAMPLE_OFFSET, offset);
+    window->alAudioOffset = offset;
 }
 
 void AudioPlayerWindow::ProgressBar::Hover(){
@@ -179,10 +188,9 @@ void AudioPlayerWindow::ProgressBar::Leave(){
 }
 
 void AudioPlayerWindow::ProgressBar::Render(){
-    if (window->launched){
-        ALint offset;
-
-        alGetSourcei(window->alSrc, AL_SAMPLE_OFFSET, &offset);
+    if (window->loaded){
+        if (window->launched)
+            alGetSourcei(window->alSrc, AL_SAMPLE_OFFSET, &window->alAudioOffset);
 
         glLineWidth(10.0f);
         glColor3f(0.6f, 0.6f, 0.6f);
@@ -192,7 +200,7 @@ void AudioPlayerWindow::ProgressBar::Render(){
         glEnd();
         glLineWidth(1.0f);
 
-        pos = Lerp(-0.6f, 0.6f, (float)offset / window->alAudioSize);
+        pos = Lerp(-0.6f, 0.6f, (float)window->alAudioOffset / window->alAudioSize);
         if (hover){
             glColor3f(0.0f, 0.0f, 0.3f);
         }else{
@@ -317,12 +325,10 @@ void AudioPlayerWindow::DrawAmplitudeGraph(float* height, size_t size){
 
 void AudioPlayerWindow::RenderGraph(){
     const int bit = 12;
-    int offset;
+    ALint offset = GetOffset();
 
     _Complex float samples[1 << bit];
     float height[1 << 10];
-
-    alGetSourcei(alSrc, AL_SAMPLE_OFFSET, &offset);
 
     if (offset + (1 << bit) >= alAudioSize){
         return;
@@ -475,7 +481,8 @@ void AudioPlayerWindow::OnMenuAccel(int id, bool accel){
 void AudioPlayerWindow::OnDropFileA(const char* path){}
 
 void AudioPlayerWindow::OnDropFileW(const wchar_t* path){
-    PreloadFile(String(path));
+    DebugLog("AudioPlayerWindow::OnDropFileW %S", path);
+    PreloadFile(WString(path));
 }
 
 void AudioPlayerWindow::OnInsLoad(){
@@ -491,22 +498,23 @@ void AudioPlayerWindow::OnInsLoad(){
 
 void AudioPlayerWindow::PreloadFile(WString file){
     if (!file.EndsWith(L".wav")){
-        String message(IDS_WAVFILE_FORM_WARNING);
-        String caption(IDS_WAVFILE_FORM_WARNING_CAPTION);
-        switch (MessageBoxA(NULL, message.GetString(), caption.GetString(), MB_YESNOCANCEL | MB_ICONWARNING)){
-        case IDCANCEL:
+        WString message(IDS_WAVFILE_FORM_WARNING);
+        WString caption(IDS_WAVFILE_FORM_WARNING_CAPTION);
+        switch (ShellMsgBox(caption, message)){
+        case MSGBOX_NO:
             DebugLog("AudioPlayerWindow::PreloadFile Stop Load File");
             return;
-        case IDYES:
+        case MSGBOX_YES:
+            DebugLog("AudioPlayerWindow::PreloadFile Preparing FFmpeg");
             if (!ShellFFmpeg(file, L".\\temp.wav")){
                 DebugError("AudioPlayerWindow::PreloadFile ShellFFmpegW Failed");
                 return;
             }
             path = file;
-            LoadFile(file);
-            DeleteFileW(file.GetString());
+            LoadFile(L".\\temp.wav");
+            File(L".\\temp.wav").Delete();
             return;
-        case IDNO:
+        case MSGBOX_CANCEL:
             path = file;
             break;
         }
@@ -624,6 +632,7 @@ void AudioPlayerWindow::LoadFile(WString file){
     alAudioLen = dataLen / wav.nAvgBytesPerSec;
     alSampleSize = wav.nBlockAlign;
     alChannels = wav.nChannels;
+    alAudioOffset = 0;
 
     DebugLog("AudioPlayerWindow::LoadFile Success");
 
@@ -651,6 +660,7 @@ void AudioPlayerWindow::Launch(){
     }
     
     alSourcePlay(alSrc);
+    alSourcei(alSrc, AL_SAMPLE_OFFSET, alAudioOffset);
 
     DebugLog("AudioPlayerWindow::Launch Success");
 
@@ -658,6 +668,7 @@ void AudioPlayerWindow::Launch(){
 }
 
 void AudioPlayerWindow::Stop(){
+    alGetSourcei(alSrc, AL_SAMPLE_OFFSET, &alAudioOffset);
     alSourceStop(alSrc);
     alSourceUnqueueBuffers(alSrc, 1, &alBuf);
 
@@ -684,6 +695,14 @@ bool AudioPlayerWindow::IsLoop(){
 
 void AudioPlayerWindow::SetLoop(bool loop){
     alSourcei(alSrc, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+}
+
+ALint AudioPlayerWindow::GetOffset(){
+    if (!loaded)
+        return 0;
+    if (launched)
+        alGetSourcei(alSrc, AL_SAMPLE_OFFSET, &alAudioOffset);
+    return alAudioOffset;
 }
 
 ALint AudioPlayerWindow::GetWaveFormat(PWAVEFORMATEX lpwav){
@@ -845,7 +864,6 @@ void AudioCaptureWindow::ProcessInput(){
     }
 
     capOffset += cnt;
-
     
     if (displayWave && adjustWave){
         for (int i = 0; i < (1 << bit); i++){
@@ -1060,6 +1078,13 @@ void AudioCaptureWindow::Launch(){
 
     capDev = alcCaptureOpenDevice(NULL, freq, AL_FORMAT_MONO16, 1 << (bit + 2));
 
+    if (!capDev){
+        DebugError("AudioCaptureWindow::Launch Capture Device Not Found");
+        return;
+    }
+
+    DebugLog("AudioCaptureWindow::Launch Open Device %p %s", alcGetString(capDev, ALC_DEVICE_SPECIFIER));
+
     if (!capBuf){
         capBuf = new short[1 << bit];
         memset(capBuf, 0, 1 << (bit + 1));
@@ -1072,7 +1097,9 @@ void AudioCaptureWindow::Launch(){
         alGenBuffers(1 << queueBit, alBuf);
         alSourcePlay(alSrc);
     }
-    if (!freqBuf) freqBuf = new _Complex float[1 << bit];
+    if (!freqBuf){
+        freqBuf = new _Complex float[1 << bit];
+    }
 
     alcCaptureStart(capDev);
     capture = true;

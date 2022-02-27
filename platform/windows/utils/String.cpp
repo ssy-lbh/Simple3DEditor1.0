@@ -1,8 +1,8 @@
-#include "../../utils.h"
+#include <utils/String.h>
 
 #include <windows.h>
 
-#include "../../log.h"
+#include <log.h>
 
 String::String(bool alloc){
     if (alloc){
@@ -21,6 +21,13 @@ String::String(){
 String::String(int resid){
     const char* pstr;
     len = LoadStringA(GetModuleHandleA(NULL), resid, (LPSTR)&pstr, 0);
+    if (!pstr){
+        DebugError("Critical: String::String(%d) LoadStringA Return NULL", resid);
+        str = new char[1];
+        str[0] = '\0';
+        len = 0;
+        return;
+    }
     str = new char[len + 1];
     str[len] = '\0';
     memcpy(str, pstr, len * sizeof(char));
@@ -437,6 +444,13 @@ WString::WString(){
 WString::WString(int resid){
     const wchar_t* pstr;
     len = LoadStringW(GetModuleHandleW(NULL), resid, (LPWSTR)&pstr, 0);
+    if (!pstr){
+        DebugError("Critical: WString::WString(%d) LoadStringW Return NULL", resid);
+        str = new wchar_t[1];
+        str[0] = L'\0';
+        len = 0;
+        return;
+    }
     str = new wchar_t[len + 1];
     str[len] = L'\0';
     memcpy(str, pstr, len * sizeof(wchar_t));
@@ -835,173 +849,4 @@ size_t WString::Split(const WString s, WString* arr, size_t len) const{
         p = pos + s.GetLength();
     }
     return Count(s) + 1;
-}
-
-File::File(){}
-
-File::File(File &&f){
-    this->path = f.path;
-    if (f.isOpened())
-        Open();
-}
-
-File::File(const File &f){
-    this->path = f.path;
-    if (f.isOpened())
-        Open();
-}
-
-File &File::operator=(File &&f){
-    Close();
-    this->path = f.path;
-    if (f.isOpened())
-        Open();
-    return *this;
-}
-
-File &File::operator=(const File &f){
-    Close();
-    this->path = f.path;
-    if (f.isOpened())
-        Open();
-    return *this;
-}
-
-File::File(const char* path){
-    this->path = path;
-    Open();
-}
-
-File::File(const wchar_t* path){
-    this->path = path;
-    Open();
-}
-
-File::File(String path){
-    this->path = path;
-    Open();
-}
-
-File::File(WString path){
-    this->path = path;
-    Open();
-}
-
-File::~File(){
-    Close();
-}
-
-bool File::Open(){
-    if (isOpened())
-        return false;
-    hFile = CreateFileA(
-        path.GetString(),
-        GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
-    if (!isOpened()){
-        DebugError("File::Open %s Failed", path.GetString());
-        return false;
-    }
-    return false;
-}
-
-bool File::Close(){
-    if (isOpened()){
-        CloseHandle(hFile);
-        hFile = INVALID_HANDLE_VALUE;
-        return true;
-    }
-    return false;
-}
-
-bool File::isOpened() const{
-    return hFile != INVALID_HANDLE_VALUE;
-}
-
-bool File::Exist(){
-    if (isOpened())
-        return true;
-    Open();
-    if (isOpened()){
-        Close();
-        return true;
-    }
-    return false;
-}
-
-bool File::Create(){
-    if (isOpened())
-        return false;
-    hFile = CreateFileA(
-        path.GetString(),
-        GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ | FILE_SHARE_WRITE,
-        NULL,
-        // 文件不存在时创建
-        CREATE_ALWAYS,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
-    if (!isOpened()){
-        DebugError("File::Create %s Failed", path.GetString());
-        return false;
-    }
-    return true;
-}
-
-bool File::Delete(){
-    Close();
-    return DeleteFileA(path.GetString()) == TRUE;
-}
-
-size_t File::Read(void* buffer, size_t size){
-    DWORD readLen;
-
-    Open();
-    ReadFile(hFile, buffer, size, &readLen, NULL);
-    return readLen;
-}
-
-size_t File::Write(const void* buffer, size_t size){
-    DWORD writeLen;
-
-    Open();
-    WriteFile(hFile, buffer, size, &writeLen, NULL);
-    return writeLen;
-}
-
-size_t File::GetPointer(){
-    LARGE_INTEGER dis;
-    LARGE_INTEGER pos;
-
-    if (!isOpened())
-        return 0;
-    dis.QuadPart = 0;
-    SetFilePointerEx(hFile, dis, &pos, FILE_CURRENT);
-    return pos.QuadPart;
-}
-
-void File::SetPointer(size_t ptr){
-    LARGE_INTEGER pos;
-
-    Open();
-    pos.QuadPart = ptr;
-    SetFilePointerEx(hFile, pos, NULL, FILE_BEGIN);
-}
-
-size_t File::GetSize(){
-    BY_HANDLE_FILE_INFORMATION Info;
-
-    Open();
-    GetFileInformationByHandle(hFile, &Info);
-    return (((size_t)Info.nFileSizeHigh << 32) | (size_t)Info.nFileSizeLow);
-}
-
-String File::GetPath(){
-    return path;
 }

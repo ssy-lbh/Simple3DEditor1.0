@@ -1,6 +1,8 @@
 #ifndef __VIEWOBJECT__
 #define __VIEWOBJECT__
 
+#include "define.h"
+
 #include "list.h"
 #include "geodef.h"
 #include "vecmath.h"

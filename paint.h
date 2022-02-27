@@ -1,6 +1,8 @@
 #ifndef __PAINT__
 #define __PAINT__
 
+#include "define.h"
+
 #include "uimgr.h"
 #include "menu.h"
 #include "geodef.h"

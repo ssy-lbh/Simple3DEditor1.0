@@ -1,4 +1,4 @@
-#include "../../glfunc.h"
+#include <glfunc.h>
 
 #include <gl/wgl.h>
 

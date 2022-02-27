@@ -1,6 +1,8 @@
 #ifndef __TREE__
 #define __TREE__
 
+#include "define.h"
+
 #include "uimgr.h"
 #include "viewobject.h"
 

@@ -1,6 +1,8 @@
 #ifndef __MENU__
 #define __MENU__
 
+#include "define.h"
+
 #include <gl/gl.h>
 
 #include "vecmath.h"

@@ -3,9 +3,6 @@
 
 #include "define.h"
 
-#include <windows.h>
-#include <windowsx.h>
-
 #include <gl/gl.h>
 #include <gl/glu.h>
 
@@ -275,8 +272,7 @@ public:
     void DeletePoint();
     bool SaveMesh(Mesh* mesh);
     bool LoadMesh(Mesh* mesh);
-    bool LoadMesh(Mesh* mesh, HANDLE hFile);
-    bool LoadMesh(Mesh* mesh, WString file);
+    bool LoadMesh(Mesh* mesh, WString path);
     void AboutBox();
     Vector3 GetLookPosition(Vector3 pos);
     Vector2 GetScreenPosition(Vector3 pos);
@@ -322,10 +318,10 @@ public:
 
     // 总场景对象
     //TODO 做出一个树状图窗口，显示场景中各个对象
-    AViewObject* scene;
+    AViewObject* scene = NULL;
 
     // 当前选中的对象
-    AViewObject* curObject;
+    AViewObject* curObject = NULL;
 
     // 选择部分
     SelectionType selType = SELECT_VERTICES;
@@ -346,7 +342,7 @@ public:
     static Main* inst;
     static GlobalData* data;
 
-    AppFrame* appFrame;
+    AppFrame* appFrame = NULL;
 
     // 测试过面向对象的结果，成功实现多屏
     IWindow* mainFrame = NULL;
@@ -362,9 +358,7 @@ public:
 
     static Mesh* GetMesh();
 
-#ifdef PLATFORM_WINDOWS
-    int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
-#endif
+    int MainEntry(int argc, char** argv);
 };
 
 #endif
