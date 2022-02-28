@@ -8,6 +8,7 @@
 #include <utils/os/Font.h>
 #include <utils/os/Thread.h>
 #include <editor/gui/UIManager.h>
+#include <editor/gui/ViewManager.h>
 
 bool AppFrame::init = false;
 
@@ -211,7 +212,6 @@ int AppFrame::MainLoop(){
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
     glFontSize(12);
-    glInitASCIIFont();
 
     Show();
     while (GetMessageA(&Msg, NULL, 0, 0)){

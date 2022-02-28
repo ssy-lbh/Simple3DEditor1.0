@@ -157,10 +157,28 @@ bool File::Delete(){
     return DeleteFileA(path.GetString()) == TRUE;
 }
 
+bool File::Delete(const char* path){
+    return DeleteFileA(path) == TRUE;
+}
+
+bool File::Delete(const wchar_t* path){
+    return DeleteFileW(path) == TRUE;
+}
+
+bool File::Delete(String path){
+    return DeleteFileA(path.GetString()) == TRUE;
+}
+
+bool File::Delete(WString path){
+    return DeleteFileW(path.GetString()) == TRUE;
+}
+
 size_t File::Read(void* buffer, size_t size){
     DWORD readLen;
 
     Open();
+    if (!IsOpened())
+        return 0;
     ReadFile(hFile, buffer, size, &readLen, NULL);
     return readLen;
 }
@@ -169,6 +187,8 @@ size_t File::Write(const void* buffer, size_t size){
     DWORD writeLen;
 
     Open();
+    if (!IsOpened())
+        return 0;
     WriteFile(hFile, buffer, size, &writeLen, NULL);
     return writeLen;
 }
@@ -188,6 +208,8 @@ void File::SetPointer(size_t ptr){
     LARGE_INTEGER pos;
 
     Open();
+    if (!IsOpened())
+        return;
     pos.QuadPart = ptr;
     SetFilePointerEx(hFile, pos, NULL, FILE_BEGIN);
 }
@@ -196,6 +218,8 @@ size_t File::GetSize(){
     BY_HANDLE_FILE_INFORMATION Info;
 
     Open();
+    if (!IsOpened())
+        return 0;
     GetFileInformationByHandle(hFile, &Info);
     return (((size_t)Info.nFileSizeHigh << 32) | (size_t)Info.nFileSizeLow);
 }

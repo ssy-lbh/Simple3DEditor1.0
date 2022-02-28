@@ -1,5 +1,8 @@
 #include <editor/AudioPlayerWindow.h>
 
+#include <lib/openal/al.h>
+#include <lib/openal/alc.h>
+
 #include <main.h>
 #include <res.h>
 #include <utils/os/Font.h>
@@ -7,6 +10,9 @@
 #include <utils/String.h>
 #include <utils/File.h>
 #include <utils/math3d/Math.h>
+#include <utils/AudioUtils.h>
+#include <utils/String.h>
+#include <utils/StringBuilder.h>
 
 AudioPlayerWindow::PlayButton::PlayButton(AudioPlayerWindow* window) : window(window) {}
 AudioPlayerWindow::PlayButton::~PlayButton(){}
@@ -15,7 +21,7 @@ bool AudioPlayerWindow::PlayButton::Trigger(Vector2 pos){
     return pos.x >= -0.5f && pos.x <= 0.5f && pos.y >= -0.9f && pos.y <= -0.3f;
 }
 
-void AudioPlayerWindow::PlayButton::Hover(){
+void AudioPlayerWindow::PlayButton::Hover(Vector2 pos){
     hover = true;
 }
 
@@ -27,7 +33,7 @@ void AudioPlayerWindow::PlayButton::Click(Vector2 pos){
     }
 }
 
-void AudioPlayerWindow::PlayButton::Leave(){
+void AudioPlayerWindow::PlayButton::Leave(Vector2 pos){
     hover = false;
 }
 
@@ -50,7 +56,10 @@ AudioPlayerWindow::ProgressBar::ProgressBar(AudioPlayerWindow* window) : window(
 AudioPlayerWindow::ProgressBar::~ProgressBar(){}
 
 bool AudioPlayerWindow::ProgressBar::Trigger(Vector2 pos){
-    return pos.x >= this->pos - 0.05f && pos.x <= this->pos + 0.05f && pos.y >= -0.2f && pos.y <= 0.0f;
+    return pos.x >= this->pos - BUTTON_WIDTH_X &&
+            pos.x <= this->pos + BUTTON_WIDTH_X &&
+            pos.y >= POSITION_Y - BUTTON_WIDTH_Y &&
+            pos.y <= POSITION_Y + BUTTON_WIDTH_Y;
 }
 
 void AudioPlayerWindow::ProgressBar::Click(Vector2 pos){
@@ -60,18 +69,18 @@ void AudioPlayerWindow::ProgressBar::Click(Vector2 pos){
 void AudioPlayerWindow::ProgressBar::Drag(Vector2 dir){
     ALint offset;
 
-    pos = Clamp(origin + dir.x, -0.6f, 0.6f);
-    offset = Clamp((int)(((pos + 0.6f) / 1.2f) * window->alAudioSize), 0, window->alAudioSize);
+    pos = Clamp(origin + dir.x, LOW_BOUND, HIGH_BOUND);
+    offset = Clamp((int)(GetRate(pos, LOW_BOUND, HIGH_BOUND) * window->alAudioSize), 0, window->alAudioSize);
 
     alSourcei(window->alSrc, AL_SAMPLE_OFFSET, offset);
     window->alAudioOffset = offset;
 }
 
-void AudioPlayerWindow::ProgressBar::Hover(){
+void AudioPlayerWindow::ProgressBar::Hover(Vector2 pos){
     hover = true;
 }
 
-void AudioPlayerWindow::ProgressBar::Leave(){
+void AudioPlayerWindow::ProgressBar::Leave(Vector2 pos){
     hover = false;
 }
 
@@ -83,18 +92,65 @@ void AudioPlayerWindow::ProgressBar::Render(){
         glLineWidth(10.0f);
         glColor3f(0.6f, 0.6f, 0.6f);
         glBegin(GL_LINES);
-        glVertex2f(-0.6f, -0.1f);
-        glVertex2f(0.6f, -0.1f);
+        glVertex2f(LOW_BOUND, POSITION_Y);
+        glVertex2f(HIGH_BOUND, POSITION_Y);
         glEnd();
         glLineWidth(1.0f);
 
-        pos = Lerp(-0.6f, 0.6f, (float)window->alAudioOffset / window->alAudioSize);
+        pos = Lerp(LOW_BOUND, HIGH_BOUND, (float)window->alAudioOffset / window->alAudioSize);
         if (hover){
             glColor3f(0.0f, 0.0f, 0.3f);
         }else{
             glColor3f(0.0f, 0.0f, 0.5f);
         }
-        GLUtils::DrawRect(pos - 0.05f, -0.2f, pos + 0.05f, 0.0f);
+        GLUtils::DrawRect(pos - BUTTON_WIDTH_X, POSITION_Y - BUTTON_WIDTH_Y,
+                            pos + BUTTON_WIDTH_X, POSITION_Y + BUTTON_WIDTH_Y);
+    }
+}
+
+AudioPlayerWindow::GainBar::GainBar(AudioPlayerWindow* window) : window(window) {}
+AudioPlayerWindow::GainBar::~GainBar(){}
+
+bool AudioPlayerWindow::GainBar::Trigger(Vector2 pos){
+    return pos.x >= (POSITION_X - BUTTON_WIDTH_X) &&
+            pos.x <= (POSITION_X + BUTTON_WIDTH_X) &&
+            pos.y >= this->pos - BUTTON_WIDTH_Y && pos.y <= this->pos + BUTTON_WIDTH_Y;
+}
+
+void AudioPlayerWindow::GainBar::Click(Vector2 pos){
+    origin = this->pos;
+}
+
+void AudioPlayerWindow::GainBar::Drag(Vector2 dir){
+    pos = Clamp(origin + dir.y, LOW_BOUND, HIGH_BOUND);
+    alListenerf(AL_GAIN, GetRate(Exp(-5.0f * GetRate(pos, HIGH_BOUND, LOW_BOUND)), 0.0067379469f /* e^-5 */, 1.0f));
+}
+
+void AudioPlayerWindow::GainBar::Hover(Vector2 pos){
+    hover = true;
+}
+
+void AudioPlayerWindow::GainBar::Leave(Vector2 pos){
+    hover = false;
+}
+
+void AudioPlayerWindow::GainBar::Render(){
+    if (window->loaded){
+        glLineWidth(5.0f);
+        glColor3f(0.6f, 0.6f, 0.6f);
+        glBegin(GL_LINES);
+        glVertex2f(POSITION_X, LOW_BOUND);
+        glVertex2f(POSITION_X, HIGH_BOUND);
+        glEnd();
+        glLineWidth(1.0f);
+
+        if (hover){
+            glColor3f(0.0f, 0.0f, 0.3f);
+        }else{
+            glColor3f(0.0f, 0.0f, 0.5f);
+        }
+        GLUtils::DrawRect(POSITION_X - BUTTON_WIDTH_X, pos - BUTTON_WIDTH_Y,
+                            POSITION_X + BUTTON_WIDTH_X, pos + BUTTON_WIDTH_Y);
     }
 }
 
@@ -157,6 +213,7 @@ AudioPlayerWindow::AudioPlayerWindow(){
 
     uiMgr->AddButton(new PlayButton(this));
     uiMgr->AddButton(new ProgressBar(this));
+    uiMgr->AddButton(new GainBar(this));
     uiMgr->AddButton(new LoopOption(this));
 
     basicMenu = new Menu();
@@ -212,7 +269,6 @@ void AudioPlayerWindow::DrawAmplitudeGraph(float* height, size_t size){
 }
 
 void AudioPlayerWindow::RenderGraph(){
-    const int bit = 12;
     ALint offset = GetOffset();
 
     _Complex float samples[1 << bit];
@@ -254,6 +310,21 @@ void AudioPlayerWindow::RenderGraph(){
     }
 }
 
+void AudioPlayerWindow::DrawTime(){
+    if (!loaded)
+        return;
+
+    int total = alAudioSize / alAudioFreq;
+    int offset = GetOffset() / alAudioFreq;
+    char time[20];
+
+    __builtin_snprintf(time, 20, "%02d:%02d/%02d:%02d", offset / 60, offset % 60, total / 60, total % 60);
+    
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glRasterPos2f(0.6f, -0.3f);
+    glDrawString(time);
+}
+
 void AudioPlayerWindow::OnRender(){
     glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
 
@@ -264,11 +335,8 @@ void AudioPlayerWindow::OnRender(){
     glDisable(GL_LIGHTING);
     glEnable(GL_ALPHA_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    GLUtils::ResetProjection();
+    GLUtils::ResetModelView();
 
     if (path.GetLength() == 0){
         glColor3f(1.0f, 0.5f, 0.0f);
@@ -280,6 +348,7 @@ void AudioPlayerWindow::OnRender(){
     }
 
     RenderGraph();
+    DrawTime();
 
     uiMgr->Render();
 
@@ -400,7 +469,7 @@ void AudioPlayerWindow::PreloadFile(WString file){
             }
             path = file;
             LoadFile(L".\\temp.wav");
-            File(L".\\temp.wav").Delete();
+            File::Delete(L".\\temp.wav");
             return;
         case MSGBOX_CANCEL:
             path = file;
@@ -506,7 +575,7 @@ void AudioPlayerWindow::LoadFile(WString file){
 
     char* fileData = new char[dataLen];
     src.Read(fileData, dataLen);
-    alBufferData(alBuf, format, fileData, dataLen, wav.nSamplesPerSec);// 11025 44100
+    alBufferData(alBuf, format, fileData, dataLen, wav.nSamplesPerSec);// 8000 11025 16000 22050 44100 48000 96000 192000
     src.Close();
 
     alAudioData = fileData;
@@ -514,6 +583,7 @@ void AudioPlayerWindow::LoadFile(WString file){
     alAudioLen = dataLen / wav.nAvgBytesPerSec;
     alSampleSize = wav.nBlockAlign;
     alChannels = wav.nChannels;
+    alAudioFreq = wav.nSamplesPerSec;
     alAudioOffset = 0;
 
     DebugLog("AudioPlayerWindow::LoadFile Success");
@@ -537,9 +607,11 @@ void AudioPlayerWindow::Launch(){
     ALint cnt;
 
     alGetSourcei(alSrc, AL_BUFFERS_QUEUED, &cnt);
-    if (cnt == 0){
+    if (cnt == 0)
         alSourceQueueBuffers(alSrc, 1, &alBuf);
-    }
+
+    if (alAudioOffset + (1 << bit) >= alAudioSize)
+        alAudioOffset = 0;
     
     alSourcePlay(alSrc);
     alSourcei(alSrc, AL_SAMPLE_OFFSET, alAudioOffset);
@@ -550,9 +622,14 @@ void AudioPlayerWindow::Launch(){
 }
 
 void AudioPlayerWindow::Stop(){
+    ALint cnt;
+
     alGetSourcei(alSrc, AL_SAMPLE_OFFSET, &alAudioOffset);
     alSourceStop(alSrc);
-    alSourceUnqueueBuffers(alSrc, 1, &alBuf);
+
+    alGetSourcei(alSrc, AL_BUFFERS_PROCESSED, &cnt);
+    if (cnt > 0)
+        alSourceUnqueueBuffers(alSrc, 1, &alBuf);
 
     launched = false;
 }

@@ -104,6 +104,13 @@ void AudioUtils::PrintOpenALInfo(){
     DebugLog("OpenAL Renderer %s", alGetString(AL_RENDERER));
     DebugLog("OpenAL Vendor %s", alGetString(AL_VENDOR));
     //DebugLog("OpenAL Extensions %s", alGetString(AL_EXTENSIONS));
+
+    if (!alDev){
+        DebugError("OpenAL Device Not Found");
+        return;
+    }
+
+    DebugLog("OpenAL Device %p %s", alDev, alcGetString(alDev, ALC_DEVICE_SPECIFIER));
 }
 
 void AudioUtils::LoadOpenALPreset(){

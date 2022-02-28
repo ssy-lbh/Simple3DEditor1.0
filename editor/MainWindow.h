@@ -40,9 +40,6 @@ private:
 
     ITool* curTool = NULL;
 
-    WString inputText;
-    bool inputConfirm = false;
-
     class MoveButton final : public IButton {
     private:
         Vector2 center;
@@ -58,7 +55,7 @@ private:
         virtual void Render() override;
         virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
-        virtual void ClickEnd() override;
+        virtual void ClickEnd(Vector2 pos, IButton* end) override;
     };
 
     class RotateButton final : public IButton {
@@ -75,7 +72,7 @@ private:
         virtual void Render() override;
         virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
-        virtual void ClickEnd() override;
+        virtual void ClickEnd(Vector2 pos, IButton* end) override;
     };
 
     class MoveOperation final : public IOperation {
@@ -260,7 +257,6 @@ public:
     void OnInsTopology();
     void OnInsSelectColor();
 
-    void GetTextInput();
     void AddPoint();
     void DeletePoint();
     bool SaveMesh(Mesh* mesh);

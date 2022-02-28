@@ -4,6 +4,7 @@
 #include <res.h>
 #include <utils/math3d/Math.h>
 #include <utils/gl/GLLights.h>
+#include <utils/gl/GLUtils.h>
 
 Transform::Transform(){}
 Transform::~Transform(){}

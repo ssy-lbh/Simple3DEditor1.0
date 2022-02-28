@@ -1,6 +1,6 @@
 #include <utils/StringBuilder.h>
 
-#include <windows.h>
+#include <cstring>
 
 #include <utils/String.h>
 #include <utils/os/Log.h>
@@ -31,7 +31,10 @@ void StringBuilder::Check(size_t reserve){
     size <<= 1;
     while (ptr + reserve >= size)
         size <<= 1;
-    data = (char*)realloc(data, size * sizeof(char));
+    char* newData = new char[size];
+    memcpy(newData, data, ptr * sizeof(char));
+    delete[] data;
+    data = newData;
 }
 
 String StringBuilder::ToString(){
@@ -47,44 +50,52 @@ size_t StringBuilder::GetLength(){
     return ptr;
 }
 
-void StringBuilder::Append(char c){
+StringBuilder& StringBuilder::Append(char c){
     Check(2);
     data[ptr++] = c;
+    return *this;
 }
 
-void StringBuilder::Append(int i){
+StringBuilder& StringBuilder::Append(int i){
     Check(12);
     ptr += __builtin_snprintf(data + ptr, 11, "%d", i);
+    return *this;
 }
 
-void StringBuilder::Append(bool b){
+StringBuilder& StringBuilder::Append(bool b){
     Check(6);
     ptr += __builtin_snprintf(data + ptr, 5, "%s", b ? "true" : "false");
+    return *this;
 }
 
-void StringBuilder::Append(float f){
+StringBuilder& StringBuilder::Append(float f){
     Check(20);
     ptr += __builtin_snprintf(data + ptr, 19, "%g", f);
+    return *this;
 }
 
-void StringBuilder::Append(double d){
+StringBuilder& StringBuilder::Append(double d){
     Check(20);
     ptr += __builtin_snprintf(data + ptr, 19, "%g", d);
+    return *this;
 
 }
-void StringBuilder::Append(String s){
+StringBuilder& StringBuilder::Append(String s){
     Check(s.GetLength() + 2);
     ptr += __builtin_snprintf(data + ptr, s.GetLength() + 1, "%s", s.GetString());
+    return *this;
 }
 
-void StringBuilder::Append(const char* s){
+StringBuilder& StringBuilder::Append(const char* s){
     size_t len = strlen(s);
     Check(len + 2);
     ptr += __builtin_snprintf(data + ptr, len + 1, "%s", s);
+    return *this;
 }
 
-void StringBuilder::Append(const wchar_t* s){
+StringBuilder& StringBuilder::Append(const wchar_t* s){
     size_t len = wcslen(s);
     Check(len + 2);
     ptr += __builtin_snprintf(data + ptr, len + 1, "%S", s);
+    return *this;
 }

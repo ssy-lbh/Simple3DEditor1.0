@@ -29,19 +29,33 @@ void NodeMapWindow::MoveButton::Drag(Vector2 dir){
     window->viewPos = start - dir;
 }
 
-NodeMapWindow::Node::Node(NodeMapWindow* window) : window(window) {}
+NodeMapWindow::Node::Node(NodeMapWindow* window) : Node(Vector2::zero, window) {}
 
-NodeMapWindow::Node::Node(Vector2 pos, NodeMapWindow* window) : position(pos), window(window) {}
+NodeMapWindow::Node::Node(Vector2 pos, NodeMapWindow* window) : position(pos), window(window) {
+    uiMgr = new UIManager();
 
-NodeMapWindow::Node::~Node(){}
+    // UIEditA* name = new UIEditA(Vector2(0.05f, 0.0f), 0.2f, [](char* s, void* user){
+    //     DebugLog("Edit %s", s);
+    // });
+    // name->SetCornerRadius(0.2f);
+    // name->SetBackgroundColor(Vector3(0.1f, 0.1f, 0.1f));
+    // name->SetFontColor(Vector3(1.0f, 1.0f, 1.0f));
+    // name->SetSelectionColor(Vector3(0.0f, 0.0f, 1.0f));
+    // uiMgr->AddButton(name);
+}
+
+NodeMapWindow::Node::~Node(){
+    if (uiMgr) delete uiMgr;
+}
 
 bool NodeMapWindow::Node::Trigger(Vector2 pos){
-    Vector2 rela = pos - position + window->viewPos;
-    return rela.x >= 0.0f && rela.x <= 0.3f && rela.y >= 0.0f && rela.y <= 0.3f;
+    relaPos = pos - position;
+    return relaPos.x >= 0.0f && relaPos.x <= 0.3f && relaPos.y >= 0.0f && relaPos.y <= 0.3f;
 }
 
 void NodeMapWindow::Node::Render(){
-    glColor3f(0.05f, 0.05f, 0.05f);
+    focus ? glColor3f(0.5f, 0.5f, 0.1f) :
+        window->selectedNodes.HasValue(this) ? glColor3f(0.3f, 0.3f, 0.1f) : glColor3f(0.05f, 0.05f, 0.05f);
     GLUtils::DrawRoundRect(
         position.x,
         position.y,
@@ -50,8 +64,8 @@ void NodeMapWindow::Node::Render(){
         0.05f,
         0.05f
     );
+
     if (connNode){
-        glDisable(GL_LINE_STIPPLE);
         glColor3f(1.0f, 1.0f, 0.2f);
         glLineWidth(1.0f);
         Vector2 begin = Vector2(position.x + 0.3f, position.y + 0.15f);
@@ -59,24 +73,69 @@ void NodeMapWindow::Node::Render(){
         Vector2 end = connNode->position + offset;
         GLUtils::DrawBezier(begin, begin + Vector2(0.3f, 0.0f), end - Vector2(0.3f, 0.0f), end, 0.01f);
     }
+
+    if (rightDown){
+        glColor3f(0.5f, 0.5f, 0.2f);
+        glLineWidth(1.0f);
+        GLUtils::DrawBezier(rightStart, rightStart + Vector2(0.3f, 0.0f), rightEnd - Vector2(0.3f, 0.0f), rightEnd, 0.01f);
+    }
+
+    uiMgr->Render();
+}
+
+void NodeMapWindow::Node::Hover(Vector2 pos){
+    uiMgr->CursorMove(pos - position);
 }
 
 void NodeMapWindow::Node::Click(Vector2 pos){
     start = position;
-    if (!window->selectedNodes.HasValue(this))
-        window->selectedNodes.Add(this);
+    uiMgr->LeftDown();
 }
 
 void NodeMapWindow::Node::Drag(Vector2 dir){
     position = start + dir;
 }
 
+void NodeMapWindow::Node::ClickEnd(Vector2 pos, IButton* end){
+    uiMgr->LeftUp();
+}
+
+void NodeMapWindow::Node::OnFocus(Vector2 pos){
+    if (!window->selectedNodes.HasValue(this))
+        window->selectedNodes.Add(this);
+    focus = true;
+}
+
+void NodeMapWindow::Node::OnKillFocus(Vector2 pos, IButton* focus){
+    this->focus = false;
+}
+
+void NodeMapWindow::Node::RightClick(Vector2 pos){
+    rightStart = pos;
+    rightEnd = pos;
+    rightDown = true;
+}
+
+void NodeMapWindow::Node::RightDrag(Vector2 dir){
+    rightEnd = rightStart + dir;
+}
+
+void NodeMapWindow::Node::RightClickEnd(Vector2 pos, IButton* end){
+    Connect((Node*)end);
+    rightDown = false;
+}
+
+bool NodeMapWindow::Node::Char(char c){
+    return uiMgr->Char(c);
+}
+
 void NodeMapWindow::Node::Connect(Node* node){
-    connNode = node;
-    offset = Vector2(0.0f, 0.15f);
+    Connect(node, Vector2(0.0f, 0.15f));
 }
 
 void NodeMapWindow::Node::Connect(Node* node, Vector2 offset){
+    if (node == this)
+        return;
     connNode = node;
     this->offset = offset;
 }
@@ -189,13 +248,9 @@ void NodeMapWindow::OnRender(){
     // UI绘制
     uiMgr->Render();
 
-    nodeMgr->RenderTransform();
-
     glPushMatrix();
     glTranslatef(-viewPos.x, -viewPos.y, 0.0f);
-
-    nodeMgr->RenderRaw();
-
+    nodeMgr->Render();
     glPopMatrix();
 }
 
@@ -221,7 +276,7 @@ void NodeMapWindow::UpdateCursor(int x, int y){
     cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
     cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
     uiMgr->CursorMove(cursorPos);
-    nodeMgr->CursorMove(cursorPos);
+    nodeMgr->CursorMove(cursorPos + viewPos);
 }
 
 void NodeMapWindow::UpdateWindowSize(int x, int y){
@@ -261,10 +316,16 @@ void NodeMapWindow::OnLeftUp(int x, int y){
 }
 
 void NodeMapWindow::OnRightDown(int x, int y){
+    UpdateCursor(x, y);
+    if (nodeMgr->RightDown())
+        return;
     Main::SetMenu(basicMenu);
 }
 
-void NodeMapWindow::OnRightUp(int x, int y){}
+void NodeMapWindow::OnRightUp(int x, int y){
+    UpdateCursor(x, y);
+    nodeMgr->RightUp();
+}
 
 void NodeMapWindow::OnMouseHover(int key, int x, int y){}
 

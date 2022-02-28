@@ -38,6 +38,10 @@ public:
     bool Create();
     bool CreateNew();
     bool Delete();
+    static bool Delete(const char* path);
+    static bool Delete(const wchar_t* path);
+    static bool Delete(String path);
+    static bool Delete(WString path);
     size_t Read(void* buffer, size_t size);
     size_t Write(const void* buffer, size_t size);
     size_t GetPointer() const;

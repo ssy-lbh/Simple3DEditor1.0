@@ -4,7 +4,6 @@
 #include <define.h>
 
 #include <utils/String.h>
-#include <editor/gui/ViewManager.h>
 
 #ifdef PLATFORM_WINDOWS
 #include <windef.h>

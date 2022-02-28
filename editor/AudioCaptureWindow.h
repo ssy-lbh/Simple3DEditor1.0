@@ -63,8 +63,8 @@ private:
         virtual bool Trigger(Vector2 pos) override;
         virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
-        virtual void Hover() override;
-        virtual void Leave() override;
+        virtual void Hover(Vector2 pos) override;
+        virtual void Leave(Vector2 pos) override;
         virtual void Render() override;
     };
 

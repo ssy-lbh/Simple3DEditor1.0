@@ -39,6 +39,8 @@
         "cstdint": "cpp",
         "numbers": "cpp",
         "system_error": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "cstdlib": "cpp",
+        "fstream": "cpp"
     }
 }

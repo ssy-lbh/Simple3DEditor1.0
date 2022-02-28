@@ -117,7 +117,7 @@ bool ShellCommandLine(WString s){
 }
 
 bool ShellFFmpeg(String src, String dst){
-    String cmd = String(".\\ffmpeg\\ffmpeg.exe -i ") + src + " -y " + dst;
+    String cmd = String(".\\lib\\ffmpeg\\ffmpeg.exe -i \"") + src + "\" -y " + dst;
 
     if (!ShellCommandLine(cmd)){
         return false;
@@ -143,7 +143,7 @@ bool ShellFFmpeg(String src, String dst){
 }
 
 bool ShellFFmpeg(WString src, WString dst){
-    WString cmd = WString(L".\\ffmpeg\\ffmpeg.exe -i ") + src + L" -y " + dst;
+    WString cmd = WString(L".\\lib\\ffmpeg\\ffmpeg.exe -i \"") + src + L"\" -y " + dst;
 
     if (!ShellCommandLine(cmd)){
         return false;

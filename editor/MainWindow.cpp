@@ -2,6 +2,7 @@
 
 #include <main.h>
 #include <res.h>
+#include <editor/dialog/Tips.h>
 #include <utils/File.h>
 #include <utils/math3d/Math.h>
 #include <utils/os/Shell.h>
@@ -37,7 +38,7 @@ void MainWindow::MoveButton::Drag(Vector2 dir){
     main->UpdateLookAtLocation();
 }
 
-void MainWindow::MoveButton::ClickEnd(){
+void MainWindow::MoveButton::ClickEnd(Vector2 pos, IButton* end){
     DebugLog("MoveButton ClickEnd");
     main->UpdateLookAtLocation();
 }
@@ -65,7 +66,7 @@ void MainWindow::RotateButton::Drag(Vector2 dir){
                             Quaternion::AxisAngle(main->camRight, dir.y * 100.0f) * start;
 }
 
-void MainWindow::RotateButton::ClickEnd(){
+void MainWindow::RotateButton::ClickEnd(Vector2 pos, IButton* end){
     DebugLog("RotateButton ClickEnd");
     main->UpdateRotation();
 }
@@ -598,10 +599,8 @@ void MainWindow::OnRender(){
     glEnable(GL_ALPHA_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    GLUtils::ResetProjection();
+    GLUtils::ResetModelView();
     if (curTool)
         curTool->OnRender();
 
@@ -671,48 +670,6 @@ void MainWindow::UpdateDistance(){
     }else if (camRange > camDis * 100.0f){
         camRange *= 0.2f;
     }
-}
-
-/** synchronized **/
-void MainWindow::GetTextInput(){
-    static MainWindow* window;
-    window = this;
-    DialogBox(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDD_TEXT), NULL,
-        (DLGPROC)[]
-#if (!_WIN64) && _WIN32
-        __attribute__((__stdcall__))
-#endif
-        (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
-            switch (uMsg){
-            case WM_INITDIALOG:
-                return (INT_PTR)TRUE;
-            case WM_CLOSE:
-                window->inputConfirm = false;
-                EndDialog(hDlg, LOWORD(wParam));
-                return (INT_PTR)TRUE;
-            case WM_COMMAND:
-                switch (LOWORD(wParam)){
-                case IDOK:{
-                    wchar_t text[DEFAULT_STRING_LENGTH + 1];
-                    text[DEFAULT_STRING_LENGTH] = L'\0';
-                    
-                    window->inputConfirm = true;
-                    GetDlgItemTextW(hDlg, IDC_TEXT_EDIT, text, DEFAULT_STRING_LENGTH);
-                    window->inputText = text;
-                    EndDialog(hDlg, LOWORD(wParam));
-                    break;
-                }
-                case IDCANCEL:
-                    window->inputConfirm = false;
-                    EndDialog(hDlg, LOWORD(wParam));
-                    break;
-                }
-                return (INT_PTR)TRUE;
-            }
-            return (INT_PTR)FALSE;
-    });
-    if (!inputConfirm)
-        inputText = String();
 }
 
 void MainWindow::AddPoint(){
@@ -838,24 +795,7 @@ bool MainWindow::LoadMesh(Mesh* mesh, WString path){
 }
 
 void MainWindow::AboutBox(){
-    DialogBox(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDD_ABOUTBOX), NULL,
-        (DLGPROC)[]
-#if (!_WIN64) && _WIN32
-        __attribute__((__stdcall__))
-#endif
-        (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam){
-            switch (uMsg){
-            case WM_INITDIALOG:
-                return (INT_PTR)TRUE;
-            case WM_COMMAND:
-                if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL){
-                    EndDialog(hDlg, LOWORD(wParam));
-                    return (INT_PTR)TRUE;
-                }
-                break;
-            }
-            return (INT_PTR)FALSE;
-    });
+    DialogVersionInfo();
 }
 
 void MainWindow::OnClose(){}

@@ -42,10 +42,17 @@ private:
     class Node final : public IButton {
     private:
         NodeMapWindow* window;
+        Vector2 relaPos;
         Vector2 start;
+        Vector2 rightStart;
+        Vector2 rightEnd;
         Vector2 position;
         Node* connNode = NULL;
         Vector2 offset;
+        bool focus = false;
+        bool rightDown = false;
+
+        UIManager* uiMgr = NULL;
 
     public:
         Node(NodeMapWindow* window);
@@ -53,8 +60,17 @@ private:
         virtual ~Node() override;
         virtual bool Trigger(Vector2 pos) override;
         virtual void Render() override;
+        virtual void Hover(Vector2 pos) override;
         virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
+        virtual void ClickEnd(Vector2 pos, IButton* end) override;
+        virtual void OnFocus(Vector2 pos);
+        virtual void OnKillFocus(Vector2 pos, IButton* focus);
+        virtual void RightClick(Vector2 pos);
+        virtual void RightDrag(Vector2 dir);
+        virtual void RightClickEnd(Vector2 pos, IButton* end);
+        virtual bool Char(char c);
+
         void Connect(Node* node);
         void Connect(Node* node, Vector2 offset);
         void Disconnect();

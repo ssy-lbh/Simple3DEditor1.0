@@ -73,6 +73,8 @@ public:
     static void PopMatrix();
     static Matrix4x4 GetProjectionMatrix();
     static Matrix4x4 GetModelViewMatrix();
+    static void ResetProjection();
+    static void ResetModelView();
 };
 
 #endif

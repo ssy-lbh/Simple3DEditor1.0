@@ -32,33 +32,11 @@ void UIManager::CursorMove(Vector2 pos){
         cur->Drag(pos - startPos);
         return;
     }
-    cur = NULL;
-    buttons.Foreach<UIManager*>([](IButton* btn, UIManager* mgr){
-        if(btn->Trigger(mgr->cursorPos)){
-            mgr->cur = btn;
-            mgr->startPos = mgr->cursorPos;
-            btn->Hover();
-        }else{
-            btn->Leave();
-        }
-    }, this);
-}
-
-void UIManager::Render(float aspect){
-    aspect = 1.0f / aspect;
-
-    glEnable(GL_ALPHA_TEST);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glMatrixMode(GL_PROJECTION);
-    glOrtho(-aspect, aspect, -1.0, 1.0, 0.0, 2.0);// OpenGL 深度[-1,1]，变换后比例不变
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    buttons.Foreach([](IButton* btn){
-        btn->Render();
-    });
+    if (rightDown && cur != NULL){
+        cur->RightDrag(pos - startPos);
+        return;
+    }
+    FindCurrent();
 }
 
 void UIManager::Render(){
@@ -66,47 +44,20 @@ void UIManager::Render(){
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
-    glMatrixMode(GL_PROJECTION);
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
 
     buttons.Foreach([](IButton* btn){
         btn->Render();
     });
-}
-
-void UIManager::RenderRaw(){
-    buttons.Foreach([](IButton* btn){
-        btn->Render();
-    });
-}
-
-void UIManager::RenderTransform(float aspect){
-    aspect = 1.0f / aspect;
-
-    glEnable(GL_ALPHA_TEST);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glMatrixMode(GL_PROJECTION);
-    glOrtho(-aspect, aspect, -1.0, 1.0, 0.0, 2.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-}
-
-void UIManager::RenderTransform(){
-    glEnable(GL_ALPHA_TEST);
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glMatrixMode(GL_PROJECTION);
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
 }
 
 bool UIManager::LeftDown(){
+    if (focus != cur){
+        if (focus)
+            focus->OnKillFocus(cursorPos, focus);
+        focus = cur;
+        if (focus)
+            focus->OnFocus(cursorPos);
+    }
     if (cur){
         leftDown = true;
         cur->Click(cursorPos);
@@ -117,11 +68,41 @@ bool UIManager::LeftDown(){
 
 bool UIManager::LeftUp(){
     if (cur){
-        cur->ClickEnd();
-        cur = NULL;
+        IButton* preBtn = cur;
+        FindCurrent();
+        preBtn->ClickEnd(cursorPos, cur);
     }
     if (leftDown){
         leftDown = false;
+        return true;
+    }
+    return false;
+}
+
+bool UIManager::RightDown(){
+    if (focus != cur){
+        if (focus)
+            focus->OnKillFocus(cursorPos, focus);
+        focus = cur;
+        if (focus)
+            focus->OnFocus(cursorPos);
+    }
+    if (cur){
+        rightDown = true;
+        cur->RightClick(cursorPos);
+        return true;
+    }
+    return false;
+}
+
+bool UIManager::RightUp(){
+    if (cur){
+        IButton* preBtn = cur;
+        FindCurrent();
+        preBtn->RightClickEnd(cursorPos, cur);
+    }
+    if (rightDown){
+        rightDown = false;
         return true;
     }
     return false;
@@ -149,14 +130,37 @@ void UIManager::Foreach(void(*func)(IButton*, void*), void* user){
     buttons.Foreach(func, user);
 }
 
+IButton* UIManager::GetCurrent(){
+    return cur;
+}
+
+IButton* UIManager::FindCurrent(){
+    cur = NULL;
+    buttons.Foreach<UIManager*>([](IButton* btn, UIManager* mgr){
+        if(btn->Trigger(mgr->cursorPos)){
+            mgr->cur = btn;
+            mgr->startPos = mgr->cursorPos;
+            btn->Hover(mgr->cursorPos);
+        }else{
+            btn->Leave(mgr->cursorPos);
+        }
+    }, this);
+    return cur;
+}
+
 IButton::IButton(){}
 IButton::~IButton(){}
 bool IButton::Trigger(Vector2 pos){ return false; }
-void IButton::Hover(){}
+void IButton::Hover(Vector2 pos){}
 void IButton::Click(Vector2 pos){}
 void IButton::Drag(Vector2 dir){}
-void IButton::ClickEnd(){}
-void IButton::Leave(){}
+void IButton::ClickEnd(Vector2 pos, IButton* end){}
+void IButton::Leave(Vector2 pos){}
+void IButton::OnFocus(Vector2 pos){}
+void IButton::OnKillFocus(Vector2 pos, IButton* focus){}
+void IButton::RightClick(Vector2 pos){}
+void IButton::RightDrag(Vector2 dir){}
+void IButton::RightClickEnd(Vector2 pos, IButton* end){}
 bool IButton::Char(char c){ return false; }
 bool IButton::Unichar(wchar_t c){ return false; }
 void IButton::Render(){}
@@ -234,16 +238,16 @@ bool UIEditA::Trigger(Vector2 pos){
     return pos.x >= position.x && pos.x <= position.x + size.x && pos.y >= position.y && pos.y <= position.y + size.y;
 }
 
-void UIEditA::Hover(){
-    Main::SetWindowCursor(IDC_IBEAM);
+void UIEditA::Hover(Vector2 pos){
+    Main::SetCursor(IDC_IBEAM);
 }
 
 void UIEditA::Click(Vector2 pos){
-    Main::SetWindowCursor(IDC_IBEAM);
+    Main::SetCursor(IDC_IBEAM);
     editing = true;
 }
 
-void UIEditA::Leave(){
+void UIEditA::Leave(Vector2 pos){
     if (editing){
         editing = false;
         text[editPos] = '\0';
@@ -341,16 +345,16 @@ bool UIEditW::Trigger(Vector2 pos){
     return pos.x >= position.x && pos.x <= position.x + size.x && pos.y >= position.y && pos.y <= position.y + size.y;
 }
 
-void UIEditW::Hover(){
-    Main::SetWindowCursor(IDC_IBEAM);
+void UIEditW::Hover(Vector2 pos){
+    Main::SetCursor(IDC_IBEAM);
 }
 
 void UIEditW::Click(Vector2 pos){
-    Main::SetWindowCursor(IDC_IBEAM);
+    Main::SetCursor(IDC_IBEAM);
     editing = true;
 }
 
-void UIEditW::Leave(){
+void UIEditW::Leave(Vector2 pos){
     editing = false;
     text[editPos] = L'\0';
 }

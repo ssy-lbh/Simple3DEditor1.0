@@ -3,11 +3,6 @@
 
 #include <define.h>
 
-#include <lib/openal/al.h>
-#include <lib/openal/alc.h>
-
-#include <utils/AudioUtils.h>
-#include <utils/String.h>
 #include <editor/gui/UIManager.h>
 #include <editor/gui/Menu.h>
 
@@ -22,6 +17,8 @@ struct AudioWaveFormat {
 
 class AudioPlayerWindow final : public IWindow {
 private:
+    const int bit = 12;
+    
     bool focus = false;
 
     Vector2 size = Vector2::one;
@@ -36,8 +33,8 @@ private:
     bool loaded = false;
     bool launched = false;
 
-    ALuint alSrc;
-    ALuint alBuf;
+    uint alSrc;
+    uint alBuf;
 
     /* size in samples */
     int alAudioSize;
@@ -49,7 +46,8 @@ private:
     int alChannels;
     /* audio data */
     void* alAudioData;
-    ALint alAudioOffset;
+    int alAudioFreq;
+    int alAudioOffset;
 
     bool displayWave = false;
 
@@ -63,17 +61,23 @@ private:
         virtual ~PlayButton() override;
 
         virtual bool Trigger(Vector2 pos) override;
-        virtual void Hover() override;
+        virtual void Hover(Vector2 pos) override;
         virtual void Click(Vector2 pos) override;
-        virtual void Leave() override;
+        virtual void Leave(Vector2 pos) override;
         virtual void Render() override;
     };
 
     class ProgressBar final : public IButton {
     private:
+        const float LOW_BOUND = -0.6f;
+        const float HIGH_BOUND = 0.6f;
+        const float POSITION_Y = -0.1f;
+        const float BUTTON_WIDTH_X = 0.05f;
+        const float BUTTON_WIDTH_Y = 0.1f;
+
         AudioPlayerWindow* window;
         bool hover = false;
-        float pos = -0.6f;
+        float pos = LOW_BOUND;
         float origin;
     
     public:
@@ -83,8 +87,33 @@ private:
         virtual bool Trigger(Vector2 pos) override;
         virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
-        virtual void Hover() override;
-        virtual void Leave() override;
+        virtual void Hover(Vector2 pos) override;
+        virtual void Leave(Vector2 pos) override;
+        virtual void Render() override;
+    };
+
+    class GainBar final : public IButton {
+    private:
+        const float LOW_BOUND = -0.8f;
+        const float HIGH_BOUND = -0.2f;
+        const float POSITION_X = -0.85f;
+        const float BUTTON_WIDTH_X = 0.05f;
+        const float BUTTON_WIDTH_Y = 0.02f;
+
+        AudioPlayerWindow* window;
+        bool hover = false;
+        float pos = HIGH_BOUND;
+        float origin;
+    
+    public:
+        GainBar(AudioPlayerWindow* window);
+        virtual ~GainBar() override;
+
+        virtual bool Trigger(Vector2 pos) override;
+        virtual void Click(Vector2 pos) override;
+        virtual void Drag(Vector2 dir) override;
+        virtual void Hover(Vector2 pos) override;
+        virtual void Leave(Vector2 pos) override;
         virtual void Render() override;
     };
 
@@ -134,6 +163,7 @@ public:
 
     void DrawLineGraph(float* height, size_t size);
     void DrawAmplitudeGraph(float* height, size_t size);
+    void DrawTime();
     void RenderGraph();
 
     virtual bool IsFocus() override;
@@ -167,9 +197,9 @@ public:
     bool IsLaunched();
     bool IsLoop();
     void SetLoop(bool loop);
-    ALint GetOffset();
+    int GetOffset();
 
-    ALint GetWaveFormat(AudioWaveFormat* wav);
+    int GetWaveFormat(AudioWaveFormat* wav);
 };
 
 #endif

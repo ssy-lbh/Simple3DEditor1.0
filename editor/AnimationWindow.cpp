@@ -311,10 +311,8 @@ void AnimationWindow::OnRender(){
     glEnable(GL_ALPHA_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    GLUtils::ResetProjection();
+    GLUtils::ResetModelView();
 
     uiMgr->Render();
 }

@@ -14,6 +14,8 @@ private:
 
 public:
     DataBuffer();
+    DataBuffer(size_t len);
+    DataBuffer(const void* buf, size_t len);
     ~DataBuffer();
 
     void Write(char c);

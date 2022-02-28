@@ -3,7 +3,7 @@
 
 #include <define.h>
 
-void glFontSize(int size);
+void glFontSize(uint size);
 void glInitASCIIFont();
 void glDrawString(const char* text);
 void glDrawCNString(const char* text);

@@ -26,11 +26,11 @@ void AudioCaptureWindow::ProgressBar::Drag(Vector2 dir){
     window->soundTouch->setPitchSemiTones(pos * 1.25f * 12.0f);
 }
 
-void AudioCaptureWindow::ProgressBar::Hover(){
+void AudioCaptureWindow::ProgressBar::Hover(Vector2 pos){
     hover = true;
 }
 
-void AudioCaptureWindow::ProgressBar::Leave(){
+void AudioCaptureWindow::ProgressBar::Leave(Vector2 pos){
     hover = false;
 }
 
@@ -258,10 +258,8 @@ void AudioCaptureWindow::OnRender(){
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    GLUtils::ResetProjection();
+    GLUtils::ResetModelView();
 
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_LINES);
@@ -361,7 +359,7 @@ void AudioCaptureWindow::Launch(){
         return;
     }
 
-    DebugLog("AudioCaptureWindow::Launch Open Device %p %s", alcGetString(capDev, ALC_DEVICE_SPECIFIER));
+    DebugLog("AudioCaptureWindow::Launch Open Device %p %s", capDev, alcGetString(capDev, ALC_DEVICE_SPECIFIER));
 
     if (!capBuf){
         capBuf = new short[1 << bit];

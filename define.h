@@ -21,71 +21,72 @@ typedef unsigned int uint;
 
 typedef unsigned int uenum;
 
-// utils.h
+// utils
 class String;
 class WString;
 class File;
+class DataBuffer;
 
 // 对象基类
 class Object;
 
 class Object {};
 
-// geodef.h
+// geodef
 class Vertex;
 class Edge;
 class Face;
 
-// mesh.h
+// mesh
 class Mesh;
 
-// vecmath.h
+// vecmath
 class Vector2;
 class Vector3;
 class Vector4;
 class Quaternion;
 class Matrix4x4;
 
-// viewobject.h
+// viewobject
 class Transform;
 class AViewObject;
 class MeshObject;
 class BezierCurveObject;
 class AudioListenerObject;
 
-// main.h
+// main
 class IUndo;
 class MainWindow;
 class LocalData;
 class GlobalData;
 class Main;
 
-// container.h
+// container
 class LRContainer;
 class UDContainer;
 class SelectionWindow;
 
-// appframe.h
+// appframe
 class AppFrame;
 
-// colorboard.h
+// colorboard
 class ColorBoard;
 
-// audio.h
+// audio
 class AudioUtils;
 class AudioPlayerWindow;
 class AudioCaptureWindow;
 
-// attrtable.h
+// attrtable
 enum class AttributeType;
 class Attribute;
 class AttributeTable;
 
-// anim.h
+// anim
 class IAnimationFunction;
 class AnimationWindow;
 
-// gltools.h
+// gltools
 class GLRect;
 class GLUtils;
 class GLTexture2D;
@@ -98,39 +99,39 @@ class GLVertexArray;
 class GLVertexBuffer;
 class GLIndexBuffer;
 
-// menu.h
+// menu
 class IMenuItem;
 class Menu;
 class MenuItem;
 
-// nodemap.h
+// nodemap
 class NodeMapWindow;
 
-// paint.h
+// paint
 class UVEditWindow;
 class PaintWindow;
 
-// timetools.h
+// timetools
 class TimeUtils;
 class TimerManager;
 
-// tree.h
+// tree
 class TreeWindow;
 
-// uimgr.h
+// uimgr
 class UIManager;
-class ViewportManager;
 class IButton;
 class IconButton;
 class UIEditA;
+class UIEditW;
 class IOperation;
 class ITool;
 class IWindow;
 
-// appframe.h
+// appframe
 class AppFrame;
 
-// viewmgr.h
+// viewmgr
 class ViewManager;
 
 #endif

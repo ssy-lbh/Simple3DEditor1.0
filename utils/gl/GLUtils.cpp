@@ -84,10 +84,10 @@ GLRect GLRect::ChildRect(float left, float right, float bottom, float top){
 
     size = GetSize();
 
-    rect.left = this->left + Round(size.x * Clamp(left, 0.0f, 1.0f));
-    rect.right = this->left + Round(size.x * Clamp(right, 0.0f, 1.0f));
-    rect.bottom = this->bottom + Round(size.y * Clamp(bottom, 0.0f, 1.0f));
-    rect.top = this->bottom + Round(size.y * Clamp(top, 0.0f, 1.0f));
+    rect.left = this->left + Round(size.x * Clamp((left + 1.0f) * 0.5f, 0.0f, 1.0f));
+    rect.right = this->left + Round(size.x * Clamp((right + 1.0f) * 0.5f, 0.0f, 1.0f));
+    rect.bottom = this->bottom + Round(size.y * Clamp((bottom + 1.0f) * 0.5f, 0.0f, 1.0f));
+    rect.top = this->bottom + Round(size.y * Clamp((top + 1.0f) * 0.5f, 0.0f, 1.0f));
 
     return rect;
 }
@@ -408,4 +408,16 @@ Matrix4x4 GLUtils::GetModelViewMatrix(){
     Matrix4x4 mat;
     glGetFloatv(GL_MODELVIEW_MATRIX, (float*)&mat);
     return mat;
+}
+
+void GLUtils::ResetProjection(){
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    // 此种变换下，Z值小的图形深度大，渲染在后
+    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
+}
+
+void GLUtils::ResetModelView(){
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 }

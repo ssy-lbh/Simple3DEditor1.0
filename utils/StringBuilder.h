@@ -21,14 +21,14 @@ public:
     const char* GetString();
     size_t GetLength();
 
-    void Append(char c);
-    void Append(int i);
-    void Append(bool b);
-    void Append(float f);
-    void Append(double d);
-    void Append(String s);
-    void Append(const char* s);
-    void Append(const wchar_t* s);
+    StringBuilder& Append(char c);
+    StringBuilder& Append(int i);
+    StringBuilder& Append(bool b);
+    StringBuilder& Append(float f);
+    StringBuilder& Append(double d);
+    StringBuilder& Append(String s);
+    StringBuilder& Append(const char* s);
+    StringBuilder& Append(const wchar_t* s);
 };
 
 #endif

@@ -90,8 +90,8 @@ public:
     ~Main();
 
     static void RequestRender();
-    static void SetWindowCursor(int id);
-    static void SetWindowCursor(const char* res);
+    static void SetCursor(int id);
+    static void SetCursor(const char* res);
     static void SetMenu(Menu* m);
     static void SelectObject(AViewObject* o);
 

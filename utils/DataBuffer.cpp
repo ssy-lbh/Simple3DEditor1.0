@@ -1,6 +1,6 @@
 #include <utils/DataBuffer.h>
 
-#include <windows.h>
+#include <cstring>
 
 #include <utils/os/Log.h>
 
@@ -8,6 +8,19 @@ DataBuffer::DataBuffer(){
     data = new char[32];
     size = 32;
     ptr = 0;
+}
+
+DataBuffer::DataBuffer(size_t len){
+    data = new char[len];
+    size = len;
+    ptr = 0;
+}
+
+DataBuffer::DataBuffer(const void* buf, size_t len){
+    data = new char[len];
+    size = len;
+    ptr = 0;
+    memcpy(data, buf, len);
 }
 
 DataBuffer::~DataBuffer(){
@@ -24,7 +37,10 @@ void DataBuffer::Check(size_t reserve){
     size <<= 1;
     while (ptr + reserve >= size)
         size <<= 1;
-    data = (char*)realloc(data, size * sizeof(char));
+    char* newData = new char[size];
+    memcpy(newData, data, ptr * sizeof(char));
+    delete[] data;
+    data = newData;
 }
 
 void DataBuffer::Write(char c){

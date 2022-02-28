@@ -107,16 +107,16 @@ void Main::RequestRender(){
 }
 
 #ifdef PLATFORM_WINDOWS
-void Main::SetWindowCursor(int id){
+void Main::SetCursor(int id){
     AppFrame* frame = (AppFrame*)ThreadLocal::Get(THREAD_LOCAL_APPFRAME);
-    SetCursor(LoadCursorA(GetModuleHandleA(NULL), MAKEINTRESOURCEA(id)));
+    ::SetCursor(LoadCursorA(GetModuleHandleA(NULL), MAKEINTRESOURCEA(id)));
     if (frame)
         frame->cursorSelected = true;
 }
 
-void Main::SetWindowCursor(const char* res){
+void Main::SetCursor(const char* res){
     AppFrame* frame = (AppFrame*)ThreadLocal::Get(THREAD_LOCAL_APPFRAME);
-    SetCursor(LoadCursorA(GetModuleHandleA(NULL), res));
+    ::SetCursor(LoadCursorA(NULL, res));
     if (frame)
         frame->cursorSelected = true;
 }
@@ -158,7 +158,6 @@ int Main::MainEntry(int argc, char** argv){
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
     glFontSize(12);
-    glInitASCIIFont();
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 

@@ -34,9 +34,10 @@ PROGOBJ		= main\
 				editor\MainWindow editor\gui\Container editor\gui\UIManager editor\gui\Menu
 PLATOBJ		= utils\String utils\File\
 				utils\os\Shell utils\os\Log utils\os\GLFunc utils\os\Thread\
-				utils\os\Time utils\os\Font utils\os\Appframe\
-				utils\gl\GLComputeProgram utils\gl\glTexture2D\
-				editor\gui\ViewManager editor\dialog\ColorBoard
+				utils\os\Time utils\os\Font utils\os\Appframe utils\os\Resource\
+				utils\gl\GLComputeProgram utils\gl\GLTexture2D\
+				editor\gui\ViewManager\
+				editor\dialog\ColorBoard editor\dialog\Tips
 EXTRAOBJ	= lib\soundtouch\mmx_optimized lib\soundtouch\sse_optimized lib\soundtouch\cpu_detect_x86
 RESOBJ		= res string
 OUTPUT 		= main.exe

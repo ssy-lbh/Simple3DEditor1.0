@@ -11,10 +11,12 @@
 class UIManager final : public Object {
 private:
     List<IButton*> buttons;
+    IButton* focus = NULL;
     IButton* cur = NULL;
     Vector2 startPos;
     Vector2 cursorPos;
     bool leftDown = false;
+    bool rightDown = false;
 
 public:
     UIManager();
@@ -23,17 +25,19 @@ public:
     void CursorMove(Vector2 pos);
     void AddButton(IButton* btn);
     void DeleteButton(IButton* btn);
-    void Render(float aspect);
+    // 渲染前一般需要重置ModelView矩阵
     void Render();
-    void RenderRaw();
-    void RenderTransform(float aspect);
-    void RenderTransform();
     bool LeftDown();
     bool LeftUp();
+    bool RightDown();
+    bool RightUp();
     bool Char(char c);
     bool Unichar(wchar_t c);
     void Foreach(void(*func)(IButton*));
     void Foreach(void(*func)(IButton*, void*), void* user);
+
+    IButton* GetCurrent();
+    IButton* FindCurrent();
 };
 
 //TODO 按钮在触发按下后持续生效到停止
@@ -43,11 +47,16 @@ public:
     virtual ~IButton();
 
     virtual bool Trigger(Vector2 pos);
-    virtual void Hover();
+    virtual void Hover(Vector2 pos);
     virtual void Click(Vector2 pos);
     virtual void Drag(Vector2 dir);
-    virtual void ClickEnd();
-    virtual void Leave();
+    virtual void ClickEnd(Vector2 pos, IButton* end);
+    virtual void OnFocus(Vector2 pos);
+    virtual void OnKillFocus(Vector2 pos, IButton* focus);
+    virtual void RightClick(Vector2 pos);
+    virtual void RightDrag(Vector2 dir);
+    virtual void RightClickEnd(Vector2 pos, IButton* end);
+    virtual void Leave(Vector2 pos);
     virtual bool Char(char c);
     virtual bool Unichar(wchar_t c);
     virtual void Render();
@@ -104,9 +113,9 @@ public:
     virtual ~UIEditA();
 
     virtual bool Trigger(Vector2 pos) override;
-    virtual void Hover() override;
+    virtual void Hover(Vector2 pos) override;
     virtual void Click(Vector2 pos) override;
-    virtual void Leave() override;
+    virtual void Leave(Vector2 pos) override;
     virtual bool Char(char c) override;
     virtual void Render() override;
 
@@ -148,9 +157,9 @@ public:
     virtual ~UIEditW();
 
     virtual bool Trigger(Vector2 pos) override;
-    virtual void Hover() override;
+    virtual void Hover(Vector2 pos) override;
     virtual void Click(Vector2 pos) override;
-    virtual void Leave() override;
+    virtual void Leave(Vector2 pos) override;
     virtual bool Unichar(wchar_t c) override;
     virtual void Render() override;
 
