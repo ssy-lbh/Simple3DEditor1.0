@@ -28,7 +28,7 @@ PROGOBJ		= main\
 				utils\math3d\ViewObject utils\math3d\Geometry utils\math3d\Property\
 				utils\gl\GLFrameBuffer utils\gl\GLIndexBuffer\
 				utils\gl\GLLights utils\gl\GLProgram utils\gl\GLShader\
-				utils\gl\GLUtils utils\gl\GLVertexArray utils\gl\glVertexBuffer\
+				utils\gl\GLUtils utils\gl\GLVertexArray utils\gl\GLVertexBuffer\
 				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
 				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
 				editor\MainWindow editor\gui\Container editor\gui\UIManager editor\gui\Menu\
