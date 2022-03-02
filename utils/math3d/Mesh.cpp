@@ -75,13 +75,16 @@ size_t Mesh::FindScreenRect(Vector3 camPos, Quaternion camDir, float zNear, floa
     }
     pack.list = &result;
     vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
-        Vector3 lookPos = (-m->camDir) * (p->pos - m->camPos);
-        if (lookPos.y < m->zNear || lookPos.y > m->zFar){
+        Vector3 lookPos;
+
+        lookPos = (-m->camDir) * (p->pos - m->camPos);
+        if (lookPos.y < m->zNear || lookPos.y > m->zFar)
             return;
-        }
         float x = lookPos.x / lookPos.y;
         float z = lookPos.z / lookPos.y;
         if (x >= m->x1 && x <= m->x2 && z >= m->y1 && z <= m->y2){
+            if (m->list->HasValue(p))
+                return;
             m->cnt++;
             m->list->Add(p);
         }

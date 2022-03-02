@@ -3,9 +3,6 @@
 
 #include <define.h>
 
-#include <gl/gl.h>
-#include <gl/glu.h>
-
 #include <editor/gui/UIManager.h>
 #include <editor/gui/Menu.h>
 
@@ -260,7 +257,6 @@ public:
     bool SaveMesh(Mesh* mesh);
     bool LoadMesh(Mesh* mesh);
     bool LoadMesh(Mesh* mesh, WString path);
-    void AboutBox();
     Vector3 GetLookPosition(Vector3 pos);
     Vector2 GetScreenPosition(Vector3 pos);
 };

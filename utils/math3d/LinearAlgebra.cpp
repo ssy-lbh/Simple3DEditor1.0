@@ -266,6 +266,10 @@ float Vector3::Determinant(Vector3 v1, Vector3 v2, Vector3 v3){
            v1.z * (v2.x * v3.y - v2.y * v3.x);
 }
 
+Vector3 Vector3::Compose(Vector3 coord, Vector3 x, Vector3 y, Vector3 z){
+    return x * coord.x + y * coord.y + z * coord.z;
+}
+
 Vector3 Vector3::Decompose(Vector3 vec, Vector3 x, Vector3 y, Vector3 z){
     float detinv = 1.0f / Determinant(x, y, z);
     return Vector3(Determinant(vec, y, z) * detinv,
@@ -543,7 +547,8 @@ Vector3 Quaternion::operator*(Vector3 v) const{
 Quaternion Quaternion::FromTo(Vector3 from, Vector3 to){
     from.Normalize();
     to.Normalize();
-    //TODO 这地方原理不太明白
+    if ((from + to).SqrMagnitude() == 0.0f)
+        return Quaternion(Vector3::Cross(from, ((from - Vector3::forward).SqrMagnitude() == 0.0f ? Vector3::right : Vector3::forward)).Normal(), 0.0f);
     return -(Quaternion((from + to).Normal(), 0.0F) / Quaternion(from, 0.0F));
 }
 

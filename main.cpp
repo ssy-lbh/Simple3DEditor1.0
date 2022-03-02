@@ -4,10 +4,12 @@
 #include <editor/gui/Container.h>
 #include <editor/gui/Menu.h>
 #include <editor/MainWindow.h>
+#include <editor/dialog/Tips.h>
 #include <utils/AudioUtils.h>
 #include <utils/os/Log.h>
 #include <utils/os/Font.h>
 #include <utils/os/Thread.h>
+#include <utils/os/Shell.h>
 #include <utils/gl/GLUtils.h>
 #include <utils/math3d/ViewObject.h>
 
@@ -52,7 +54,6 @@ void LocalData::OnLeftDown(int x, int y){
             menu->Click();
         }
         SetMenu(NULL);
-        return;
     }
 }
 
@@ -66,6 +67,45 @@ void LocalData::OnRightDown(int x, int y){
 
 void LocalData::OnRightUp(int x, int y){
     UpdateCursor(x, y);
+}
+
+void LocalData::OnMenuAccel(int id, bool accel){
+    switch (id){
+    case IDM_EXIT:
+        if (ShellMsgBox(WString(IDS_EXIT_CONFIRM_CAPTION), WString(IDS_EXIT_CONFIRM)) == MSGBOX_YES)
+            PostQuitMessage(0);
+        break;
+    case IDM_ABOUT:
+        DialogVersionInfo();
+        break;
+    case IDM_LEFT:
+        if (menu)
+            menu->PressLeft();
+        break;
+    case IDM_RIGHT:
+        if (menu)
+            menu->PressRight();
+        break;
+    case IDM_UP:
+        if (menu)
+            menu->PressUp();
+        break;
+    case IDM_DOWN:
+        if (menu)
+            menu->PressDown();
+        break;
+    case IDM_CONFIRM:
+        if (menu){
+            if (menu->InChainMenu(cursorPos - menuPos)){
+                menu->Click();
+            }
+            SetMenu(NULL);
+        }
+        break;
+    case IDM_CANCEL:
+        SetMenu(NULL);
+        break;
+    }
 }
 
 void LocalData::Render(){
@@ -184,6 +224,8 @@ int Main::MainEntry(int argc, char** argv){
 
 Main* Main::inst = NULL;
 GlobalData* Main::data = NULL;
+
+#include <utils/os/Shell.h>
 
 int main(int argc, char** argv){
     Main::inst = new Main();

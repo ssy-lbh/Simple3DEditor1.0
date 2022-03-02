@@ -100,6 +100,13 @@ BEGIN
     "^L",           IDM_LOAD,               ASCII, NOINVERT
     VK_ESCAPE,      IDM_EXIT,               VIRTKEY, NOINVERT
 
+    VK_LEFT,        IDM_LEFT,               VIRTKEY, NOINVERT
+    VK_RIGHT,       IDM_RIGHT,              VIRTKEY, NOINVERT
+    VK_UP,          IDM_UP,                 VIRTKEY, NOINVERT
+    VK_DOWN,        IDM_DOWN,               VIRTKEY, NOINVERT
+    VK_RETURN,      IDM_CONFIRM,            VIRTKEY, NOINVERT
+    "q",            IDM_CANCEL,             ASCII, NOINVERT
+
     "p",            IDM_POINT,              ASCII, NOINVERT
     "f",            IDM_TOPOLOGY,           ASCII, NOINVERT
     "g",            IDM_MOVE,               ASCII, NOINVERT
@@ -118,7 +125,7 @@ BEGIN
     "e",            IDM_EXCLUDE,            ASCII, NOINVERT
 
     "A",            IDM_MENU_BASIC,         ASCII, NOINVERT
-    "^W",             IDM_MENU_WINDOW,        ASCII, NOINVERT
+    "^W",           IDM_MENU_WINDOW,        ASCII, NOINVERT
 
     "1",            IDM_TOOL_EMPTY,         ASCII, ALT, NOINVERT
     "2",            IDM_TOOL_SELECTBOX,     ASCII, ALT, NOINVERT

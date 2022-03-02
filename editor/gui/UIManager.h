@@ -40,7 +40,6 @@ public:
     IButton* FindCurrent();
 };
 
-//TODO 按钮在触发按下后持续生效到停止
 interface IButton : public Object {
 public:
     IButton();

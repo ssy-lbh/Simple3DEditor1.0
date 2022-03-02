@@ -165,13 +165,16 @@ public:
     }
 
     void Clear(){
-        //DebugLog("Clear");
+        ptr = 0;
+    }
+
+    void Clear(size_t memory){
         delete[] data;
-        size = 8;
+        size = memory;
         data = new T[size];
         ptr = 0;
         if (data == NULL){
-            DebugError("Critical: List<T>::Clear Allocate Memory Failed");
+            DebugError("Critical: List<T>::Clear(%d) Allocate Memory Failed", memory);
         }
     }
 

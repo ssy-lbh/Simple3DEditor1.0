@@ -26,12 +26,17 @@ String ShellFileSelectWindow(String filter, int flags){
     ofn.Flags = flags;
 
     if (!GetOpenFileNameA(&ofn)){
+        SetCurrentDirectoryA(GetAppDirectoryA().GetString());
         return String();
     }
 
     if (*buffer == '\0'){
+        SetCurrentDirectoryA(GetAppDirectoryA().GetString());
         return String();
     }
+
+    // 防止文件选择框改变当前目录
+    SetCurrentDirectoryA(GetAppDirectoryA().GetString());
 
     return String(buffer);
 }
@@ -56,12 +61,17 @@ WString ShellFileSelectWindow(WString filter, int flags){
     ofn.Flags = flags;
 
     if (!GetOpenFileNameW(&ofn)){
+        SetCurrentDirectoryW(GetAppDirectoryW().GetString());
         return WString();
     }
 
     if (*buffer == L'\0'){
+        SetCurrentDirectoryW(GetAppDirectoryW().GetString());
         return WString();
     }
+
+    // 防止文件选择框改变当前目录
+    SetCurrentDirectoryW(GetAppDirectoryW().GetString());
 
     return WString(buffer);
 }
@@ -117,13 +127,13 @@ bool ShellCommandLine(WString s){
 }
 
 bool ShellFFmpeg(String src, String dst){
-    String cmd = String(".\\lib\\ffmpeg\\ffmpeg.exe -i \"") + src + "\" -y " + dst;
+    String cmd = String(".\\lib\\ffmpeg\\ffmpeg -i \"") + src + "\" -y " + dst;
 
     if (!ShellCommandLine(cmd)){
         return false;
     }
 
-    for (int i = 0; i < 50; i++){
+    for (int i = 0; i < 100; i++){
         HANDLE hFile = CreateFileA(
             dst.GetString(),
             GENERIC_READ,
@@ -137,19 +147,19 @@ bool ShellFFmpeg(String src, String dst){
             CloseHandle(hFile);
             return true;
         }
-        Sleep(40);
+        Sleep(100);
     }
     return false;
 }
 
 bool ShellFFmpeg(WString src, WString dst){
-    WString cmd = WString(L".\\lib\\ffmpeg\\ffmpeg.exe -i \"") + src + L"\" -y " + dst;
+    WString cmd = WString(L".\\lib\\ffmpeg\\ffmpeg -i \"") + src + L"\" -y " + dst;
 
     if (!ShellCommandLine(cmd)){
         return false;
     }
 
-    for (int i = 0; i < 50; i++){
+    for (int i = 0; i < 100; i++){
         HANDLE hFile = CreateFileW(
             dst.GetString(),
             GENERIC_READ,
@@ -163,7 +173,7 @@ bool ShellFFmpeg(WString src, WString dst){
             CloseHandle(hFile);
             return true;
         }
-        Sleep(40);
+        Sleep(100);
     }
     return false;
 }
@@ -176,4 +186,78 @@ int ShellMsgBox(String caption, String text){
 int ShellMsgBox(WString caption, WString text){
     AppFrame* frame = AppFrame::GetLocalInst();
     return MessageBoxW((frame == NULL ? NULL : frame->hWnd), text.GetString(), caption.GetString(), MB_YESNOCANCEL | MB_ICONINFORMATION);
+}
+
+bool ShellPrint(String file){
+    DWORD_PTR res;
+
+    res = (DWORD_PTR)ShellExecuteA(NULL, "print", file.GetString(), NULL, NULL, SW_HIDE);
+    
+    if (res >= 32){
+        return true;
+    }else{
+        DebugError("[Print] Failed %d", res);
+        return false;
+    }
+}
+
+bool ShellPrint(WString file){
+    DWORD_PTR res;
+
+    res = (DWORD_PTR)ShellExecuteW(NULL, L"print", file.GetString(), NULL, NULL, SW_HIDE);
+    
+    if (res >= 32){
+        return true;
+    }else{
+        DebugError("[Print] Failed %d", res);
+        return false;
+    }
+}
+
+String GetAppDirectoryA(){
+    size_t len = DEFAULT_STRING_LENGTH;
+    char* str;
+    size_t div1, div2;
+
+    str = new char[len];
+    while (GetModuleFileNameA(NULL, str, len) >= len){
+        delete[] str;
+        len <<= 1;
+        str = new char[len];
+    }
+
+    String res(str, len);
+    delete[] str;
+
+    div1 = res.FindRevChar('\\');
+    div2 = res.FindRevChar('/');
+
+    if ((div2 != -1 && div2 > div1) || div1 == -1)
+        div1 = div2;
+
+    return res.SubString(0, div1);
+}
+
+WString GetAppDirectoryW(){
+    size_t len = DEFAULT_STRING_LENGTH;
+    wchar_t* str;
+    size_t div1, div2;
+
+    str = new wchar_t[len];
+    while (GetModuleFileNameW(NULL, str, len) >= len){
+        delete[] str;
+        len <<= 1;
+        str = new wchar_t[len];
+    }
+
+    WString res(str, len);
+    delete[] str;
+
+    div1 = res.FindRevChar(L'\\');
+    div2 = res.FindRevChar(L'/');
+
+    if ((div2 != -1 && div2 > div1) || div1 == -1)
+        div1 = div2;
+
+    return res.SubString(0, div1);
 }

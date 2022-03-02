@@ -82,7 +82,6 @@ void UVEditWindow::SelectTool::OnLeftUp(){
         Main::data->selPoints.Clear();
         return;
     }
-    //TODO 等待实现范围框选
     if (!Main::data->curObject)
         return;
     Main::data->curObject->OnSelectUV(

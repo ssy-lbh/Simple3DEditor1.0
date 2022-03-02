@@ -397,7 +397,7 @@ MainWindow::MainWindow(){
     }, this));
     basicMenu->AddItem(new MenuItem());
     basicMenu->AddItem(new MenuItem(L"关于", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->AboutBox();
+        DialogVersionInfo();
     }, this));
     basicMenu->AddItem(new MenuItem());
 
@@ -555,7 +555,7 @@ void MainWindow::RenderModelView(){
     RenderOptions options;
     options.light = lightEnabled;
     //TODO 后续光照设置法线
-    Main::data->scene->OnRender(&options);
+    Main::data->scene->OnChainRender(&options);
 
     // 已选择点绘制
     glDisable(GL_LIGHTING);
@@ -593,7 +593,6 @@ void MainWindow::OnRender(){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //TODO 做好Container组件，实现UI尺寸坐标管理
     RenderModelView();
 
     // 工具绘制
@@ -640,7 +639,6 @@ void MainWindow::UpdateWindowSize(int x, int y){
     aspect = (float)cliSize.x / cliSize.y;
 }
 
-//TODO 添加一些UI范围检测
 void MainWindow::UpdateCursor(int x, int y){
     cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
     cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
@@ -798,10 +796,6 @@ bool MainWindow::LoadMesh(Mesh* mesh, WString path){
     return true;
 }
 
-void MainWindow::AboutBox(){
-    DialogVersionInfo();
-}
-
 void MainWindow::OnClose(){}
 
 void MainWindow::OnTimer(int id){}
@@ -912,12 +906,6 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         break;
     case IDM_LOAD:
         OnInsLoad();
-        break;
-    case IDM_EXIT:
-        PostQuitMessage(0);
-        break;
-    case IDM_ABOUT:
-        AboutBox();
         break;
     case IDM_POINT:
         AddPoint();

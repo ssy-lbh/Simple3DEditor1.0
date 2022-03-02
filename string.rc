@@ -15,4 +15,6 @@ BEGIN
                        "便携式网络图形(*.png)\0*.png\0"
                        "专业联合图片(*.jpeg)\0*.jpeg\0"
                        "任意图片格式(*.*)\0*.*\0"
+    IDS_EXIT_CONFIRM "确认要退出程序？"
+    IDS_EXIT_CONFIRM_CAPTION "退出确认"
 END

@@ -86,10 +86,15 @@ protected:
 
     Menu* curMenu = NULL;
     Vector2 menuPos;
+    bool openMenu = false;
+    bool rightPressed = false;
+
+    void SetMenu(Menu* m, size_t pos);
     
 public:
     Menu();
     ~Menu();
+
     void AddItem(IMenuItem* item);
     void SetClientSize(Vector2 size);
     bool InMenu(Vector2 relaPos);
@@ -99,6 +104,11 @@ public:
     void RenderItem(IMenuItem* item);
     void Render(float x, float y);
     void ResetSelect();
+
+    void PressUp();
+    void PressDown();
+    void PressLeft();
+    void PressRight();
 };
 
 #endif

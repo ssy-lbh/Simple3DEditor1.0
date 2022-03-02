@@ -212,6 +212,7 @@ AnimationWindow::AnimationWindow(){
 
 AnimationWindow::~AnimationWindow(){
     DebugLog("AnimationWindow Destroyed");
+    SetCurve(NULL);
     if (uiMgr) delete uiMgr;
     if (basicMenu) delete basicMenu;
 }

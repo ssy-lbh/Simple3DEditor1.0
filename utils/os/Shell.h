@@ -18,5 +18,10 @@ bool ShellFFmpeg(String src, String dst);
 bool ShellFFmpeg(WString src, WString dst);
 int ShellMsgBox(String caption, String text);
 int ShellMsgBox(WString caption, WString text);
+bool ShellPrint(String file);
+bool ShellPrint(WString file);
+
+String GetAppDirectoryA();
+WString GetAppDirectoryW();
 
 #endif

@@ -21,7 +21,6 @@ public:
         ROT_EULER_ZYX
     };
 
-    //TODO 先就只使用这一种，其他的以后补齐
     RotationMode rotationMode = ROT_EULER_XYZ;
 
     // 变换顺序: 大小、旋转、位置
@@ -29,6 +28,8 @@ public:
     PropertyQuaternion rotation;
     PropertyVector3 rotationXYZ;
     PropertyVector3 scale;
+
+    Matrix4x4 chainMat = Matrix4x4::identity;
 
     Transform();
     ~Transform();
@@ -48,8 +49,6 @@ public:
     bool light = false;
 };
 
-//TODO 3D视口中的可视对象，内部继承后可作为网格体、声源、曲线等
-//TODO 正在设计中
 class AViewObject : public Object {
 public:
     Transform transform;
@@ -77,6 +76,7 @@ public:
 
     AViewObject* GetParent();
     void SetParent(AViewObject* o);
+    bool HasAncestor(AViewObject* o);
 
     Matrix4x4 GetObjectToWorldMatrix();
     Matrix4x4 GetWorldToObjectMatrix();
@@ -84,6 +84,7 @@ public:
     // 具体选择什么应取决于选择模式，计划放置于全局数据中
     // 除了网格体，也应有其它类型对象被选中
     // 已实现的父类方法中，都是对子对象的遍历调用
+    //TODO 待实现对象、边、面选择
     virtual void OnSelect(Vector3 ori, Vector3 dir);
     virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2);
     virtual void OnSelectUV(Vector2 uv, float err = 0.01f);
@@ -91,6 +92,7 @@ public:
 
     virtual Mesh* GetMesh();
 
+    void OnChainRender(const RenderOptions* options);
     virtual void OnRender(const RenderOptions* options);
     virtual void OnRenderUVMap();
 
@@ -172,6 +174,23 @@ public:
     virtual void OnRender(const RenderOptions* options) override;
 
     virtual void OnTimer(int id) override;
+};
+
+class CameraObject final : public AViewObject {
+private:
+    static const float SCALE;
+
+    Vertex pos;
+    Vertex lookAt;
+
+public:
+    CameraObject();
+    virtual ~CameraObject() override;
+
+    virtual void OnSelect(Vector3 ori, Vector3 dir) override;
+    virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
+
+    virtual void OnRender(const RenderOptions* options) override;
 };
 
 #endif

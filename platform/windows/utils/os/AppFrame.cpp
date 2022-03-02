@@ -300,9 +300,11 @@ LRESULT CALLBACK AppFrame::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     case WM_COMMAND:
         switch (HIWORD(wParam)){
         case 0:
+            data->OnMenuAccel(LOWORD(wParam), false);
             Main::data->scene->OnMenuAccel(LOWORD(wParam), false);
             break;
         case 1:
+            data->OnMenuAccel(LOWORD(wParam), true);
             Main::data->scene->OnMenuAccel(LOWORD(wParam), true);
             break;
         }

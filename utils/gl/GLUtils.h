@@ -77,12 +77,4 @@ public:
     static void ResetModelView();
 };
 
-void glColorv3(Vector3 v);
-void glColorv4(Vector4 v);
-void glRotateq(Quaternion q);
-void glScalev3(Vector3 v);
-void glLoadMatrix(Matrix4x4 mat);
-void glMultMatrix(Matrix4x4 mat);
-void glGetMatrix(Matrix4x4* mat);
-
 #endif

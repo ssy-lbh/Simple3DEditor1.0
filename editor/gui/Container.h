@@ -5,7 +5,7 @@
 
 #include <editor/gui/UIManager.h>
 
-//TODO 容器期望集成选择夹、拆分窗口、属性窗口等容器
+//TODO 容器期望集成选择夹、属性窗口等容器
 class LRContainer final : public IWindow {
 private:
     IWindow* lWindow;

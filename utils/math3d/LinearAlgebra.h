@@ -106,6 +106,7 @@ public:
     static float Sine(Vector3, Vector3);
     static float Tangent(Vector3, Vector3);
     static float Determinant(Vector3, Vector3, Vector3);
+    static Vector3 Compose(Vector3 coord, Vector3 x, Vector3 y, Vector3 z);
     static Vector3 Decompose(Vector3 vec, Vector3 x, Vector3 y, Vector3 z);
 
     Vector3 Normal() const;

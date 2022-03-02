@@ -4,6 +4,7 @@
 #include <res.h>
 #include <utils/math3d/Math.h>
 #include <utils/math3d/Mesh.h>
+#include <utils/gl/GLSimplified.h>
 #include <utils/gl/GLLights.h>
 #include <utils/gl/GLUtils.h>
 
@@ -188,13 +189,19 @@ void AViewObject::SetParent(AViewObject* o){
     o->AddChild(this);
 }
 
+bool AViewObject::HasAncestor(AViewObject* o){
+    if (this == o)
+        return true;
+    return (parent == NULL ? false : parent->HasAncestor(o));
+}
+
 List<AViewObject*>& AViewObject::GetChildren(){
     return children;
 }
 
 Matrix4x4 AViewObject::GetObjectToWorldMatrix(){
     if (parent)
-        return transform.GetMatrix() * parent->GetObjectToWorldMatrix();
+        return parent->GetObjectToWorldMatrix() * transform.GetMatrix();
     return transform.GetMatrix();
 }
 
@@ -211,11 +218,23 @@ void AViewObject::OnSelectUV(Vector2 uv1, Vector2 uv2){}
 
 Mesh* AViewObject::GetMesh(){ return NULL; }
 
-void AViewObject::OnRender(const RenderOptions* options){
+void AViewObject::OnChainRender(const RenderOptions* options){
     size_t len = children.Size();
+
+    if (parent){
+        transform.chainMat = parent->transform.chainMat * transform.GetMatrix();
+    }else{
+        transform.chainMat = transform.GetMatrix();
+    }
+
+    transform.PushMatrix();
     for (size_t i = 0; i < len; i++)
-        children[i]->OnRender(options);
+        children[i]->OnChainRender(options);
+    OnRender(options);
+    transform.PopMatrix();
 }
+
+void AViewObject::OnRender(const RenderOptions* options){}
 
 void AViewObject::OnRenderUVMap(){
     size_t len = children.Size();
@@ -266,11 +285,10 @@ MeshObject::~MeshObject(){
 }
 
 void MeshObject::OnSelect(Vector3 ori, Vector3 dir){
-    Matrix4x4 curMat = transform.GetInvMatrix();
+    Matrix4x4 curMat = GetWorldToObjectMatrix();
 
     ori = curMat * Vector4(ori, 1.0f);
     dir = curMat * Vector4(dir, 0.0f);
-    AViewObject::OnSelect(ori, dir);
 
     switch (Main::data->selType){
     case GlobalData::SELECT_VERTICES:{
@@ -279,6 +297,8 @@ void MeshObject::OnSelect(Vector3 ori, Vector3 dir){
             Main::data->selPoints.Clear();
             DebugLog("No Point Selected");
         }else{
+            if (Main::data->selPoints.HasValue(v))
+                return;
             Main::data->selPoints.Add(v);
             DebugLog("Select Point %f %f %f", v->pos.x, v->pos.y, v->pos.z);
         }
@@ -290,6 +310,8 @@ void MeshObject::OnSelect(Vector3 ori, Vector3 dir){
             Main::data->selEdges.Clear();
             DebugLog("No Edge Selected");
         }else{
+            if (Main::data->selEdges.HasValue(e))
+                return;
             Main::data->selEdges.Add(e);
             DebugLog("Select Edge (%f,%f,%f) (%f,%f,%f)", e->v1->pos.x, e->v1->pos.y, e->v1->pos.z, e->v2->pos.x, e->v2->pos.y, e->v2->pos.z);
         }
@@ -299,11 +321,10 @@ void MeshObject::OnSelect(Vector3 ori, Vector3 dir){
 }
 
 void MeshObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
-    Matrix4x4 curMat = transform.GetInvMatrix();
+    Matrix4x4 curMat = GetWorldToObjectMatrix();
 
     camPos = curMat * Vector4(camPos, 1.0f);
-    camDir = transform.GetRotation() * camDir;
-    AViewObject::OnSelect(camPos, camDir, zBound, p1, p2);
+    camDir = Quaternion::FromTo(Vector3::forward, curMat * (camDir * Vector3::forward));
 
     switch (Main::data->selType){
     case GlobalData::SELECT_VERTICES:
@@ -325,6 +346,8 @@ void MeshObject::OnSelectUV(Vector2 uv, float err){
         Main::data->selPoints.Clear();
         DebugLog("No Point Selected");
     }else{
+        if (Main::data->selPoints.HasValue(v))
+            return;
         Main::data->selPoints.Add(v);
         DebugLog("Select Point %f %f", v->uv.x, v->uv.y);
     }
@@ -340,12 +363,7 @@ Mesh* MeshObject::GetMesh(){
 }
 
 void MeshObject::OnRender(const RenderOptions* options){
-    transform.PushMatrix();
-    AViewObject::OnRender(options);
-
     mesh->Render(options->light);
-
-    transform.PopMatrix();
 }
 
 void MeshObject::OnRenderUVMap(){
@@ -358,6 +376,8 @@ BezierCurveObject::BezierCurveObject() : AViewObject(L"BezierCurve"){
     v[1].pos = Vector3(0.0f, 0.0f, 0.0f);
     v[2].pos = Vector3(0.0f, 0.0f, 5.0f);
     v[3].pos = Vector3(5.0f, 0.0f, 5.0f);
+    for (int i = 0; i < 4; i++)
+        v[i].object = this;
 }
 
 BezierCurveObject::~BezierCurveObject(){
@@ -365,15 +385,16 @@ BezierCurveObject::~BezierCurveObject(){
 }
 
 void BezierCurveObject::OnSelect(Vector3 ori, Vector3 dir){
-    Matrix4x4 curMat = transform.GetInvMatrix();
+    Matrix4x4 curMat = GetWorldToObjectMatrix();
 
     ori = curMat * Vector4(ori, 1.0f);
     dir = curMat * Vector4(dir, 0.0f);
-    AViewObject::OnSelect(ori, dir);
 
     bool hit = false;
     for (int i = 0; i < 4; i++){
         if (v[i].Hit(ori, dir)){
+            if (Main::data->selPoints.HasValue(&v[i]))
+                return;
             Main::data->selPoints.Add(&v[i]);
             DebugLog("Select Point %f %f %f", v[i].pos.x, v[i].pos.y, v[i].pos.z);
             hit = true;
@@ -385,15 +406,16 @@ void BezierCurveObject::OnSelect(Vector3 ori, Vector3 dir){
     }
 }
 void BezierCurveObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
-    Matrix4x4 curMat = transform.GetInvMatrix();
+    Matrix4x4 curMat = GetWorldToObjectMatrix();
 
     camPos = curMat * Vector4(camPos, 1.0f);
-    camDir = transform.GetRotation() * camDir;
-    AViewObject::OnSelect(camPos, camDir, zBound, p1, p2);
+    camDir = Quaternion::FromTo(Vector3::forward, curMat * (camDir * Vector3::forward));
 
     bool hit = false;
     for (int i = 0; i < 4; i++){
         if (v[i].Hit(camPos, camDir, zBound, p1, p2)){
+            if (Main::data->selPoints.HasValue(&v[i]))
+                return;
             Main::data->selPoints.Add(&v[i]);
             DebugLog("Select Point %f %f %f", v[i].pos.x, v[i].pos.y, v[i].pos.z);
             hit = true;
@@ -410,6 +432,8 @@ void BezierCurveObject::OnSelectUV(Vector2 uv, float err){
     bool hit = false;
     for (int i = 0; i < 4; i++){
         if (v[i].HitUV(uv, err)){
+            if (Main::data->selPoints.HasValue(&v[i]))
+                return;
             Main::data->selPoints.Add(&v[i]);
             DebugLog("Select Point %f %f", v[i].uv.x, v[i].uv.y);
             hit = true;
@@ -430,14 +454,14 @@ void BezierCurveObject::OnSelectUV(Vector2 uv1, Vector2 uv2){
 }
 
 void BezierCurveObject::OnRender(const RenderOptions* options){
-    AViewObject::OnRender(options);
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
     glPointSize(4.0f);
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_POINTS);
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++){
         glVertex3f(v[i].pos.x, v[i].pos.y, v[i].pos.z);
+    }
     glEnd();
     glDisable(GL_POINT_SMOOTH);
 
@@ -450,6 +474,7 @@ void BezierCurveObject::OnRender(const RenderOptions* options){
 
 void BezierCurveObject::OnRenderUVMap(){
     AViewObject::OnRenderUVMap();
+
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
     glPointSize(4.0f);
@@ -470,6 +495,7 @@ void BezierCurveObject::OnRenderUVMap(){
 PointLightObject::PointLightObject() : AViewObject(L"PointLight"){
     light = GLLights::Create();
     UpdateLight();
+    v.object = this;
 }
 
 PointLightObject::~PointLightObject(){
@@ -478,13 +504,14 @@ PointLightObject::~PointLightObject(){
 }
 
 void PointLightObject::OnSelect(Vector3 ori, Vector3 dir){
-    Matrix4x4 curMat = transform.GetInvMatrix();
+    Matrix4x4 curMat = GetWorldToObjectMatrix();
 
     ori = curMat * Vector4(ori, 1.0f);
     dir = curMat * Vector4(dir, 0.0f);
-    AViewObject::OnSelect(ori, dir);
 
     if (v.Hit(ori, dir)){
+        if (Main::data->selPoints.HasValue(&v))
+            return;
         Main::data->selPoints.Add(&v);
         DebugLog("Select Point %f %f %f", v.pos.x, v.pos.y, v.pos.z);
     }else{
@@ -494,13 +521,14 @@ void PointLightObject::OnSelect(Vector3 ori, Vector3 dir){
 }
 
 void PointLightObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
-    Matrix4x4 curMat = transform.GetInvMatrix();
+    Matrix4x4 curMat = GetWorldToObjectMatrix();
 
     camPos = curMat * Vector4(camPos, 1.0f);
-    camDir = transform.GetRotation() * camDir;
-    AViewObject::OnSelect(camPos, camDir, zBound, p1, p2);
+    camDir = Quaternion::FromTo(Vector3::forward, curMat * (camDir * Vector3::forward));
 
     if (v.Hit(camPos, camDir, zBound, p1, p2)){
+        if (Main::data->selPoints.HasValue(&v))
+            return;
         Main::data->selPoints.Add(&v);
         DebugLog("Select Point %f %f %f", v.pos.x, v.pos.y, v.pos.z);
     }else{
@@ -510,7 +538,6 @@ void PointLightObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBoun
 }
 
 void PointLightObject::OnRender(const RenderOptions* options){
-    AViewObject::OnRender(options);
     UpdateLight();
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
@@ -527,7 +554,9 @@ void PointLightObject::OnTimer(int id){
 }
 
 void PointLightObject::UpdateLight(){
-    GLfloat position[] = {v.pos.x, v.pos.y, v.pos.z, 1.0};// 最后一个参数为1.0表示该光源是point light
+    Vector3 pos = transform.chainMat * Vector4(v.pos, 1.0f);
+
+    GLfloat position[] = {pos.x, pos.y, pos.z, 1.0};// 最后一个参数为1.0表示该光源是point light
 
     GLfloat ambient[] = {0.0, 0.0, 0.0, 0.0};// 暂不使用环境光
     GLfloat diffuse[] = {v.color.x, v.color.y, v.color.z, 1.0};
@@ -539,20 +568,23 @@ void PointLightObject::UpdateLight(){
     glLightfv(light, GL_POSITION, position);
 }
 
-AudioListenerObject::AudioListenerObject() : AViewObject(L"AudioListener"){}
+AudioListenerObject::AudioListenerObject() : AViewObject(L"AudioListener"){
+    v.object = this;
+}
 
 AudioListenerObject::~AudioListenerObject(){
     Free(children);
 }
 
 void AudioListenerObject::OnSelect(Vector3 ori, Vector3 dir){
-    Matrix4x4 curMat = transform.GetInvMatrix();
+    Matrix4x4 curMat = GetWorldToObjectMatrix();
 
     ori = curMat * Vector4(ori, 1.0f);
     dir = curMat * Vector4(dir, 0.0f);
-    AViewObject::OnSelect(ori, dir);
     
     if (v.Hit(ori, dir)){
+        if (Main::data->selPoints.HasValue(&v))
+            return;
         Main::data->selPoints.Add(&v);
         DebugLog("Select Point %f %f %f", v.pos.x, v.pos.y, v.pos.z);
     }else{
@@ -562,13 +594,14 @@ void AudioListenerObject::OnSelect(Vector3 ori, Vector3 dir){
 }
 
 void AudioListenerObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
-    Matrix4x4 curMat = transform.GetInvMatrix();
+    Matrix4x4 curMat = GetWorldToObjectMatrix();
 
     camPos = curMat * Vector4(camPos, 1.0f);
-    camDir = transform.GetRotation() * camDir;
-    AViewObject::OnSelect(camPos, camDir, zBound, p1, p2);
+    camDir = Quaternion::FromTo(Vector3::forward, curMat * (camDir * Vector3::forward));
 
     if (v.Hit(camPos, camDir, zBound, p1, p2)){
+        if (Main::data->selPoints.HasValue(&v))
+            return;
         Main::data->selPoints.Add(&v);
         DebugLog("Select Point %f %f %f", v.pos.x, v.pos.y, v.pos.z);
     }else{
@@ -578,8 +611,8 @@ void AudioListenerObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zB
 }
 
 void AudioListenerObject::OnRender(const RenderOptions* options){
-    AViewObject::OnRender(options);
-    Main::data->audioPos = v.pos;
+    Main::data->audioPos = transform.chainMat * Vector4(v.pos, 1.0f);
+
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
     glPointSize(4.0f);
@@ -592,4 +625,113 @@ void AudioListenerObject::OnRender(const RenderOptions* options){
 
 void AudioListenerObject::OnTimer(int id){
     AViewObject::OnTimer(id);
+}
+
+const float CameraObject::SCALE = 0.3f;
+
+CameraObject::CameraObject() : AViewObject(L"Camera"){
+    pos.object = this;
+    lookAt.object = this;
+}
+
+CameraObject::~CameraObject(){
+    Free(children);
+}
+
+void CameraObject::OnSelect(Vector3 ori, Vector3 dir){
+    Matrix4x4 curMat = GetWorldToObjectMatrix();
+
+    ori = curMat * Vector4(ori, 1.0f);
+    dir = curMat * Vector4(dir, 0.0f);
+    
+    if (pos.Hit(ori, dir)){
+        if (Main::data->selPoints.HasValue(&pos))
+            return;
+        Main::data->selPoints.Add(&pos);
+        DebugLog("Select Point %f %f %f", pos.pos.x, pos.pos.y, pos.pos.z);
+    }else if (lookAt.Hit(ori, dir)){
+        if (Main::data->selPoints.HasValue(&lookAt))
+            return;
+        Main::data->selPoints.Add(&lookAt);
+        DebugLog("Select Point %f %f %f", lookAt.pos.x, lookAt.pos.y, lookAt.pos.z);
+    }else{
+        Main::data->selPoints.Clear();
+        DebugLog("No Point Selected");
+    }
+}
+
+void CameraObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
+    Matrix4x4 curMat = GetWorldToObjectMatrix();
+    bool hit = false;
+
+    camPos = curMat * Vector4(camPos, 1.0f);
+    camDir = Quaternion::FromTo(Vector3::forward, curMat * (camDir * Vector3::forward));
+
+    if (pos.Hit(camPos, camDir, zBound, p1, p2)){
+        hit = true;
+        if (Main::data->selPoints.HasValue(&pos))
+            return;
+        Main::data->selPoints.Add(&pos);
+        DebugLog("Select Point %f %f %f", pos.pos.x, pos.pos.y, pos.pos.z);
+    }
+    
+    if (lookAt.Hit(camPos, camDir, zBound, p1, p2)){
+        hit = true;
+        if (Main::data->selPoints.HasValue(&lookAt))
+            return;
+        Main::data->selPoints.Add(&lookAt);
+        DebugLog("Select Point %f %f %f", lookAt.pos.x, lookAt.pos.y, lookAt.pos.z);
+    }
+    
+    if (!hit){
+        Main::data->selPoints.Clear();
+        DebugLog("No Point Selected");
+    }
+}
+
+void CameraObject::OnRender(const RenderOptions* options){
+    Quaternion dir;
+    Vector3 forward;
+    Vector3 right;
+    Vector3 up;
+
+    Vector3 v = pos.pos;
+    Vector3 v1, v2, v3, v4;
+
+    if ((lookAt.pos - pos.pos).SqrMagnitude() == 0.0f)
+        return;
+    forward = (lookAt.pos - pos.pos).Normal();
+    dir = Quaternion::FromTo(Vector3::forward, forward);
+    right = dir * Vector3::right;
+    up = dir * Vector3::up;
+
+    v1 = Vector3::Compose(Vector3(SCALE, SCALE, SCALE), right, forward, up);
+    v2 = Vector3::Compose(Vector3(SCALE, SCALE, -SCALE), right, forward, up);
+    v3 = Vector3::Compose(Vector3(-SCALE, SCALE, SCALE), right, forward, up);
+    v4 = Vector3::Compose(Vector3(-SCALE, SCALE, -SCALE), right, forward, up);
+
+    glEnable(GL_LINE_SMOOTH);
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glBegin(GL_LINE_LOOP);
+    glVertexv3(v1);
+    glVertexv3(v2);
+    glVertexv3(v4);
+    glVertexv3(v3);
+    glEnd();
+    glBegin(GL_LINES);
+    glVertexv3(v); glVertexv3(v1);
+    glVertexv3(v); glVertexv3(v2);
+    glVertexv3(v); glVertexv3(v3);
+    glVertexv3(v); glVertexv3(v4);
+    glEnd();
+    glDisable(GL_LINE_SMOOTH);
+
+    glDisable(GL_LIGHTING);
+    glEnable(GL_POINT_SMOOTH);
+    glPointSize(4.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_POINTS);
+    glVertexv3(v);
+    glEnd();
+    glDisable(GL_POINT_SMOOTH);
 }

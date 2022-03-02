@@ -10,6 +10,7 @@
 #include <utils/String.h>
 #include <utils/File.h>
 #include <utils/gl/GLUtils.h>
+#include <utils/gl/GLSimplified.h>
 #include <utils/math3d/Math.h>
 #include <utils/AudioUtils.h>
 #include <utils/String.h>

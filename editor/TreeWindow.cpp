@@ -109,23 +109,44 @@ void TreeWindow::OnMouseMove(int x, int y){
 }
 
 void TreeWindow::OnLeftDown(int x, int y){
+    size_t selected;
+
     UpdateCursor(x, y);
 
-    size_t selected = (size_t)((1.0f - cursorPos.y) / (30.0f * cliInvSize.y));
-    if (selected < objectList.Size()){
-        AViewObject* o = objectList[selected];
-        if (Main::data->curObject == o){
-            o->unfold = !o->unfold;
-            DebugLog("TreeWindow %s Object %S", o->unfold ? "Unfold" : "Fold", o->name.GetString());
-        }else{
-            DebugLog("TreeWindow Select Object %S", o->name.GetString());
-            Main::SelectObject(o);
-        }
-    }
+    selected = (size_t)((1.0f - cursorPos.y) / (30.0f * cliInvSize.y));
+    dragObject = (selected < objectList.Size() ? objectList[selected] : NULL);
 }
 
 void TreeWindow::OnLeftUp(int x, int y){
+    size_t selected;
+
     UpdateCursor(x, y);
+
+    if (!dragObject)
+        return;
+
+    selected = (size_t)((1.0f - cursorPos.y) / (30.0f * cliInvSize.y));
+    if (selected < objectList.Size()){
+        AViewObject* o = objectList[selected];
+        if (o == dragObject){
+            if (Main::data->curObject != o){
+                DebugLog("TreeWindow Select Object %S", o->name.GetString());
+                Main::SelectObject(o);
+                dragObject = NULL;
+                return;
+            }
+            o->unfold = !o->unfold;
+            DebugLog("TreeWindow %s Object %S", o->unfold ? "Unfold" : "Fold", o->name.GetString());
+        }else{
+            if (!o || o->HasAncestor(dragObject)){
+                dragObject = NULL;
+                return;
+            }
+            o->AddChild(dragObject);
+            DebugLog("TreeWindow Set %S As Child Of %S", dragObject->name.GetString(), o->name.GetString());
+        }
+    }
+    dragObject = NULL;
 }
 
 void TreeWindow::OnRightDown(int x, int y){

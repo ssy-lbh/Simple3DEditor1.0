@@ -39,6 +39,7 @@ public:
     void OnLeftUp(int x, int y);
     void OnRightDown(int x, int y);
     void OnRightUp(int x, int y);
+    void OnMenuAccel(int id, bool accel);
 
     void Render();
 };
@@ -57,7 +58,6 @@ public:
     float animFrame = 0.0f;
 
     // 总场景对象
-    //TODO 做出一个树状图窗口，显示场景中各个对象
     AViewObject* scene = NULL;
 
     // 当前选中的对象

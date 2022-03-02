@@ -37,7 +37,6 @@ ColorBoard* ColorBoard::inst = NULL;
 ColorBoard::ColorBoard(){
     DebugLog("ColorBoard Created %p", this);
 
-    //TODO 添加属性WS_POPUP时SetProp失效
     hWnd = CreateWindowExA(
         0,
         "ModelView.ColorBoard",
