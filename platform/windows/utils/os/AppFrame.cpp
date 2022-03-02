@@ -13,6 +13,8 @@
 bool AppFrame::init = false;
 
 AppFrame::AppFrame(String name, IWindow* mainFrame, size_t height, size_t width, bool async) : name(name), mainFrame(mainFrame), height(height), width(width) {
+    hInst = GetModuleHandleA(NULL);
+    
     Initialize();
 
     if (async){
@@ -212,6 +214,10 @@ int AppFrame::MainLoop(){
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
     glFontSize(12);
+    glInitASCIIFont();
+
+    // 放在这里是为了让OpenGL初始化
+    mainFrame->OnCreate();
 
     Show();
     while (GetMessageA(&Msg, NULL, 0, 0)){
@@ -307,7 +313,7 @@ LRESULT CALLBACK AppFrame::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     switch (uMsg){
     case WM_LBUTTONDOWN:
         if (!cursorSelected)
-            SetCursor(LoadCursorA(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDC_CLICKED)));
+            SetCursor(LoadCursorA(hInst, MAKEINTRESOURCE(IDC_CLICKED)));
         break;
     case WM_UNICHAR:
         // 当其他软件试图使用UNICODE_NOCHAR测试本软件是否处理unicode字符时
@@ -329,9 +335,6 @@ void AppFrame::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, L
     // 事件中鼠标坐标上下需反转
     int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
     switch (uMsg){
-    case WM_CREATE:
-        window->OnCreate();
-        break;
     case WM_CLOSE:
         window->OnClose();
         break;
@@ -408,8 +411,6 @@ void AppFrame::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, L
 }
 
 void AppFrame::InitWindow(){
-    HINSTANCE hInst = GetModuleHandleA(NULL);
-
     data = new LocalData();
     viewMgr = new ViewManager(this);
 

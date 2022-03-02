@@ -12,8 +12,8 @@ PLATFORM_U	= WINDOWS
 
 GCC			= g++.exe
 RM			= del
-CFLAGS 		= -I"." -m64
-OFLAGS		= -m64 -g
+CFLAGS 		= -I"." -m64 -std=c++11
+OFLAGS		= -m64 -s
 LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 "lib\openal\OpenAL32.lib"
 RES  		= windres.exe
 MKDIR   	= mkdir
@@ -25,13 +25,14 @@ PROGOBJ		= main\
 				lib\soundtouch\PeakFinder lib\soundtouch\BPMDetect\
 				utils\StringBuilder utils\DataBuffer utils\AudioUtils\
 				utils\math3d\Math utils\math3d\LinearAlgebra utils\math3d\Mesh\
-				utils\math3d\ViewObject utils\math3d\Geometry\
+				utils\math3d\ViewObject utils\math3d\Geometry utils\math3d\Property\
 				utils\gl\GLFrameBuffer utils\gl\GLIndexBuffer\
 				utils\gl\GLLights utils\gl\GLProgram utils\gl\GLShader\
 				utils\gl\GLUtils utils\gl\GLVertexArray utils\gl\glVertexBuffer\
 				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
 				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
-				editor\MainWindow editor\gui\Container editor\gui\UIManager editor\gui\Menu
+				editor\MainWindow editor\gui\Container editor\gui\UIManager editor\gui\Menu\
+				editor\gui\AnimationCurve
 PLATOBJ		= utils\String utils\File\
 				utils\os\Shell utils\os\Log utils\os\GLFunc utils\os\Thread\
 				utils\os\Time utils\os\Font utils\os\Appframe utils\os\Resource\

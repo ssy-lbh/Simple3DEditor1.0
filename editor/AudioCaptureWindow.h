@@ -6,12 +6,10 @@
 #include <lib/openal/al.h>
 #include <lib/openal/alc.h>
 
-#include <utils/AudioUtils.h>
-#include <utils/String.h>
 #include <editor/gui/UIManager.h>
 #include <editor/gui/Menu.h>
-
-#include <lib/soundtouch/SoundTouch.h>
+#include <utils/String.h>
+#include <utils/math3d/LinearAlgebra.h>
 
 class AudioCaptureWindow final : public IWindow {
 private:

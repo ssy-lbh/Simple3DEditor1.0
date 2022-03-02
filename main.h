@@ -6,10 +6,9 @@
 #include <gl/gl.h>
 #include <gl/glu.h>
 
-#include <editor/gui/Menu.h>
-#include <editor/dialog/ColorBoard.h>
+#include <utils/List.h>
 #include <utils/os/AppFrame.h>
-#include <utils/math3d/ViewObject.h>
+#include <utils/math3d/LinearAlgebra.h>
 
 //TODO 补全撤销功能
 interface IUndo : public Object {
@@ -28,6 +27,8 @@ public:
 
     LocalData();
     ~LocalData();
+
+    static LocalData* GetLocalInst();
 
     void UpdateCursor(int x, int y);
     void UpdateWindowSize(int x, int y);

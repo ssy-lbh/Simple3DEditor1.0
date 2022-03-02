@@ -18,6 +18,7 @@ private:
     static bool init;
 
 public:
+    HINSTANCE hInst;
     HWND hWnd;
     HACCEL hAccel;
     HDC hDC;
@@ -54,6 +55,8 @@ public:
 
     bool reqRender = false;
     bool cursorSelected = false;
+
+    uint fontASCII;
 
     AppFrame(String name, IWindow* mainFrame, size_t height, size_t width, bool async = false);
     ~AppFrame();

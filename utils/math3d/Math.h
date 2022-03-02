@@ -31,6 +31,9 @@
 #define ToRadian(x) ((x) * 0.017453292519f)
 #define ToAngle(x) ((x) * 57.29577951308f)
 
+template <typename T>
+inline T Square(T x){ return x * x; }
+
 float GetRate(float x, float a, float b);
 
 float Lerp(float a, float b, float t);

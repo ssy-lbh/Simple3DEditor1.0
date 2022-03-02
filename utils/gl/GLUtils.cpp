@@ -421,3 +421,28 @@ void GLUtils::ResetModelView(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
+
+void glColorv3(Vector3 v){
+    glColor3f(v.x, v.y, v.z);
+}
+
+void glColorv4(Vector4 v){
+    glColor4f(v.x, v.y, v.z, v.w);
+}
+
+void glRotateq(Quaternion q){
+    Vector3 axis = q.GetAxis().Normal();
+    glRotatef(ToAngle(2.0f * Acos(q.w)), axis.x, axis.y, axis.z);
+}
+
+void glScalev3(Vector3 v){
+    glScalef(v.x, v.y, v.z);
+}
+
+void glLoadMatrix(Matrix4x4 mat){
+    glLoadMatrixf((GLfloat*)&mat);
+}
+
+void glMultMatrix(Matrix4x4 mat){
+    glMultMatrixf((GLfloat*)&mat);
+}

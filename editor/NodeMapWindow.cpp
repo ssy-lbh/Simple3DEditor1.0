@@ -34,6 +34,7 @@ NodeMapWindow::Node::Node(NodeMapWindow* window) : Node(Vector2::zero, window) {
 NodeMapWindow::Node::Node(Vector2 pos, NodeMapWindow* window) : position(pos), window(window) {
     uiMgr = new UIManager();
 
+    //TODO 做好适配变换的组件
     // UIEditA* name = new UIEditA(Vector2(0.05f, 0.0f), 0.2f, [](char* s, void* user){
     //     DebugLog("Edit %s", s);
     // });
@@ -233,8 +234,6 @@ void NodeMapWindow::OnRender(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    if (!bktex)
-        bktex = new GLTexture2D(IDB_NODEMAP_BACKGROUND);
     bktex->Enable();
     glColor3f(0.5f, 0.5f, 0.5f);
     glBegin(GL_TRIANGLE_FAN);
@@ -254,7 +253,9 @@ void NodeMapWindow::OnRender(){
     glPopMatrix();
 }
 
-void NodeMapWindow::OnClose(){}
+void NodeMapWindow::OnCreate(){
+    bktex = new GLTexture2D(IDB_NODEMAP_BACKGROUND);
+}
 
 void NodeMapWindow::OnChar(char c){
     //DebugLog("NodeMapWindow::OnChar");

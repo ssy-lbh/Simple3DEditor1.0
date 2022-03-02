@@ -4,7 +4,6 @@
 #include <define.h>
 
 #include <editor/gui/UIManager.h>
-#include <editor/gui/Menu.h>
 #include <utils/math3d/LinearAlgebra.h>
 
 class PaintWindow final : public IWindow {
@@ -20,13 +19,13 @@ private:
     IOperation* curOp = NULL;
     ITool* brush = NULL;
 
-    GLuint paintTex = 0;
-    GLint width, height;
+    uint paintTex = 0;
+    int width, height;
 
     class ClearBrush final : public ITool {
     private:
         PaintWindow* window;
-        GLuint colorLoc;
+        uint colorLoc;
         Vector3 color = Vector3::one;
 
         GLComputeProgram* prog = NULL;
@@ -44,7 +43,7 @@ private:
     private:
         PaintWindow* window;
         bool draw = false;
-        GLuint paintLoc, offsetLoc, positionLoc, radiusLoc, colorLoc;
+        uint paintLoc, offsetLoc, positionLoc, radiusLoc, colorLoc;
         Vector3 color = Vector3::one;
 
         GLComputeProgram* prog = NULL;

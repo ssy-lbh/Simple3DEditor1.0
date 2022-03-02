@@ -53,6 +53,14 @@ private:
 
     class PlayButton final : public IButton {
     private:
+        static const float BOUND_LEFT;
+        static const float BOUND_RIGHT;
+        static const float BOUND_TOP;
+        static const float BOUND_BOTTOM;
+        static const float RADIUS;
+        static const Vector3 HOVER_COLOR;
+        static const Vector3 LEAVE_COLOR;
+
         AudioPlayerWindow* window;
         bool hover = false;
 
@@ -69,11 +77,11 @@ private:
 
     class ProgressBar final : public IButton {
     private:
-        const float LOW_BOUND = -0.6f;
-        const float HIGH_BOUND = 0.6f;
-        const float POSITION_Y = -0.1f;
-        const float BUTTON_WIDTH_X = 0.05f;
-        const float BUTTON_WIDTH_Y = 0.1f;
+        static const float LOW_BOUND;
+        static const float HIGH_BOUND;
+        static const float POSITION_Y;
+        static const float BUTTON_WIDTH_X;
+        static const float BUTTON_WIDTH_Y;
 
         AudioPlayerWindow* window;
         bool hover = false;
@@ -94,11 +102,11 @@ private:
 
     class GainBar final : public IButton {
     private:
-        const float LOW_BOUND = -0.8f;
-        const float HIGH_BOUND = -0.2f;
-        const float POSITION_X = -0.85f;
-        const float BUTTON_WIDTH_X = 0.05f;
-        const float BUTTON_WIDTH_Y = 0.02f;
+        static const float LOW_BOUND;
+        static const float HIGH_BOUND;
+        static const float POSITION_X;
+        static const float BUTTON_WIDTH_X;
+        static const float BUTTON_WIDTH_Y;
 
         AudioPlayerWindow* window;
         bool hover = false;

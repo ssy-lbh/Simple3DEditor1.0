@@ -4,7 +4,6 @@
 #include <define.h>
 
 #include <editor/gui/UIManager.h>
-#include <utils/math3d/ViewObject.h>
 
 class TreeWindow final : public IWindow {
 private:

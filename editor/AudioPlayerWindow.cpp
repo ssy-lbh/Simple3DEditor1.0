@@ -14,11 +14,19 @@
 #include <utils/String.h>
 #include <utils/StringBuilder.h>
 
+const float AudioPlayerWindow::PlayButton::BOUND_LEFT = -0.5f;
+const float AudioPlayerWindow::PlayButton::BOUND_RIGHT = 0.5f;
+const float AudioPlayerWindow::PlayButton::BOUND_TOP = -0.3f;
+const float AudioPlayerWindow::PlayButton::BOUND_BOTTOM = -0.9f;
+const float AudioPlayerWindow::PlayButton::RADIUS = 0.2f;
+const Vector3 AudioPlayerWindow::PlayButton::HOVER_COLOR = Vector3(1.0f, 0.5f, 0.0f);
+const Vector3 AudioPlayerWindow::PlayButton::LEAVE_COLOR = Vector3(0.0f, 0.4f, 1.0f);
+
 AudioPlayerWindow::PlayButton::PlayButton(AudioPlayerWindow* window) : window(window) {}
 AudioPlayerWindow::PlayButton::~PlayButton(){}
 
 bool AudioPlayerWindow::PlayButton::Trigger(Vector2 pos){
-    return pos.x >= -0.5f && pos.x <= 0.5f && pos.y >= -0.9f && pos.y <= -0.3f;
+    return pos.x >= BOUND_LEFT && pos.x <= BOUND_RIGHT && pos.y >= BOUND_BOTTOM && pos.y <= BOUND_TOP;
 }
 
 void AudioPlayerWindow::PlayButton::Hover(Vector2 pos){
@@ -39,9 +47,9 @@ void AudioPlayerWindow::PlayButton::Leave(Vector2 pos){
 
 void AudioPlayerWindow::PlayButton::Render(){
     if (hover){
-        glColor3f(1.0f, 0.5f, 0.0f);
+        glColorv3(HOVER_COLOR);
     }else{
-        glColor3f(0.0f, 0.4f, 1.0f);
+        glColorv3(LEAVE_COLOR);
     }
     GLUtils::DrawRoundRect(-0.5f, -0.9f, 1.0f, 0.6f, 0.2f, 0.05f);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -51,6 +59,12 @@ void AudioPlayerWindow::PlayButton::Render(){
     glVertex2f(0.25f, -0.6f);
     glEnd();
 }
+
+const float AudioPlayerWindow::ProgressBar::LOW_BOUND = -0.6f;
+const float AudioPlayerWindow::ProgressBar::HIGH_BOUND = 0.6f;
+const float AudioPlayerWindow::ProgressBar::POSITION_Y = -0.1f;
+const float AudioPlayerWindow::ProgressBar::BUTTON_WIDTH_X = 0.05f;
+const float AudioPlayerWindow::ProgressBar::BUTTON_WIDTH_Y = 0.1f;
 
 AudioPlayerWindow::ProgressBar::ProgressBar(AudioPlayerWindow* window) : window(window) {}
 AudioPlayerWindow::ProgressBar::~ProgressBar(){}
@@ -107,6 +121,12 @@ void AudioPlayerWindow::ProgressBar::Render(){
                             pos + BUTTON_WIDTH_X, POSITION_Y + BUTTON_WIDTH_Y);
     }
 }
+
+const float AudioPlayerWindow::GainBar::LOW_BOUND = -0.8f;
+const float AudioPlayerWindow::GainBar::HIGH_BOUND = -0.2f;
+const float AudioPlayerWindow::GainBar::POSITION_X = -0.85f;
+const float AudioPlayerWindow::GainBar::BUTTON_WIDTH_X = 0.05f;
+const float AudioPlayerWindow::GainBar::BUTTON_WIDTH_Y = 0.02f;
 
 AudioPlayerWindow::GainBar::GainBar(AudioPlayerWindow* window) : window(window) {}
 AudioPlayerWindow::GainBar::~GainBar(){}

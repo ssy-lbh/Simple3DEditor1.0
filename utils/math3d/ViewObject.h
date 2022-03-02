@@ -5,8 +5,8 @@
 
 #include <utils/List.h>
 #include <utils/math3d/Geometry.h>
-#include <utils/math3d/Mesh.h>
 #include <utils/math3d/LinearAlgebra.h>
+#include <utils/math3d/Property.h>
 #include <utils/String.h>
 
 class Transform final : public Object {
@@ -22,13 +22,13 @@ public:
     };
 
     //TODO 先就只使用这一种，其他的以后补齐
-    RotationMode rotationMode = ROT_QUATERNION;
+    RotationMode rotationMode = ROT_EULER_XYZ;
 
     // 变换顺序: 大小、旋转、位置
-    Vector3 position = Vector3::zero;
-    Quaternion rotation = Quaternion::one;
-    Vector3 rotationXYZ = Vector3::zero;
-    Vector3 scale = Vector3::one;
+    PropertyVector3 position;
+    PropertyQuaternion rotation;
+    PropertyVector3 rotationXYZ;
+    PropertyVector3 scale;
 
     Transform();
     ~Transform();
@@ -39,6 +39,8 @@ public:
     void PushMatrix();
     void PushInvMatrix();
     void PopMatrix();
+
+    void SetFrame(float frame);
 };
 
 class RenderOptions : public Object {
@@ -97,7 +99,7 @@ public:
     virtual void OnUnichar(wchar_t c);
     virtual void OnMenuAccel(int id, bool accel);
 
-    virtual void OnAnimationFrame(int frame);
+    virtual void OnAnimationFrame(float frame);
 };
 
 class MeshObject final : public AViewObject {

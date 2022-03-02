@@ -3,7 +3,6 @@
 
 #include <define.h>
 
-#include <editor/gui/Menu.h>
 #include <editor/gui/UIManager.h>
 
 //TODO 容器期望集成选择夹、拆分窗口、属性窗口等容器
@@ -11,7 +10,7 @@ class LRContainer final : public IWindow {
 private:
     IWindow* lWindow;
     IWindow* rWindow;
-    LONG dis = 1;
+    int dis = 1;
     IWindow* focus = NULL;
     bool right = false;
     Vector2 size = Vector2(2.0f, 0.0f);
@@ -65,7 +64,7 @@ class UDContainer final : public IWindow {
 private:
     IWindow* uWindow;
     IWindow* dWindow;
-    LONG dis = 1;
+    int dis = 1;
     IWindow* focus = NULL;
     bool up = false;
     Vector2 size = Vector2(0.0f, 2.0f);

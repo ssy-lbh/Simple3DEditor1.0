@@ -1,10 +1,11 @@
 #include <editor/AudioCaptureWindow.h>
 
 #include <lib/opengl/gl/gl.h>
+#include <lib/soundtouch/SoundTouch.h>
 
 #include <main.h>
 #include <res.h>
-#include <lib/soundtouch/SoundTouch.h>
+#include <utils/AudioUtils.h>
 #include <utils/math3d/Math.h>
 #include <utils/os/Font.h>
 #include <utils/os/Shell.h>

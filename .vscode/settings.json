@@ -41,6 +41,13 @@
         "system_error": "cpp",
         "ostream": "cpp",
         "cstdlib": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "cmath": "cpp",
+        "cstdio": "cpp",
+        "cstring": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp"
     }
 }

@@ -4,6 +4,7 @@
 
 #include <main.h>
 #include <editor/gui/ViewManager.h>
+#include <utils/gl/GLUtils.h>
 #include <utils/gl/GLTexture2D.h>
 #include <utils/os/Font.h>
 
@@ -43,6 +44,17 @@ void UIManager::Render(){
     glEnable(GL_ALPHA_TEST);
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+
+    buttons.Foreach([](IButton* btn){
+        btn->Render();
+    });
+}
+
+void UIManager::RenderWithDepth(){
+    glEnable(GL_ALPHA_TEST);
+    glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
 
     buttons.Foreach([](IButton* btn){

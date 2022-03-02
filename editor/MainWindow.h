@@ -6,10 +6,8 @@
 #include <gl/gl.h>
 #include <gl/glu.h>
 
-#include <editor/dialog/ColorBoard.h>
-#include <editor/gui/Menu.h>
 #include <editor/gui/UIManager.h>
-#include <editor/gui/ViewManager.h>
+#include <editor/gui/Menu.h>
 
 class MainWindow final : public IWindow {
 private:

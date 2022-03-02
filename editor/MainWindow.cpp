@@ -2,9 +2,12 @@
 
 #include <main.h>
 #include <res.h>
+#include <editor/gui/ViewManager.h>
+#include <editor/dialog/ColorBoard.h>
 #include <editor/dialog/Tips.h>
 #include <utils/File.h>
 #include <utils/math3d/Math.h>
+#include <utils/math3d/Mesh.h>
 #include <utils/os/Shell.h>
 #include <utils/gl/GLTexture2D.h>
 
@@ -502,6 +505,7 @@ void MainWindow::InitLight0(){
 }
 
 void MainWindow::RenderModelView(){
+    // 这些暂定是默认设置
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_AUTO_NORMAL);
     glEnable(GL_BLEND);

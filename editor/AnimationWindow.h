@@ -3,36 +3,15 @@
 
 #include <define.h>
 
-#include <editor/gui/Menu.h>
 #include <editor/gui/UIManager.h>
+#include <editor/gui/Menu.h>
 #include <utils/List.h>
-
-interface IAnimationFunction {
-public:
-    IAnimationFunction();
-    virtual ~IAnimationFunction();
-
-    virtual float GetValue(Vector2 p1, Vector2 p2, float val);
-};
-
-class LinearFunc final : public IAnimationFunction {
-public:
-    LinearFunc();
-    virtual ~LinearFunc() override;
-
-    virtual float GetValue(Vector2 p1, Vector2 p2, float val) override;
-};
-
-class SquareFunc final : public IAnimationFunction {
-public:
-    SquareFunc();
-    virtual ~SquareFunc() override;
-
-    virtual float GetValue(Vector2 p1, Vector2 p2, float val) override;
-};
 
 class AnimationWindow : public IWindow {
 private:
+    static const float DEFAULT_START_FRAME;
+    static const float DEFAULT_END_FRAME;
+
     bool focus;
 
     Vector2 cliSize, cliInvSize;
@@ -43,11 +22,13 @@ private:
 
     Menu* basicMenu = NULL;
 
-    float startFrame = 0.0f;
-    float endFrame = 250.0f;
+    float startFrame = DEFAULT_START_FRAME;
+    float endFrame = DEFAULT_END_FRAME;
     float fps = 25.0f;
     float frame = 0.0f;
     bool play = false;
+
+    AnimationCurve* curve = NULL;
 
     class FrameIndicator : public IButton {
     private:
@@ -66,6 +47,10 @@ private:
     };
 
     class Bottom : public IButton {
+    private:
+        static const Vector3 COLOR;
+        static const float DEPTH;
+
     public:
         Bottom();
         virtual ~Bottom() override;
@@ -86,41 +71,20 @@ private:
         virtual void Render() override;
     };
 
-    class AnimationCurve : public IButton {
+    class RotationMenu : public IMenuItem {
     private:
-        enum SelectTarget {
-            NONE,
-            POINT,
-            SEGMENT
-        };
-
         AnimationWindow* window;
-        
-        List<IAnimationFunction*> functions;
-        List<Vector2> points;
-
-        SelectTarget selTarget = NONE;
-        size_t selIndex;
-        Vector2 initialPos;
-
-        Menu* funcMenu;
+        Menu* xyzMenu;
+        Menu* quatMenu;
 
     public:
-        AnimationCurve(AnimationWindow* window);
-        ~AnimationCurve();
+        RotationMenu(AnimationWindow* window);
+        virtual ~RotationMenu() override;
 
-        virtual bool Trigger(Vector2 pos) override;
-        virtual void Click(Vector2 pos) override;
-        virtual void Drag(Vector2 dir) override;
-        virtual void Render() override;
-
-        size_t GetSegment(float pos);
-        float GetValue(float pos);
-        void OnChangeRange(float start, float end);
-        void SetFunc(size_t seg, IAnimationFunction* func);
+        virtual IMenuItem::ItemType GetType() override;
+        virtual const wchar_t* GetName() override;
+        virtual Menu* GetMenu() override;
     };
-
-    AnimationCurve* curve;
 
 public:
     AnimationWindow();
@@ -142,6 +106,8 @@ public:
 
     void UpdateCursor(int x, int y);
     void UpdateWindowSize(int x, int y);
+    void SetCurve(AnimationCurve* curve);
+    void SetProperty(Property* prop);
 };
 
 #endif

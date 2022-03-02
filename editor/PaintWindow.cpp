@@ -4,8 +4,10 @@
 
 #include <main.h>
 #include <res.h>
+#include <editor/gui/Menu.h>
 #include <editor/dialog/ColorBoard.h>
 #include <utils/math3d/Math.h>
+#include <utils/math3d/Mesh.h>
 #include <utils/os/GLFunc.h>
 #include <utils/gl/GLTexture2D.h>
 #include <utils/gl/GLComputeProgram.h>

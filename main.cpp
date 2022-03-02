@@ -1,23 +1,22 @@
 #include <main.h>
 
 #include <res.h>
-
 #include <editor/gui/Container.h>
+#include <editor/gui/Menu.h>
 #include <editor/MainWindow.h>
-#include <editor/NodeMapWindow.h>
-#include <editor/AudioPlayerWindow.h>
-#include <editor/AudioCaptureWindow.h>
-#include <editor/UVEditWindow.h>
-#include <editor/PaintWindow.h>
-#include <utils/os/Shell.h>
+#include <utils/AudioUtils.h>
 #include <utils/os/Log.h>
-#include <utils/os/GLFunc.h>
 #include <utils/os/Font.h>
 #include <utils/os/Thread.h>
 #include <utils/gl/GLUtils.h>
+#include <utils/math3d/ViewObject.h>
 
 LocalData::LocalData(){}
 LocalData::~LocalData(){}
+
+LocalData* LocalData::GetLocalInst(){
+    return (LocalData*)ThreadLocal::Get(THREAD_LOCAL_LOCALDATA);
+}
 
 void LocalData::UpdateCursor(int x, int y){
     // 坐标反转
@@ -101,21 +100,21 @@ Main::~Main(){
 }
 
 void Main::RequestRender(){
-    AppFrame* frame = (AppFrame*)ThreadLocal::Get(THREAD_LOCAL_APPFRAME);
+    AppFrame* frame = AppFrame::GetLocalInst();
     if (frame)
         frame->reqRender = true;
 }
 
 #ifdef PLATFORM_WINDOWS
 void Main::SetCursor(int id){
-    AppFrame* frame = (AppFrame*)ThreadLocal::Get(THREAD_LOCAL_APPFRAME);
+    AppFrame* frame = AppFrame::GetLocalInst();
     ::SetCursor(LoadCursorA(GetModuleHandleA(NULL), MAKEINTRESOURCEA(id)));
     if (frame)
         frame->cursorSelected = true;
 }
 
 void Main::SetCursor(const char* res){
-    AppFrame* frame = (AppFrame*)ThreadLocal::Get(THREAD_LOCAL_APPFRAME);
+    AppFrame* frame = AppFrame::GetLocalInst();
     ::SetCursor(LoadCursorA(NULL, res));
     if (frame)
         frame->cursorSelected = true;
@@ -123,7 +122,7 @@ void Main::SetCursor(const char* res){
 #endif
 
 void Main::SetMenu(Menu* m){
-    LocalData* data = (LocalData*)ThreadLocal::Get(THREAD_LOCAL_LOCALDATA);
+    LocalData* data = LocalData::GetLocalInst();
     if (data)
         data->SetMenu(m);
 }
@@ -158,6 +157,10 @@ int Main::MainEntry(int argc, char** argv){
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
     glFontSize(12);
+    glInitASCIIFont();
+
+    // 放在这里是为了让OpenGL初始化
+    mainFrame->OnCreate();
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 

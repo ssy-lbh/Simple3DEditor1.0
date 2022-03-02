@@ -6,8 +6,7 @@
 #include <windowsx.h>
 #endif
 
-#include <gl/gl.h>
-
+#include <utils/gl/GLUtils.h>
 #include <utils/math3d/LinearAlgebra.h>
 
 class ColorBoard final : public Object {
@@ -24,7 +23,7 @@ private:
     
     Vector3 color;
     Vector2 cursorPos;
-    RECT cliRect;
+    Vector2 cliSize;
     float white = 1.0f;
 
     static ColorBoard* inst;
@@ -38,6 +37,9 @@ public:
     static ColorBoard* GetInst();
     static Vector3 GetColor();
     Vector3 RunAndGetColor();
+
+    void UpdateWindowSize(int x, int y);
+    void UpdateCursor(int x, int y);
 };
 
 #endif

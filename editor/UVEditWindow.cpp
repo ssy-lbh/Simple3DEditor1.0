@@ -4,7 +4,11 @@
 
 #include <main.h>
 #include <res.h>
+#include <editor/gui/Menu.h>
 #include <utils/gl/GLTexture2D.h>
+#include <utils/gl/GLUtils.h>
+#include <utils/math3d/Mesh.h>
+#include <utils/math3d/Geometry.h>
 
 UVEditWindow::MoveOperation::MoveOperation(UVEditWindow* main) : main(main) {}
 UVEditWindow::MoveOperation::~MoveOperation(){}

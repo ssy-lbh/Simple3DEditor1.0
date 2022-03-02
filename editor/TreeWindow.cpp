@@ -2,6 +2,8 @@
 
 #include <main.h>
 #include <utils/os/Font.h>
+#include <utils/gl/GLUtils.h>
+#include <utils/math3d/ViewObject.h>
 
 TreeWindow::TreeWindow(){
     DebugLog("TreeWindow Launched");

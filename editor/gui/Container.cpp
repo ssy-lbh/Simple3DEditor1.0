@@ -2,7 +2,6 @@
 
 #include <main.h>
 #include <res.h>
-
 #include <editor/AudioPlayerWindow.h>
 #include <editor/AudioCaptureWindow.h>
 #include <editor/AnimationWindow.h>
@@ -11,6 +10,8 @@
 #include <editor/PaintWindow.h>
 #include <editor/TreeWindow.h>
 #include <editor/UVEditWindow.h>
+#include <editor/gui/Menu.h>
+#include <editor/gui/ViewManager.h>
 #include <utils/math3d/Math.h>
 #include <utils/os/Log.h>
 #include <utils/os/AppFrame.h>

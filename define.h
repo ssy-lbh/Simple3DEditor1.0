@@ -24,6 +24,7 @@ typedef unsigned int uenum;
 // utils
 class String;
 class WString;
+class StringBuilder;
 class File;
 class DataBuffer;
 
@@ -84,6 +85,7 @@ class AttributeTable;
 
 // anim
 class IAnimationFunction;
+class AnimationCurve;
 class AnimationWindow;
 
 // gltools
@@ -133,5 +135,15 @@ class AppFrame;
 
 // viewmgr
 class ViewManager;
+
+// property
+class Property;
+class PropertyVector3;
+class PropertyQuaternion;
+
+// soundtouch
+namespace soundtouch {
+    class SoundTouch;
+};
 
 #endif

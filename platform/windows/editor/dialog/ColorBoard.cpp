@@ -96,9 +96,6 @@ LRESULT CALLBACK ColorBoard::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 LRESULT CALLBACK ColorBoard::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     switch (uMsg){
-    case WM_CREATE:
-        GetClientRect(hWnd, &cliRect);
-        break;
     case WM_CLOSE:
         PostQuitMessage(0);
         break;
@@ -109,15 +106,13 @@ LRESULT CALLBACK ColorBoard::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
             break;
         }
     case WM_SIZE:
-        GetClientRect(hWnd, &cliRect);
-        cursorPos.x = 2.0f * GET_X_LPARAM(lParam) / (cliRect.right - cliRect.left) - 1.0f;
-        cursorPos.y = 1.0f - 2.0f * GET_Y_LPARAM(lParam) / (cliRect.bottom - cliRect.top);
+        UpdateWindowSize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_MOUSEMOVE:
-        cursorPos.x = 2.0f * GET_X_LPARAM(lParam) / (cliRect.right - cliRect.left) - 1.0f;
-        cursorPos.y = 1.0f - 2.0f * GET_Y_LPARAM(lParam) / (cliRect.bottom - cliRect.top);
+        UpdateCursor(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_LBUTTONDOWN:
+        UpdateCursor(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         if (cursorPos.x >= 0.4f && cursorPos.x <= 0.93333333f){
             white = (cursorPos.y + 1.0f) * 0.5f;
             break;
@@ -125,6 +120,8 @@ LRESULT CALLBACK ColorBoard::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
         if (cursorPos.x <= 0.33333333f){
             float x = (cursorPos.x + 0.33333333f) * 1.5f;
             if (x * x + cursorPos.y * cursorPos.y <= 1.0f){
+                RECT cliRect;
+                GetClientRect(hWnd, &cliRect);
                 glReadPixels(GET_X_LPARAM(lParam), (cliRect.bottom - cliRect.top) - GET_Y_LPARAM(lParam),
                                 1, 1, GL_RGB, GL_FLOAT, (GLvoid*)&color);
                 DebugLog("ColorBoard Select Color %f %f %f", color.x, color.y, color.z);
@@ -235,4 +232,14 @@ Vector3 ColorBoard::RunAndGetColor(){
     ShowWindow(hWnd, SW_HIDE);
 
     return color;
+}
+
+void ColorBoard::UpdateWindowSize(int x, int y){
+    cliSize.x = x;
+    cliSize.y = y;
+}
+
+void ColorBoard::UpdateCursor(int x, int y){
+    cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
+    cursorPos.y = 1.0f - 2.0f * y / cliSize.y;
 }

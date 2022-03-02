@@ -3,9 +3,7 @@
 
 #include <define.h>
 
-#include <editor/gui/Menu.h>
 #include <editor/gui/UIManager.h>
-#include <utils/math3d/Geometry.h>
 
 class UVEditWindow final : public IWindow {
 private:

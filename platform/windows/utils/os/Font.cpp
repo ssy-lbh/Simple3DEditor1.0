@@ -2,12 +2,10 @@
 
 #include <lib/opengl/gl/gl.h>
 
+#include <utils/os/AppFrame.h>
 #include <utils/math3d/LinearAlgebra.h>
 
 #define MAX_CHARS 128
-
-static GLuint font = 0;
-static bool init = false;
 
 void glFontSize(uint size) {
     HFONT hFont;
@@ -19,24 +17,21 @@ void glFontSize(uint size) {
 
     HFONT hOldFont = (HFONT)SelectObject(hDC, hFont);
     DeleteObject(hOldFont);
-    init = false;
 }
 
 void glInitASCIIFont(){
+    AppFrame* frame = AppFrame::GetLocalInst();
     HDC hDC;
 
-    if (!font)
-        font = glGenLists(MAX_CHARS);
+    frame->fontASCII = glGenLists(MAX_CHARS);
     hDC = wglGetCurrentDC();
-    wglUseFontBitmapsA(hDC, 0, MAX_CHARS, font);
+    wglUseFontBitmapsA(hDC, 0, MAX_CHARS, frame->fontASCII);
 }
 
 void glDrawString(const char* text){
-    if (!init){
-        glInitASCIIFont();
-        init = true;
-    }
-    glListBase(font);
+    AppFrame* frame = AppFrame::GetLocalInst();
+
+    glListBase(frame->fontASCII);
     glCallLists(strlen(text), GL_UNSIGNED_BYTE, text);
 }
 

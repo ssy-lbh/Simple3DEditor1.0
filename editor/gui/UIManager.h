@@ -4,7 +4,6 @@
 #include <define.h>
 
 #include <utils/List.h>
-#include <utils/gl/GLUtils.h>
 #include <utils/String.h>
 #include <utils/math3d/LinearAlgebra.h>
 
@@ -27,6 +26,7 @@ public:
     void DeleteButton(IButton* btn);
     // 渲染前一般需要重置ModelView矩阵
     void Render();
+    void RenderWithDepth();
     bool LeftDown();
     bool LeftUp();
     bool RightDown();
