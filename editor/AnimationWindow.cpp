@@ -2,7 +2,10 @@
 
 #include <main.h>
 #include <utils/os/Font.h>
+#include <utils/gl/GLUtils.h>
 #include <utils/math3d/Math.h>
+#include <utils/math3d/ViewObject.h>
+#include <utils/math3d/Property.h>
 #include <editor/gui/AnimationCurve.h>
 
 AnimationWindow::FrameIndicator::FrameIndicator(AnimationWindow* window) : window(window) {

@@ -9,6 +9,7 @@
 #include <utils/os/Shell.h>
 #include <utils/String.h>
 #include <utils/File.h>
+#include <utils/gl/GLUtils.h>
 #include <utils/math3d/Math.h>
 #include <utils/AudioUtils.h>
 #include <utils/String.h>

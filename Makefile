@@ -12,7 +12,7 @@ PLATFORM_U	= WINDOWS
 
 GCC			= g++.exe
 RM			= del
-CFLAGS 		= -I"." -m64 -std=c++11
+CFLAGS 		= -I"." -m64
 OFLAGS		= -m64 -s
 LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 "lib\openal\OpenAL32.lib"
 RES  		= windres.exe

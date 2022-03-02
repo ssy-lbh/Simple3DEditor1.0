@@ -1,12 +1,14 @@
 #include <utils/os/AppFrame.h>
 
 #include <windows.h>
+#include <windowsx.h>
 
 #include <main.h>
 #include <res.h>
 #include <utils/os/GLFunc.h>
 #include <utils/os/Font.h>
 #include <utils/os/Thread.h>
+#include <utils/math3d/ViewObject.h>
 #include <editor/gui/UIManager.h>
 #include <editor/gui/ViewManager.h>
 

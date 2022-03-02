@@ -3,6 +3,7 @@
 #include <lib/opengl/gl/gl.h>
 
 #include <main.h>
+#include <editor/gui/Menu.h>
 #include <editor/gui/ViewManager.h>
 #include <utils/math3d/Math.h>
 
