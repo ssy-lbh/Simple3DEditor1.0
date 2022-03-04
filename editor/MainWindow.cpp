@@ -8,6 +8,7 @@
 #include <editor/dialog/ColorBoard.h>
 #include <editor/dialog/Tips.h>
 #include <utils/File.h>
+#include <utils/AudioUtils.h>
 #include <utils/math3d/Math.h>
 #include <utils/math3d/Mesh.h>
 #include <utils/os/Shell.h>
@@ -663,6 +664,7 @@ void MainWindow::UpdateCursor(int x, int y){
 
 void MainWindow::UpdateLookAtLocation(){
     camPos = camLookat - camForward * camDis;
+    alListenerPosv3(camPos);
 }
 
 void MainWindow::UpdateRotation(){
@@ -671,6 +673,8 @@ void MainWindow::UpdateRotation(){
     camRight = camDir * Vector3::right;
     camPos = camLookat - camForward * camDis;
     cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
+    alListenerPosv3(camPos);
+    alListenerDirv3(camForward);
 }
 
 void MainWindow::UpdateDistance(){
@@ -681,6 +685,7 @@ void MainWindow::UpdateDistance(){
     }else if (camRange > camDis * 100.0f){
         camRange *= 0.2f;
     }
+    alListenerPosv3(camPos);
 }
 
 void MainWindow::AddPoint(){

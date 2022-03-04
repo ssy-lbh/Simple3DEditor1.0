@@ -178,6 +178,8 @@ Mesh* Main::GetMesh(){
 }
 
 int Main::MainEntry(int argc, char** argv){
+    AudioUtils::InitOpenAL();
+
     mainFrame = new SelectionWindow(new MainWindow());
 
     appFrame = new AppFrame("ModelView", mainFrame, 600, 600);

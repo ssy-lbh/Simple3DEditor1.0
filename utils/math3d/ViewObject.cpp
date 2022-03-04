@@ -2,6 +2,7 @@
 
 #include <main.h>
 #include <res.h>
+#include <utils/AudioUtils.h>
 #include <utils/math3d/Math.h>
 #include <utils/math3d/Mesh.h>
 #include <utils/gl/GLSimplified.h>
@@ -568,63 +569,20 @@ void PointLightObject::UpdateLight(){
     glLightfv(light, GL_POSITION, position);
 }
 
-AudioListenerObject::AudioListenerObject() : AViewObject(L"AudioListener"){
-    v.object = this;
-}
+AudioListenerObject::AudioListenerObject() : AViewObject(L"AudioListener"){}
 
 AudioListenerObject::~AudioListenerObject(){
     Free(children);
 }
 
-void AudioListenerObject::OnSelect(Vector3 ori, Vector3 dir){
-    Matrix4x4 curMat = GetWorldToObjectMatrix();
-
-    ori = curMat * Vector4(ori, 1.0f);
-    dir = curMat * Vector4(dir, 0.0f);
-    
-    if (v.Hit(ori, dir)){
-        if (Main::data->selPoints.HasValue(&v))
-            return;
-        Main::data->selPoints.Add(&v);
-        DebugLog("Select Point %f %f %f", v.pos.x, v.pos.y, v.pos.z);
-    }else{
-        Main::data->selPoints.Clear();
-        DebugLog("No Point Selected");
-    }
-}
-
-void AudioListenerObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
-    Matrix4x4 curMat = GetWorldToObjectMatrix();
-
-    camPos = curMat * Vector4(camPos, 1.0f);
-    camDir = Quaternion::FromTo(Vector3::forward, curMat * (camDir * Vector3::forward));
-
-    if (v.Hit(camPos, camDir, zBound, p1, p2)){
-        if (Main::data->selPoints.HasValue(&v))
-            return;
-        Main::data->selPoints.Add(&v);
-        DebugLog("Select Point %f %f %f", v.pos.x, v.pos.y, v.pos.z);
-    }else{
-        Main::data->selPoints.Clear();
-        DebugLog("No Point Selected");
-    }
-}
-
 void AudioListenerObject::OnRender(const RenderOptions* options){
-    Main::data->audioPos = transform.chainMat * Vector4(v.pos, 1.0f);
+    Vector3 pos = transform.chainMat * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+    Vector3 dir = (transform.chainMat * Vector4(Vector3::forward, 0.0f)).Normal();
 
-    glDisable(GL_LIGHTING);
-    glEnable(GL_POINT_SMOOTH);
-    glPointSize(4.0f);
-    glBegin(GL_POINTS);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex3f(v.pos.x, v.pos.y, v.pos.z);
-    glEnd();
-    glDisable(GL_POINT_SMOOTH);
-}
+    alListenerPosv3(pos);
+    alListenerDirv3(dir);
 
-void AudioListenerObject::OnTimer(int id){
-    AViewObject::OnTimer(id);
+    GLUtils::Draw3DArrow(pos, dir, 0.3f, 0.3f);
 }
 
 const float CameraObject::SCALE = 0.3f;

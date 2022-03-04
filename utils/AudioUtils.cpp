@@ -125,6 +125,14 @@ void AudioUtils::LoadOpenALPreset(){
     alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 }
 
-void alListenerv3(uenum param, Vector3 value){
-    alListener3f(param, value.x, value.y, value.z);
+void alListenerPosv3(Vector3 value){
+    alListener3f(AL_POSITION, value.x, value.y, value.z);
+}
+
+void alListenerVelocityv3(Vector3 value){
+    alListener3f(AL_VELOCITY, value.x, value.y, value.z);
+}
+
+void alListenerDirv3(Vector3 value){
+    alListener3f(AL_ORIENTATION, value.x, value.y, value.z);
 }

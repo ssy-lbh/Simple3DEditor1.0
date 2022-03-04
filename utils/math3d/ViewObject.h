@@ -160,20 +160,14 @@ public:
     void UpdateLight();
 };
 
+//TODO 修改为附着于一个物体，以transform确定位置
 class AudioListenerObject final : public AViewObject {
-private:
-    Vertex v;
-
 public:
     AudioListenerObject();
     virtual ~AudioListenerObject() override;
 
-    virtual void OnSelect(Vector3 ori, Vector3 dir) override;
-    virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
-
+    // 使用渲染回调获取最新位置信息，并更新AudioListener
     virtual void OnRender(const RenderOptions* options) override;
-
-    virtual void OnTimer(int id) override;
 };
 
 class CameraObject final : public AViewObject {

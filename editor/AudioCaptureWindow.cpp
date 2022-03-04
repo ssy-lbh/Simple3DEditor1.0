@@ -94,8 +94,6 @@ void AudioCaptureWindow::AdjushWaveItem::OnClick(){
 
 AudioCaptureWindow::AudioCaptureWindow(){
     DebugLog("AudioCaptureWindow Launched");
-
-    AudioUtils::InitOpenAL();
     
     //SoundTouch 貌似在我的电脑上性能有限，不能很好做到实时变音
     soundTouch = new soundtouch::SoundTouch();

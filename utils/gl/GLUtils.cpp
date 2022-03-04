@@ -1,7 +1,9 @@
 #include <utils/gl/GLUtils.h>
 
 #include <lib/opengl/gl/gl.h>
+
 #include <utils/os/Log.h>
+#include <utils/gl/GLSimplified.h>
 #include <utils/math3d/Math.h>
 #include <utils/math3d/LinearAlgebra.h>
 
@@ -152,7 +154,7 @@ void GLUtils::DrawCornerWithUV(Vector2 center, float start, float end, float rad
 }
 
 void GLUtils::DrawCornerWithUV(float x, float y, float start, float end, float radius, float step, GLRect uvBound){
-    DrawCornerWithUV(Vector2(x, y), start, end, radius, step, uvBound);
+    DrawCornerWithUV(Vector2(x, y), start, end, radius, uvBound, step);
 }
 
 void GLUtils::DrawCornerWithUV(Vector2 center, float start, float end, float radius, float step, GLRect uvBound){
@@ -172,6 +174,50 @@ void GLUtils::DrawCornerWithUV(Vector2 center, float start, float end, float rad
     vsin = Sin(end), vcos = Cos(end);
     glTexCoord2f(uvBound.GetXRatioPos((vcos + 1.0f) * 0.5f), uvBound.GetYRatioPos((vsin + 1.0f) * 0.5f));
     glVertex2f(center.x + radius * vcos, center.y + radius * vsin);
+    glEnd();
+}
+
+void GLUtils::Draw3DArrow(Vector3 ori, Vector3 dir, float radius, float rate, float lineWidth, float step){
+    Quaternion rot = Quaternion::FromTo(Vector3::forward, dir);
+    Vector3 forward;
+    Vector3 right;
+    Vector3 up;
+    Vector3 dst;
+    Vector3 center;
+
+    rot = Quaternion::FromTo(Vector3::forward, dir);
+
+    forward = dir.Normal();
+    right = (rot * Vector3::right) * radius;
+    up = (rot * Vector3::up) * radius;
+
+    dst = ori + dir;
+    center = ori + dir * (1.0f - rate);
+
+    glEnable(GL_LINE_SMOOTH);
+    glLineWidth(lineWidth);
+    glBegin(GL_LINES);
+    glVertexv3(ori); glVertexv3(dst);
+    glEnd();
+    glLineWidth(1.0f);
+    glDisable(GL_LINE_SMOOTH);
+
+    glBegin(GL_TRIANGLE_FAN);
+    glVertexv3(dst);
+    glVertex2f(center + right);
+    for (float i = 0.0f; i < 2.0f * PI; i += step){
+        glVertex2f(center + right * Cos(i) + up * Sin(i));
+    }
+    glVertex2f(center + right);
+    glEnd();
+
+    glBegin(GL_TRIANGLE_FAN);
+    glVertexv3(center);
+    glVertex2f(center + right);
+    for (float i = 0.0f; i < 2.0f * PI; i += step){
+        glVertex2f(center + right * Cos(i) + up * Sin(i));
+    }
+    glVertex2f(center + right);
     glEnd();
 }
 
@@ -277,14 +323,14 @@ void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, float step){
     float yminUV = 1.0f - rect.GetYRatio(ymin);
     float ymaxUV = 1.0f - rect.GetYRatio(ymax);
 
-    GLUtils::DrawCornerWithUV(xmin, ymax, 90.0f, 180.0f, radius, step,
-        GLRect(0.0f, xminUV, ymaxUV, 0.0f));
-    GLUtils::DrawCornerWithUV(xmax, ymax, 0.0f, 90.0f, radius, step,
-        GLRect(xmaxUV, 1.0f, ymaxUV, 0.0f));
-    GLUtils::DrawCornerWithUV(xmin, ymin, 180.0f, 270.0f, radius, step,
-        GLRect(0.0f, xminUV, 1.0f, yminUV));
-    GLUtils::DrawCornerWithUV(xmax, ymin, 270.0f, 360.0f, radius, step,
-        GLRect(xmaxUV, 1.0f, 1.0f, yminUV));
+    GLUtils::DrawCornerWithUV(xmin, ymax, 90.0f, 180.0f, radius,
+        GLRect(0.0f, xminUV, ymaxUV, 0.0f), step);
+    GLUtils::DrawCornerWithUV(xmax, ymax, 0.0f, 90.0f, radius,
+        GLRect(xmaxUV, 1.0f, ymaxUV, 0.0f), step);
+    GLUtils::DrawCornerWithUV(xmin, ymin, 180.0f, 270.0f, radius,
+        GLRect(0.0f, xminUV, 1.0f, yminUV), step);
+    GLUtils::DrawCornerWithUV(xmax, ymin, 270.0f, 360.0f, radius,
+        GLRect(xmaxUV, 1.0f, 1.0f, yminUV), step);
 
     GLUtils::DrawRectWithUV(
         GLRect(xmin, xmax, rect.bottom, rect.top),
@@ -311,14 +357,14 @@ void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, float step, GLRect 
     float yminUV = uvBound.GetYRatioPos(rect.GetYRatio(ymin));
     float ymaxUV = uvBound.GetYRatioPos(rect.GetYRatio(ymax));
 
-    GLUtils::DrawCornerWithUV(xmin, ymax, 90.0f, 180.0f, radius, step,
-        GLRect(uvBound.left, xminUV, ymaxUV, uvBound.top));
-    GLUtils::DrawCornerWithUV(xmax, ymax, 0.0f, 90.0f, radius, step,
-        GLRect(xmaxUV, uvBound.right, ymaxUV, uvBound.top));
-    GLUtils::DrawCornerWithUV(xmin, ymin, 180.0f, 270.0f, radius, step,
-        GLRect(uvBound.left, xminUV, uvBound.bottom, yminUV));
-    GLUtils::DrawCornerWithUV(xmax, ymin, 270.0f, 360.0f, radius, step,
-        GLRect(xmaxUV, uvBound.right, uvBound.bottom, yminUV));
+    GLUtils::DrawCornerWithUV(xmin, ymax, 90.0f, 180.0f, radius,
+        GLRect(uvBound.left, xminUV, ymaxUV, uvBound.top), step);
+    GLUtils::DrawCornerWithUV(xmax, ymax, 0.0f, 90.0f, radius,
+        GLRect(xmaxUV, uvBound.right, ymaxUV, uvBound.top), step);
+    GLUtils::DrawCornerWithUV(xmin, ymin, 180.0f, 270.0f, radius,
+        GLRect(uvBound.left, xminUV, uvBound.bottom, yminUV), step);
+    GLUtils::DrawCornerWithUV(xmax, ymin, 270.0f, 360.0f, radius,
+        GLRect(xmaxUV, uvBound.right, uvBound.bottom, yminUV), step);
 
     GLUtils::DrawRectWithUV(
         GLRect(xmin, xmax, rect.bottom, rect.top),

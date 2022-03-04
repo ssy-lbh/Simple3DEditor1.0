@@ -34,6 +34,8 @@ public:
     static void LoadOpenALPreset();
 };
 
-void alListenerv3(uenum param, Vector3 value);
+void alListenerPosv3(Vector3 value);
+void alListenerVelocityv3(Vector3 value);
+void alListenerDirv3(Vector3 value);
 
 #endif

@@ -229,8 +229,6 @@ void AudioPlayerWindow::DisplayModeItem::OnClick(){
 AudioPlayerWindow::AudioPlayerWindow(){
     DebugLog("AudioPlayerWindow Launched");
 
-    AudioUtils::InitOpenAL();
-
     uiMgr = new UIManager();
 
     uiMgr->AddButton(new PlayButton(this));
@@ -373,12 +371,6 @@ void AudioPlayerWindow::OnRender(){
     DrawTime();
 
     uiMgr->Render();
-
-    if (IsLaunched()){
-        //TODO 需要单声道音频才有效
-        Vector3 pos = Main::data->audioPos;
-        alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
-    }
 }
 
 void AudioPlayerWindow::OnClose(){}
