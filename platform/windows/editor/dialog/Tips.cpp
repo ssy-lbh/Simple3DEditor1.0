@@ -10,7 +10,11 @@ void DialogTextInput(wchar_t* str, size_t size){
     static wchar_t* pstr;
     static size_t ssize;
     static bool inputConfirm;
-    while(__atomic_test_and_set(&lock, true));
+
+    // 自旋锁(听说D语言不允许空的循环体，也许可以这样水一水)
+    while(__atomic_test_and_set(&lock, true))
+        continue;
+
     pstr = str;
     ssize = size;
     inputConfirm = false;

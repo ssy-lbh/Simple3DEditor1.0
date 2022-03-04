@@ -17,6 +17,7 @@ public:
     RenderWindow();
     virtual ~RenderWindow() override;
 
+    void InitCamera();
     void RenderModelView();
 
     virtual bool IsFocus() override;

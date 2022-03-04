@@ -342,4 +342,10 @@ void NodeMapWindow::OnKillFocus(){
 
 void NodeMapWindow::OnMouseWheel(int delta){}
 
-void NodeMapWindow::OnMenuAccel(int id, bool accel){}
+void NodeMapWindow::OnMenuAccel(int id, bool accel){
+    switch (id){
+    case IDM_MENU_BASIC:
+        Main::SetMenu(basicMenu);
+        break;
+    }
+}

@@ -11,7 +11,7 @@
 #include <handleapi.h>
 #endif
 
-// 应保证为单例
+// 应保证单个线程内为单例
 class AppFrame final : public Object {
 #ifdef PLATFORM_WINDOWS
 private:

@@ -3,9 +3,6 @@
 
 #include <define.h>
 
-#include <gl/gl.h>
-#include <gl/glu.h>
-
 #include <utils/List.h>
 #include <utils/os/AppFrame.h>
 #include <utils/math3d/LinearAlgebra.h>
@@ -16,6 +13,7 @@ public:
     virtual void Execute() = 0;
 };
 
+//TODO 可加入窗口内拖拽功能
 class LocalData final : public Object {
 public:
     Vector2 cursorPos;
@@ -44,6 +42,7 @@ public:
     void Render();
 };
 
+//TODO 可加入全局拖拽功能，在窗口之间传送数据
 class GlobalData final : public Object {
 public:
     enum SelectionType {

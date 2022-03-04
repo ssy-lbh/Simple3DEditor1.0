@@ -128,6 +128,10 @@ public:
         return ptr;
     }
 
+    bool Empty(){
+        return ptr == 0;
+    }
+
     T& GetFront(){
         //DebugLog("GetFront");
         if (ptr == 0){

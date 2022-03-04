@@ -3,8 +3,6 @@
 
 #include <define.h>
 
-#include <gl/gl.h>
-
 #include <utils/List.h>
 #include <utils/math3d/LinearAlgebra.h>
 

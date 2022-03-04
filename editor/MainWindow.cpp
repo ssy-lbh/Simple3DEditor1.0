@@ -1,5 +1,7 @@
 #include <editor/MainWindow.h>
 
+#include <lib/opengl/gl/glu.h>
+
 #include <main.h>
 #include <res.h>
 #include <editor/gui/ViewManager.h>
@@ -47,15 +49,22 @@ void MainWindow::MoveButton::ClickEnd(Vector2 pos, IButton* end){
 }
 
 MainWindow::RotateButton::RotateButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
-MainWindow::RotateButton::~RotateButton(){}
+
+MainWindow::RotateButton::~RotateButton(){
+    if (texture) delete texture;
+}
 
 bool MainWindow::RotateButton::Trigger(Vector2 pos){
     return (pos - center).SqrMagnitude() <= radius * radius;
 }
 
 void MainWindow::RotateButton::Render(){
-    glColor3f(0.3f, 0.3f, 0.3f);
-    GLUtils::DrawCorner(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    if (!texture)
+        texture = new GLTexture2D(IDB_BUTTON_ROTATE);
+    texture->Enable();
+    GLUtils::DrawCornerWithUV(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
+    GLTexture2D::Disable();
 }
 
 void MainWindow::RotateButton::Click(Vector2 pos){
@@ -696,7 +705,7 @@ void MainWindow::DeletePoint(){
 bool MainWindow::SaveMesh(Mesh* mesh){
     if (!mesh)
         return false;
-    WString file = ShellFileSelectWindow(WString(IDS_OBJFILE_FILTER), OFN_PATHMUSTEXIST | OFN_EXPLORER);
+    WString file = ShellFileSelectWindow(WString(IDS_OBJFILE_FILTER), FILESELECT_REQ_PATH);
     if (file.GetLength() == 0){
         DebugError("Stop Saving");
         return false;
@@ -717,7 +726,7 @@ bool MainWindow::SaveMesh(Mesh* mesh){
 bool MainWindow::LoadMesh(Mesh* mesh){
     if (!mesh)
         return false;
-    WString file = ShellFileSelectWindow(WString(IDS_OBJFILE_FILTER), OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER);
+    WString file = ShellFileSelectWindow(WString(IDS_OBJFILE_FILTER), FILESELECT_REQ_FILE | FILESELECT_REQ_PATH);
     if (file.GetLength() == 0){
         DebugLog("Stop Loading");
         return false;
@@ -1130,7 +1139,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         Mesh* mesh = Main::GetMesh();
         if (!mesh)
             break;
-        WString file = ShellFileSelectWindow(WString(IDS_PICFILE_FILTER), OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER);
+        WString file = ShellFileSelectWindow(WString(IDS_PICFILE_FILTER), FILESELECT_REQ_FILE | FILESELECT_REQ_PATH);
         if (file.GetLength() == 0){
             DebugLog("Stop Loading");
             break;
@@ -1138,7 +1147,6 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         DebugLog("Load Texture %S", file.GetString());
         mesh->SetTexture(new GLTexture2D(file.GetString()));
     }
-        break;
     }
     // 当前操作的命令
     if (curOp)

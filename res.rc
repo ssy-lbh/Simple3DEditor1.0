@@ -21,12 +21,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "lin-boheng@gitee.com"
             VALUE "FileDescription", "3D编辑器"
-            VALUE "FileVersion", "1.0.3"
+            VALUE "FileVersion", "1.0.7"
             VALUE "InternalName", "StereoVision.exe"
             VALUE "LegalCopyright", "Copyright (C) lin-boheng@gitee.com 2021"
             VALUE "OriginalFilename", "main.exe"
             VALUE "ProductName", "StereoVision"
-            VALUE "ProductVersion", "1.0.3"
+            VALUE "ProductVersion", "1.0.7"
         END
     END
     BLOCK "VarFileInfo"
@@ -53,15 +53,16 @@ IDS_BRUSH_RGB_AVERAGE SHADER    "res/shader/brush_rgb_average.comp"
 IDB_EARTH_WATER BITMAP          "res/texture/earth_water.bmp"
 IDB_NODEMAP_BACKGROUND BITMAP   "res/texture/nodemap_background.bmp"
 IDB_BUTTON_MOVE BITMAP          "res/texture/btn_move.bmp"
+IDB_BUTTON_ROTATE BITMAP        "res/texture/btn_rotate.bmp"
 
 IDC_MENU MENU
 BEGIN
     POPUP "文件(&F)"
     BEGIN
-        MENUITEM "保存(&S)",                        IDM_SAVE
-        MENUITEM "载入(&L)",                        IDM_LOAD
+        MENUITEM "保存\tCtrl+S",                    IDM_SAVE
+        MENUITEM "载入\tCtrl+L",                    IDM_LOAD
         MENUITEM SEPARATOR
-        MENUITEM "退出(&X)",                        IDM_EXIT
+        MENUITEM "退出\tESC",                       IDM_EXIT
     END
     POPUP "网格体(&M)"
     BEGIN
@@ -76,8 +77,8 @@ BEGIN
     END
     POPUP "工具(&T)"
     BEGIN
-        MENUITEM "点选",                            IDM_TOOL_EMPTY
-        MENUITEM "框选",                            IDM_TOOL_SELECTBOX
+        MENUITEM "点选\tAlt+1",                     IDM_TOOL_EMPTY
+        MENUITEM "框选\tAlt+2",                     IDM_TOOL_SELECTBOX
     END
     POPUP "纹理(&P)"
     BEGIN
@@ -86,9 +87,13 @@ BEGIN
         MENUITEM "加载",                            IDM_TEXTURE_LOAD
         MENUITEM "使用画布纹理",                     IDM_TEXTURE_USE_PAINT
     END
-    POPUP "版本(&H)"
+    POPUP "窗口(&W)"
     BEGIN
-        MENUITEM "关于(&A) ...",                    IDM_ABOUT
+        MENUITEM "窗口菜单\tCtrl+W",                IDM_MENU_WINDOW
+    END
+    POPUP "版本(&V)"
+    BEGIN
+        MENUITEM "关于...\tAlt+?",                  IDM_ABOUT
     END
 END
 

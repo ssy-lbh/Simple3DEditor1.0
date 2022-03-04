@@ -59,6 +59,7 @@ private:
         float radius;
         Quaternion start;
         MainWindow* main;
+        GLTexture2D* texture = NULL;
 
     public:
         RotateButton(Vector2 center, float radius, MainWindow* main);

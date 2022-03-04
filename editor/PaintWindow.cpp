@@ -347,6 +347,9 @@ void PaintWindow::OnMenuAccel(int id, bool accel){
     case IDM_BRUSH_RGB_AVERAGE:
         SetBrush(new DefaultBrush(this, IDS_BRUSH_RGB_AVERAGE));
         break;
+    case IDM_MENU_BASIC:
+        Main::SetMenu(basicMenu);
+        break;
     }
     if (brush)
         brush->OnCommand(id);

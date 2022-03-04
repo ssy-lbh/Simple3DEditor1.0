@@ -1,6 +1,7 @@
 #include <editor/AnimationWindow.h>
 
 #include <main.h>
+#include <res.h>
 #include <utils/os/Font.h>
 #include <utils/gl/GLUtils.h>
 #include <utils/math3d/Math.h>
@@ -290,7 +291,14 @@ void AnimationWindow::OnKillFocus(){
 }
 
 void AnimationWindow::OnMouseWheel(int delta){}
-void AnimationWindow::OnMenuAccel(int id, bool accel){}
+
+void AnimationWindow::OnMenuAccel(int id, bool accel){
+    switch (id){
+    case IDM_MENU_BASIC:
+        Main::SetMenu(basicMenu);
+        break;
+    }
+}
 
 void AnimationWindow::UpdateCursor(int x, int y){
     cursorPos.x = 2.0f * x / cliSize.x - 1.0f;

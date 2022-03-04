@@ -1,5 +1,7 @@
 #include <main.h>
 
+#include <lib/opengl/gl/gl.h>
+
 #include <res.h>
 #include <editor/gui/Container.h>
 #include <editor/gui/Menu.h>
@@ -96,9 +98,7 @@ void LocalData::OnMenuAccel(int id, bool accel){
         break;
     case IDM_CONFIRM:
         if (menu){
-            if (menu->InChainMenu(cursorPos - menuPos)){
-                menu->Click();
-            }
+            menu->Click();
             SetMenu(NULL);
         }
         break;
@@ -180,7 +180,7 @@ Mesh* Main::GetMesh(){
 int Main::MainEntry(int argc, char** argv){
     mainFrame = new SelectionWindow(new MainWindow());
 
-    appFrame = new AppFrame("ModelView", mainFrame, 750, 1250);
+    appFrame = new AppFrame("ModelView", mainFrame, 600, 600);
 
     DebugLog("Main Window Created");
 
@@ -191,6 +191,7 @@ int Main::MainEntry(int argc, char** argv){
     DebugLog("OpenGL Version %s", glGetString(GL_VERSION));
     DebugLog("OpenGL Renderer %s", glGetString(GL_RENDERER));
     DebugLog("OpenGL Vendor %s", glGetString(GL_VENDOR));
+    //DebugLog("OpenGL Extensions %s", glGetString(GL_EXTENSIONS));
 
     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
@@ -224,8 +225,6 @@ int Main::MainEntry(int argc, char** argv){
 
 Main* Main::inst = NULL;
 GlobalData* Main::data = NULL;
-
-#include <utils/os/Shell.h>
 
 int main(int argc, char** argv){
     Main::inst = new Main();

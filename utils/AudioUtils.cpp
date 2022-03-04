@@ -1,12 +1,16 @@
 #include <utils/AudioUtils.h>
 
+#include <lib/openal/al.h>
+#include <lib/openal/alc.h>
+
 #include <utils/math3d/Math.h>
+#include <utils/math3d/LinearAlgebra.h>
 #include <utils/os/Log.h>
 
 bool AudioUtils::init = false;
 
-ALCdevice* AudioUtils::alDev;
-ALCcontext* AudioUtils::alCtx;
+ALCdevice* AudioUtils::alDev = NULL;
+ALCcontext* AudioUtils::alCtx = NULL;
 
 AudioUtils::Complex::Complex(_Complex float comp) : comp(comp) {}
 AudioUtils::Complex::~Complex(){}
@@ -119,4 +123,8 @@ void AudioUtils::LoadOpenALPreset(){
     alListener3f(AL_ORIENTATION, 0.0f, 1.0f, 0.0f);
 
     alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
+}
+
+void alListenerv3(uenum param, Vector3 value){
+    alListener3f(param, value.x, value.y, value.z);
 }

@@ -4,10 +4,13 @@
 #include <define.h>
 
 #ifdef PLATFORM_WINDOWS
-#include <windef.h>
-#define MSGBOX_YES IDYES
-#define MSGBOX_NO IDNO
-#define MSGBOX_CANCEL IDCANCEL
+#define MSGBOX_YES 6
+#define MSGBOX_NO 7
+#define MSGBOX_CANCEL 2
+
+#define FILESELECT_REQ_PATH 0x800
+#define FILESELECT_REQ_FILE 0x1000
+#define FILESELECT_MULTIPLE 0x200
 #endif
 
 String ShellFileSelectWindow(String filter, int flags);

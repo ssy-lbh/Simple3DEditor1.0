@@ -3,8 +3,8 @@
 
 #include <define.h>
 
-#include <lib/openal/al.h>
-#include <lib/openal/alc.h>
+typedef struct ALCdevice_struct ALCdevice;
+typedef struct ALCcontext_struct ALCcontext;
 
 #define alCheckError(tag) AudioUtils::CheckALError(tag, __FILE__, __LINE__)
 
@@ -33,5 +33,7 @@ public:
     static void PrintOpenALInfo();
     static void LoadOpenALPreset();
 };
+
+void alListenerv3(uenum param, Vector3 value);
 
 #endif

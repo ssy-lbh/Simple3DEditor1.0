@@ -375,7 +375,7 @@ void AudioPlayerWindow::OnRender(){
     uiMgr->Render();
 
     if (IsLaunched()){
-        //TODO 不知道为什么，设置无效
+        //TODO 需要单声道音频才有效
         Vector3 pos = Main::data->audioPos;
         alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
     }
@@ -454,6 +454,9 @@ void AudioPlayerWindow::OnMenuAccel(int id, bool accel){
     case IDM_LOAD:
         OnInsLoad();
         break;
+    case IDM_MENU_BASIC:
+        Main::SetMenu(basicMenu);
+        break;
     }
 }
 
@@ -467,7 +470,7 @@ void AudioPlayerWindow::OnDropFileW(const wchar_t* path){
 void AudioPlayerWindow::OnInsLoad(){
     // 暂不使用 L"PCM音频文件(*.wav)\0*.wav\0所有音频类型(.*)\0*.*\0"，此状态下发现Shell时可能的环境错误
     // 若要使用请拖入文件
-    WString file = ShellFileSelectWindow(WString(IDS_WAVFILE_FILTER), OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_EXPLORER);
+    WString file = ShellFileSelectWindow(WString(IDS_WAVFILE_FILTER), FILESELECT_REQ_PATH | FILESELECT_REQ_FILE);
     if (file.GetLength() == 0){
         DebugLog("Stop Loading");
         return;
@@ -597,6 +600,34 @@ void AudioPlayerWindow::LoadFile(WString file){
 
     char* fileData = new char[dataLen];
     src.Read(fileData, dataLen);
+
+    // 转为单声道(后续可加入用户设置)
+    if (format == AL_FORMAT_STEREO8){
+        char* oldData = fileData;
+        char* newData;
+        dataLen >>= 1;
+        newData = new char[dataLen];
+        for (int i = 0; i < dataLen; i++)
+            newData[i] = oldData[i << 1];
+        delete[] oldData;
+        fileData = newData;
+        format = AL_FORMAT_MONO8;
+        wav.nChannels = 1;
+        wav.nBlockAlign = 1;
+    }else if (format == AL_FORMAT_STEREO16){
+        char* oldData = fileData;
+        char* newData;
+        dataLen >>= 1;
+        newData = new char[dataLen];
+        for (int i = 0; i < (dataLen >> 1); i++)
+            ((short*)newData)[i] = ((short*)oldData)[i << 1];
+        delete[] oldData;
+        fileData = newData;
+        format = AL_FORMAT_MONO16;
+        wav.nChannels = 1;
+        wav.nBlockAlign = 2;
+    }
+
     alBufferData(alBuf, format, fileData, dataLen, wav.nSamplesPerSec);// 8000 11025 16000 22050 44100 48000 96000 192000
     src.Close();
 

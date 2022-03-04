@@ -23,7 +23,7 @@ String ShellFileSelectWindow(String filter, int flags){
     ofn.nMaxFile = DEFAULT_STRING_LENGTH;
     ofn.nFilterIndex = 0;
     //标志如果是多选要加上OFN_ALLOWMULTISELECT 
-    ofn.Flags = flags;
+    ofn.Flags = flags | OFN_EXPLORER;
 
     if (!GetOpenFileNameA(&ofn)){
         SetCurrentDirectoryA(GetAppDirectoryA().GetString());
@@ -58,7 +58,7 @@ WString ShellFileSelectWindow(WString filter, int flags){
     ofn.nMaxFile = DEFAULT_STRING_LENGTH;
     ofn.nFilterIndex = 0;
     //标志如果是多选要加上OFN_ALLOWMULTISELECT 
-    ofn.Flags = flags;
+    ofn.Flags = flags | OFN_EXPLORER;
 
     if (!GetOpenFileNameW(&ofn)){
         SetCurrentDirectoryW(GetAppDirectoryW().GetString());
@@ -204,7 +204,7 @@ bool ShellPrint(String file){
 bool ShellPrint(WString file){
     DWORD_PTR res;
 
-    res = (DWORD_PTR)ShellExecuteW(NULL, L"print", file.GetString(), NULL, NULL, SW_HIDE);
+    res = (DWORD_PTR)ShellExecuteW(NULL, L"print", file.GetString(), NULL, NULL, SW_SHOWDEFAULT);
     
     if (res >= 32){
         return true;

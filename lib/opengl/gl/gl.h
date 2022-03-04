@@ -9,11 +9,22 @@
 #define __gl_h_
 #define __GL_H__
 
-#if !(defined(WINGDIAPI) && defined(APIENTRY))
-#include <windows.h>
-#else
-#include <stddef.h>
+// 别问我为什么把这改了，windows.h实在是太大，构建速度降低太多
+#ifndef WINGDIAPI
+#define WINGDIAPI __declspec (dllimport)
 #endif
+#ifndef APIENTRY
+#define APIENTRY __stdcall
+#endif
+#ifndef CALLBACK
+#define CALLBACK __stdcall
+#endif
+
+// #if !(defined(WINGDIAPI) && defined(APIENTRY))
+// #include <windows.h>
+// #else
+// #include <stddef.h>
+// #endif
 
 #ifdef __cplusplus
 extern "C" {

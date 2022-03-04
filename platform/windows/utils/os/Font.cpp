@@ -1,6 +1,9 @@
 #include <utils/os/Font.h>
 
+#include <windows.h>
+
 #include <lib/opengl/gl/gl.h>
+#include <lib/opengl/gl/wgl.h>
 
 #include <utils/os/AppFrame.h>
 #include <utils/math3d/LinearAlgebra.h>

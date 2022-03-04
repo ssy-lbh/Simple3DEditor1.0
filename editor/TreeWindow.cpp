@@ -106,6 +106,9 @@ void TreeWindow::UpdateWindowSize(int x, int y){
 
 void TreeWindow::OnMouseMove(int x, int y){
     UpdateCursor(x, y);
+
+    if (dragObject)
+        Main::SetCursor(IDC_UPARROW);
 }
 
 void TreeWindow::OnLeftDown(int x, int y){
@@ -153,7 +156,9 @@ void TreeWindow::OnRightDown(int x, int y){
     UpdateCursor(x, y);
 }
 
-void TreeWindow::OnRightUp(int x, int y){}
+void TreeWindow::OnRightUp(int x, int y){
+    UpdateCursor(x, y);
+}
 
 void TreeWindow::OnMouseHover(int key, int x, int y){}
 

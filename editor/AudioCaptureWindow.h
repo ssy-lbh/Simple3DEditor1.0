@@ -3,13 +3,12 @@
 
 #include <define.h>
 
-#include <lib/openal/al.h>
-#include <lib/openal/alc.h>
-
 #include <editor/gui/UIManager.h>
 #include <editor/gui/Menu.h>
 #include <utils/String.h>
 #include <utils/math3d/LinearAlgebra.h>
+
+typedef struct ALCdevice_struct ALCdevice;
 
 class AudioCaptureWindow final : public IWindow {
 private:
@@ -29,16 +28,16 @@ private:
     Menu* basicMenu;
 
     ALCdevice* capDev = NULL;
-    ALvoid* capBuf = NULL;
-    ALint capOffset = 0;
-    ALvoid* recBuf = NULL;
-    ALint recOffset = 0;
+    void* capBuf = NULL;
+    int capOffset = 0;
+    void* recBuf = NULL;
+    int recOffset = 0;
     _Complex float* freqBuf = NULL;
 
     bool capture = false;
 
-    ALuint alBuf[1 << queueBit];
-    ALuint alSrc;
+    uint alBuf[1 << queueBit];
+    uint alSrc;
     int head = 0, tail = 0;
 
     soundtouch::SoundTouch* soundTouch = NULL;
@@ -136,7 +135,9 @@ public:
 
     void Launch();
     void Stop();
-    void UpdateBuffer(ALvoid* buf, ALsizei size);
+    void UpdateBuffer(void* buf, int size);
+    bool SetCaptureDevice(const char* name);
+    bool CloseCaptureDevice();
 };
 
 #endif

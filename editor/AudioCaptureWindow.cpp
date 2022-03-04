@@ -1,7 +1,8 @@
 #include <editor/AudioCaptureWindow.h>
 
 #include <lib/opengl/gl/gl.h>
-#include <lib/soundtouch/SoundTouch.h>
+#include <lib/openal/al.h>
+#include <lib/openal/alc.h>
 
 #include <main.h>
 #include <res.h>
@@ -10,6 +11,9 @@
 #include <utils/os/Font.h>
 #include <utils/os/Shell.h>
 #include <utils/gl/GLUtils.h>
+
+// 应在一切windows相关类型定义之后
+#include <lib/soundtouch/SoundTouch.h>
 
 AudioCaptureWindow::ProgressBar::ProgressBar(AudioCaptureWindow* window) : window(window) {}
 AudioCaptureWindow::ProgressBar::~ProgressBar(){}
@@ -109,6 +113,29 @@ AudioCaptureWindow::AudioCaptureWindow(){
     basicMenu->AddItem(new CaptureItem(this));
     basicMenu->AddItem(new DisplayModeItem(this));
     basicMenu->AddItem(new AdjushWaveItem(this));
+    basicMenu->AddItem(new MenuItem(L"刷新输入设备", MENUITEM_LAMBDA_TRANS(AudioCaptureWindow)[](AudioCaptureWindow* window){
+        if (window->capDev){
+            if (window->capture){
+                window->Stop();
+                window->CloseCaptureDevice();
+                window->Launch();
+            }else{
+                window->CloseCaptureDevice();
+            }
+        }
+    }, this));
+
+    alGenSources(1, &alSrc);
+    alGenBuffers(1 << queueBit, alBuf);
+    alSourcePlay(alSrc);
+
+    capBuf = new short[1 << bit];
+    memset(capBuf, 0, (1 << (bit + 1)));
+    
+    recBuf = new short[1 << bit];
+    memset(recBuf, 0, (1 << (bit + 1)));
+
+    freqBuf = new _Complex float[1 << bit];
 }
 
 AudioCaptureWindow::~AudioCaptureWindow(){
@@ -118,9 +145,7 @@ AudioCaptureWindow::~AudioCaptureWindow(){
     if (recBuf) delete (short*)recBuf;
     if (freqBuf) delete freqBuf;
 
-    if (capDev){
-        alcCaptureCloseDevice(capDev);
-    }
+    CloseCaptureDevice();
 
     if (soundTouch){
         soundTouch->clear();
@@ -341,7 +366,13 @@ void AudioCaptureWindow::OnKillFocus(){
 
 void AudioCaptureWindow::OnMouseWheel(int delta){}
 
-void AudioCaptureWindow::OnMenuAccel(int id, bool accel){}
+void AudioCaptureWindow::OnMenuAccel(int id, bool accel){
+    switch (id){
+    case IDM_MENU_BASIC:
+        Main::SetMenu(basicMenu);
+        break;
+    }
+}
 
 void AudioCaptureWindow::OnDropFileA(const char* path){}
 
@@ -353,30 +384,8 @@ void AudioCaptureWindow::Launch(){
         return;
     }
 
-    capDev = alcCaptureOpenDevice(NULL, freq, AL_FORMAT_MONO16, 1 << (bit + 2));
-
-    if (!capDev){
-        DebugError("AudioCaptureWindow::Launch Capture Device Not Found");
+    if (!SetCaptureDevice(NULL))
         return;
-    }
-
-    DebugLog("AudioCaptureWindow::Launch Open Device %p %s", capDev, alcGetString(capDev, ALC_DEVICE_SPECIFIER));
-
-    if (!capBuf){
-        capBuf = new short[1 << bit];
-        memset(capBuf, 0, 1 << (bit + 1));
-    }
-    if (!recBuf){
-        recBuf = new short[1 << bit];
-        memset(recBuf, 0, 1 << (bit + 1));
-
-        alGenSources(1, &alSrc);
-        alGenBuffers(1 << queueBit, alBuf);
-        alSourcePlay(alSrc);
-    }
-    if (!freqBuf){
-        freqBuf = new _Complex float[1 << bit];
-    }
 
     alcCaptureStart(capDev);
     capture = true;
@@ -389,9 +398,9 @@ void AudioCaptureWindow::Stop(){
     capture = false;
 }
 
-void AudioCaptureWindow::UpdateBuffer(ALvoid* buf, ALsizei size){
-    ALint cnt;
-    ALint state;
+void AudioCaptureWindow::UpdateBuffer(void* buf, int size){
+    int cnt;
+    int state;
 
     //DebugLog("AudioCaptureWindow %p Queue Buffer %d %d", this, head, alBuf[head & queueMask]);
     alBufferData(alBuf[head & queueMask], AL_FORMAT_MONO16, buf, size, freq);
@@ -407,4 +416,34 @@ void AudioCaptureWindow::UpdateBuffer(ALvoid* buf, ALsizei size){
     if (state != AL_PLAYING){
         alSourcePlay(alSrc);
     }
+}
+
+bool AudioCaptureWindow::SetCaptureDevice(const char* name){
+    if (capDev){
+        return true;
+    }
+
+    capDev = alcCaptureOpenDevice(name, freq, AL_FORMAT_MONO16, 1 << (bit + queueBit));
+
+    if (!capDev){
+        DebugError("AudioCaptureWindow::SetCaptureDevice Capture Device %s Not Found", name ? name : "(default)");
+        return false;
+    }
+
+    DebugLog("AudioCaptureWindow::SetCaptureDevice Open Device %p %s", capDev, alcGetString(capDev, ALC_DEVICE_SPECIFIER));
+
+    return true;
+}
+
+bool AudioCaptureWindow::CloseCaptureDevice(){
+    ALCboolean res;
+
+    if (!capDev){
+        return false;
+    }
+
+    res = alcCaptureCloseDevice(capDev);
+    capDev = NULL;
+
+    return res;
 }

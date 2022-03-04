@@ -1,5 +1,7 @@
 #include <editor/gui/Menu.h>
 
+#include <lib/opengl/gl/gl.h>
+
 #include <utils/os/Font.h>
 #include <utils/os/Log.h>
 #include <utils/gl/GLUtils.h>
@@ -146,13 +148,13 @@ void Menu::RenderItem(IMenuItem* item){
         break;
     case IMenuItem::ItemType::GROUP:{
         float height = 30.0f * cliInvSize.y, width = 250.0f * cliInvSize.y;
-        Menu* itemMenu = item->GetMenu();
         if (drawCounter == selected){
             glColor3f(0.1f, 0.4f, 1.0f);
             glBegin(GL_TRIANGLES);
             glVertex2f(minPos.x, minPos.y); glVertex2f(minPos.x + width, minPos.y); glVertex2f(minPos.x + width, minPos.y + height);
             glVertex2f(minPos.x, minPos.y); glVertex2f(minPos.x, minPos.y + height); glVertex2f(minPos.x + width, minPos.y + height);
             glEnd();
+            Menu* itemMenu = item->GetMenu();
             if (itemMenu == NULL){
                 DebugError("Menu::RenderItem %llu:%p NullPointerException", drawCounter, item);
             }else{
@@ -254,7 +256,7 @@ void Menu::PressDown(){
         curMenu->PressDown();
         return;
     }
-    if (selected < items.Size() - 1 && items.Size() != 0){
+    if ((selected < items.Size() - 1 && items.Size() != 0) || selected == -1){
         selected++;
         openMenu = false;
     }
