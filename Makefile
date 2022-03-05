@@ -29,6 +29,7 @@ PROGOBJ		= main\
 				utils\gl\GLFrameBuffer utils\gl\GLIndexBuffer\
 				utils\gl\GLLights utils\gl\GLProgram utils\gl\GLShader\
 				utils\gl\GLUtils utils\gl\GLVertexArray utils\gl\GLVertexBuffer\
+				utils\gl\GLTexture2D utils\gl\GLRenderTexture2D utils\gl\GLComputeProgram\
 				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
 				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
 				editor\MainWindow editor\gui\Container editor\gui\UIManager editor\gui\Menu\
@@ -36,7 +37,6 @@ PROGOBJ		= main\
 PLATOBJ		= utils\String utils\File\
 				utils\os\Shell utils\os\Log utils\os\GLFunc utils\os\Thread\
 				utils\os\Time utils\os\Font utils\os\Appframe utils\os\Resource\
-				utils\gl\GLComputeProgram utils\gl\GLTexture2D\
 				editor\gui\ViewManager\
 				editor\dialog\ColorBoard editor\dialog\Tips
 EXTRAOBJ	= lib\soundtouch\mmx_optimized lib\soundtouch\sse_optimized lib\soundtouch\cpu_detect_x86

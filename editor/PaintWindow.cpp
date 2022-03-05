@@ -10,16 +10,17 @@
 #include <utils/math3d/Mesh.h>
 #include <utils/os/GLFunc.h>
 #include <utils/gl/GLTexture2D.h>
+#include <utils/gl/GLRenderTexture2D.h>
 #include <utils/gl/GLComputeProgram.h>
 
 PaintWindow::ClearBrush::ClearBrush(PaintWindow* window) : window(window) {
     prog = new GLComputeProgram(IDS_BRUSH_CLEAR);
-    if (prog->CheckShaderError()){
+    if (prog->CompileShader()){
         DebugError("Compute Shader %d Compile Error:", IDS_BRUSH_CLEAR);
         prog->PrintShaderLog();
         err = true;
     }
-    if (prog->CheckProgramError()){
+    if (prog->LinkProgram()){
         DebugError("Program Link Error:");
         prog->PrintProgramLog();
         err = true;
@@ -46,7 +47,7 @@ void PaintWindow::ClearBrush::OnLeftDown(){
     kernel = prog->GetProgram();
     glProgramUniform3f(kernel, colorLoc, color.x, color.y, color.z);
 
-    prog->Dispatch((window->width + 7) >> 3, (window->height + 7) >> 3, 1);
+    prog->Dispatch((window->GetWidth() + 7) >> 3, (window->GetHeight() + 7) >> 3, 1);
 }
 
 void PaintWindow::ClearBrush::OnCommand(int id){
@@ -59,12 +60,12 @@ void PaintWindow::ClearBrush::OnCommand(int id){
 
 PaintWindow::DefaultBrush::DefaultBrush(PaintWindow* window) : window(window) {
     prog = new GLComputeProgram(IDS_BRUSH_OVERLAY);
-    if (prog->CheckShaderError()){
+    if (prog->CompileShader()){
         DebugError("Compute Shader %d Compile Error:", IDS_BRUSH_OVERLAY);
         prog->PrintShaderLog();
         err = true;
     }
-    if (prog->CheckProgramError()){
+    if (prog->LinkProgram()){
         DebugError("Program Link Error:");
         prog->PrintProgramLog();
         err = true;
@@ -82,12 +83,12 @@ PaintWindow::DefaultBrush::DefaultBrush(PaintWindow* window) : window(window) {
 
 PaintWindow::DefaultBrush::DefaultBrush(PaintWindow* window, int shaderId) : window(window) {
     prog = new GLComputeProgram(shaderId);
-    if (prog->CheckShaderError()){
+    if (prog->CompileShader()){
         DebugError("Compute Shader %d Compile Error:", shaderId);
         prog->PrintShaderLog();
         err = true;
     }
-    if (prog->CheckProgramError()){
+    if (prog->LinkProgram()){
         DebugError("Program Link Error:");
         prog->PrintProgramLog();
         err = true;
@@ -140,8 +141,8 @@ void PaintWindow::DefaultBrush::Draw(){
 
     prog->BindTexture(0, window->paintTex, GL_READ_WRITE, GL_RGBA32F);
 
-    position[0] = window->width * (window->cursorPos.x + 1.0f) * 0.5f;
-    position[1] = window->height * (window->cursorPos.y + 1.0f) * 0.5f;
+    position[0] = window->GetWidth() * (window->cursorPos.x + 1.0f) * 0.5f;
+    position[1] = window->GetHeight() * (window->cursorPos.y + 1.0f) * 0.5f;
     offset[0] = position[0] - 12;
     offset[1] = position[1] - 12;
 
@@ -198,12 +199,16 @@ PaintWindow::~PaintWindow(){
     DebugLog("PaintWindow Destroyed");
     if (basicMenu) delete basicMenu;
     if (brush) delete brush;
-
-    if (glIsTexture(paintTex)) glDeleteTextures(1, &paintTex);
+    if (paintTex) delete paintTex;
 }
 
 bool PaintWindow::IsFocus(){
     return focus;
+}
+
+void PaintWindow::OnCreate(){
+    CreateImage(500, 500);
+    SetBrush(new DefaultBrush(this, IDS_BRUSH_OVERLAY));
 }
 
 void PaintWindow::OnRender(){
@@ -216,32 +221,26 @@ void PaintWindow::OnRender(){
     glLoadIdentity();
 
     // 测试代码
-    if (!paintTex){
-        CreateImage(500, 500);
-        SetBrush(new DefaultBrush(this, IDS_BRUSH_OVERLAY));
 
-        // 可能是因为该段渲染流程使用的内部其他类型的管线
-        // Vertex会进入内部VertexBuffer
-        // Color会写入uniforn变量中
-        // glEnd()以后执行DrawCall时，颜色只会以最后设置的颜色为准
-        // 所以目前顶点属性的差值尚未解决
+    // 可能是因为该段渲染流程使用的内部其他类型的管线
+    // Vertex会进入内部VertexBuffer
+    // Color会写入uniforn变量中
+    // glEnd()以后执行DrawCall时，颜色只会以最后设置的颜色为准
+    // 所以目前顶点属性的插值尚未解决
 
-        // GLFrameBuffer* frame = new GLFrameBuffer();
-        // frame->BindTexture(paintTex, 500, 500);
-        // frame->Enable();
-        // glColor3f(1.0f, 1.0f, 1.0f);
-        // glBegin(GL_TRIANGLES);
-        // glVertex2f(0.0f, 1.0f);
-        // glVertex2f(0.866f, -0.5f);
-        // glVertex2f(-0.866f, -0.5f);
-        // glEnd();
-        // frame->Disable();
-        // delete frame;
-    }
+    // GLFrameBuffer* frame = new GLFrameBuffer();
+    // frame->BindTexture(paintTex, 500, 500);
+    // frame->Enable();
+    // glColor3f(1.0f, 1.0f, 1.0f);
+    // glBegin(GL_TRIANGLES);
+    // glVertex2f(0.0f, 1.0f);
+    // glVertex2f(0.866f, -0.5f);
+    // glVertex2f(-0.866f, -0.5f);
+    // glEnd();
+    // frame->Disable();
+    // delete frame;
 
-    if (paintTex){
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, paintTex);
+    if (paintTex->Enable()){
         glColor3f(1.0f, 1.0f, 1.0f);
         glBegin(GL_TRIANGLE_FAN);
         glTexCoord2f(0.0f, 0.0f); glVertex2f(-1.0f, 1.0f);
@@ -249,7 +248,7 @@ void PaintWindow::OnRender(){
         glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, -1.0f);
         glTexCoord2f(0.0f, 1.0f); glVertex2f(-1.0f, -1.0f);
         glEnd();
-        glDisable(GL_TEXTURE_2D);
+        GLRenderTexture2D::Disable();
     }
 }
 
@@ -391,26 +390,22 @@ void PaintWindow::SetBrush(ITool* tool){
 
 void PaintWindow::CreateImage(int x, int y){
     DebugLog("PaintWindow::CreateImage %d %d", x, y);
-    if (paintTex){
-        glDeleteTextures(1, &paintTex);
-        paintTex = 0;
-    }
 
-    width = x; height = y;
+    if (paintTex)
+        delete paintTex;
 
-    glGenTextures(1, &paintTex);
-    glBindTexture(GL_TEXTURE_2D, paintTex);
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1); //支持4字节对齐
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);      //S方向上贴图
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);      //T方向上贴图
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);       //放大纹理过滤方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);       //缩小纹理过滤方式
-
-    glTexStorage2D(GL_TEXTURE_2D, 8, GL_RGBA32F, x, y);
+    paintTex = new GLRenderTexture2D(x, y, GL_RGBA32F);
 }
 
 bool PaintWindow::InRect(int x, int y){
-    return (GLuint)x < (GLuint)width && (GLuint)y < (GLuint)height;
+    return (GLuint)x < (GLuint)paintTex->GetWidth() &&
+            (GLuint)y < (GLuint)paintTex->GetHeight();
+}
+
+int PaintWindow::GetWidth(){
+    return paintTex->GetWidth();
+}
+
+int PaintWindow::GetHeight(){
+    return paintTex->GetHeight();
 }

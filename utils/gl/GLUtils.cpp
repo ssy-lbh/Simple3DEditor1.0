@@ -12,6 +12,8 @@ GLRect::GLRect(Vector2 p1, Vector2 p2) : left(p1.x), right(p2.x), top(p1.y), bot
 GLRect::GLRect(float left, float right, float bottom, float top) : left(left), right(right), bottom(bottom), top(top) {}
 GLRect::~GLRect(){}
 
+const GLRect GLRect::zero = GLRect(0.0f, 0.0f, 0.0f, 0.0f);
+
 float GLRect::GetAspect(){
     return (right - left) / (top - bottom);
 }
@@ -153,11 +155,11 @@ void GLUtils::DrawCornerWithUV(Vector2 center, float start, float end, float rad
     DrawCornerWithUV(center.x, center.y, start, end, radius, step);
 }
 
-void GLUtils::DrawCornerWithUV(float x, float y, float start, float end, float radius, float step, GLRect uvBound){
+void GLUtils::DrawCornerWithUV(float x, float y, float start, float end, float radius, GLRect uvBound, float step){
     DrawCornerWithUV(Vector2(x, y), start, end, radius, uvBound, step);
 }
 
-void GLUtils::DrawCornerWithUV(Vector2 center, float start, float end, float radius, float step, GLRect uvBound){
+void GLUtils::DrawCornerWithUV(Vector2 center, float start, float end, float radius, GLRect uvBound, float step){
     float vsin, vcos;
 
     start = ToRadian(start);
@@ -197,27 +199,25 @@ void GLUtils::Draw3DArrow(Vector3 ori, Vector3 dir, float radius, float rate, fl
     glEnable(GL_LINE_SMOOTH);
     glLineWidth(lineWidth);
     glBegin(GL_LINES);
-    glVertexv3(ori); glVertexv3(dst);
+    glVertexv3(ori); glVertexv3(center);
     glEnd();
     glLineWidth(1.0f);
     glDisable(GL_LINE_SMOOTH);
 
     glBegin(GL_TRIANGLE_FAN);
     glVertexv3(dst);
-    glVertex2f(center + right);
-    for (float i = 0.0f; i < 2.0f * PI; i += step){
-        glVertex2f(center + right * Cos(i) + up * Sin(i));
-    }
-    glVertex2f(center + right);
+    glVertexv3(center + right);
+    for (float i = 0.0f; i < 2.0f * PI; i += step)
+        glVertexv3(center + right * Cos(i) + up * Sin(i));
+    glVertexv3(center + right);
     glEnd();
 
     glBegin(GL_TRIANGLE_FAN);
     glVertexv3(center);
-    glVertex2f(center + right);
-    for (float i = 0.0f; i < 2.0f * PI; i += step){
-        glVertex2f(center + right * Cos(i) + up * Sin(i));
-    }
-    glVertex2f(center + right);
+    glVertexv3(center + right);
+    for (float i = 0.0f; i < 2.0f * PI; i += step)
+        glVertexv3(center + right * Cos(i) + up * Sin(i));
+    glVertexv3(center + right);
     glEnd();
 }
 
@@ -346,7 +346,7 @@ void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, float step){
     );
 }
 
-void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, float step, GLRect uvBound){
+void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, GLRect uvBound, float step){
     float width = rect.GetWidth(), height = rect.GetHeight();
     float xmin = rect.left + radius, xmax = rect.left + width - radius;
     float ymax = rect.bottom + height - radius, ymin = rect.bottom + radius;

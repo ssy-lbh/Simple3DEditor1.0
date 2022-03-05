@@ -20,7 +20,6 @@ private:
     const int bit = 12;
     
     bool focus = false;
-
     Vector2 size = Vector2::one;
     Vector2 cursorPos;
 
@@ -28,26 +27,7 @@ private:
 
     Menu* basicMenu;
 
-    WString path;
-
-    bool loaded = false;
-    bool launched = false;
-
-    uint alSrc;
-    uint alBuf;
-
-    /* size in samples */
-    int alAudioSize;
-    /* length in seconds */
-    int alAudioLen;
-    /* size in bytes */
-    int alSampleSize;
-    /* number of channels */
-    int alChannels;
-    /* audio data */
-    void* alAudioData;
-    int alAudioFreq;
-    int alAudioOffset;
+    AudioSourceObject* source = NULL;
 
     bool displayWave = false;
 

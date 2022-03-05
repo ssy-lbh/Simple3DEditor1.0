@@ -3,21 +3,22 @@
 
 #include <define.h>
 
+#include <utils/gl/GLUtils.h>
+
 class GLFrameBuffer final : public Object {
 private:
     uint frame = 0;
-    bool hasScale = false;
-    int x = 0, y = 0;
+    GLRect rect = GLRect::zero;
 
 public:
     GLFrameBuffer();
-    GLFrameBuffer(uint texture);
+    GLFrameBuffer(GLRenderTexture2D* texture);
     ~GLFrameBuffer();
 
-    void BindTexture(uint texture);
-    void BindTexture(uint texture, int x, int y);
-    void BindTexture(uint texture, uenum attachment);
-    void BindTexture(uint texture, uenum attachment, int x, int y);
+    void BindTexture(GLRenderTexture2D* texture);
+    void BindTexture(GLRenderTexture2D* texture, uenum attachment);
+    void SetSize(GLRect rect);
+    void SetSize(GLRenderTexture2D* texture);
     void Enable();
     void Disable();
 };

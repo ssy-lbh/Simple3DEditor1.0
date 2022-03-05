@@ -38,7 +38,7 @@ public:
     void Render(bool light);
     void RenderUVMap();
 
-    void WriteToOBJ(File* file, bool uv = false, bool normal = false);
+    void WriteToOBJ(File file, bool uv = false, bool normal = false);
 
     // ID为-1时删除
     void SetTexture(int resid);

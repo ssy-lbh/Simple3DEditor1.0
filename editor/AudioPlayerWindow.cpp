@@ -1,7 +1,6 @@
 #include <editor/AudioPlayerWindow.h>
 
 #include <lib/openal/al.h>
-#include <lib/openal/alc.h>
 
 #include <main.h>
 #include <res.h>
@@ -12,6 +11,8 @@
 #include <utils/gl/GLUtils.h>
 #include <utils/gl/GLSimplified.h>
 #include <utils/math3d/Math.h>
+#include <utils/math3d/LinearAlgebra.h>
+#include <utils/math3d/ViewObject.h>
 #include <utils/AudioUtils.h>
 #include <utils/String.h>
 #include <utils/StringBuilder.h>
@@ -83,13 +84,15 @@ void AudioPlayerWindow::ProgressBar::Click(Vector2 pos){
 }
 
 void AudioPlayerWindow::ProgressBar::Drag(Vector2 dir){
-    ALint offset;
+    ALint size;
 
     pos = Clamp(origin + dir.x, LOW_BOUND, HIGH_BOUND);
-    offset = Clamp((int)(GetRate(pos, LOW_BOUND, HIGH_BOUND) * window->alAudioSize), 0, window->alAudioSize);
 
-    alSourcei(window->alSrc, AL_SAMPLE_OFFSET, offset);
-    window->alAudioOffset = offset;
+    if (!window->source)
+        return;
+    
+    size = window->source->GetSize();
+    window->source->SetOffset(Clamp((int)(GetRate(pos, LOW_BOUND, HIGH_BOUND) * size), 0, size));
 }
 
 void AudioPlayerWindow::ProgressBar::Hover(Vector2 pos){
@@ -101,27 +104,26 @@ void AudioPlayerWindow::ProgressBar::Leave(Vector2 pos){
 }
 
 void AudioPlayerWindow::ProgressBar::Render(){
-    if (window->loaded){
-        if (window->launched)
-            alGetSourcei(window->alSrc, AL_SAMPLE_OFFSET, &window->alAudioOffset);
+    // 因为Render调用之前source不能为NULL，所以应不需检查
+    ALint offset = window->source->GetOffset();
+    ALint size = window->source->GetSize();
 
-        glLineWidth(10.0f);
-        glColor3f(0.6f, 0.6f, 0.6f);
-        glBegin(GL_LINES);
-        glVertex2f(LOW_BOUND, POSITION_Y);
-        glVertex2f(HIGH_BOUND, POSITION_Y);
-        glEnd();
-        glLineWidth(1.0f);
+    glLineWidth(10.0f);
+    glColor3f(0.6f, 0.6f, 0.6f);
+    glBegin(GL_LINES);
+    glVertex2f(LOW_BOUND, POSITION_Y);
+    glVertex2f(HIGH_BOUND, POSITION_Y);
+    glEnd();
+    glLineWidth(1.0f);
 
-        pos = Lerp(LOW_BOUND, HIGH_BOUND, (float)window->alAudioOffset / window->alAudioSize);
-        if (hover){
-            glColor3f(0.0f, 0.0f, 0.3f);
-        }else{
-            glColor3f(0.0f, 0.0f, 0.5f);
-        }
-        GLUtils::DrawRect(pos - BUTTON_WIDTH_X, POSITION_Y - BUTTON_WIDTH_Y,
-                            pos + BUTTON_WIDTH_X, POSITION_Y + BUTTON_WIDTH_Y);
+    pos = Lerp(LOW_BOUND, HIGH_BOUND, (float)offset / size);
+    if (hover){
+        glColor3f(0.0f, 0.0f, 0.3f);
+    }else{
+        glColor3f(0.0f, 0.0f, 0.5f);
     }
+    GLUtils::DrawRect(pos - BUTTON_WIDTH_X, POSITION_Y - BUTTON_WIDTH_Y,
+                        pos + BUTTON_WIDTH_X, POSITION_Y + BUTTON_WIDTH_Y);
 }
 
 const float AudioPlayerWindow::GainBar::LOW_BOUND = -0.8f;
@@ -145,7 +147,8 @@ void AudioPlayerWindow::GainBar::Click(Vector2 pos){
 
 void AudioPlayerWindow::GainBar::Drag(Vector2 dir){
     pos = Clamp(origin + dir.y, LOW_BOUND, HIGH_BOUND);
-    alListenerf(AL_GAIN, GetRate(Exp(-5.0f * GetRate(pos, HIGH_BOUND, LOW_BOUND)), 0.0067379469f /* e^-5 */, 1.0f));
+    if (window->source)
+        window->source->SetGain(GetRate(Exp(-5.0f * GetRate(pos, HIGH_BOUND, LOW_BOUND)), 0.0067379469f /* e^-5 */, 1.0f));
 }
 
 void AudioPlayerWindow::GainBar::Hover(Vector2 pos){
@@ -157,23 +160,21 @@ void AudioPlayerWindow::GainBar::Leave(Vector2 pos){
 }
 
 void AudioPlayerWindow::GainBar::Render(){
-    if (window->loaded){
-        glLineWidth(5.0f);
-        glColor3f(0.6f, 0.6f, 0.6f);
-        glBegin(GL_LINES);
-        glVertex2f(POSITION_X, LOW_BOUND);
-        glVertex2f(POSITION_X, HIGH_BOUND);
-        glEnd();
-        glLineWidth(1.0f);
+    glLineWidth(5.0f);
+    glColor3f(0.6f, 0.6f, 0.6f);
+    glBegin(GL_LINES);
+    glVertex2f(POSITION_X, LOW_BOUND);
+    glVertex2f(POSITION_X, HIGH_BOUND);
+    glEnd();
+    glLineWidth(1.0f);
 
-        if (hover){
-            glColor3f(0.0f, 0.0f, 0.3f);
-        }else{
-            glColor3f(0.0f, 0.0f, 0.5f);
-        }
-        GLUtils::DrawRect(POSITION_X - BUTTON_WIDTH_X, pos - BUTTON_WIDTH_Y,
-                            POSITION_X + BUTTON_WIDTH_X, pos + BUTTON_WIDTH_Y);
+    if (hover){
+        glColor3f(0.0f, 0.0f, 0.3f);
+    }else{
+        glColor3f(0.0f, 0.0f, 0.5f);
     }
+    GLUtils::DrawRect(POSITION_X - BUTTON_WIDTH_X, pos - BUTTON_WIDTH_Y,
+                        POSITION_X + BUTTON_WIDTH_X, pos + BUTTON_WIDTH_Y);
 }
 
 AudioPlayerWindow::LoopOption::LoopOption(AudioPlayerWindow* window) : window(window) {}
@@ -240,6 +241,17 @@ AudioPlayerWindow::AudioPlayerWindow(){
     basicMenu->AddItem(new MenuItem(L"加载", MENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](AudioPlayerWindow* window){
         window->OnMenuAccel(IDM_LOAD, false);
     }, this));
+    basicMenu->AddItem(new MenuItem(L"加载当前对象", MENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](AudioPlayerWindow* window){
+        if (!Main::data->curObject){
+            DebugError("Current Selected Object Is NULL");
+            return;
+        }
+        if (Main::data->curObject->GetType() != ViewObjectType::OBJECT_AUDIO_SOURCE){
+            DebugError("Current Selected Object Is Not An AudioSourceObject");
+            return;
+        }
+        window->source = (AudioSourceObject*)Main::data->curObject;
+    }, this));
     basicMenu->AddItem(new LoopItem(this));
     basicMenu->AddItem(new DisplayModeItem(this));
 }
@@ -247,14 +259,6 @@ AudioPlayerWindow::AudioPlayerWindow(){
 AudioPlayerWindow::~AudioPlayerWindow(){
     DebugLog("AudioPlayerWindow Destroyed");
     if (uiMgr) delete uiMgr;
-    if (alAudioData) delete[] (char*)alAudioData;
-
-    if (launched){
-        alSourceStop(alSrc);
-
-        alDeleteBuffers(1, &alBuf);
-        alDeleteSources(1, &alSrc);
-    }
 }
 
 bool AudioPlayerWindow::IsFocus(){
@@ -289,53 +293,53 @@ void AudioPlayerWindow::DrawAmplitudeGraph(float* height, size_t size){
 }
 
 void AudioPlayerWindow::RenderGraph(){
-    ALint offset = GetOffset();
+    ALint offset = source->GetOffset();
+    ALint sampleSize = source->GetSampleSize();
+    ALint channels = source->GetChannelCount();
+    char* data = source->GetData();
 
-    _Complex float samples[1 << bit];
+    Complex samples[1 << bit];
     float height[1 << 10];
 
-    if (offset + (1 << bit) >= alAudioSize){
+    if (offset + (1 << bit) >= source->GetSize()){
         return;
     }
 
-    if (alSampleSize == 4 && alChannels == 2){
+    if (sampleSize == 4 && channels == 2){
         for (int i = 0; i < (1 << bit); i++){
-            samples[i] = ((short*)alAudioData)[(i + offset) << 1];
+            samples[i] = Complex(((short*)data)[(i + offset) << 1]);
         }
-    }else if (alSampleSize == 2 && alChannels == 1){
+    }else if (sampleSize == 2 && channels == 1){
         for (int i = 0; i < (1 << bit); i++){
-            samples[i] = ((short*)alAudioData)[i + offset];
+            samples[i] = Complex(((short*)data)[i + offset]);
         }
-    }else if (alSampleSize == 2 && alChannels == 2){
+    }else if (sampleSize == 2 && channels == 2){
         for (int i = 0; i < (1 << bit); i++){
-            samples[i] = ((short)(((char*)alAudioData)[(i + offset) << 1] - 0x80) << 8);
+            samples[i] = Complex(((short)(((char*)data)[(i + offset) << 1] - 0x80) << 8));
         }
-    }else if (alSampleSize == 1 && alChannels == 1){
+    }else if (sampleSize == 1 && channels == 1){
         for (int i = 0; i < (1 << bit); i++){
-            samples[i] = ((short)(((char*)alAudioData)[i + offset] - 0x80) << 8);
+            samples[i] = Complex(((short)(((char*)data)[i + offset] - 0x80) << 8));
         }
     }
 
     if (displayWave){
         for (int i = 0; i < (1 << 10); i++){
-            height[i] = AudioUtils::Complex(samples[i << (bit - 10)]).real * 0.0000152587890625f + 0.5f;
+            height[i] = samples[i << (bit - 10)].real * 0.0000152587890625f + 0.5f;
         }
         DrawLineGraph(height, 1 << 10);
     }else{
         AudioUtils::FFT(samples, bit, false);
         for (int i = 0; i < (1 << 10); i++){
-            height[i] = __builtin_log(AudioUtils::Complex(samples[i << (bit - 10)]).MagnitudeSqr()) * 0.1f;
+            height[i] = Log(samples[i << (bit - 10)].SqrMagnitude()) * 0.1f;
         }
         DrawAmplitudeGraph(height, 1 << 10);
     }
 }
 
 void AudioPlayerWindow::DrawTime(){
-    if (!loaded)
-        return;
-
-    int total = alAudioSize / alAudioFreq;
-    int offset = GetOffset() / alAudioFreq;
+    int total = source->GetLength();
+    int offset = source->GetOffset() / source->GetFrequency();
     char time[20];
 
     __builtin_snprintf(time, 20, "%02d:%02d/%02d:%02d", offset / 60, offset % 60, total / 60, total % 60);
@@ -358,10 +362,10 @@ void AudioPlayerWindow::OnRender(){
     GLUtils::ResetProjection();
     GLUtils::ResetModelView();
 
-    if (path.GetLength() == 0){
+    if (!source){
         glColor3f(1.0f, 0.5f, 0.0f);
         glRasterPos2f(-1.0f, 1.0f - 30.0f / size.y);
-        glDrawCNString(L"尚未存在音频文件");
+        glDrawCNString(L"尚未存在音源");
         glRasterPos2f(-1.0f, 1.0f - 60.0f / size.y);
         glDrawCNString(L"可以将文件拖拽至此处");
         return;
@@ -484,18 +488,14 @@ void AudioPlayerWindow::PreloadFile(WString file){
                 DebugError("AudioPlayerWindow::PreloadFile ShellFFmpegW Failed");
                 return;
             }
-            path = file;
             LoadFile(L".\\temp.wav");
             File::Delete(L".\\temp.wav");
             return;
         case MSGBOX_CANCEL:
-            path = file;
             break;
         }
-    }else{
-        path = file;
     }
-    LoadFile(path);
+    LoadFile(file);
 }
 
 void AudioPlayerWindow::LoadFile(WString file){
@@ -503,35 +503,15 @@ void AudioPlayerWindow::LoadFile(WString file){
         return;
     }
 
-    if (loaded){
-        DebugLog("AudioPlayerWindow::LoadFile Unload %S", path.GetString());
-        if (launched){
-            Stop();
-        }
-        alDeleteBuffers(1, &alBuf);
-        alDeleteSources(1, &alSrc);
-        loaded = false;
-    }
-
     DebugLog("AudioPlayerWindow::LoadFile From %S", file.GetString());
 
     File src(file);
-
-    if (!src.IsOpened()){
+    if (!src.Open()){
         DebugError("AudioPlayerWindow::LoadFile File Open Failed");
         return;
     }
 
-    DebugLog("OpenAL Started");
-
-    alGenSources(1, &alSrc);
-    alGenBuffers(1, &alBuf);
-
-    alSourcef(alSrc, AL_REFERENCE_DISTANCE, 1.0f);
-    alSourcef(alSrc, AL_ROLLOFF_FACTOR, 2.0f);
-    alSourcef(alSrc, AL_MAX_DISTANCE, 100.0f);
-
-    // analyse data segment
+    // 解析PCM数据
     int specNum;
     int readLen;
     int dataLen;
@@ -620,93 +600,56 @@ void AudioPlayerWindow::LoadFile(WString file){
         wav.nBlockAlign = 2;
     }
 
-    alBufferData(alBuf, format, fileData, dataLen, wav.nSamplesPerSec);// 8000 11025 16000 22050 44100 48000 96000 192000
+    source = (AudioSourceObject*)Main::AddObject(new AudioSourceObject(format, fileData, dataLen, wav.nSamplesPerSec));
+    // 频率 8000 11025 16000 22050 44100 48000 96000 192000
     src.Close();
 
-    alAudioData = fileData;
-    alAudioSize = dataLen / wav.nBlockAlign;
-    alAudioLen = dataLen / wav.nAvgBytesPerSec;
-    alSampleSize = wav.nBlockAlign;
-    alChannels = wav.nChannels;
-    alAudioFreq = wav.nSamplesPerSec;
-    alAudioOffset = 0;
-
     DebugLog("AudioPlayerWindow::LoadFile Success");
-
-    loaded = true;
 }
 
 bool AudioPlayerWindow::IsLoaded(){
-    return loaded;
+    return source;
 }
 
 void AudioPlayerWindow::Launch(){
-    if (path.GetLength() == 0)
-        return;
-
-    if (!loaded){
+    if (!source){
         DebugError("AudioPlayerWindow::Launch Is Not Loaded");
         return;
     }
 
-    ALint cnt;
-
-    alGetSourcei(alSrc, AL_BUFFERS_QUEUED, &cnt);
-    if (cnt == 0)
-        alSourceQueueBuffers(alSrc, 1, &alBuf);
-
-    if (alAudioOffset + (1 << bit) >= alAudioSize)
-        alAudioOffset = 0;
-    
-    alSourcePlay(alSrc);
-    alSourcei(alSrc, AL_SAMPLE_OFFSET, alAudioOffset);
+    source->Play();
 
     DebugLog("AudioPlayerWindow::Launch Success");
-
-    launched = true;
 }
 
 void AudioPlayerWindow::Stop(){
-    ALint cnt;
-
-    alGetSourcei(alSrc, AL_SAMPLE_OFFSET, &alAudioOffset);
-    alSourceStop(alSrc);
-
-    alGetSourcei(alSrc, AL_BUFFERS_PROCESSED, &cnt);
-    if (cnt > 0)
-        alSourceUnqueueBuffers(alSrc, 1, &alBuf);
-
-    launched = false;
+    if (!source)
+        return;
+    source->Stop();
 }
 
 bool AudioPlayerWindow::IsLaunched(){
-    ALint state;
-
-    alGetSourcei(alSrc, AL_SOURCE_STATE, &state);
-    if (state == AL_PLAYING){
-        launched = true;
-    }else{
-        launched = false;
-    }
-    return launched;
+    if (!source)
+        return false;
+    return source->IsPlaying();
 }
 
 bool AudioPlayerWindow::IsLoop(){
-    ALint loop;
-    alGetSourcei(alSrc, AL_LOOPING, &loop);
-    return loop == AL_TRUE;
+    if (!source)
+        return false;
+    return source->IsLoop();
 }
 
 void AudioPlayerWindow::SetLoop(bool loop){
-    alSourcei(alSrc, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+    if (!source)
+        return;
+    return source->SetLoop(loop);
 }
 
 ALint AudioPlayerWindow::GetOffset(){
-    if (!loaded)
+    if (!source)
         return 0;
-    if (launched)
-        alGetSourcei(alSrc, AL_SAMPLE_OFFSET, &alAudioOffset);
-    return alAudioOffset;
+    return source->GetOffset();
 }
 
 ALint AudioPlayerWindow::GetWaveFormat(AudioWaveFormat* wav){

@@ -28,9 +28,23 @@ AnimationCurve* Property::GetCurve(){
     return curve;
 }
 
+AnimationCurve* Property::GenCurve(){
+    if (!curve)
+        curve = new AnimationCurve(0.0f, 250.0f);
+    return curve;
+}
+
 void Property::SetFrame(float frame){
     if (curve)
         value = curve->GetValue(frame);
+}
+
+void Property::InsertValue(float frame){
+    GenCurve()->AddPoint(Vector2(frame, value));
+}
+
+void Property::InsertValue(float frame, float val){
+    GenCurve()->AddPoint(Vector2(frame, val));
 }
 
 PropertyVector3::PropertyVector3(){}
@@ -49,6 +63,14 @@ void PropertyVector3::SetFrame(float frame){
     x.SetFrame(frame); y.SetFrame(frame); z.SetFrame(frame);
 }
 
+void PropertyVector3::InsertValue(float frame){
+    x.InsertValue(frame); y.InsertValue(frame); z.InsertValue(frame);
+}
+
+void PropertyVector3::InsertValue(float frame, Vector3 val){
+    x.InsertValue(frame, val.x); y.InsertValue(frame, val.y); z.InsertValue(frame, val.z);
+}
+
 PropertyQuaternion::PropertyQuaternion(){}
 PropertyQuaternion::PropertyQuaternion(Quaternion value, bool initCurve) : x(value.x, initCurve), y(value.y, initCurve), z(value.z, initCurve), w(value.w, initCurve) {}
 PropertyQuaternion::~PropertyQuaternion(){}
@@ -63,4 +85,12 @@ void PropertyQuaternion::Set(Quaternion val){
 
 void PropertyQuaternion::SetFrame(float frame){
     x.SetFrame(frame); y.SetFrame(frame); z.SetFrame(frame); w.SetFrame(frame);
+}
+
+void PropertyQuaternion::InsertValue(float frame){
+    x.InsertValue(frame); y.InsertValue(frame); z.InsertValue(frame); w.InsertValue(frame);
+}
+
+void PropertyQuaternion::InsertValue(float frame, Quaternion val){
+    x.InsertValue(frame, val.x); y.InsertValue(frame, val.y); z.InsertValue(frame, val.z); w.InsertValue(frame, val.w);
 }

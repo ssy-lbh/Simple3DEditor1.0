@@ -32,7 +32,7 @@ private:
     int capOffset = 0;
     void* recBuf = NULL;
     int recOffset = 0;
-    _Complex float* freqBuf = NULL;
+    Complex* freqBuf = NULL;
 
     bool capture = false;
 

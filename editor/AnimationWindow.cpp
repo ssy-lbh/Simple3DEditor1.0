@@ -1,7 +1,10 @@
 #include <editor/AnimationWindow.h>
 
+#include <lib/opengl/gl/gl.h>
+
 #include <main.h>
 #include <res.h>
+#include <utils/os/Time.h>
 #include <utils/os/Font.h>
 #include <utils/gl/GLUtils.h>
 #include <utils/math3d/Math.h>
@@ -25,7 +28,7 @@ void AnimationWindow::FrameIndicator::Click(Vector2 pos){
 
 void AnimationWindow::FrameIndicator::Drag(Vector2 dir){
     pos = Clamp(origin + dir.x, -1.0f, 1.0f);
-    window->frame = Lerp(window->startFrame, window->endFrame, (pos + 1.0f) * 0.5f);
+    window->SetFrame(Lerp(window->startFrame, window->endFrame, (pos + 1.0f) * 0.5f));
 }
 
 void AnimationWindow::FrameIndicator::Render(){
@@ -45,7 +48,7 @@ void AnimationWindow::FrameIndicator::Render(){
     glColor3f(0.2f, 0.3f, 1.0f);
     GLUtils::DrawRoundRect(pos - 0.05f, 0.9f, 0.1f, 0.1f, 0.02f, 0.05f);
 
-    __builtin_snprintf(frame, 10, "%d", (int)__builtin_floor(window->frame));
+    __builtin_snprintf(frame, 10, "%d", (int)Floor(window->frame));
     width = glGetStringWidth(frame);
 
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -55,6 +58,8 @@ void AnimationWindow::FrameIndicator::Render(){
 
 const Vector3 AnimationWindow::Bottom::COLOR = Vector3(0.0f, 0.0f, 0.0f);
 const float AnimationWindow::Bottom::DEPTH = -1.0f;
+const float AnimationWindow::Bottom::BOUND_TOP = -0.8f;
+const float AnimationWindow::Bottom::BOUND_BOTTOM = -1.0f;
 
 AnimationWindow::Bottom::Bottom(){}
 AnimationWindow::Bottom::~Bottom(){}
@@ -62,10 +67,10 @@ AnimationWindow::Bottom::~Bottom(){}
 void AnimationWindow::Bottom::Render(){
     glColor3f(COLOR.x, COLOR.y, COLOR.z);
     glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(-1.0f, -0.8f, DEPTH);
-    glVertex3f(1.0f, -0.8f, DEPTH);
-    glVertex3f(1.0f, -1.0f, DEPTH);
-    glVertex3f(-1.0f, -1.0f, DEPTH);
+    glVertex3f(-1.0f, BOUND_TOP, DEPTH);
+    glVertex3f(1.0f, BOUND_TOP, DEPTH);
+    glVertex3f(1.0f, BOUND_BOTTOM, DEPTH);
+    glVertex3f(-1.0f, BOUND_BOTTOM, DEPTH);
     glEnd();
 }
 
@@ -77,16 +82,15 @@ bool AnimationWindow::PlayButton::Trigger(Vector2 pos){
 }
 
 void AnimationWindow::PlayButton::Click(Vector2 pos){
-    window->play = !window->play;
-    if (window->frame == window->endFrame)
-        window->frame = window->startFrame;
+    window->IsPlaying() ? window->Stop() : window->Play();
+    DebugLog("AnimationWindow %s", window->IsPlaying() ? "Play" : "Stop");
 }
 
 void AnimationWindow::PlayButton::Render(){
     glColor3f(0.3f, 0.3f, 0.3f);
     GLUtils::DrawRect(-0.1f, -0.98f, 0.1f, -0.82f);
 
-    if (!window->play){
+    if (!window->IsPlaying()){
         glColor3f(1.0f, 1.0f, 1.0f);
         glBegin(GL_TRIANGLES);
         glVertex2f(-0.05f, -0.97f);
@@ -209,6 +213,61 @@ AnimationWindow::AnimationWindow(){
         Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_ZYX;
     }, this));
     basicMenu->AddItem(new MenuItem(L"旋转模式", rotModeMenu));
+    basicMenu->AddItem(new MenuItem());
+
+    Menu* fpsMenu = new Menu();
+    fpsMenu->AddItem(new MenuItem(L"10", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 10.0f;
+    }, this));
+    fpsMenu->AddItem(new MenuItem(L"15", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 15.0f;
+    }, this));
+    fpsMenu->AddItem(new MenuItem(L"20", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 20.0f;
+    }, this));
+    fpsMenu->AddItem(new MenuItem(L"25", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 25.0f;
+    }, this));
+    fpsMenu->AddItem(new MenuItem(L"30", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 30.0f;
+    }, this));
+    fpsMenu->AddItem(new MenuItem(L"40", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 40.0f;
+    }, this));
+    fpsMenu->AddItem(new MenuItem(L"50", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 50.0f;
+    }, this));
+    fpsMenu->AddItem(new MenuItem(L"60", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 60.0f;
+    }, this));
+    fpsMenu->AddItem(new MenuItem(L"75", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 75.0f;
+    }, this));
+    fpsMenu->AddItem(new MenuItem(L"100", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 100.0f;
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"帧率", fpsMenu));
+
+    Menu* highFpsMenu = new Menu();
+    highFpsMenu->AddItem(new MenuItem(L"200", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 200.0f;
+    }, this));
+    highFpsMenu->AddItem(new MenuItem(L"300", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 300.0f;
+    }, this));
+    highFpsMenu->AddItem(new MenuItem(L"400", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 400.0f;
+    }, this));
+    highFpsMenu->AddItem(new MenuItem(L"500", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 500.0f;
+    }, this));
+    highFpsMenu->AddItem(new MenuItem(L"750", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 750.0f;
+    }, this));
+    highFpsMenu->AddItem(new MenuItem(L"1000", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
+        window->fps = 1000.0f;
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"高帧率(仅供快放)", highFpsMenu));
 }
 
 AnimationWindow::~AnimationWindow(){
@@ -240,19 +299,26 @@ void AnimationWindow::OnRender(){
 }
 
 void AnimationWindow::OnTimer(int id){
-    if (play){
-        frame += 0.01f * fps;
-        Main::RequestRender();
-        if (frame > endFrame){
-            // 结束直接暂停
-            //play = false;
-            // 循环
-            frame = startFrame;
+    switch (id){
+    // 标准10ms时钟
+    case 1:
+        if (play){
+            float curTime = TimeUtils::GetTime();
+
+            frame += (curTime - time) * fps;
+            time = curTime;
+            if (frame > endFrame){
+                // 结束直接暂停
+                //play = false;
+                //break;
+                // 循环
+                frame = startFrame;
+            }
+            frame = Clamp(frame, startFrame, endFrame);
+            Main::OnAnimationFrame(frame);
         }
-        frame = Clamp(frame, startFrame, endFrame);
+        break;
     }
-    Main::data->animFrame = frame;
-    Main::data->scene->OnAnimationFrame(frame);
 }
 
 void AnimationWindow::OnResize(int x, int y){
@@ -334,4 +400,22 @@ void AnimationWindow::SetProperty(Property* prop){
         SetCurve(prop->GetCurve());
         curve->OnChangeRange(startFrame, endFrame);
     }
+}
+
+void AnimationWindow::SetFrame(float frame){
+    this->frame = Clamp(frame, startFrame, endFrame);
+    Main::OnAnimationFrame(this->frame);
+}
+
+void AnimationWindow::Play(){
+    play = true;
+    time = TimeUtils::GetTime();
+}
+
+void AnimationWindow::Stop(){
+    play = false;
+}
+
+bool AnimationWindow::IsPlaying(){
+    return play;
 }

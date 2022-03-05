@@ -19,8 +19,7 @@ private:
     IOperation* curOp = NULL;
     ITool* brush = NULL;
 
-    uint paintTex = 0;
-    int width, height;
+    GLRenderTexture2D* paintTex = NULL;
 
     class ClearBrush final : public ITool {
     private:
@@ -67,6 +66,7 @@ public:
     virtual ~PaintWindow();
 
     virtual bool IsFocus() override;
+    virtual void OnCreate() override;
     virtual void OnRender() override;
     virtual void OnResize(int x, int y) override;
     virtual void OnMouseMove(int x, int y) override;
@@ -86,6 +86,8 @@ public:
 
     void CreateImage(int x, int y);
     bool InRect(int x, int y);
+    int GetWidth();
+    int GetHeight();
 };
 
 #endif

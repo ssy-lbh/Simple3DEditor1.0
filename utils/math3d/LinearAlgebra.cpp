@@ -2,15 +2,15 @@
 
 #include <utils/math3d/Math.h>
 
-Vector2::Vector2() : x(0.0f), y(0.0f){}
+Vector2::Vector2() : x(0.0f), y(0.0f) {}
 
-Vector2::Vector2(Vector3 &&v) : x(v.x), y(v.y){}
+Vector2::Vector2(Vector3 &&v) : x(v.x), y(v.y) {}
 
-Vector2::Vector2(Vector4 &&v) : x(v.x), y(v.y){}
+Vector2::Vector2(Vector4 &&v) : x(v.x), y(v.y) {}
 
-Vector2::Vector2(const Vector3 &v) : x(v.x), y(v.y){}
+Vector2::Vector2(const Vector3 &v) : x(v.x), y(v.y) {}
 
-Vector2::Vector2(const Vector4 &v) : x(v.x), y(v.y){}
+Vector2::Vector2(const Vector4 &v) : x(v.x), y(v.y) {}
 
 Vector2 &Vector2::operator=(Vector3 &&v){
     x = v.x; y = v.y;
@@ -32,7 +32,7 @@ Vector2 &Vector2::operator=(const Vector4 &v){
     return *this;
 }
 
-Vector2::Vector2(float x, float y) : x(x), y(y){}
+Vector2::Vector2(float x, float y) : x(x), y(y) {}
 
 Vector2::~Vector2(){}
 
@@ -141,15 +141,15 @@ Vector2 Vector2::Rotate(float angle) const{
     return Vector2(x * vcos - y * vsin, x * vsin + y * vcos);
 }
 
-Vector3::Vector3() : x(0.0f), y(0.0f), z(0.0f){}
+Vector3::Vector3() : x(0.0f), y(0.0f), z(0.0f) {}
 
-Vector3::Vector3(Vector2 &&v) : x(v.x), y(v.y), z(0.0f){}
+Vector3::Vector3(Vector2 &&v) : x(v.x), y(v.y), z(0.0f) {}
 
-Vector3::Vector3(Vector4 &&v) : x(v.x), y(v.y), z(v.z){}
+Vector3::Vector3(Vector4 &&v) : x(v.x), y(v.y), z(v.z) {}
 
-Vector3::Vector3(const Vector2 &v) : x(v.x), y(v.y), z(0.0f){}
+Vector3::Vector3(const Vector2 &v) : x(v.x), y(v.y), z(0.0f) {}
 
-Vector3::Vector3(const Vector4 &v) : x(v.x), y(v.y), z(v.z){}
+Vector3::Vector3(const Vector4 &v) : x(v.x), y(v.y), z(v.z) {}
 
 Vector3 &Vector3::operator=(Vector2 &&v){
     this->x = v.x; this->y = v.y; this->z = 0.0f;
@@ -323,15 +323,15 @@ Vector3 Vector3::RotateZ(float angle) const{
     return Vector3(x * vcos - y * vsin, x * vsin + y * vcos, z);
 }
 
-Vector4::Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f){}
+Vector4::Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
 
-Vector4::Vector4(Vector2 &&v) : x(v.x), y(v.y), z(0.0f), w(0.0f){}
+Vector4::Vector4(Vector2 &&v) : x(v.x), y(v.y), z(0.0f), w(0.0f) {}
 
-Vector4::Vector4(Vector3 &&v) : x(v.x), y(v.y), z(v.z), w(0.0f){}
+Vector4::Vector4(Vector3 &&v) : x(v.x), y(v.y), z(v.z), w(0.0f) {}
 
-Vector4::Vector4(const Vector2 &v) : x(v.x), y(v.y), z(0.0f), w(0.0f){}
+Vector4::Vector4(const Vector2 &v) : x(v.x), y(v.y), z(0.0f), w(0.0f) {}
 
-Vector4::Vector4(const Vector3 &v) : x(v.x), y(v.y), z(v.z), w(0.0f){}
+Vector4::Vector4(const Vector3 &v) : x(v.x), y(v.y), z(v.z), w(0.0f) {}
 
 Vector4 &Vector4::operator=(Vector2 &&v){
     this->x = v.x; this->y = v.y; this->z = 0.0f; this->w = 0.0f;
@@ -353,13 +353,13 @@ Vector4 &Vector4::operator=(const Vector3 &v){
     return *this;
 }
 
-Vector4::Vector4(float x, float y) : x(x), y(y), z(0.0f), w(0.0f){}
+Vector4::Vector4(float x, float y) : x(x), y(y), z(0.0f), w(0.0f) {}
 
-Vector4::Vector4(float x, float y, float z) : x(x), y(y), z(z), w(0.0f){}
+Vector4::Vector4(float x, float y, float z) : x(x), y(y), z(z), w(0.0f) {}
 
-Vector4::Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w){}
+Vector4::Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 
-Vector4::Vector4(Vector3 v, float w) : x(v.x), y(v.y), z(v.z), w(w){}
+Vector4::Vector4(Vector3 v, float w) : x(v.x), y(v.y), z(v.z), w(w) {}
 
 Vector4::~Vector4(){}
 
@@ -487,7 +487,180 @@ Vector4 Vector4::RotateZ(float angle) const{
     return Vector3(*this).RotateZ(angle);
 }
 
-Quaternion::Quaternion(){}
+Complex::Complex() : comp(0.0f) {}
+
+Complex::Complex(float &&real) : real(real), imag(0.0f) {}
+
+Complex::Complex(_Complex float &&comp) : comp(comp) {}
+
+Complex::Complex(Vector2 &&v) : real(v.x), imag(v.y) {}
+
+Complex::Complex(const float &real) : real(real), imag(0.0f) {}
+
+Complex::Complex(const _Complex float &comp) : comp(comp) {}
+
+Complex::Complex(const Vector2 &v) : real(v.x), imag(v.y) {}
+
+Complex &Complex::operator=(float &&real){
+    this->real = real; this->imag = 0.0f;
+    return *this;
+}
+
+Complex &Complex::operator=(_Complex float &&comp){
+    this->comp = comp;
+    return *this;
+}
+
+Complex &Complex::operator=(Vector2 &&v){
+    this->real = v.x; this->imag = v.y;
+    return *this;
+}
+
+Complex &Complex::operator=(const float &real){
+    this->real = real; this->imag = 0.0f;
+    return *this;
+}
+
+Complex &Complex::operator=(const _Complex float &comp){
+    this->comp = comp;
+    return *this;
+}
+
+Complex &Complex::operator=(const Vector2 &v){
+    this->real = v.x; this->imag = v.y;
+    return *this;
+}
+
+Complex::Complex(float real, float imag) : real(real), imag(imag) {}
+
+Complex::~Complex(){}
+
+const Complex Complex::one          = { 1.0F, 0.0F};
+const Complex Complex::i            = { 0.0F, 1.0F};
+
+Complex Complex::operator+(Complex c) const{
+    return Complex(comp + c.comp);
+}
+
+Complex Complex::operator+(float x) const{
+    return Complex(real + x, imag);
+}
+
+Complex Complex::operator-(Complex c) const{
+    return Complex(comp - c.comp);
+}
+
+Complex Complex::operator-(float x) const{
+    return Complex(real - x, imag);
+}
+
+Complex Complex::operator*(Complex c) const{
+    return Complex(comp * c.comp);
+}
+
+Complex Complex::operator*(float x) const{
+    return Complex(comp * x);
+}
+
+Complex Complex::operator/(Complex c) const{
+    return Complex(comp / c.comp);
+}
+
+Complex Complex::operator/(float x) const{
+    return Complex(comp / x);
+}
+
+Complex &Complex::operator+=(Complex c){
+    comp += c.comp;
+    return *this;
+}
+
+Complex &Complex::operator+=(float x){
+    real += x;
+    return *this;
+}
+
+Complex &Complex::operator-=(Complex c){
+    comp -= c.comp;
+    return *this;
+}
+
+Complex &Complex::operator-=(float x){
+    real -= x;
+    return *this;
+}
+
+Complex &Complex::operator*=(Complex c){
+    comp *= c.comp;
+    return *this;
+}
+
+Complex &Complex::operator*=(float x){
+    comp *= x;
+    return *this;
+}
+
+Complex &Complex::operator/=(Complex c){
+    comp /= c.comp;
+    return *this;
+}
+
+Complex &Complex::operator/=(float x){
+    comp /= x;
+    return *this;
+}
+
+Complex Complex::operator-() const{
+    return Complex(-comp);
+}
+
+Vector2 Complex::operator*(Vector2 v) const{
+    return Vector2(real * v.x - imag * v.y, real * v.y + imag * v.x);
+}
+
+Complex Complex::FromTo(Vector2 from, Vector2 to){
+    return (Complex(to) / Complex(from)).Normal();
+}
+
+Complex Complex::Reflection(Vector2 axis, Vector2 v){
+    return Square(Complex(axis) / Complex(i)).Normal();
+}
+
+Complex Complex::Rotation(float angle){
+    float vsin, vcos;
+    SinCosf(ToRadian(angle), &vsin, &vcos);
+    return Complex(vcos, vsin);
+}
+
+Complex Complex::Conjugate() const{
+    return Complex(real, -imag);
+}
+
+Complex Complex::Inverse() const{
+    return Complex(real, -imag) / SqrMagnitude();
+}
+
+Complex Complex::Normal() const{
+    return *this / Magnitude();
+}
+
+Complex &Complex::Normalize(){
+    return (*this /= Magnitude());
+}
+
+Complex &Complex::Rotate(float angle){
+    return (*this *= Rotation(angle));
+}
+
+float Complex::Magnitude() const{
+    return Sqrt(real * real + imag * imag);
+}
+
+float Complex::SqrMagnitude() const{
+    return real * real + imag * imag;
+}
+
+Quaternion::Quaternion() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) {}
 
 Quaternion::Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 
@@ -553,12 +726,13 @@ Quaternion Quaternion::FromTo(Vector3 from, Vector3 to){
 }
 
 Quaternion Quaternion::Reflection(Vector3 axis, Vector3 v){
-    return Quaternion(axis.Normal(), 0.0F) / Quaternion(v.Normal(), 0.0F);
+    return (Quaternion(axis, 0.0F) / Quaternion(v, 0.0F)).Normal();
 }
 
 Quaternion Quaternion::AxisAngle(Vector3 axis, float angle){
-    angle *= 0.00872664625997164788461845384244F;
-    return Quaternion(axis.Normal() * Sin(angle), Cos(angle));
+    float vsin, vcos;
+    SinCosf(angle * 0.00872664625997164788F, &vsin, &vcos);
+    return Quaternion(axis.Normal() * vsin, vcos);
 }
 
 Quaternion Quaternion::EulerZXY(Vector3 angle){

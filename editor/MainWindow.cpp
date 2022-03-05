@@ -374,18 +374,6 @@ void MainWindow::SelectTool::OnRender(){
     }
 }
 
-MainWindow::LightItem::LightItem(MainWindow* window) : window(window) {}
-MainWindow::LightItem::~LightItem(){}
-
-const wchar_t* MainWindow::LightItem::GetName(){
-    return window->lightEnabled ? L"光照:开" : L"光照:关";
-}
-
-void MainWindow::LightItem::OnClick(){
-    window->lightEnabled = !window->lightEnabled;
-    DebugLog("MainWindow::LightItem Light State %s", window->lightEnabled ? "On" : "Off");
-}
-
 MainWindow::MainWindow(){
     DebugLog("MainWindow Launched");
     uiMgr = new UIManager();
@@ -452,32 +440,82 @@ MainWindow::MainWindow(){
 
     Menu* objectMenu = new Menu();
     objectMenu->AddItem(new MenuItem(L"网格体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::data->scene->AddChild(new MeshObject());
+        Main::AddObject(new MeshObject());
     }, this));
     objectMenu->AddItem(new MenuItem(L"三次贝塞尔曲线", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::data->scene->AddChild(new BezierCurveObject());
+        Main::AddObject(new BezierCurveObject());
     }, this));
     objectMenu->AddItem(new MenuItem(L"点光源", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::data->scene->AddChild(new PointLightObject());
+        Main::AddObject(new PointLightObject());
     }, this));
     objectMenu->AddItem(new MenuItem(L"音频收听者", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::data->scene->AddChild(new AudioListenerObject());
+        Main::AddObject(new AudioListenerObject());
+    }, this));
+    objectMenu->AddItem(new MenuItem(L"摄像机", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::AddObject(new CameraObject());
     }, this));
     basicMenu->AddItem(new MenuItem(L"添加对象", objectMenu));
 
     basicMenu->AddItem(new MenuItem());
-    basicMenu->AddItem(new LightItem(this));
+    basicMenu->AddItem(new SwitchMenuItem(L"光照:开", L"光照:关", SWITCHMENUITEM_LAMBDA_TRANS(MainWindow)[](bool state, MainWindow* window){
+        window->lightEnabled = state;
+        DebugLog("MainWindow Light State %s", window->lightEnabled ? "On" : "Off");
+    }, this, lightEnabled));
+
+    basicMenu->AddItem(new MenuItem());
+    basicMenu->AddItem(new SwitchMenuItem(L"音频控制:开", L"音频控制:关", SWITCHMENUITEM_LAMBDA_TRANS(MainWindow)[](bool state, MainWindow* window){
+        window->audioControl = state;
+        DebugLog("MainWindow Audio Control %s", window->audioControl ? "On" : "Off");
+        if (state){
+            // 重置速度并记录当前位置
+            alListenerPosAutoVelv3(window->camPos);
+            alListenerVelocityv3(Vector3::zero);
+            alListenerDirv3(window->camForward, window->camUp);
+        }else{
+            alListenerPosv3(Vector3::zero);
+            alListenerVelocityv3(Vector3::zero);
+            alListenerDirv3(Vector3::forward, Vector3::up);
+        }
+    }, this, audioControl));
+    basicMenu->AddItem(new SwitchMenuItem(L"多普勒效应:开", L"多普勒效应:关", SWITCHMENUITEM_LAMBDA_TRANS(MainWindow)[](bool state, MainWindow* window){
+        window->dopplerEffect = state;
+        DebugLog("MainWindow Doppler Effect %s", window->dopplerEffect ? "On" : "Off");
+        if (state){
+            // 重置速度并记录当前位置
+            alListenerPosAutoVelv3(window->camPos);
+            alListenerVelocityv3(Vector3::zero);
+        }else{
+            alListenerVelocityv3(Vector3::zero);
+        }
+    }, this, dopplerEffect));
+
+    insertMenu = new Menu();
+    insertMenu->AddItem(new MenuItem(L"位置", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::data->curObject->transform.InsertPos(Main::data->animFrame);
+    }, this));
+    insertMenu->AddItem(new MenuItem(L"旋转", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::data->curObject->transform.InsertRot(Main::data->animFrame);
+    }, this));
+    insertMenu->AddItem(new MenuItem(L"大小", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::data->curObject->transform.InsertScale(Main::data->animFrame);
+    }, this));
 
     uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
     uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
+
+    if (audioControl){
+        alListenerDirv3(camForward, camUp);
+    }else{
+        alListenerDirv3(Vector3::forward, Vector3::up);
+    }
 }
 
 MainWindow::~MainWindow(){
     DebugLog("MainWindow Destroyed");
-    if(basicMenu) delete basicMenu;
-    if(uiMgr) delete uiMgr;
-    if(curOp) delete curOp;
-    if(colorBoard) delete colorBoard;
+    if (basicMenu) delete basicMenu;
+    if (insertMenu) delete insertMenu;
+    if (uiMgr) delete uiMgr;
+    if (curOp) delete curOp;
 }
 
 void MainWindow::InitCamera(){
@@ -664,7 +702,6 @@ void MainWindow::UpdateCursor(int x, int y){
 
 void MainWindow::UpdateLookAtLocation(){
     camPos = camLookat - camForward * camDis;
-    alListenerPosv3(camPos);
 }
 
 void MainWindow::UpdateRotation(){
@@ -673,8 +710,8 @@ void MainWindow::UpdateRotation(){
     camRight = camDir * Vector3::right;
     camPos = camLookat - camForward * camDis;
     cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
-    alListenerPosv3(camPos);
-    alListenerDirv3(camForward);
+    if (audioControl)
+        alListenerDirv3(camForward, camUp);
 }
 
 void MainWindow::UpdateDistance(){
@@ -685,7 +722,6 @@ void MainWindow::UpdateDistance(){
     }else if (camRange > camDis * 100.0f){
         camRange *= 0.2f;
     }
-    alListenerPosv3(camPos);
 }
 
 void MainWindow::AddPoint(){
@@ -723,7 +759,7 @@ bool MainWindow::SaveMesh(Mesh* mesh){
         return false;
     }
     DebugLog("Saving Object");
-    mesh->WriteToOBJ(&target, true, true);
+    mesh->WriteToOBJ(target, true, false);
     target.Close();
     return true;
 }
@@ -774,30 +810,30 @@ bool MainWindow::LoadMesh(Mesh* mesh, WString path){
                 DebugLog("Object Annotation %s", fileData + filePtr + 1);
             }else if (__builtin_sscanf(fileData + filePtr, "v %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
                 vert.Add(mesh->AddVertex(vec + camLookat));
+            }else if (__builtin_sscanf(fileData + filePtr, "vt %f %f", &vec.x, &vec.y) == 2){
+                vertUV.Add(Vector2(vec.x, vec.y));
+            }else if (__builtin_sscanf(fileData + filePtr, "vn %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
+                vertNormal.Add(Vector3(vec));
+            }else if (__builtin_sscanf(fileData + filePtr, "f %d/%d %d/%d %d/%d", &v1, &vt1, &v2, &vt2, &v3, &vt3) == 6){
+                mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
+                vert[v1 - 1]->uv = vertUV[vt1 - 1];
+                vert[v2 - 1]->uv = vertUV[vt2 - 1];
+                vert[v3 - 1]->uv = vertUV[vt3 - 1];
             }else if (__builtin_sscanf(fileData + filePtr, "f %d//%d %d//%d %d//%d", &v1, &vn1, &v2, &vn2, &v3, &vn3) == 6){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
                 vert[v1 - 1]->normal = vertNormal[vn1 - 1];
                 vert[v2 - 1]->normal = vertNormal[vn2 - 1];
                 vert[v3 - 1]->normal = vertNormal[vn3 - 1];
-            }else if (__builtin_sscanf(fileData + filePtr, "f %d/%d %d/%d %d/%d", &v1, &vt1, &v2, &vt2, &v3, &vt3) == 6){
-                mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
-                vert[v1 - 1]->uv = vertUV[vn1 - 1];
-                vert[v2 - 1]->uv = vertUV[vn2 - 1];
-                vert[v3 - 1]->uv = vertUV[vn3 - 1];
             }else if (__builtin_sscanf(fileData + filePtr, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3) == 9){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
-                vert[v1 - 1]->uv = vertUV[vn1 - 1];
-                vert[v2 - 1]->uv = vertUV[vn2 - 1];
-                vert[v3 - 1]->uv = vertUV[vn3 - 1];
+                vert[v1 - 1]->uv = vertUV[vt1 - 1];
+                vert[v2 - 1]->uv = vertUV[vt2 - 1];
+                vert[v3 - 1]->uv = vertUV[vt3 - 1];
                 vert[v1 - 1]->normal = vertNormal[vn1 - 1];
                 vert[v2 - 1]->normal = vertNormal[vn2 - 1];
                 vert[v3 - 1]->normal = vertNormal[vn3 - 1];
             }else if (__builtin_sscanf(fileData + filePtr, "f %d %d %d", &v1, &v2, &v3) == 3){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
-            }else if (__builtin_sscanf(fileData + filePtr, "vt %f %f", &vec.x, &vec.y) == 2){
-                vertUV.Add(Vector2(vec.x, vec.y));
-            }else if (__builtin_sscanf(fileData + filePtr, "vn %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
-                vertNormal.Add(Vector3(vec));
             }else{
                 DebugError("Object File Unknown Line %s", fileData + filePtr);
             }
@@ -810,9 +846,19 @@ bool MainWindow::LoadMesh(Mesh* mesh, WString path){
     return true;
 }
 
+void MainWindow::OnCreate(){}
+
 void MainWindow::OnClose(){}
 
-void MainWindow::OnTimer(int id){}
+void MainWindow::OnTimer(int id){
+    if (audioControl){
+        if (dopplerEffect){
+            alListenerPosAutoVelv3(camPos);
+        }else{
+            alListenerPosv3(camPos);
+        }
+    }
+}
 
 void MainWindow::OnResize(int x, int y){
     UpdateWindowSize(x, y);
@@ -1119,6 +1165,9 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         break;
     case IDM_MENU_BASIC:
         Main::SetMenu(basicMenu);
+        break;
+    case IDM_MENU_INSERT:
+        Main::SetMenu(insertMenu);
         break;
     case IDM_TOOL_EMPTY:
         SetTool(new EmptyTool(this));

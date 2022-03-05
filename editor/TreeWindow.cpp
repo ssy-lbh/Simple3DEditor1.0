@@ -1,5 +1,7 @@
 #include <editor/TreeWindow.h>
 
+#include <lib/opengl/gl/gl.h>
+
 #include <main.h>
 #include <utils/os/Font.h>
 #include <utils/gl/GLUtils.h>

@@ -74,17 +74,14 @@ public:
     ~GlobalData();
 
     void SelectObject(AViewObject* o);
+
+    void OnAnimationFrame(float frame);
 };
 
 class Main final : public Object {
 public:
     static Main* inst;
     static GlobalData* data;
-
-    AppFrame* appFrame = NULL;
-
-    // 测试过面向对象的结果，成功实现多屏
-    IWindow* mainFrame = NULL;
 
     Main();
     ~Main();
@@ -94,6 +91,8 @@ public:
     static void SetCursor(const char* res);
     static void SetMenu(Menu* m);
     static void SelectObject(AViewObject* o);
+    static AViewObject* AddObject(AViewObject* o);
+    static void OnAnimationFrame(float frame);
 
     static Mesh* GetMesh();
 

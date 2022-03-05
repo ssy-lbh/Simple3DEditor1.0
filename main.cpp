@@ -114,9 +114,7 @@ void LocalData::Render(){
 }
 
 GlobalData::GlobalData(){
-    curObject = new MeshObject();
     scene = new AViewObject(L"Scene");
-    scene->AddChild(curObject);
 }
 
 GlobalData::~GlobalData(){
@@ -131,8 +129,14 @@ void GlobalData::SelectObject(AViewObject* o){
     selFaces.Clear();
 }
 
+void GlobalData::OnAnimationFrame(float frame){
+    animFrame = frame;
+    scene->OnAnimationFrame(frame);
+}
+
 Main::Main(){
     data = new GlobalData();
+    SelectObject(AddObject(new MeshObject()));
 }
 
 Main::~Main(){
@@ -171,6 +175,16 @@ void Main::SelectObject(AViewObject* o){
     data->SelectObject(o);
 }
 
+AViewObject* Main::AddObject(AViewObject* o){
+    data->scene->AddChild(o);
+    return o;
+}
+
+void Main::OnAnimationFrame(float frame){
+    data->OnAnimationFrame(frame);
+    RequestRender();
+}
+
 Mesh* Main::GetMesh(){
     if (!data->curObject)
         return NULL;
@@ -180,9 +194,9 @@ Mesh* Main::GetMesh(){
 int Main::MainEntry(int argc, char** argv){
     AudioUtils::InitOpenAL();
 
-    mainFrame = new SelectionWindow(new MainWindow());
+    IWindow* mainFrame = new SelectionWindow(new MainWindow());
 
-    appFrame = new AppFrame("ModelView", mainFrame, 600, 600);
+    AppFrame* appFrame = new AppFrame("ModelView", mainFrame, 600, 600);
 
     DebugLog("Main Window Created");
 

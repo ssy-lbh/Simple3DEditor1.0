@@ -15,19 +15,8 @@ public:
     static ALCdevice* alDev;
     static ALCcontext* alCtx;
 
-    union Complex {
-        _Complex float comp;
-        float real, imag;
-
-        Complex(_Complex float comp);
-        ~Complex();
-
-        float MagnitudeSqr();
-        float Magnitude();
-    };
-
     static bool CheckALError(const char* tag, const char* file, int line);
-    static void FFT(_Complex float* input, int sizebit, bool inv);
+    static void FFT(Complex* input, int sizebit, bool inv);
     static void InitOpenAL();
     static void UninitOpenAL();
     static void PrintOpenALInfo();
@@ -36,6 +25,7 @@ public:
 
 void alListenerPosv3(Vector3 value);
 void alListenerVelocityv3(Vector3 value);
-void alListenerDirv3(Vector3 value);
+void alListenerPosAutoVelv3(Vector3 value);
+void alListenerDirv3(Vector3 dir, Vector3 up);
 
 #endif

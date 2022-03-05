@@ -20,7 +20,11 @@ public:
     
     void SetCurve(AnimationCurve* curve);
     AnimationCurve* GetCurve();
+    // 不存在曲线时创建
+    AnimationCurve* GenCurve();
     void SetFrame(float frame);
+    void InsertValue(float frame);
+    void InsertValue(float frame, float val);
 };
 
 class PropertyVector3 : public Object {
@@ -37,6 +41,9 @@ public:
     void Set(Vector3 val);
 
     void SetFrame(float frame);
+
+    void InsertValue(float frame);
+    void InsertValue(float frame, Vector3 val);
 };
 
 class PropertyQuaternion : public Object {
@@ -54,6 +61,9 @@ public:
     void Set(Quaternion val);
 
     void SetFrame(float frame);
+
+    void InsertValue(float frame);
+    void InsertValue(float frame, Quaternion val);
 };
 
 #endif

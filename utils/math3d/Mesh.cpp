@@ -14,6 +14,7 @@ Mesh::Mesh(){}
 Mesh::Mesh(AViewObject* object) : object(object) {}
 
 Mesh::~Mesh(){
+    if (modeltex) delete modeltex;
     Free(vertices);
     Free(edges);
     Free(faces);
@@ -315,8 +316,7 @@ void Mesh::Render(bool light){
     if (light)
         glEnable(GL_LIGHTING);// 开启光照系统
     glShadeModel(GL_SMOOTH);
-    if (modeltex){
-        modeltex->Enable();
+    if (EnableTexture()){
         glColor3f(1.0f, 1.0f, 1.0f);
         glBegin(GL_TRIANGLES);
         faces.Foreach([](Face* f){
@@ -331,7 +331,7 @@ void Mesh::Render(bool light){
         });
         glEnd();
         glShadeModel(GL_FLAT);
-        modeltex->Disable();
+        DisableTexture();
     }else{
         glBegin(GL_TRIANGLES);
         faces.Foreach([](Face* f){
@@ -372,10 +372,10 @@ void Mesh::RenderUVMap(){
     glDisable(GL_LINE_SMOOTH);
 }
 
-void Mesh::WriteToOBJ(File* file, bool uv, bool normal){
+void Mesh::WriteToOBJ(File file, bool uv, bool normal){
     size_t index = 0;
-    file->Write("# StereoVision 3D Editor\n", 25);
-    file->Write("# Author: lin-boheng@gitee.com\n", 31);
+    file.Write("# StereoVision 3D Editor\n", 25);
+    file.Write("# Author: lin-boheng@gitee.com\n", 31);
     // 顶点索引
     vertices.Foreach<size_t*>([](Vertex* v, size_t* i){
         v->index = ++*i;
@@ -386,7 +386,7 @@ void Mesh::WriteToOBJ(File* file, bool uv, bool normal){
         DWORD len;
         len = __builtin_snprintf(tmp, MAX_PATH, "v %f %f %f\n", v->pos.x, v->pos.y, v->pos.z);
         file->Write(tmp, len);
-    }, file);
+    }, &file);
     // 纹理UV坐标
     if (uv){
         vertices.Foreach<File*>([](Vertex* v, File* file){
@@ -394,7 +394,7 @@ void Mesh::WriteToOBJ(File* file, bool uv, bool normal){
             DWORD len;
             len = __builtin_snprintf(tmp, MAX_PATH, "vt %f %f\n", v->uv.x, v->uv.y);
             file->Write(tmp, len);
-        }, file);
+        }, &file);
     }
     // 顶点法线
     if (normal){
@@ -403,7 +403,7 @@ void Mesh::WriteToOBJ(File* file, bool uv, bool normal){
             DWORD len;
             len = __builtin_snprintf(tmp, MAX_PATH, "vn %f %f %f\n", v->normal.x, v->normal.y, v->normal.z);
             file->Write(tmp, len);
-        }, file);
+        }, &file);
     }
     // 片元
     if (!uv && !normal){
@@ -413,7 +413,7 @@ void Mesh::WriteToOBJ(File* file, bool uv, bool normal){
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d %d %d\n", idx1, idx2, idx3);
             file->Write(tmp, len);
-        }, file);
+        }, &file);
     }else if (uv && !normal){
         faces.Foreach<File*>([](Face* f, File* file){
             char tmp[MAX_PATH + 1];
@@ -421,7 +421,7 @@ void Mesh::WriteToOBJ(File* file, bool uv, bool normal){
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d/%d %d/%d %d/%d\n", idx1, idx1, idx2, idx2, idx3, idx3);
             file->Write(tmp, len);
-        }, file);
+        }, &file);
     }else if (!uv && normal){
         faces.Foreach<File*>([](Face* f, File* file){
             char tmp[MAX_PATH + 1];
@@ -429,7 +429,7 @@ void Mesh::WriteToOBJ(File* file, bool uv, bool normal){
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d//%d %d//%d %d//%d\n", idx1, idx1, idx2, idx2, idx3, idx3);
             file->Write(tmp, len);
-        }, file);
+        }, &file);
     }else{
         faces.Foreach<File*>([](Face* f, File* file){
             char tmp[MAX_PATH + 1];
@@ -437,7 +437,7 @@ void Mesh::WriteToOBJ(File* file, bool uv, bool normal){
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d/%d/%d %d/%d/%d %d/%d/%d\n", idx1, idx1, idx1, idx2, idx2, idx2, idx3, idx3, idx3);
             file->Write(tmp, len);
-        }, file);
+        }, &file);
     }
 }
 
@@ -471,7 +471,11 @@ void Mesh::ResetTexture(){
 bool Mesh::EnableTexture(){
     if (!modeltex)
         return false;
-    modeltex->Enable();
+    if (!modeltex->Enable()){
+        delete modeltex;
+        modeltex = NULL;
+        return false;
+    }
     return true;
 }
 

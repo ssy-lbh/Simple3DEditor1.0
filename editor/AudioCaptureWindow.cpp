@@ -8,6 +8,7 @@
 #include <res.h>
 #include <utils/AudioUtils.h>
 #include <utils/math3d/Math.h>
+#include <utils/math3d/LinearAlgebra.h>
 #include <utils/os/Font.h>
 #include <utils/os/Shell.h>
 #include <utils/gl/GLUtils.h>
@@ -133,15 +134,15 @@ AudioCaptureWindow::AudioCaptureWindow(){
     recBuf = new short[1 << bit];
     memset(recBuf, 0, (1 << (bit + 1)));
 
-    freqBuf = new _Complex float[1 << bit];
+    freqBuf = new Complex[1 << bit];
 }
 
 AudioCaptureWindow::~AudioCaptureWindow(){
     DebugLog("AudioCaptureWindow Destroyed");
     if (uiMgr) delete uiMgr;
-    if (capBuf) delete (short*)capBuf;
-    if (recBuf) delete (short*)recBuf;
-    if (freqBuf) delete freqBuf;
+    if (capBuf) delete[] (short*)capBuf;
+    if (recBuf) delete[] (short*)recBuf;
+    if (freqBuf) delete[] freqBuf;
 
     CloseCaptureDevice();
 
@@ -213,7 +214,7 @@ void AudioCaptureWindow::ProcessInput(){
         glBegin(GL_LINES);
         for (int i = 0; i < 1024; i++){
             float rate = i / 1024.0f;
-            float amp = Clamp(__builtin_log(AudioUtils::Complex(freqBuf[i << (bit - 10)]).MagnitudeSqr()) * 0.1f, 2.0f / size.y, 1.0f);
+            float amp = Clamp(Log(freqBuf[i << (bit - 10)].SqrMagnitude()) * 0.1f, 2.0f / size.y, 1.0f);
             glColor3f(rate, 1.0f - rate, 0.0f);
             glVertex2f(rate * 2.0f - 1.0f, (-amp + 1.0f) * 0.5f);
             glVertex2f(rate * 2.0f - 1.0f, (amp + 1.0f) * 0.5f);
@@ -263,7 +264,7 @@ void AudioCaptureWindow::ProcessOutput(){
         glBegin(GL_LINES);
         for (int i = 0; i < 1024; i++){
             float rate = i / 1024.0f;
-            float amp = Clamp(__builtin_log(AudioUtils::Complex(freqBuf[i << (bit - 10)]).MagnitudeSqr()) * 0.1f, 2.0f / size.y, 1.0f);
+            float amp = Clamp(Log(freqBuf[i << (bit - 10)].SqrMagnitude()) * 0.1f, 2.0f / size.y, 1.0f);
             glColor3f(rate, 1.0f - rate, 0.0f);
             glVertex2f(rate * 2.0f - 1.0f, (-amp - 1.0f) * 0.5f);
             glVertex2f(rate * 2.0f - 1.0f, (amp - 1.0f) * 0.5f);

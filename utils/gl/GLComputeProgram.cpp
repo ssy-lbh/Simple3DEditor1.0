@@ -1,36 +1,27 @@
 #include <utils/gl/GLComputeProgram.h>
 
-#include <windows.h>
+#include <lib/opengl/gl/gl.h>
 
 #include <res.h>
-#include <lib/opengl/gl/gl.h>
+#include <utils/DataBuffer.h>
+#include <utils/os/Resource.h>
 #include <utils/os/Log.h>
 #include <utils/os/GLFunc.h>
+#include <utils/gl/GLTexture2D.h>
+#include <utils/gl/GLRenderTexture2D.h>
 
 GLComputeProgram::GLComputeProgram(int resid){
-    HINSTANCE hInst = GetModuleHandleA(NULL);
-    HRSRC kernelSrc;
-    HGLOBAL resIdx;
-    LPVOID resPtr;
-    DWORD resSize;
+    int resSize;
     char* srcData;
 
-    kernelSrc = FindResourceA(hInst, MAKEINTRESOURCE(resid), MAKEINTRESOURCE(SHADER));
-    resIdx = LoadResource(hInst, kernelSrc);
-    resPtr = LockResource(resIdx);
-    resSize = SizeofResource(hInst, kernelSrc);
-    srcData = new char[resSize];
-    RtlCopyMemory(srcData, resPtr, resSize);
-    FreeResource(resIdx);
+    DataBuffer data = Resource::GetShader(resid);
+    srcData = (char*)data.Buffer();
+    resSize = data.Size();
 
     prog = glCreateProgram();
     shader = glCreateShader(GL_COMPUTE_SHADER);
 
-    glShaderSource(shader, 1, &srcData, NULL);
-    glCompileShader(shader);
-
-    glAttachShader(prog, shader);
-    glLinkProgram(prog);
+    glShaderSource(shader, 1, &srcData, &resSize);
 }
 
 GLComputeProgram::GLComputeProgram(const char* source){
@@ -38,10 +29,6 @@ GLComputeProgram::GLComputeProgram(const char* source){
     shader = glCreateShader(GL_COMPUTE_SHADER);
 
     glShaderSource(shader, 1, &source, NULL);
-    glCompileShader(shader);
-
-    glAttachShader(prog, shader);
-    glLinkProgram(prog);
 }
 
 GLComputeProgram::~GLComputeProgram(){
@@ -53,19 +40,25 @@ GLuint GLComputeProgram::GetProgram(){
     return prog;
 }
 
-bool GLComputeProgram::CheckProgramError(){
-    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &progLog);
-    return progLog > 0;// OpenGL 程序的日志长度为0时正常
+bool GLComputeProgram::LinkProgram(){
+    GLint status;
+
+    glAttachShader(prog, shader);
+    glLinkProgram(prog);
+    glGetProgramiv(prog, GL_LINK_STATUS, &status);
+    return status == GL_FALSE;
 }
 
-bool GLComputeProgram::CheckShaderError(){
-    glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &shaderLog);
-    return shaderLog > 0;// OpenGL 着色器的日志长度为-1时正常，不过为什么跟程序不一样？保险起见这样写
+bool GLComputeProgram::CompileShader(){
+    GLint status;
+
+    glCompileShader(shader);
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+    return status == GL_FALSE;
 }
 
 void GLComputeProgram::PrintProgramLog(){
     char* log;
-    GLint logLen;
 
     if (progLog == -1)
         glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &progLog);
@@ -79,7 +72,6 @@ void GLComputeProgram::PrintProgramLog(){
 
 void GLComputeProgram::PrintShaderLog(){
     char* log;
-    GLint logLen;
 
     if (shaderLog == -1)
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &shaderLog);
@@ -106,4 +98,12 @@ void GLComputeProgram::BindTexture(uint unit, uint texture, uenum access, uenum 
     // 省略了glActiveTexture(GL_TEXTURE0);
     glBindImageTexture(unit, texture, 0, GL_FALSE, 0, access, format);
     glDisable(GL_TEXTURE_2D);
+}
+
+void GLComputeProgram::BindTexture(uint unit, GLTexture2D* texture, uenum access, uenum format){
+    BindTexture(unit, texture->GetTexture(), access, format);
+}
+
+void GLComputeProgram::BindTexture(uint unit, GLRenderTexture2D* texture, uenum access, uenum format){
+    BindTexture(unit, texture->GetTexture(), access, format);
 }

@@ -17,13 +17,15 @@ public:
     ~GLComputeProgram();
 
     uint GetProgram();
-    bool CheckProgramError();
-    bool CheckShaderError();
+    bool LinkProgram();
+    bool CompileShader();
     void PrintProgramLog();
     void PrintShaderLog();
     void Dispatch(int x, int y, int z);
     uint GetLoc(const char* name);
     void BindTexture(uint unit, uint texture, uenum access, uenum format);
+    void BindTexture(uint unit, GLTexture2D* texture, uenum access, uenum format);
+    void BindTexture(uint unit, GLRenderTexture2D* texture, uenum access, uenum format);
 };
 
 #endif

@@ -5,7 +5,8 @@
 
 class TimeUtils {
 public:
-    static float GetTime();
+    // time in seconds
+    static double GetTime();
 };
 
 class TimerManager {

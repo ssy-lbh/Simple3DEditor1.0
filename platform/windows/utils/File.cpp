@@ -45,22 +45,18 @@ File &File::operator=(const File &f){
 
 File::File(const char* path){
     this->path = path;
-    Open();
 }
 
 File::File(const wchar_t* path){
     this->path = path;
-    Open();
 }
 
 File::File(String path){
     this->path = path;
-    Open();
 }
 
 File::File(WString path){
     this->path = path;
-    Open();
 }
 
 File::~File(){
@@ -121,7 +117,7 @@ bool File::Create(){
         FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL,
         // 文件不存在时创建
-        CREATE_ALWAYS,
+        CREATE_NEW,
         FILE_ATTRIBUTE_NORMAL,
         NULL
     );
@@ -141,7 +137,7 @@ bool File::CreateNew(){
         FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL,
         // 总是创建新文件
-        CREATE_NEW,
+        CREATE_ALWAYS,
         FILE_ATTRIBUTE_NORMAL,
         NULL
     );

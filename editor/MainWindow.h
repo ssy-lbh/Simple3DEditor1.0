@@ -15,6 +15,8 @@ private:
     float aspect;
 
     bool lightEnabled = false;
+    bool audioControl = true;
+    bool dopplerEffect = true;
 
     Vector3 camLookat = Vector3::up;
     Quaternion camDir = Quaternion::one;
@@ -26,12 +28,11 @@ private:
     float camRange = 100.0f;
 
     Menu* basicMenu;
+    Menu* insertMenu;
 
     UIManager* uiMgr;
 
     IOperation* curOp = NULL;
-
-    ColorBoard* colorBoard = NULL;
 
     ITool* curTool = NULL;
 
@@ -200,19 +201,6 @@ private:
         virtual void OnRender() override;
     };
 
-    class LightItem final : public IMenuItem {
-    private:
-        MainWindow* window;
-    
-    public:
-        LightItem(MainWindow* window);
-        virtual ~LightItem() override;
-
-        virtual const wchar_t* GetName() override;
-
-        virtual void OnClick() override;
-    };
-
 public:
     MainWindow();
     virtual ~MainWindow() override;
@@ -231,6 +219,7 @@ public:
     void UpdateDistance();
 
     virtual bool IsFocus() override;
+    virtual void OnCreate() override;
     virtual void OnRender() override;
     virtual void OnClose() override;
     virtual void OnTimer(int id) override;

@@ -1,8 +1,11 @@
 #include <utils/math3d/ViewObject.h>
 
+#include <lib/openal/al.h>
+
 #include <main.h>
 #include <res.h>
 #include <utils/AudioUtils.h>
+#include <utils/os/Time.h>
 #include <utils/math3d/Math.h>
 #include <utils/math3d/Mesh.h>
 #include <utils/gl/GLSimplified.h>
@@ -148,14 +151,33 @@ void Transform::SetFrame(float frame){
     scale.SetFrame(frame);
 }
 
-AViewObject::AViewObject() : name(L"Object"){}
+void Transform::InsertPos(float frame){
+    position.InsertValue(frame);
+}
 
-AViewObject::AViewObject(const wchar_t* name) : name(name){}
+void Transform::InsertRot(float frame){
+    if (rotationMode == ROT_QUATERNION){
+        rotation.InsertValue(frame);
+    }else{
+        rotationXYZ.InsertValue(frame);
+    }
+}
 
+void Transform::InsertScale(float frame){
+    scale.InsertValue(frame);
+}
+
+AViewObject::AViewObject() : name(L"Object") {}
+AViewObject::AViewObject(ViewObjectType type) : name(L"Object"), type(type) {}
+AViewObject::AViewObject(const wchar_t* name) : name(name) {}
+AViewObject::AViewObject(const wchar_t* name, ViewObjectType type) : name(name), type(type) {}
 AViewObject::AViewObject(WString name) : name(name){}
+AViewObject::AViewObject(WString name, ViewObjectType type) : name(name), type(type) {}
 
 AViewObject::~AViewObject(){
     Free(children);
+    if (parent)
+        parent->DeleteChild(this);
 }
 
 void AViewObject::AddChild(AViewObject* o){
@@ -178,6 +200,10 @@ void AViewObject::EnumChildren(void(*func)(AViewObject*)){
 
 void AViewObject::EnumChildren(void(*func)(AViewObject*, void*), void* user){
     children.Foreach<void*>(func, user);
+}
+
+ViewObjectType AViewObject::GetType(){
+    return type;
 }
 
 AViewObject* AViewObject::GetParent(){
@@ -274,14 +300,13 @@ void AViewObject::OnAnimationFrame(float frame){
         children[i]->OnAnimationFrame(frame);
 }
 
-MeshObject::MeshObject() : AViewObject(L"Mesh"){
+MeshObject::MeshObject() : AViewObject(L"Mesh", ViewObjectType::OBJECT_MESH) {
     mesh = new Mesh(this);
 }
 
 MeshObject::~MeshObject(){
     // 子类析构器在返回前会自动调用父类析构器
     // 因此不要再这里调用AViewObject::~AViewObject，不然会导致多次delete使程序崩溃
-    Free(children);
     if (mesh) delete mesh;
 }
 
@@ -372,7 +397,7 @@ void MeshObject::OnRenderUVMap(){
     mesh->RenderUVMap();
 }
 
-BezierCurveObject::BezierCurveObject() : AViewObject(L"BezierCurve"){
+BezierCurveObject::BezierCurveObject() : AViewObject(L"BezierCurve", ViewObjectType::OBJECT_BEZIER_CURVE) {
     v[0].pos = Vector3(-5.0f, 0.0f, 0.0f);
     v[1].pos = Vector3(0.0f, 0.0f, 0.0f);
     v[2].pos = Vector3(0.0f, 0.0f, 5.0f);
@@ -381,9 +406,7 @@ BezierCurveObject::BezierCurveObject() : AViewObject(L"BezierCurve"){
         v[i].object = this;
 }
 
-BezierCurveObject::~BezierCurveObject(){
-    Free(children);
-}
+BezierCurveObject::~BezierCurveObject(){}
 
 void BezierCurveObject::OnSelect(Vector3 ori, Vector3 dir){
     Matrix4x4 curMat = GetWorldToObjectMatrix();
@@ -493,14 +516,13 @@ void BezierCurveObject::OnRenderUVMap(){
     glDisable(GL_LINE_SMOOTH);
 }
 
-PointLightObject::PointLightObject() : AViewObject(L"PointLight"){
+PointLightObject::PointLightObject() : AViewObject(L"PointLight", ViewObjectType::OBJECT_POINT_LIGHT) {
     light = GLLights::Create();
     UpdateLight();
     v.object = this;
 }
 
 PointLightObject::~PointLightObject(){
-    Free(children);
     GLLights::Destroy(light);
 }
 
@@ -569,32 +591,191 @@ void PointLightObject::UpdateLight(){
     glLightfv(light, GL_POSITION, position);
 }
 
-AudioListenerObject::AudioListenerObject() : AViewObject(L"AudioListener"){}
+int AudioSourceObject::REPLAY_ERROR = 4000;
 
-AudioListenerObject::~AudioListenerObject(){
-    Free(children);
+AudioSourceObject::AudioSourceObject(uenum format, char* data, int size, int freq) : AViewObject(L"AudioSource", ViewObjectType::OBJECT_AUDIO_SOURCE) {
+    alGenSources(1, &alSrc);
+    alGenBuffers(1, &alBuf);
+
+    alSourcef(alSrc, AL_REFERENCE_DISTANCE, 1.0f);
+    alSourcef(alSrc, AL_ROLLOFF_FACTOR, 2.0f);
+    alSourcef(alSrc, AL_MAX_DISTANCE, 100.0f);
+
+    alBufferData(alBuf, format, data, size, freq);
+    alSourceQueueBuffers(alSrc, 1, &alBuf);
+
+    switch (format){
+    case AL_FORMAT_MONO8:
+        alSampleSize = 1;
+        alChannels = 1;
+        break;
+    case AL_FORMAT_MONO16:
+        alSampleSize = 2;
+        alChannels = 1;
+        break;
+    case AL_FORMAT_STEREO8:
+        alSampleSize = 2;
+        alChannels = 2;
+        break;
+    case AL_FORMAT_STEREO16:
+        alSampleSize = 4;
+        alChannels = 2;
+        break;
+    }
+
+    alAudioData = data;
+    alAudioSize = size / alSampleSize;
+    alAudioLen = alAudioSize / freq;
+    alAudioFreq = freq;
+    alAudioOffset = 0;
+
+    recPos = Vector3::zero;
+    recTime = TimeUtils::GetTime();
 }
+
+AudioSourceObject::~AudioSourceObject(){
+    if (alAudioData) delete[] (char*)alAudioData;
+
+    alDeleteSources(1, &alSrc);
+    alDeleteBuffers(1, &alBuf);
+}
+
+void AudioSourceObject::OnTimer(int id){
+    Vector3 pos = transform.chainMat * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+    SetPosAutoVelv3(pos);
+}
+
+void AudioSourceObject::OnRender(const RenderOptions* options){
+    glDisable(GL_LIGHTING);
+    glEnable(GL_POINT_SMOOTH);
+    glPointSize(4.0f);
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glBegin(GL_POINTS);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glEnd();
+    glDisable(GL_POINT_SMOOTH);
+}
+
+char* AudioSourceObject::GetData(){
+    return (char*)alAudioData;
+}
+
+int AudioSourceObject::GetSize(){
+    return alAudioSize;
+}
+
+int AudioSourceObject::GetLength(){
+    return alAudioLen;
+}
+
+int AudioSourceObject::GetSampleSize(){
+    return alSampleSize;
+}
+
+int AudioSourceObject::GetChannelCount(){
+    return alChannels;
+}
+
+int AudioSourceObject::GetFrequency(){
+    return alAudioFreq;
+}
+
+int AudioSourceObject::GetOffset(){
+    if (IsPlaying())
+        alGetSourcei(alSrc, AL_SAMPLE_OFFSET, &alAudioOffset);
+    return alAudioOffset;
+}
+
+bool AudioSourceObject::IsLoop(){
+    ALint loop;
+    alGetSourcei(alSrc, AL_LOOPING, &loop);
+    return loop == AL_TRUE;
+}
+
+float AudioSourceObject::GetGain(){
+    float gain;
+    alGetSourcef(alSrc, AL_GAIN, &gain);
+    return gain;
+}
+
+void AudioSourceObject::SetOffset(int offset){
+    if (IsPlaying())
+        alSourcei(alSrc, AL_SAMPLE_OFFSET, offset);
+    alAudioOffset = offset;
+}
+
+void AudioSourceObject::SetLoop(bool loop){
+    alSourcei(alSrc, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+}
+
+void AudioSourceObject::SetGain(float gain){
+    alSourcef(alSrc, AL_GAIN, gain);
+}
+
+void AudioSourceObject::Play(){
+    alSourcePlay(alSrc);
+    if (alAudioOffset + REPLAY_ERROR >= alAudioSize)
+        alAudioOffset = 0;
+    alSourcei(alSrc, AL_SAMPLE_OFFSET, alAudioOffset);
+}
+
+void AudioSourceObject::Stop(){
+    alGetSourcei(alSrc, AL_SAMPLE_OFFSET, &alAudioOffset);
+    alSourceStop(alSrc);
+}
+
+bool AudioSourceObject::IsPlaying(){
+    ALint state;
+    alGetSourcei(alSrc, AL_SOURCE_STATE, &state);
+    return state == AL_PLAYING;
+}
+
+void AudioSourceObject::SetPosv3(Vector3 value){
+    alSource3f(alSrc, AL_POSITION, value.x, value.y, value.z);
+}
+
+void AudioSourceObject::SetVelocityv3(Vector3 value){
+    alSource3f(alSrc, AL_VELOCITY, value.x, value.y, value.z);
+}
+
+void AudioSourceObject::SetPosAutoVelv3(Vector3 value){
+    float curTime = TimeUtils::GetTime();
+    Vector3 vel = (value - recPos) / (curTime - recTime);
+
+    recPos = value;
+    recTime = curTime;
+
+    alSource3f(alSrc, AL_POSITION, value.x, value.y, value.z);
+    alSource3f(alSrc, AL_VELOCITY, vel.x, vel.y, vel.z);
+}
+
+AudioListenerObject::AudioListenerObject() : AViewObject(L"AudioListener", ViewObjectType::OBJECT_AUDIO_LISTENER) {}
+
+AudioListenerObject::~AudioListenerObject(){}
 
 void AudioListenerObject::OnRender(const RenderOptions* options){
     Vector3 pos = transform.chainMat * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
     Vector3 dir = (transform.chainMat * Vector4(Vector3::forward, 0.0f)).Normal();
+    Vector3 up = (transform.chainMat * Vector4(Vector3::up, 0.0f)).Normal();
 
     alListenerPosv3(pos);
-    alListenerDirv3(dir);
+    alListenerDirv3(dir, up);
 
-    GLUtils::Draw3DArrow(pos, dir, 0.3f, 0.3f);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    GLUtils::Draw3DArrow(pos, dir, 0.3f, 0.3f, 10.0f);
+
+    glColor3f(0.0f, 0.0f, 1.0f);
+    GLUtils::Draw3DArrow(pos, up * 0.5f, 0.08f, 0.3f, 5.0f);
 }
 
 const float CameraObject::SCALE = 0.3f;
 
-CameraObject::CameraObject() : AViewObject(L"Camera"){
+CameraObject::CameraObject() : AViewObject(L"Camera", ViewObjectType::OBJECT_CAMERA) {
     pos.object = this;
     lookAt.object = this;
 }
 
-CameraObject::~CameraObject(){
-    Free(children);
-}
+CameraObject::~CameraObject(){}
 
 void CameraObject::OnSelect(Vector3 ori, Vector3 dir){
     Matrix4x4 curMat = GetWorldToObjectMatrix();

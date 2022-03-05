@@ -42,11 +42,25 @@ public:
     void PopMatrix();
 
     void SetFrame(float frame);
+
+    void InsertPos(float frame);
+    void InsertRot(float frame);
+    void InsertScale(float frame);
 };
 
 class RenderOptions : public Object {
 public:
     bool light = false;
+};
+
+enum class ViewObjectType {
+    OBJECT_DEFAULT,
+    OBJECT_MESH,
+    OBJECT_BEZIER_CURVE,
+    OBJECT_POINT_LIGHT,
+    OBJECT_AUDIO_SOURCE,
+    OBJECT_AUDIO_LISTENER,
+    OBJECT_CAMERA
 };
 
 class AViewObject : public Object {
@@ -58,8 +72,13 @@ public:
 
 protected:
     AViewObject* parent = NULL;
-
     List<AViewObject*> children;
+
+    const ViewObjectType type = ViewObjectType::OBJECT_DEFAULT;
+
+    AViewObject(ViewObjectType type);
+    AViewObject(const wchar_t* name, ViewObjectType type);
+    AViewObject(WString name, ViewObjectType type);
 
 public:
     AViewObject();
@@ -74,6 +93,7 @@ public:
     void EnumChildren(void(*func)(AViewObject*, void*), void* user);
     List<AViewObject*>& GetChildren();
 
+    ViewObjectType GetType();
     AViewObject* GetParent();
     void SetParent(AViewObject* o);
     bool HasAncestor(AViewObject* o);
@@ -160,7 +180,63 @@ public:
     void UpdateLight();
 };
 
-//TODO 修改为附着于一个物体，以transform确定位置
+class AudioSourceObject final : public AViewObject {
+private:
+    static int REPLAY_ERROR;
+
+    uint alSrc;
+    uint alBuf;
+
+    /* size in samples */
+    int alAudioSize;
+    /* length in seconds */
+    int alAudioLen;
+    /* size in bytes */
+    int alSampleSize;
+    /* number of channels */
+    int alChannels;
+    /* audio data */
+    void* alAudioData;
+    int alAudioFreq;
+    int alAudioOffset;
+
+    Vector3 recPos;
+    float recTime;
+
+public:
+    // 输入的数据内部引用，自动回收，不能调用后释放data所在内存
+    AudioSourceObject(uenum format, char* data, int size, int freq);
+    virtual ~AudioSourceObject() override;
+
+    virtual void OnTimer(int id) override;
+
+    // 使用渲染回调获取最新位置信息，并更新AudioListener
+    virtual void OnRender(const RenderOptions* options) override;
+
+    char* GetData();
+    int GetSize();
+    int GetLength();
+    int GetSampleSize();
+    int GetChannelCount();
+    int GetFrequency();
+    int GetOffset();
+    bool IsLoop();
+    float GetGain();
+
+    void SetOffset(int offset);
+    void SetLoop(bool loop);
+    void SetGain(float gain);
+
+    void Play();
+    void Stop();
+    bool IsPlaying();
+
+    void SetPosv3(Vector3 value);
+    void SetVelocityv3(Vector3 value);
+    void SetPosAutoVelv3(Vector3 value);
+};
+
+//TODO 可修改为附着于一个物体，以transform确定位置
 class AudioListenerObject final : public AViewObject {
 public:
     AudioListenerObject();

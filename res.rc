@@ -50,10 +50,10 @@ IDS_BRUSH_WATERCOLOR SHADER     "res/shader/brush_watercolor.comp"
 IDS_BRUSH_RGB_MUL SHADER        "res/shader/brush_rgb_mul.comp"
 IDS_BRUSH_RGB_AVERAGE SHADER    "res/shader/brush_rgb_average.comp"
 
-IDB_EARTH_WATER BITMAP          "res/texture/earth_water.bmp"
-IDB_NODEMAP_BACKGROUND BITMAP   "res/texture/nodemap_background.bmp"
-IDB_BUTTON_MOVE BITMAP          "res/texture/btn_move.bmp"
-IDB_BUTTON_ROTATE BITMAP        "res/texture/btn_rotate.bmp"
+IDB_EARTH_WATER TEXTURE         "res/texture/earth_water.png"
+IDB_NODEMAP_BACKGROUND TEXTURE  "res/texture/nodemap_background.png"
+IDB_BUTTON_MOVE TEXTURE         "res/texture/btn_move.png"
+IDB_BUTTON_ROTATE TEXTURE       "res/texture/btn_rotate.png"
 
 IDC_MENU MENU
 BEGIN
@@ -66,14 +66,11 @@ BEGIN
     END
     POPUP "网格体(&M)"
     BEGIN
-        POPUP "基本"
-        BEGIN
-            MENUITEM "平面",                        IDM_MESH_BASIC_PLANE
-            MENUITEM "方块",                        IDM_MESH_BASIC_BLOCK
-            MENUITEM "球体",                        IDM_MESH_BASIC_SPHERE
-            MENUITEM "圆柱体",                      IDM_MESH_BASIC_CYLINDER
-            MENUITEM "胶囊体",                      IDM_MESH_BASIC_CAPSULE
-        END
+        MENUITEM "平面",                            IDM_MESH_BASIC_PLANE
+        MENUITEM "方块",                            IDM_MESH_BASIC_BLOCK
+        MENUITEM "球体",                            IDM_MESH_BASIC_SPHERE
+        MENUITEM "圆柱体",                          IDM_MESH_BASIC_CYLINDER
+        MENUITEM "胶囊体",                          IDM_MESH_BASIC_CAPSULE
     END
     POPUP "工具(&T)"
     BEGIN
@@ -91,6 +88,10 @@ BEGIN
     BEGIN
         MENUITEM "窗口菜单\tCtrl+W",                IDM_MENU_WINDOW
     END
+    POPUP "动画(&A)"
+    BEGIN
+        MENUITEM "插值\tShift+I",                   IDM_MENU_INSERT
+    END
     POPUP "版本(&V)"
     BEGIN
         MENUITEM "关于...\tAlt+?",                  IDM_ABOUT
@@ -99,7 +100,6 @@ END
 
 IDC_MENU ACCELERATORS
 BEGIN
-    "/",            IDM_ABOUT,              ASCII, ALT, NOINVERT
     "?",            IDM_ABOUT,              ASCII, ALT, NOINVERT
     "^S",           IDM_SAVE,               ASCII, NOINVERT
     "^L",           IDM_LOAD,               ASCII, NOINVERT
@@ -131,6 +131,7 @@ BEGIN
 
     "A",            IDM_MENU_BASIC,         ASCII, NOINVERT
     "^W",           IDM_MENU_WINDOW,        ASCII, NOINVERT
+    "I",            IDM_MENU_INSERT,        ASCII, NOINVERT
 
     "1",            IDM_TOOL_EMPTY,         ASCII, ALT, NOINVERT
     "2",            IDM_TOOL_SELECTBOX,     ASCII, ALT, NOINVERT

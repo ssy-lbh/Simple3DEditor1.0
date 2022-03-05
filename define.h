@@ -45,6 +45,7 @@ class Mesh;
 class Vector2;
 class Vector3;
 class Vector4;
+class Complex;
 class Quaternion;
 class Matrix4x4;
 
@@ -53,7 +54,9 @@ class Transform;
 class AViewObject;
 class MeshObject;
 class BezierCurveObject;
+class AudioSourceObject;
 class AudioListenerObject;
+class CameraObject;
 
 // main
 class IUndo;
@@ -92,6 +95,7 @@ class AnimationWindow;
 class GLRect;
 class GLUtils;
 class GLTexture2D;
+class GLRenderTexture2D;
 class GLComputeProgram;
 class GLFrameBuffer;
 class GLLights;

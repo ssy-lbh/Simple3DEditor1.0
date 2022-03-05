@@ -720,14 +720,22 @@ IWindow* SelectionWindow::GetWindow(){
 }
 
 void SelectionWindow::SetWindow(IWindow* window, bool del){
-    if (curWindow && del){
-        curWindow->OnClose();
-        delete curWindow;
-    }
-    curWindow = window;
-    if (curWindow){
-        curWindow->OnCreate();
-        curWindow->OnResize(sizeX, sizeY);
-        curWindow->OnMouseMove(cursorX, cursorY);
+    if (del){
+        if (curWindow){
+            curWindow->OnClose();
+            delete curWindow;
+        }
+        curWindow = window;
+        if (curWindow){
+            curWindow->OnCreate();
+            curWindow->OnResize(sizeX, sizeY);
+            curWindow->OnMouseMove(cursorX, cursorY);
+        }
+    }else{
+        curWindow = window;
+        if (curWindow){
+            curWindow->OnResize(sizeX, sizeY);
+            curWindow->OnMouseMove(cursorX, cursorY);
+        }
     }
 }

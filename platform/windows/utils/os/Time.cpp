@@ -4,7 +4,7 @@
 
 #include <utils/os/Log.h>
 
-float TimeUtils::GetTime(){
+double TimeUtils::GetTime(){
     LARGE_INTEGER time;
     LARGE_INTEGER freq;
 

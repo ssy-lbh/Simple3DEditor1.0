@@ -28,6 +28,8 @@ private:
     float frame = 0.0f;
     bool play = false;
 
+    float time;
+
     AnimationCurve* curve = NULL;
 
     class FrameIndicator : public IButton {
@@ -50,6 +52,8 @@ private:
     private:
         static const Vector3 COLOR;
         static const float DEPTH;
+        static const float BOUND_TOP;
+        static const float BOUND_BOTTOM;
 
     public:
         Bottom();
@@ -108,6 +112,11 @@ public:
     void UpdateWindowSize(int x, int y);
     void SetCurve(AnimationCurve* curve);
     void SetProperty(Property* prop);
+    void SetFrame(float frame);
+
+    void Play();
+    void Stop();
+    bool IsPlaying();
 };
 
 #endif

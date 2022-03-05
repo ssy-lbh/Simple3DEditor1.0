@@ -14,6 +14,14 @@ public:
     virtual float GetValue(Vector2 p1, Vector2 p2, float val);
 };
 
+class RightValueFunc final : public IAnimationFunction {
+public:
+    RightValueFunc();
+    virtual ~RightValueFunc() override;
+
+    virtual float GetValue(Vector2 p1, Vector2 p2, float val) override;
+};
+
 class LinearFunc final : public IAnimationFunction {
 public:
     LinearFunc();
@@ -56,7 +64,9 @@ private:
     size_t selIndex;
     Vector2 initialPos;
 
-    Menu* funcMenu;
+    Menu* basicMenu;
+
+    float ratio = 1.0f;
 
 public:
     AnimationCurve(float startFrame, float endFrame);
@@ -72,6 +82,10 @@ public:
     float GetValue(float pos);
     void OnChangeRange(float start, float end);
     void SetFunc(size_t seg, IAnimationFunction* func);
+    void AddPoint(Vector2 point);
+    void AddPoint(size_t index, Vector2 point);
+    void RemovePoint(size_t index);
+    void FlushRange();
 };
 
 #endif

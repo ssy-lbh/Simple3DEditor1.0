@@ -192,9 +192,76 @@ public:
     Vector4 RotateZ(float) const;
 };
 
+// 复数在二维上有与四元数在三维上相似的功能，即表示一个旋转
+// 不同的是复数满足交换律，而四元数不满足
+class Complex final : public Object {
+public:
+    union {
+        _Complex float comp;
+        struct {
+            float real;
+            float imag;
+        };
+    };
+
+    static const Complex one;
+    static const Complex i;
+
+    Complex();
+    Complex(float &&);
+    Complex(_Complex float &&);
+    Complex(Vector2 &&);
+    Complex(Complex &&) = default;
+    Complex(const float &);
+    Complex(const _Complex float &);
+    Complex(const Vector2 &);
+    Complex(const Complex &) = default;
+    Complex &operator=(float &&);
+    Complex &operator=(_Complex float &&);
+    Complex &operator=(Vector2 &&);
+    Complex &operator=(Complex &&) = default;
+    Complex &operator=(const float &);
+    Complex &operator=(const _Complex float &);
+    Complex &operator=(const Vector2 &);
+    Complex &operator=(const Complex &) = default;
+    Complex(float, float);
+    ~Complex();
+    Complex operator+(Complex) const;
+    Complex operator+(float) const;
+    Complex operator-(Complex) const;
+    Complex operator-(float) const;
+    Complex operator*(Complex) const;
+    Complex operator*(float) const;
+    Complex operator/(Complex) const;
+    Complex operator/(float) const;
+    Complex &operator+=(Complex);
+    Complex &operator+=(float);
+    Complex &operator-=(Complex);
+    Complex &operator-=(float);
+    Complex &operator*=(Complex);
+    Complex &operator*=(float);
+    Complex &operator/=(Complex);
+    Complex &operator/=(float);
+    Complex operator-() const;
+    Vector2 operator*(Vector2) const;
+
+    static Complex FromTo(Vector2 from, Vector2 to);
+    static Complex Reflection(Vector2 axis, Vector2 v);
+    static Complex Rotation(float);
+
+    Complex Conjugate() const;
+    Complex Inverse() const;
+    Complex Normal() const;
+    Complex &Normalize();
+    Complex &Rotate(float);
+    float Magnitude() const;
+    float SqrMagnitude() const;
+};
+
+// 四元数不满足交换律，应按照旋转顺序依次从右往左排列，对向量操作应为左乘
+// 四元数的旋转轴即为(x,y,z)方向
 class Quaternion final : public Object {
 public:
-    // 四元数的旋转轴即为(x,y,z)方向
     float x;
     float y;
     float z;
@@ -224,7 +291,7 @@ public:
     static Quaternion FromTo(Vector3 from, Vector3 to);
     static Quaternion Reflection(Vector3 axis, Vector3 v);
     static Quaternion AxisAngle(Vector3, float);
-    static Quaternion EulerZXY(float, float, float);
+    static Quaternion EulerZXY(float x, float y, float z);
     static Quaternion EulerZXY(Vector3);
     static Quaternion LookAt(Vector3 dir, Vector3 up);
 

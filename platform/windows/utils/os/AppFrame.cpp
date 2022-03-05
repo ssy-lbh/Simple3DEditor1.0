@@ -15,6 +15,8 @@
 bool AppFrame::init = false;
 
 AppFrame::AppFrame(String name, IWindow* mainFrame, size_t height, size_t width, bool async) : name(name), mainFrame(mainFrame), height(height), width(width) {
+    DebugLog("AppFrame %p Launched", this);
+    
     hInst = GetModuleHandleA(NULL);
     
     Initialize();
@@ -39,6 +41,7 @@ AppFrame::AppFrame(String name, IWindow* mainFrame, size_t height, size_t width,
 }
 
 AppFrame::~AppFrame(){
+    DebugLog("AppFrame %p Destoryed", this);
     if (mainFrame) delete mainFrame;
     if (data) delete data;
     if (viewMgr) delete viewMgr;

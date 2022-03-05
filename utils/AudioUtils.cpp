@@ -3,6 +3,7 @@
 #include <lib/openal/al.h>
 #include <lib/openal/alc.h>
 
+#include <utils/os/Time.h>
 #include <utils/math3d/Math.h>
 #include <utils/math3d/LinearAlgebra.h>
 #include <utils/os/Log.h>
@@ -11,17 +12,6 @@ bool AudioUtils::init = false;
 
 ALCdevice* AudioUtils::alDev = NULL;
 ALCcontext* AudioUtils::alCtx = NULL;
-
-AudioUtils::Complex::Complex(_Complex float comp) : comp(comp) {}
-AudioUtils::Complex::~Complex(){}
-
-float AudioUtils::Complex::MagnitudeSqr(){
-    return real * real + imag * imag;
-}
-
-float AudioUtils::Complex::Magnitude(){
-    return __builtin_sqrt(real * real + imag * imag);
-}
 
 bool AudioUtils::CheckALError(const char* tag, const char* file, int line){
     int loopCnt = 0;
@@ -40,7 +30,7 @@ bool AudioUtils::CheckALError(const char* tag, const char* file, int line){
 	return loopCnt != 0;
 }
 
-void AudioUtils::FFT(_Complex float* input, int sizebit, bool inv){
+void AudioUtils::FFT(Complex* input, int sizebit, bool inv){
     int size = 1 << sizebit;
     int* rev = new int[size];
     rev[0] = 0;
@@ -49,7 +39,7 @@ void AudioUtils::FFT(_Complex float* input, int sizebit, bool inv){
     }
     for (int i = 0; i < size; i++){
         if (i < rev[i]){
-            _Complex float tmp;
+            Complex tmp;
             tmp = input[i];
             input[i] = input[rev[i]];
             input[rev[i]] = tmp;
@@ -59,11 +49,11 @@ void AudioUtils::FFT(_Complex float* input, int sizebit, bool inv){
     for (int i = 1; i <= sizebit; i++){
         int half = (1 << (i - 1)), num = (1 << i);
         for (int j = 0; j < (1 << (sizebit - i)); j++){
-            _Complex float o, m;
-            m = 1.0f + 0.0if;
-            o = __builtin_sin(PI / num) * (inv ? -1.0if : 1.0if) + __builtin_cos(PI / num);
+            Complex o, m;
+            m = 1.0f;
+            o = inv ? Complex::Rotation(PI / num) : Complex::Rotation(-PI / num);
             for (int k = (j << i); k < (j << i) + half; k++){
-                _Complex float A = input[k], B = input[k + half];
+                Complex A = input[k], B = input[k + half];
                 input[k] = A + B * o;//单位根份数
                 input[k + half] = A - B * o;
                 m *= o;
@@ -133,6 +123,22 @@ void alListenerVelocityv3(Vector3 value){
     alListener3f(AL_VELOCITY, value.x, value.y, value.z);
 }
 
-void alListenerDirv3(Vector3 value){
-    alListener3f(AL_ORIENTATION, value.x, value.y, value.z);
+const float VELOCITY_RATIO = 1.0f;
+
+void alListenerPosAutoVelv3(Vector3 value){
+    static Vector3 pos = value;
+    static float time = 0.0f;
+
+    float curTime = TimeUtils::GetTime();
+    Vector3 vel = (value - pos) * VELOCITY_RATIO / (curTime - time);
+    pos = value;
+    time = curTime;
+
+    alListener3f(AL_POSITION, value.x, value.y, value.z);
+    alListener3f(AL_VELOCITY, vel.x, vel.y, vel.z);
+}
+
+void alListenerDirv3(Vector3 dir, Vector3 up){
+    float ori[] = {dir.x, dir.y, dir.z, up.x, up.y, up.z};
+    alListenerfv(AL_ORIENTATION, ori);
 }

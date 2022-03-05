@@ -50,4 +50,17 @@ public:
     String GetPath() const;
 };
 
+class ISerializable : public Object {
+public:
+    void Serialize(File& f);
+};
+
+class IDeserializable : public Object {
+public:
+    void Deserialize(File& f);
+};
+
+// Object中的方法应该以ISerializable为首，多继承中几个基类是连同各自的不同基类存入该子类的
+class IMemorable : public ISerializable, public IDeserializable {};
+
 #endif

@@ -7,15 +7,25 @@ class GLTexture2D final : public Object {
 private:
     uint tex;
     bool delTex = true;
+    int x, y;
+    uenum format;
+
+    void InitData(DataBuffer& data, int x, int y, int channel);
     
 public:
     GLTexture2D(const char* path);
     GLTexture2D(const wchar_t* path);
     GLTexture2D(int resid);
-    GLTexture2D(uint texture, bool delTex = false);
+    GLTexture2D(GLRenderTexture2D* tex);
     ~GLTexture2D();
+
     bool Enable();
+    // 同glDisable(GL_TEXTURE_2D);
     static void Disable();
+    uint GetTexture();
+    int GetWidth();
+    int GetHeight();
+    uenum GetFormat();
 };
 
 #endif

@@ -49,6 +49,8 @@ public:
     virtual void OnClick() override;
 };
 
+#define SWITCHMENUITEM_LAMBDA_TRANS(t) (void(*)(bool, void*))(void(*)(bool, t*))
+
 class SwitchMenuItem final : public IMenuItem {
 public:
     const wchar_t* nameOn = NULL;
@@ -60,9 +62,35 @@ public:
     void* userData = NULL;
 
     SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff);
+    SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, bool state);
     SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, void(*click)(bool, void*));
+    SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, void(*click)(bool, void*), bool state);
     SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, void(*click)(bool, void*), void* userData);
+    SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, void(*click)(bool, void*), void* userData, bool state);
     virtual ~SwitchMenuItem() override;
+
+    virtual IMenuItem::ItemType GetType() override;
+    virtual const wchar_t* GetName() override;
+
+    virtual void OnClick() override;
+};
+
+class ConditionalMenuItem final : public IMenuItem {
+public:
+    const wchar_t* nameTrue = NULL;
+    const wchar_t* nameFalse = NULL;
+
+    bool(*judge)(void*) = NULL;
+    void* judgeData = NULL;
+
+    void(*click)(bool, void*) = NULL;
+    void* userData = NULL;
+
+    ConditionalMenuItem(const wchar_t* nameTrue, const wchar_t* nameFalse, bool(*judge)(void*));
+    ConditionalMenuItem(const wchar_t* nameTrue, const wchar_t* nameFalse, bool(*judge)(void*), void(*click)(bool, void*));
+    ConditionalMenuItem(const wchar_t* nameTrue, const wchar_t* nameFalse, bool(*judge)(void*), void(*click)(bool, void*), void* data);
+    ConditionalMenuItem(const wchar_t* nameTrue, const wchar_t* nameFalse, bool(*judge)(void*), void* judgeData, void(*click)(bool, void*), void* userData);
+    virtual ~ConditionalMenuItem() override;
 
     virtual IMenuItem::ItemType GetType() override;
     virtual const wchar_t* GetName() override;

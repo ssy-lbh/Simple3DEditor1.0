@@ -12,6 +12,8 @@ public:
     float bottom;
     float top;
 
+    static const GLRect zero;
+
     GLRect();
     GLRect(Vector2 p1, Vector2 p2);
     GLRect(float left, float right, float bottom, float top);
