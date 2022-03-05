@@ -19,25 +19,26 @@ public:
     GLRect(float left, float right, float bottom, float top);
     ~GLRect();
 
-    float GetAspect();
-    float GetWidth();
-    float GetHeight();
-    Vector2 GetSize();
-    float GetXRatio(float x);
-    float GetYRatio(float y);
-    Vector2 GetRatio(float x, float y);
-    Vector2 GetRatio(Vector2 pos);
-    float GetXRatioPos(float ratio);
-    float GetYRatioPos(float ratio);
-    Vector2 GetRatioPos(float ratioX, float ratioY);
-    Vector2 GetRatioPos(Vector2 ratio);
-    float MapXPos(GLRect rect, float x);
-    float MapYPos(GLRect rect, float y);
+    float GetAspect() const;
+    float GetWidth() const;
+    float GetHeight() const;
+    Vector2 GetSize() const;
+    bool Inside(Vector2 pos) const;
+    float GetXRatio(float x) const;
+    float GetYRatio(float y) const;
+    Vector2 GetRatio(float x, float y) const;
+    Vector2 GetRatio(Vector2 pos) const;
+    float GetXRatioPos(float ratio) const;
+    float GetYRatioPos(float ratio) const;
+    Vector2 GetRatioPos(float ratioX, float ratioY) const;
+    Vector2 GetRatioPos(Vector2 ratio) const;
+    float MapXPos(GLRect rect, float x) const;
+    float MapYPos(GLRect rect, float y) const;
     // 把pos在rect中所在的位置比例映射到自身中位置
-    Vector2 MapPos(GLRect rect, Vector2 pos);
-    Vector2 MapPos(GLRect rect, float x, float y);
-    GLRect ChildRect(GLRect ratio);
-    GLRect ChildRect(float left, float right, float bottom, float top);
+    Vector2 MapPos(GLRect rect, Vector2 pos) const;
+    Vector2 MapPos(GLRect rect, float x, float y) const;
+    GLRect ChildRect(GLRect ratio) const;
+    GLRect ChildRect(float left, float right, float bottom, float top) const;
 };
 
 #define glCheckError(tag) GLUtils::CheckGLError(tag, __FILE__, __LINE__)

@@ -5,6 +5,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <lib/stb_image/stb_image.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <lib/stb_image/stb_image_write.h>
+
 #include <res.h>
 #include <utils/String.h>
 #include <utils/DataBuffer.h>
@@ -111,4 +114,96 @@ DataBuffer Resource::GetShader(int id){
     delete[] srcData;
 
     return res;
+}
+
+void Resource::StoreImage(String path, DataBuffer data, int x, int y, int comp){
+    if (path.EndsWith(".png")){
+        StorePNG(path, data.Buffer(), x, y, comp);
+    }else if (path.EndsWith(".jpg")){
+        StoreJPG(path, data.Buffer(), x, y, comp, 100);
+    }else if (path.EndsWith(".tga")){
+        StoreTGA(path, data.Buffer(), x, y, comp);
+    }else if (path.EndsWith(".bmp")){
+        StoreBMP(path, data.Buffer(), x, y, comp);
+    }else if (path.EndsWith(".hdr")){
+        StoreHDR(path, data.Buffer(), x, y, comp);
+    }else{
+        DebugError("Resource::StoreImage File Format Not Supported, Default To '.png'");
+        StorePNG(path + ".png", data.Buffer(), x, y, comp);
+    }
+}
+
+void Resource::StoreImage(String path, const void* data, int x, int y, int comp){
+    if (path.EndsWith(".png")){
+        StorePNG(path, data, x, y, comp);
+    }else if (path.EndsWith(".jpg")){
+        StoreJPG(path, data, x, y, comp, 100);
+    }else if (path.EndsWith(".tga")){
+        StoreTGA(path, data, x, y, comp);
+    }else if (path.EndsWith(".bmp")){
+        StoreBMP(path, data, x, y, comp);
+    }else if (path.EndsWith(".hdr")){
+        StoreHDR(path, data, x, y, comp);
+    }else{
+        DebugError("Resource::StoreImage File Format Not Supported, Default To '.png'");
+        StorePNG(path + ".png", data, x, y, comp);
+    }
+}
+
+void Resource::StoreBMP(String path, DataBuffer data, int x, int y, int comp){
+    stbi_write_bmp(path.GetString(), x, y, comp, data.Buffer());
+}
+
+void Resource::StorePNG(String path, DataBuffer data, int x, int y, int comp){
+    stbi_write_png(path.GetString(), x, y, comp, data.Buffer(), x * comp);
+}
+
+void Resource::StoreJPG(String path, DataBuffer data, int x, int y, int comp, int quality){
+    stbi_write_jpg(path.GetString(), x, y, comp, data.Buffer(), quality);
+}
+
+void Resource::StoreTGA(String path, DataBuffer data, int x, int y, int comp){
+    stbi_write_tga(path.GetString(), x, y, comp, data.Buffer());
+}
+
+void Resource::StoreHDR(String path, DataBuffer data, int x, int y, int comp){
+    size_t size = data.Size();
+    unsigned char* src = (unsigned char*)data.Buffer();
+    float* buf = new float[size];
+
+    for (size_t i = 0; i < size; i++)
+        buf[i] = src[i];
+
+    stbi_write_hdr(path.GetString(), x, y, comp, buf);
+
+    delete[] buf;
+}
+
+void Resource::StoreBMP(String path, const void* data, int x, int y, int comp){
+    stbi_write_bmp(path.GetString(), x, y, comp, data);
+}
+
+void Resource::StorePNG(String path, const void* data, int x, int y, int comp){
+    stbi_write_png(path.GetString(), x, y, comp, data, x * comp);
+}
+
+void Resource::StoreJPG(String path, const void* data, int x, int y, int comp, int quality){
+    stbi_write_jpg(path.GetString(), x, y, comp, data, quality);
+}
+
+void Resource::StoreTGA(String path, const void* data, int x, int y, int comp){
+    stbi_write_tga(path.GetString(), x, y, comp, data);
+}
+
+void Resource::StoreHDR(String path, const void* data, int x, int y, int comp){
+    size_t size = (size_t)x * y * comp;
+    unsigned char* src = (unsigned char*)data;
+    float* buf = new float[size];
+
+    for (size_t i = 0; i < size; i++)
+        buf[i] = src[i];
+
+    stbi_write_hdr(path.GetString(), x, y, comp, buf);
+
+    delete[] buf;
 }

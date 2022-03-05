@@ -8,10 +8,12 @@
 #include <editor/MainWindow.h>
 #include <editor/dialog/Tips.h>
 #include <utils/AudioUtils.h>
+#include <utils/StringBuilder.h>
 #include <utils/os/Log.h>
 #include <utils/os/Font.h>
 #include <utils/os/Thread.h>
 #include <utils/os/Shell.h>
+#include <utils/os/Resource.h>
 #include <utils/gl/GLUtils.h>
 #include <utils/math3d/ViewObject.h>
 
@@ -183,6 +185,40 @@ AViewObject* Main::AddObject(AViewObject* o){
 void Main::OnAnimationFrame(float frame){
     data->OnAnimationFrame(frame);
     RequestRender();
+}
+
+void Main::SaveImage(String file, GLRect rect){
+    size_t width = (size_t)rect.GetWidth();
+    size_t height = (size_t)rect.GetHeight();
+    size_t size = (width * height) << 2;
+    char* buffer = new char[size];
+
+    DebugLog("SaveImage %s", file.GetString());
+
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(rect.left, rect.bottom, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+    Resource::StoreImage(file, buffer, width, height, 4);
+
+    delete[] buffer;
+}
+
+void Main::RenderAnimation(String dir, size_t start, size_t end, GLRect rect){
+    AppFrame* frame = AppFrame::GetLocalInst();
+    StringBuilder builder;
+
+    for (size_t i = start; i <= end; i++){
+        data->OnAnimationFrame(i);
+
+        frame->Render();
+        frame->SwapBuffer();
+        
+        builder.Append(dir);
+        builder.Append(i);
+        builder.Append(".png");
+        SaveImage(builder.ToString(), rect);
+        builder.Clear();
+    }
 }
 
 Mesh* Main::GetMesh(){

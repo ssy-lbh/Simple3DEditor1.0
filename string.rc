@@ -14,6 +14,8 @@ BEGIN
     IDS_PICFILE_FILTER "位图文件(*.bmp)\0*.bmp\0"
                        "便携式网络图形(*.png)\0*.png\0"
                        "专业联合图片(*.jpg, *.jpeg)\0*.jpg;*.jpeg\0"
+                       "无失真标记图形(*.tga)\0*.tga\0"
+                       "高动态范围图像(*.hdr)\0*.hdr\0"
                        "任意图片格式(*.*)\0*.*\0"
     IDS_EXIT_CONFIRM "确认要退出程序？"
     IDS_EXIT_CONFIRM_CAPTION "退出确认"

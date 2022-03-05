@@ -167,6 +167,16 @@ void Transform::InsertScale(float frame){
     scale.InsertValue(frame);
 }
 
+SelectInfo::SelectInfo(){}
+SelectInfo::~SelectInfo(){}
+
+bool SelectInfo::Inside(Vector3 pos) const{
+    Vector3 lookPos = (-camDir) * (pos - camPos);
+    if (lookPos.y < zBound.x || lookPos.y > zBound.y)
+        return false;
+    return rect.Inside(Vector2(lookPos.x, lookPos.z) / lookPos.y);
+}
+
 AViewObject::AViewObject() : name(L"Object") {}
 AViewObject::AViewObject(ViewObjectType type) : name(L"Object"), type(type) {}
 AViewObject::AViewObject(const wchar_t* name) : name(name) {}
@@ -227,19 +237,15 @@ List<AViewObject*>& AViewObject::GetChildren(){
 }
 
 Matrix4x4 AViewObject::GetObjectToWorldMatrix(){
-    if (parent)
-        return parent->GetObjectToWorldMatrix() * transform.GetMatrix();
-    return transform.GetMatrix();
+    return transform.chainMat;
 }
 
 Matrix4x4 AViewObject::GetWorldToObjectMatrix(){
-    if (parent)
-        return transform.GetInvMatrix() * parent->GetWorldToObjectMatrix();
-    return transform.GetInvMatrix();
+    return transform.chainInvMat;
 }
 
 void AViewObject::OnSelect(Vector3 ori, Vector3 dir){}
-void AViewObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){}
+void AViewObject::OnSelect(const SelectInfo* info){}
 void AViewObject::OnSelectUV(Vector2 uv, float err){}
 void AViewObject::OnSelectUV(Vector2 uv1, Vector2 uv2){}
 
@@ -250,8 +256,10 @@ void AViewObject::OnChainRender(const RenderOptions* options){
 
     if (parent){
         transform.chainMat = parent->transform.chainMat * transform.GetMatrix();
+        transform.chainInvMat = transform.GetInvMatrix() * parent->transform.chainInvMat;
     }else{
         transform.chainMat = transform.GetMatrix();
+        transform.chainInvMat = transform.GetInvMatrix();
     }
 
     transform.PushMatrix();
@@ -311,10 +319,8 @@ MeshObject::~MeshObject(){
 }
 
 void MeshObject::OnSelect(Vector3 ori, Vector3 dir){
-    Matrix4x4 curMat = GetWorldToObjectMatrix();
-
-    ori = curMat * Vector4(ori, 1.0f);
-    dir = curMat * Vector4(dir, 0.0f);
+    ori = transform.chainInvMat * Vector4(ori, 1.0f);
+    dir = transform.chainInvMat * Vector4(dir, 0.0f);
 
     switch (Main::data->selType){
     case GlobalData::SELECT_VERTICES:{
@@ -346,27 +352,15 @@ void MeshObject::OnSelect(Vector3 ori, Vector3 dir){
     }
 }
 
-void MeshObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
-    Matrix4x4 curMat = GetWorldToObjectMatrix();
-
-    camPos = curMat * Vector4(camPos, 1.0f);
-    camDir = Quaternion::FromTo(Vector3::forward, curMat * (camDir * Vector3::forward));
-
+void MeshObject::OnSelect(const SelectInfo* info){
     switch (Main::data->selType){
     case GlobalData::SELECT_VERTICES:
-        mesh->FindScreenRect(
-            camPos, camDir,
-            zBound.x, zBound.y,
-            p1.x, p2.x,
-            p1.y, p2.y,
-            Main::data->selPoints
-        );
+        mesh->FindScreenRect(info, transform.chainMat, Main::data->selPoints);
         break;
     }
 }
 
 void MeshObject::OnSelectUV(Vector2 uv, float err){
-    AViewObject::OnSelectUV(uv, err);
     Vertex* v = mesh->FindUV(uv, err);
     if (!v){
         Main::data->selPoints.Clear();
@@ -380,7 +374,6 @@ void MeshObject::OnSelectUV(Vector2 uv, float err){
 }
 
 void MeshObject::OnSelectUV(Vector2 uv1, Vector2 uv2){
-    AViewObject::OnSelectUV(uv1, uv2);
     mesh->FindUVRect(uv1, uv2, Main::data->selPoints);
 }
 
@@ -389,7 +382,7 @@ Mesh* MeshObject::GetMesh(){
 }
 
 void MeshObject::OnRender(const RenderOptions* options){
-    mesh->Render(options->light);
+    mesh->Render(options);
 }
 
 void MeshObject::OnRenderUVMap(){
@@ -409,10 +402,8 @@ BezierCurveObject::BezierCurveObject() : AViewObject(L"BezierCurve", ViewObjectT
 BezierCurveObject::~BezierCurveObject(){}
 
 void BezierCurveObject::OnSelect(Vector3 ori, Vector3 dir){
-    Matrix4x4 curMat = GetWorldToObjectMatrix();
-
-    ori = curMat * Vector4(ori, 1.0f);
-    dir = curMat * Vector4(dir, 0.0f);
+    ori = transform.chainInvMat * Vector4(ori, 1.0f);
+    dir = transform.chainInvMat * Vector4(dir, 0.0f);
 
     bool hit = false;
     for (int i = 0; i < 4; i++){
@@ -429,15 +420,10 @@ void BezierCurveObject::OnSelect(Vector3 ori, Vector3 dir){
         DebugLog("No Point Selected");
     }
 }
-void BezierCurveObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
-    Matrix4x4 curMat = GetWorldToObjectMatrix();
-
-    camPos = curMat * Vector4(camPos, 1.0f);
-    camDir = Quaternion::FromTo(Vector3::forward, curMat * (camDir * Vector3::forward));
-
+void BezierCurveObject::OnSelect(const SelectInfo* info){
     bool hit = false;
     for (int i = 0; i < 4; i++){
-        if (v[i].Hit(camPos, camDir, zBound, p1, p2)){
+        if (info->Inside(transform.chainMat * Vector4(v[i].pos, 1.0f))){
             if (Main::data->selPoints.HasValue(&v[i]))
                 return;
             Main::data->selPoints.Add(&v[i]);
@@ -452,7 +438,6 @@ void BezierCurveObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBou
 }
 
 void BezierCurveObject::OnSelectUV(Vector2 uv, float err){
-    AViewObject::OnSelectUV(uv, err);
     bool hit = false;
     for (int i = 0; i < 4; i++){
         if (v[i].HitUV(uv, err)){
@@ -470,7 +455,6 @@ void BezierCurveObject::OnSelectUV(Vector2 uv, float err){
 }
 
 void BezierCurveObject::OnSelectUV(Vector2 uv1, Vector2 uv2){
-    AViewObject::OnSelectUV(uv1, uv2);
     for (int i = 0; i < 4; i++){
         if (v[i].HitUV(uv1, uv2))
             Main::data->selPoints.Add(&v[i]);
@@ -527,10 +511,8 @@ PointLightObject::~PointLightObject(){
 }
 
 void PointLightObject::OnSelect(Vector3 ori, Vector3 dir){
-    Matrix4x4 curMat = GetWorldToObjectMatrix();
-
-    ori = curMat * Vector4(ori, 1.0f);
-    dir = curMat * Vector4(dir, 0.0f);
+    ori = transform.chainInvMat * Vector4(ori, 1.0f);
+    dir = transform.chainInvMat * Vector4(dir, 0.0f);
 
     if (v.Hit(ori, dir)){
         if (Main::data->selPoints.HasValue(&v))
@@ -543,13 +525,8 @@ void PointLightObject::OnSelect(Vector3 ori, Vector3 dir){
     }
 }
 
-void PointLightObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
-    Matrix4x4 curMat = GetWorldToObjectMatrix();
-
-    camPos = curMat * Vector4(camPos, 1.0f);
-    camDir = Quaternion::FromTo(Vector3::forward, curMat * (camDir * Vector3::forward));
-
-    if (v.Hit(camPos, camDir, zBound, p1, p2)){
+void PointLightObject::OnSelect(const SelectInfo* info){
+    if (info->Inside(transform.chainMat * Vector4(v.pos, 1.0f))){
         if (Main::data->selPoints.HasValue(&v))
             return;
         Main::data->selPoints.Add(&v);
@@ -641,7 +618,7 @@ AudioSourceObject::~AudioSourceObject(){
 }
 
 void AudioSourceObject::OnTimer(int id){
-    Vector3 pos = transform.chainMat * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+    Vector3 pos = transform.chainMat * Vector4(Vector3::zero, 1.0f);
     SetPosAutoVelv3(pos);
 }
 
@@ -778,10 +755,8 @@ CameraObject::CameraObject() : AViewObject(L"Camera", ViewObjectType::OBJECT_CAM
 CameraObject::~CameraObject(){}
 
 void CameraObject::OnSelect(Vector3 ori, Vector3 dir){
-    Matrix4x4 curMat = GetWorldToObjectMatrix();
-
-    ori = curMat * Vector4(ori, 1.0f);
-    dir = curMat * Vector4(dir, 0.0f);
+    ori = transform.chainInvMat * Vector4(ori, 1.0f);
+    dir = transform.chainInvMat * Vector4(dir, 0.0f);
     
     if (pos.Hit(ori, dir)){
         if (Main::data->selPoints.HasValue(&pos))
@@ -799,14 +774,10 @@ void CameraObject::OnSelect(Vector3 ori, Vector3 dir){
     }
 }
 
-void CameraObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
-    Matrix4x4 curMat = GetWorldToObjectMatrix();
+void CameraObject::OnSelect(const SelectInfo* info){
     bool hit = false;
 
-    camPos = curMat * Vector4(camPos, 1.0f);
-    camDir = Quaternion::FromTo(Vector3::forward, curMat * (camDir * Vector3::forward));
-
-    if (pos.Hit(camPos, camDir, zBound, p1, p2)){
+    if (info->Inside(transform.chainMat * Vector4(pos.pos, 1.0f))){
         hit = true;
         if (Main::data->selPoints.HasValue(&pos))
             return;
@@ -814,7 +785,7 @@ void CameraObject::OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, V
         DebugLog("Select Point %f %f %f", pos.pos.x, pos.pos.y, pos.pos.z);
     }
     
-    if (lookAt.Hit(camPos, camDir, zBound, p1, p2)){
+    if (info->Inside(transform.chainMat * Vector4(lookAt.pos, 1.0f))){
         hit = true;
         if (Main::data->selPoints.HasValue(&lookAt))
             return;

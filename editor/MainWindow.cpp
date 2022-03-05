@@ -1,5 +1,6 @@
 #include <editor/MainWindow.h>
 
+#include <lib/opengl/gl/gl.h>
 #include <lib/opengl/gl/glu.h>
 
 #include <main.h>
@@ -10,7 +11,9 @@
 #include <utils/File.h>
 #include <utils/AudioUtils.h>
 #include <utils/math3d/Math.h>
+#include <utils/math3d/LinearAlgebra.h>
 #include <utils/math3d/Mesh.h>
+#include <utils/math3d/ViewObject.h>
 #include <utils/os/Shell.h>
 #include <utils/gl/GLTexture2D.h>
 
@@ -354,12 +357,13 @@ void MainWindow::SelectTool::OnLeftUp(){
         return;
     }
     if (Main::data->curObject){
-        Main::data->curObject->OnSelect(
-            window->camPos, window->camDir,
-            Vector2(window->camDis * 0.02, window->camDis * 20.0),
-            Vector2(start.x * window->aspect, start.y),
-            Vector2(end.x * window->aspect, end.y)
-        );
+        SelectInfo info;
+        info.camPos = window->camPos;
+        info.camDir = window->camDir;
+        info.zBound = Vector2(window->camDis * 0.02, window->camDis * 20.0);
+        info.rect = GLRect(Vector2(start.x * window->aspect, start.y), Vector2(end.x * window->aspect, end.y));
+        
+        Main::data->curObject->OnSelect(&info);
     }
 }
 
@@ -533,25 +537,6 @@ void MainWindow::InitCamera(){
             camUp.x, camUp.y, camUp.z);
 }
 
-void MainWindow::InitLight0(){
-    GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat mat_shininess[] = {50.0};
-
-    GLfloat light_position[] = {0.0, 0.0, 2.0, 1.0};// 最后一个参数为0.0表示该光源是directional的
-
-    GLfloat light_ambient[] = {0.0, 0.0, 0.0, 1.0};
-    GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat light_specular[] = {0.0, 0.0, 0.0, 1.0};
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-}
-
 void MainWindow::RenderModelView(){
     // 这些暂定是默认设置
     glEnable(GL_DEPTH_TEST);
@@ -601,6 +586,9 @@ void MainWindow::RenderModelView(){
     glEnd();
 
     RenderOptions options;
+    options.vertex = true;
+    options.edge = true;
+    options.face = true;
     options.light = lightEnabled;
     //TODO 后续光照设置法线
     Main::data->scene->OnChainRender(&options);
@@ -649,7 +637,6 @@ void MainWindow::OnRender(){
     glDisable(GL_LIGHTING);
     glEnable(GL_ALPHA_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glMatrixMode(GL_PROJECTION);
     GLUtils::ResetProjection();
     GLUtils::ResetModelView();
     if (curTool)
@@ -746,13 +733,11 @@ void MainWindow::DeletePoint(){
 bool MainWindow::SaveMesh(Mesh* mesh){
     if (!mesh)
         return false;
-    WString file = ShellFileSelectWindow(WString(IDS_OBJFILE_FILTER), FILESELECT_REQ_PATH);
+    WString file = ShellFileSelectWindow(WString(IDS_OBJFILE_FILTER), FILESELECT_REQ_PATH, true);
     if (file.GetLength() == 0){
         DebugError("Stop Saving");
         return false;
     }
-    if (!file.EndsWith(L".obj"))
-        file = file + L".obj";
     File target(file);
     if (!target.CreateNew()){
         DebugError("CreateFile %S Error!", file.GetString());

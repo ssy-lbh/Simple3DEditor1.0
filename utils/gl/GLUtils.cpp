@@ -8,81 +8,94 @@
 #include <utils/math3d/LinearAlgebra.h>
 
 GLRect::GLRect(){}
-GLRect::GLRect(Vector2 p1, Vector2 p2) : left(p1.x), right(p2.x), top(p1.y), bottom(p2.y) { Sort(left, right); Sort(bottom, top); }
-GLRect::GLRect(float left, float right, float bottom, float top) : left(left), right(right), bottom(bottom), top(top) {}
+
+GLRect::GLRect(Vector2 p1, Vector2 p2) : left(p1.x), right(p2.x), top(p1.y), bottom(p2.y) {
+    Sort(left, right); Sort(bottom, top);
+}
+
+GLRect::GLRect(float left, float right, float bottom, float top)
+    : left(left), right(right), bottom(bottom), top(top) {
+    Sort(left, right); Sort(bottom, top);
+}
+
 GLRect::~GLRect(){}
 
 const GLRect GLRect::zero = GLRect(0.0f, 0.0f, 0.0f, 0.0f);
 
-float GLRect::GetAspect(){
+float GLRect::GetAspect() const{
     return (right - left) / (top - bottom);
 }
 
-float GLRect::GetWidth(){
+float GLRect::GetWidth() const{
     return right - left;
 }
 
-float GLRect::GetHeight(){
+float GLRect::GetHeight() const{
     return top - bottom;
 }
 
-Vector2 GLRect::GetSize(){
+Vector2 GLRect::GetSize() const{
     return Vector2(right - left, top - bottom);
 }
 
-float GLRect::GetXRatio(float x){
+bool GLRect::Inside(Vector2 pos) const{
+    return pos.x >= left && pos.x <= right &&
+            pos.y >= bottom && pos.y <= top;
+}
+
+float GLRect::GetXRatio(float x) const{
     return GetRate(x, left, right);
 }
 
-float GLRect::GetYRatio(float y){
+float GLRect::GetYRatio(float y) const{
     return GetRate(y, bottom, top);
 }
 
-Vector2 GLRect::GetRatio(float x, float y){
+Vector2 GLRect::GetRatio(float x, float y) const{
     return Vector2(GetRate(x, left, right), GetRate(y, bottom, top));
 }
 
-Vector2 GLRect::GetRatio(Vector2 pos){
+Vector2 GLRect::GetRatio(Vector2 pos) const{
     return GetRatio(pos.x, pos.y);
 }
 
-float GLRect::GetXRatioPos(float ratio){
+float GLRect::GetXRatioPos(float ratio) const{
     return Lerp(left, right, ratio);
 }
 
-float GLRect::GetYRatioPos(float ratio){
+float GLRect::GetYRatioPos(float ratio) const{
     return Lerp(bottom, top, ratio);
 }
 
-Vector2 GLRect::GetRatioPos(float ratioX, float ratioY){
+Vector2 GLRect::GetRatioPos(float ratioX, float ratioY) const{
     return Vector2(Lerp(left, right, ratioX), Lerp(bottom, top, ratioY));
 }
 
-Vector2 GLRect::GetRatioPos(Vector2 ratio){
+Vector2 GLRect::GetRatioPos(Vector2 ratio) const{
     return GetRatioPos(ratio.x, ratio.y);
 }
 
-float GLRect::MapXPos(GLRect rect, float x){
+float GLRect::MapXPos(GLRect rect, float x) const{
     return GetXRatioPos(rect.GetXRatio(x));
 }
 
-float GLRect::MapYPos(GLRect rect, float y){
+float GLRect::MapYPos(GLRect rect, float y) const{
     return GetYRatioPos(rect.GetYRatio(y));
 }
 
-Vector2 GLRect::MapPos(GLRect rect, Vector2 pos){
+Vector2 GLRect::MapPos(GLRect rect, Vector2 pos) const{
     return GetRatioPos(rect.GetRatio(pos));
 }
 
-Vector2 GLRect::MapPos(GLRect rect, float x, float y){
+Vector2 GLRect::MapPos(GLRect rect, float x, float y) const{
     return GetRatioPos(rect.GetRatio(x, y));
 }
 
-GLRect GLRect::ChildRect(GLRect ratio){
+GLRect GLRect::ChildRect(GLRect ratio) const{
     return ChildRect(ratio.left, ratio.right, ratio.bottom, ratio.top);
 }
 
-GLRect GLRect::ChildRect(float left, float right, float bottom, float top){
+GLRect GLRect::ChildRect(float left, float right, float bottom, float top) const{
     GLRect rect;
     Vector2 size;
 

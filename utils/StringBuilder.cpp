@@ -50,6 +50,10 @@ size_t StringBuilder::GetLength(){
     return ptr;
 }
 
+void StringBuilder::Clear(){
+    ptr = 0;
+}
+
 StringBuilder& StringBuilder::Append(char c){
     Check(2);
     data[ptr++] = c;
@@ -59,6 +63,12 @@ StringBuilder& StringBuilder::Append(char c){
 StringBuilder& StringBuilder::Append(int i){
     Check(12);
     ptr += __builtin_snprintf(data + ptr, 11, "%d", i);
+    return *this;
+}
+
+StringBuilder& StringBuilder::Append(size_t s){
+    Check(24);
+    ptr += __builtin_snprintf(data + ptr, 23, "%llu", s);
     return *this;
 }
 

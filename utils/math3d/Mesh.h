@@ -3,7 +3,7 @@
 
 #include <define.h>
 
-#include <utils/math3d/ViewObject.h>
+#include <utils/List.h>
 
 class Mesh final : public Object {
 private:
@@ -21,7 +21,7 @@ public:
     ~Mesh();
 
     Vertex* Find(Vector3 ori, Vector3 dir);
-    size_t FindScreenRect(Vector3 camPos, Quaternion camDir, float zNear, float zFar, float x1, float x2, float y1, float y2, List<Vertex*>& result);
+    size_t FindScreenRect(const SelectInfo* info, Matrix4x4 mat, List<Vertex*>& result);
     Edge* FindEdge(Vector3 ori, Vector3 dir);
     Vertex* FindUV(Vector2 uv, float err = 0.01f);
     size_t FindUVRect(Vector2 uv1, Vector2 uv2, List<Vertex*>& result);
@@ -35,7 +35,7 @@ public:
     void DeleteTriFace(Face* f);
 
     void Render();
-    void Render(bool light);
+    void Render(const RenderOptions* options);
     void RenderUVMap();
 
     void WriteToOBJ(File file, bool uv = false, bool normal = false);

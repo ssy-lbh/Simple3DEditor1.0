@@ -206,7 +206,6 @@ public:
     virtual ~MainWindow() override;
 
     void InitCamera();
-    void InitLight0();
 
     void RenderModelView();
     void SetOperation(IOperation* op);

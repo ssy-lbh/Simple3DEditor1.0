@@ -97,7 +97,7 @@ String::String(const WString &s){
 }
 
 String &String::operator=(const char* s){
-    delete str;
+    delete[] str;
     len = strlen(s);
     str = new char[len + 1];
     str[len] = '\0';
@@ -106,7 +106,7 @@ String &String::operator=(const char* s){
 }
 
 String &String::operator=(const wchar_t* s){
-    delete str;
+    delete[] str;
     len = WideCharToMultiByte(CP_ACP, 0, s, -1, NULL, 0, NULL, NULL);
     str = new char[len + 1];
     WideCharToMultiByte(CP_ACP, 0, s, -1, str, len, NULL, NULL);
@@ -115,7 +115,7 @@ String &String::operator=(const wchar_t* s){
 }
 
 String &String::operator=(String &&s){
-    delete str;
+    delete[] str;
     str = new char[s.len + 1];
     memcpy(str, s.str, len * sizeof(char));
     str[s.len] = '\0';
@@ -124,7 +124,7 @@ String &String::operator=(String &&s){
 }
 
 String &String::operator=(WString &&s){
-    delete str;
+    delete[] str;
     len = WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), NULL, 0, NULL, NULL);
     str = new char[len + 1];
     WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), str, len, NULL, NULL);
@@ -133,7 +133,7 @@ String &String::operator=(WString &&s){
 }
 
 String &String::operator=(const String &s){
-    delete str;
+    delete[] str;
     str = new char[s.len + 1];
     memcpy(str, s.str, len * sizeof(char));
     str[s.len] = '\0';
@@ -142,7 +142,7 @@ String &String::operator=(const String &s){
 }
 
 String &String::operator=(const WString &s){
-    delete str;
+    delete[] str;
     len = WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), NULL, 0, NULL, NULL);
     str = new char[len + 1];
     WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), str, len, NULL, NULL);
@@ -155,7 +155,7 @@ String::~String(){
         DebugError("Critical: String::~String() When str Is NULL");
         return;
     }
-    delete str;
+    delete[] str;
 }
 
 char String::operator[](size_t index) const{
@@ -520,7 +520,7 @@ WString::WString(const WString &s){
 }
 
 WString &WString::operator=(const char* s){
-    delete str;
+    delete[] str;
     len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s, -1, NULL, 0);
     str = new wchar_t[len + 1];
     MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s, -1, str, len);
@@ -529,7 +529,7 @@ WString &WString::operator=(const char* s){
 }
 
 WString &WString::operator=(const wchar_t* s){
-    delete str;
+    delete[] str;
     len = wcslen(s);
     str = new wchar_t[len + 1];
     str[len] = L'\0';
@@ -538,7 +538,7 @@ WString &WString::operator=(const wchar_t* s){
 }
 
 WString &WString::operator=(String &&s){
-    delete str;
+    delete[] str;
     len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), NULL, 0);
     str = new wchar_t[len + 1];
     MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), str, len);
@@ -547,7 +547,7 @@ WString &WString::operator=(String &&s){
 }
 
 WString &WString::operator=(WString &&s){
-    delete str;
+    delete[] str;
     str = new wchar_t[s.len + 1];
     memcpy(str, s.str, s.len * sizeof(wchar_t));
     str[s.len] = L'\0';
@@ -556,7 +556,7 @@ WString &WString::operator=(WString &&s){
 }
 
 WString &WString::operator=(const String &s){
-    delete str;
+    delete[] str;
     len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), NULL, 0);
     str = new wchar_t[len + 1];
     MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), str, len);
@@ -565,7 +565,7 @@ WString &WString::operator=(const String &s){
 }
 
 WString &WString::operator=(const WString &s){
-    delete str;
+    delete[] str;
     str = new wchar_t[s.len + 1];
     memcpy(str, s.str, s.len * sizeof(wchar_t));
     str[s.len] = L'\0';
@@ -578,7 +578,7 @@ WString::~WString(){
         DebugError("Critical: WString::~WString() When str Is NULL");
         return;
     }
-    delete str;
+    delete[] str;
 }
 
 wchar_t WString::operator[](size_t index) const{
@@ -591,7 +591,7 @@ wchar_t WString::operator[](size_t index) const{
 
 WString WString::operator+(WString s) const{
     WString res;
-    delete res.str;
+    delete[] res.str;
     res.len = len + s.len;
     res.str = new wchar_t[res.len + 1];
     res.str[res.len] = L'\0';

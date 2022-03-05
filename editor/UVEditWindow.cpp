@@ -9,6 +9,7 @@
 #include <utils/gl/GLUtils.h>
 #include <utils/math3d/Mesh.h>
 #include <utils/math3d/Geometry.h>
+#include <utils/math3d/ViewObject.h>
 
 UVEditWindow::MoveOperation::MoveOperation(UVEditWindow* main) : main(main) {}
 UVEditWindow::MoveOperation::~MoveOperation(){}

@@ -4,6 +4,7 @@
 #include <define.h>
 
 #include <utils/List.h>
+#include <utils/gl/GLUtils.h>
 #include <utils/math3d/Geometry.h>
 #include <utils/math3d/LinearAlgebra.h>
 #include <utils/math3d/Property.h>
@@ -28,8 +29,11 @@ public:
     PropertyQuaternion rotation;
     PropertyVector3 rotationXYZ;
     PropertyVector3 scale;
-
+    
+    // Object To World
     Matrix4x4 chainMat = Matrix4x4::identity;
+    // World To Object
+    Matrix4x4 chainInvMat = Matrix4x4::identity;
 
     Transform();
     ~Transform();
@@ -48,9 +52,25 @@ public:
     void InsertScale(float frame);
 };
 
-class RenderOptions : public Object {
+struct RenderOptions {
 public:
-    bool light = false;
+    bool vertex;
+    bool edge;
+    bool face;
+    bool light;
+};
+
+class SelectInfo final : public Object {
+public:
+    Vector3 camPos;
+    Quaternion camDir;
+    Vector2 zBound;
+    GLRect rect;
+
+    SelectInfo();
+    ~SelectInfo();
+
+    bool Inside(Vector3 pos) const;
 };
 
 enum class ViewObjectType {
@@ -106,7 +126,7 @@ public:
     // 已实现的父类方法中，都是对子对象的遍历调用
     //TODO 待实现对象、边、面选择
     virtual void OnSelect(Vector3 ori, Vector3 dir);
-    virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2);
+    virtual void OnSelect(const SelectInfo* info);
     virtual void OnSelectUV(Vector2 uv, float err = 0.01f);
     virtual void OnSelectUV(Vector2 uv1, Vector2 uv2);
 
@@ -133,7 +153,7 @@ public:
     virtual ~MeshObject() override;
 
     virtual void OnSelect(Vector3 ori, Vector3 dir) override;
-    virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
+    virtual void OnSelect(const SelectInfo* info) override;
     virtual void OnSelectUV(Vector2 uv, float err = 0.01f) override;
     virtual void OnSelectUV(Vector2 uv1, Vector2 uv2) override;
 
@@ -153,7 +173,7 @@ public:
     virtual ~BezierCurveObject() override;
 
     virtual void OnSelect(Vector3 ori, Vector3 dir) override;
-    virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
+    virtual void OnSelect(const SelectInfo* info) override;
     virtual void OnSelectUV(Vector2 uv, float err = 0.01f) override;
     virtual void OnSelectUV(Vector2 uv1, Vector2 uv2) override;
 
@@ -171,7 +191,7 @@ public:
     virtual ~PointLightObject() override;
 
     virtual void OnSelect(Vector3 ori, Vector3 dir) override;
-    virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
+    virtual void OnSelect(const SelectInfo* info) override;
 
     virtual void OnRender(const RenderOptions* options) override;
 
@@ -258,7 +278,7 @@ public:
     virtual ~CameraObject() override;
 
     virtual void OnSelect(Vector3 ori, Vector3 dir) override;
-    virtual void OnSelect(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2) override;
+    virtual void OnSelect(const SelectInfo* info) override;
 
     virtual void OnRender(const RenderOptions* options) override;
 };

@@ -6,12 +6,12 @@
 #include <utils/os/Log.h>
 #include <utils/String.h>
 
-String ShellFileSelectWindow(String filter, int flags){
+String ShellFileSelectWindow(String filter, int flags, bool save){
     OPENFILENAMEA ofn;
-    char buffer[DEFAULT_STRING_LENGTH + 1];
+    char buffer[DEFAULT_STRING_LENGTH];
     AppFrame* frame = AppFrame::GetLocalInst();
     
-    buffer[DEFAULT_STRING_LENGTH] = '\0';
+    *buffer = '\0';
 
     RtlZeroMemory(&ofn, sizeof(OPENFILENAMEA));
     ofn.lStructSize = sizeof(OPENFILENAMEA);
@@ -25,14 +25,30 @@ String ShellFileSelectWindow(String filter, int flags){
     //标志如果是多选要加上OFN_ALLOWMULTISELECT 
     ofn.Flags = flags | OFN_EXPLORER;
 
-    if (!GetOpenFileNameA(&ofn)){
-        SetCurrentDirectoryA(GetAppDirectoryA().GetString());
-        return String();
-    }
-
-    if (*buffer == '\0'){
-        SetCurrentDirectoryA(GetAppDirectoryA().GetString());
-        return String();
+    if (save){
+        if (!GetSaveFileNameA(&ofn) || *buffer == '\0'){
+            SetCurrentDirectoryA(GetAppDirectoryA().GetString());
+            return String();
+        }
+        if (ofn.nFileExtension == 0 && ofn.nFilterIndex > 0){
+            DWORD cnt = ofn.nFilterIndex << 1;
+            LPCSTR p = ofn.lpstrFilter;
+            LPSTR end;
+            while (--cnt)
+                p += (strlen(p) + 1);
+            p++;
+            SetCurrentDirectoryA(GetAppDirectoryA().GetString());
+            if (*p != '.' || !strcmp(p, ".*"))
+                return String(buffer);
+            if (end = strchr(p, ';'))
+                *end = '\0';
+            return String(buffer) + p;
+        }
+    }else{
+        if (!GetOpenFileNameA(&ofn) || *buffer == '\0'){
+            SetCurrentDirectoryA(GetAppDirectoryA().GetString());
+            return String();
+        }
     }
 
     // 防止文件选择框改变当前目录
@@ -41,12 +57,12 @@ String ShellFileSelectWindow(String filter, int flags){
     return String(buffer);
 }
 
-WString ShellFileSelectWindow(WString filter, int flags){
+WString ShellFileSelectWindow(WString filter, int flags, bool save){
     OPENFILENAMEW ofn;
-    wchar_t buffer[DEFAULT_STRING_LENGTH + 1];
+    wchar_t buffer[DEFAULT_STRING_LENGTH];
     AppFrame* frame = AppFrame::GetLocalInst();
     
-    buffer[DEFAULT_STRING_LENGTH] = L'\0';
+    *buffer = L'\0';
 
     RtlZeroMemory(&ofn, sizeof(OPENFILENAMEW));
     ofn.lStructSize = sizeof(OPENFILENAMEW);
@@ -60,14 +76,30 @@ WString ShellFileSelectWindow(WString filter, int flags){
     //标志如果是多选要加上OFN_ALLOWMULTISELECT 
     ofn.Flags = flags | OFN_EXPLORER;
 
-    if (!GetOpenFileNameW(&ofn)){
-        SetCurrentDirectoryW(GetAppDirectoryW().GetString());
-        return WString();
-    }
-
-    if (*buffer == L'\0'){
-        SetCurrentDirectoryW(GetAppDirectoryW().GetString());
-        return WString();
+    if (save){
+        if (!GetSaveFileNameW(&ofn) || *buffer == L'\0'){
+            SetCurrentDirectoryW(GetAppDirectoryW().GetString());
+            return WString();
+        }
+        if (ofn.nFileExtension == 0 && ofn.nFilterIndex > 0){
+            DWORD cnt = ofn.nFilterIndex << 1;
+            LPCWSTR p = ofn.lpstrFilter;
+            LPWSTR end;
+            while (--cnt)
+                p += (wcslen(p) + 1);
+            p++;
+            SetCurrentDirectoryW(GetAppDirectoryW().GetString());
+            if (*p != L'.' || !wcscmp(p, L".*"))
+                return WString(buffer);
+            if (end = wcschr(p, L';'))
+                *end = L'\0';
+            return WString(buffer) + p;
+        }
+    }else{
+        if (!GetOpenFileNameW(&ofn) || *buffer == L'\0'){
+            SetCurrentDirectoryW(GetAppDirectoryW().GetString());
+            return WString();
+        }
     }
 
     // 防止文件选择框改变当前目录

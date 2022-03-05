@@ -32,8 +32,8 @@ PROGOBJ		= main\
 				utils\gl\GLTexture2D utils\gl\GLRenderTexture2D utils\gl\GLComputeProgram\
 				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
 				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
-				editor\MainWindow editor\gui\Container editor\gui\UIManager editor\gui\Menu\
-				editor\gui\AnimationCurve
+				editor\MainWindow editor\RenderWindow editor\gui\Container editor\gui\Menu\
+				editor\gui\UIManager editor\gui\AnimationCurve
 PLATOBJ		= utils\String utils\File\
 				utils\os\Shell utils\os\Log utils\os\GLFunc utils\os\Thread\
 				utils\os\Time utils\os\Font utils\os\Appframe utils\os\Resource\

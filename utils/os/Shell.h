@@ -13,8 +13,8 @@
 #define FILESELECT_MULTIPLE 0x200
 #endif
 
-String ShellFileSelectWindow(String filter, int flags);
-WString ShellFileSelectWindow(WString filter, int flags);
+String ShellFileSelectWindow(String filter, int flags, bool save = false);
+WString ShellFileSelectWindow(WString filter, int flags, bool save = false);
 bool ShellCommandLine(String s);
 bool ShellCommandLine(WString s);
 bool ShellFFmpeg(String src, String dst);

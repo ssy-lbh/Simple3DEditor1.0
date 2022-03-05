@@ -21,8 +21,10 @@ public:
     const char* GetString();
     size_t GetLength();
 
+    void Clear();
     StringBuilder& Append(char c);
     StringBuilder& Append(int i);
+    StringBuilder& Append(size_t s);
     StringBuilder& Append(bool b);
     StringBuilder& Append(float f);
     StringBuilder& Append(double d);

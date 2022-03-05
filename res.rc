@@ -61,6 +61,7 @@ BEGIN
     BEGIN
         MENUITEM "保存\tCtrl+S",                    IDM_SAVE
         MENUITEM "载入\tCtrl+L",                    IDM_LOAD
+        MENUITEM "打印\tCtrl+P",                    IDM_PRINT
         MENUITEM SEPARATOR
         MENUITEM "退出\tESC",                       IDM_EXIT
     END
@@ -91,6 +92,7 @@ BEGIN
     POPUP "动画(&A)"
     BEGIN
         MENUITEM "插值\tShift+I",                   IDM_MENU_INSERT
+        MENUITEM "渲染",                            IDM_RENDER_ANIMATION
     END
     POPUP "版本(&V)"
     BEGIN
@@ -103,6 +105,7 @@ BEGIN
     "?",            IDM_ABOUT,              ASCII, ALT, NOINVERT
     "^S",           IDM_SAVE,               ASCII, NOINVERT
     "^L",           IDM_LOAD,               ASCII, NOINVERT
+    "^P",           IDM_PRINT,              ASCII, NOINVERT
     VK_ESCAPE,      IDM_EXIT,               VIRTKEY, NOINVERT
 
     VK_LEFT,        IDM_LEFT,               VIRTKEY, NOINVERT

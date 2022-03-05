@@ -51,6 +51,9 @@ class Matrix4x4;
 
 // viewobject
 class Transform;
+class RenderOptions;
+class SelectInfo;
+enum class ViewObjectType;
 class AViewObject;
 class MeshObject;
 class BezierCurveObject;
@@ -116,6 +119,9 @@ class NodeMapWindow;
 // paint
 class UVEditWindow;
 class PaintWindow;
+
+// render
+class RenderWindow;
 
 // timetools
 class TimeUtils;

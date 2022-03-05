@@ -4,10 +4,14 @@
 
 #include <main.h>
 #include <res.h>
-#include <utils/os/Log.h>
 #include <utils/File.h>
-#include <utils/math3d/Geometry.h>
+#include <utils/os/Log.h>
+#include <utils/gl/GLUtils.h>
 #include <utils/gl/GLTexture2D.h>
+#include <utils/math3d/Math.h>
+#include <utils/math3d/LinearAlgebra.h>
+#include <utils/math3d/Geometry.h>
+#include <utils/math3d/ViewObject.h>
 
 Mesh::Mesh(){}
 
@@ -45,45 +49,19 @@ Vertex* Mesh::Find(Vector3 ori, Vector3 dir){
     }
 }
 
-size_t Mesh::FindScreenRect(Vector3 camPos, Quaternion camDir, float zNear, float zFar, float x1, float x2, float y1, float y2, List<Vertex*>& result){
+size_t Mesh::FindScreenRect(const SelectInfo* info, Matrix4x4 mat, List<Vertex*>& result){
     struct {
         size_t cnt;
-        Vector3 camPos;
-        Quaternion camDir;
-        float zNear;
-        float zFar;
-        float x1, x2, y1, y2;
+        const SelectInfo* info;
+        Matrix4x4 mat;
         List<Vertex*>* list;
     }pack;
     pack.cnt = 0;
-    pack.camPos = camPos;
-    pack.camDir = camDir;
-    pack.zNear = zNear;
-    pack.zFar = zFar;
-    if (x1 < x2){
-        pack.x1 = x1;
-        pack.x2 = x2;
-    }else{
-        pack.x1 = x2;
-        pack.x2 = x1;
-    }
-    if (y1 < y2){
-        pack.y1 = y1;
-        pack.y2 = y2;
-    }else{
-        pack.y1 = y2;
-        pack.y2 = y1;
-    }
+    pack.info = info;
+    pack.mat = mat;
     pack.list = &result;
     vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
-        Vector3 lookPos;
-
-        lookPos = (-m->camDir) * (p->pos - m->camPos);
-        if (lookPos.y < m->zNear || lookPos.y > m->zFar)
-            return;
-        float x = lookPos.x / lookPos.y;
-        float z = lookPos.z / lookPos.y;
-        if (x >= m->x1 && x <= m->x2 && z >= m->y1 && z <= m->y2){
+        if (m->info->Inside(m->mat * Vector4(p->pos, 1.0f))){
             if (m->list->HasValue(p))
                 return;
             m->cnt++;
@@ -287,63 +265,75 @@ void Mesh::DeleteTriFace(Face* f){
 }
 
 void Mesh::Render(){
-    Render(false);
+    RenderOptions options;
+    options.vertex = true;
+    options.edge = true;
+    options.face = true;
+    options.light = false;
+
+    Render(&options);
 }
 
-void Mesh::Render(bool light){
+void Mesh::Render(const RenderOptions* options){
     glDisable(GL_LIGHTING);
-    glEnable(GL_POINT_SMOOTH);
-    glPointSize(4.0f);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBegin(GL_POINTS);
-    vertices.Foreach([](Vertex* v){
-        glVertex3f(v->pos.x, v->pos.y, v->pos.z);
-    });
-    glEnd();
-    glDisable(GL_POINT_SMOOTH);
 
-    glEnable(GL_LINE_SMOOTH);
-    glLineWidth(1.0f);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBegin(GL_LINES);
-    edges.Foreach([](Edge* e){
-        glVertex3f(e->v1->pos.x, e->v1->pos.y, e->v1->pos.z);
-        glVertex3f(e->v2->pos.x, e->v2->pos.y, e->v2->pos.z);
-    });
-    glEnd();
-    glDisable(GL_LINE_SMOOTH);
-
-    if (light)
-        glEnable(GL_LIGHTING);// 开启光照系统
-    glShadeModel(GL_SMOOTH);
-    if (EnableTexture()){
+    if (options->vertex){
+        glEnable(GL_POINT_SMOOTH);
+        glPointSize(4.0f);
         glColor3f(1.0f, 1.0f, 1.0f);
-        glBegin(GL_TRIANGLES);
-        faces.Foreach([](Face* f){
-            Vertex* v;
-            // V坐标已经反转
-            v = f->vertices[0];
-            glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
-            v = f->vertices[1];
-            glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
-            v = f->vertices[2];
-            glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+        glBegin(GL_POINTS);
+        vertices.Foreach([](Vertex* v){
+            glVertex3f(v->pos.x, v->pos.y, v->pos.z);
         });
         glEnd();
-        glShadeModel(GL_FLAT);
-        DisableTexture();
-    }else{
-        glBegin(GL_TRIANGLES);
-        faces.Foreach([](Face* f){
-            Vertex* v;
-            v = f->vertices[0];
-            glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
-            v = f->vertices[1];
-            glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
-            v = f->vertices[2];
-            glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+        glDisable(GL_POINT_SMOOTH);
+    }
+    
+    if (options->edge){
+        glEnable(GL_LINE_SMOOTH);
+        glLineWidth(1.0f);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBegin(GL_LINES);
+        edges.Foreach([](Edge* e){
+            glVertex3f(e->v1->pos.x, e->v1->pos.y, e->v1->pos.z);
+            glVertex3f(e->v2->pos.x, e->v2->pos.y, e->v2->pos.z);
         });
         glEnd();
+        glDisable(GL_LINE_SMOOTH);
+    }
+
+    if (options->face){
+        if (options->light)
+            glEnable(GL_LIGHTING);// 开启光照系统
+        glShadeModel(GL_SMOOTH);
+        if (EnableTexture()){
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glBegin(GL_TRIANGLES);
+            faces.Foreach([](Face* f){
+                Vertex* v;
+                // V坐标已经反转
+                v = f->vertices[0];
+                glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+                v = f->vertices[1];
+                glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+                v = f->vertices[2];
+                glTexCoord2f(v->uv.x, 1.0f - v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+            });
+            glEnd();
+            DisableTexture();
+        }else{
+            glBegin(GL_TRIANGLES);
+            faces.Foreach([](Face* f){
+                Vertex* v;
+                v = f->vertices[0];
+                glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+                v = f->vertices[1];
+                glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+                v = f->vertices[2];
+                glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+            });
+            glEnd();
+        }
         glShadeModel(GL_FLAT);
     }
 }

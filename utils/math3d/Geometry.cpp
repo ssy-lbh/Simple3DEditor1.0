@@ -1,6 +1,7 @@
 #include <utils/math3d/Geometry.h>
 
 #include <utils/os/Log.h>
+#include <utils/gl/GLUtils.h>
 #include <utils/math3d/Math.h>
 #include <utils/math3d/ViewObject.h>
 
@@ -79,20 +80,15 @@ Edge* Vertex::EdgeRelateTo(Vertex* v){
     return pack.res;
 }
 
-bool Vertex::Hit(Vector3 ori, Vector3 dir){
-    return Vector3::Cosine(dir, pos - ori) > 0.9997f;
+bool Vertex::Hit(Vector3 pos, Vector3 camPos, Quaternion camDir, Vector2 zBound, GLRect rect){
+    Vector3 lookPos = (-camDir) * (pos - camPos);
+    if (lookPos.y < zBound.x || lookPos.y > zBound.y)
+        return false;
+    return rect.Inside(Vector2(lookPos.x, lookPos.z) / lookPos.y);
 }
 
-bool Vertex::Hit(Vector3 camPos, Quaternion camDir, Vector2 zBound, Vector2 p1, Vector2 p2){
-    Vector3 lookPos = (-camDir) * (pos - camPos);
-    if (lookPos.y < zBound.x || lookPos.y > zBound.y){
-        return false;
-    }
-    float inv = 1.0f / lookPos.y;
-    float x = lookPos.x * inv;
-    float z = lookPos.z * inv;
-    Sort(p1.x, p2.x); Sort(p1.y, p2.y);
-    return x >= p1.x && x <= p2.x && z >= p1.y && z <= p2.y;
+bool Vertex::Hit(Vector3 ori, Vector3 dir){
+    return Vector3::Cosine(dir, pos - ori) > 0.9997f;
 }
 
 bool Vertex::HitUV(Vector2 uv, float err){

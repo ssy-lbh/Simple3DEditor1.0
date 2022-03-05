@@ -5,20 +5,38 @@
 
 #include <editor/gui/UIManager.h>
 #include <editor/gui/Menu.h>
+#include <utils/gl/GLUtils.h>
 
 class RenderWindow final : public IWindow {
 private:
     bool focus = false;
 
-    Vector2 cliSize;
     Vector2 cursorPos;
+    Vector2 cliSize;
+    GLRect rect;
+
+    bool lightEnabled = false;
+
+    Vector3 camLookat = Vector3::up;
+    Quaternion camDir = Quaternion::one;
+    float camDis = 5.0f;
+    Vector3 camPos = Vector3::back * 5.0f + Vector3::up;
+    Vector3 camRight = Vector3::right;
+    Vector3 camUp = Vector3::up;
+    Vector3 camForward = Vector3::forward;
+
+    Menu* basicMenu;
+
+    UIManager* uiMgr;
 
 public:
     RenderWindow();
     virtual ~RenderWindow() override;
 
     void InitCamera();
-    void RenderModelView();
+
+    void UpdateWindowSize(int x, int y);
+    void UpdateCursor(int x, int y);
 
     virtual bool IsFocus() override;
     virtual void OnRender() override;
@@ -41,8 +59,9 @@ public:
     virtual void OnDropFileA(const char* path) override;
     virtual void OnDropFileW(const wchar_t* path) override;
 
-    void UpdateWindowSize(int x, int y);
-    void UpdateCursor(int x, int y);
+    void OnInsSave();
+
+    void SaveImage(String file);
 };
 
 #endif

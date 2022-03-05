@@ -93,6 +93,8 @@ public:
     static void SelectObject(AViewObject* o);
     static AViewObject* AddObject(AViewObject* o);
     static void OnAnimationFrame(float frame);
+    static void SaveImage(String file, GLRect rect);
+    static void RenderAnimation(String dir, size_t start, size_t end, GLRect rect);
 
     static Mesh* GetMesh();
 

@@ -10,6 +10,7 @@
 #include <editor/PaintWindow.h>
 #include <editor/TreeWindow.h>
 #include <editor/UVEditWindow.h>
+#include <editor/RenderWindow.h>
 #include <editor/gui/Menu.h>
 #include <editor/gui/ViewManager.h>
 #include <utils/math3d/Math.h>
@@ -579,6 +580,9 @@ void SelectionWindow::InitMenu(){
     }, this));
     selMenu->AddItem(new MenuItem(L"动画控制器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
         window->SetWindow(new AnimationWindow());
+    }, this));
+    selMenu->AddItem(new MenuItem(L"渲染窗口", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
+        window->SetWindow(new RenderWindow());
     }, this));
     selMenu->AddItem(new MenuItem());
     selMenu->AddItem(new MenuItem(L"左右分割至左侧", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){

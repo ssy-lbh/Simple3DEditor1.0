@@ -10,6 +10,42 @@ DataBuffer::DataBuffer(){
     ptr = 0;
 }
 
+DataBuffer::DataBuffer(DataBuffer &&d){
+    size = d.size;
+    data = new char[size];
+    ptr = d.ptr;
+    rptr = d.rptr;
+    memcpy(data, d.data, ptr);
+}
+
+DataBuffer::DataBuffer(const DataBuffer &d){
+    size = d.size;
+    data = new char[size];
+    ptr = d.ptr;
+    rptr = d.rptr;
+    memcpy(data, d.data, ptr);
+}
+
+DataBuffer &DataBuffer::operator=(DataBuffer &&d){
+    delete[] data;
+    size = d.size;
+    data = new char[size];
+    ptr = d.ptr;
+    rptr = d.rptr;
+    memcpy(data, d.data, ptr);
+    return *this;
+}
+
+DataBuffer &DataBuffer::operator=(const DataBuffer &d){
+    delete[] data;
+    size = d.size;
+    data = new char[size];
+    ptr = d.ptr;
+    rptr = d.rptr;
+    memcpy(data, d.data, ptr);
+    return *this;
+}
+
 DataBuffer::DataBuffer(size_t len){
     data = new char[len];
     size = len;
@@ -28,7 +64,7 @@ DataBuffer::~DataBuffer(){
         DebugError("Critical: StringBuilder::~StringBuilder() When data Is NULL");
         return;
     }
-    delete data;
+    delete[] data;
 }
 
 void DataBuffer::Check(size_t reserve){
@@ -75,6 +111,14 @@ void DataBuffer::Seek(size_t pos){
 
 size_t DataBuffer::Tell(){
     return rptr;
+}
+
+size_t DataBuffer::GetPtr(){
+    return ptr;
+}
+
+void DataBuffer::SetPtr(size_t pos){
+    ptr = pos;
 }
 
 void* DataBuffer::Buffer(){

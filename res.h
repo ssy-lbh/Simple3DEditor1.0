@@ -13,11 +13,13 @@
 #define IDM_EXIT                            402
 #define IDM_ABOUT                           403
 #define IDM_LOAD                            404
-#define IDM_MESH_BASIC_PLANE                405
-#define IDM_MESH_BASIC_SPHERE               406
-#define IDM_MESH_BASIC_BLOCK                407
-#define IDM_MESH_BASIC_CAPSULE              408
-#define IDM_MESH_BASIC_CYLINDER             409
+#define IDM_PRINT                           405
+#define IDM_MESH_BASIC_PLANE                406
+#define IDM_MESH_BASIC_SPHERE               407
+#define IDM_MESH_BASIC_BLOCK                408
+#define IDM_MESH_BASIC_CAPSULE              409
+#define IDM_MESH_BASIC_CYLINDER             410
+#define IDM_RENDER_ANIMATION                411
 
 #define IDM_LEFT                            501
 #define IDM_RIGHT                           502
