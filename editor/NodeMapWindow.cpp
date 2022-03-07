@@ -254,7 +254,7 @@ void NodeMapWindow::OnRender(){
 }
 
 void NodeMapWindow::OnCreate(){
-    bktex = new GLTexture2D(IDB_NODEMAP_BACKGROUND);
+    bktex = new GLTexture2D(IDT_NODEMAP_BACKGROUND);
 }
 
 void NodeMapWindow::OnChar(char c){

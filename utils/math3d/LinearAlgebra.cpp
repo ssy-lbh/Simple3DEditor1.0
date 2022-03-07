@@ -141,6 +141,14 @@ Vector2 Vector2::Rotate(float angle) const{
     return Vector2(x * vcos - y * vsin, x * vsin + y * vcos);
 }
 
+Point2::Point2() : Vector2(0.0f, 0.0f) {}
+
+Point2::Point2(float x, float y) : Vector2(x, y) {}
+
+Point2::~Point2(){}
+
+const Point2 Point2::zero       = { 0.0F, 0.0F};
+
 Vector3::Vector3() : x(0.0f), y(0.0f), z(0.0f) {}
 
 Vector3::Vector3(Vector2 &&v) : x(v.x), y(v.y), z(0.0f) {}
@@ -171,9 +179,9 @@ Vector3 &Vector3::operator=(const Vector4 &v){
     return *this;
 }
 
-Vector3::Vector3(float x, float y) : x(x), y(y), z(0.0f){}
+Vector3::Vector3(float x, float y) : x(x), y(y), z(0.0f) {}
 
-Vector3::Vector3(float x, float y, float z) : x(x), y(y), z(z){}
+Vector3::Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
 
 Vector3::~Vector3(){}
 
@@ -323,18 +331,41 @@ Vector3 Vector3::RotateZ(float angle) const{
     return Vector3(x * vcos - y * vsin, x * vsin + y * vcos, z);
 }
 
+Point3::Point3() : Vector3(0.0f, 0.0f, 0.0f) {}
+
+Point3::Point3(float x, float y) : Vector3(x, y, 0.0f) {}
+
+Point3::Point3(float x, float y, float z) : Vector3(x, y, z) {}
+
+Point3::~Point3(){}
+
+const Point3 Point3::zero       = { 0.0F, 0.0F, 0.0F};
+
 Vector4::Vector4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
 
 Vector4::Vector4(Vector2 &&v) : x(v.x), y(v.y), z(0.0f), w(0.0f) {}
 
+Vector4::Vector4(Point2 &&v) : x(v.x), y(v.y), z(0.0f), w(1.0f) {}
+
 Vector4::Vector4(Vector3 &&v) : x(v.x), y(v.y), z(v.z), w(0.0f) {}
+
+Vector4::Vector4(Point3 &&v) : x(v.x), y(v.y), z(v.z), w(1.0f) {}
 
 Vector4::Vector4(const Vector2 &v) : x(v.x), y(v.y), z(0.0f), w(0.0f) {}
 
+Vector4::Vector4(const Point2 &v) : x(v.x), y(v.y), z(0.0f), w(1.0f) {}
+
 Vector4::Vector4(const Vector3 &v) : x(v.x), y(v.y), z(v.z), w(0.0f) {}
+
+Vector4::Vector4(const Point3 &v) : x(v.x), y(v.y), z(v.z), w(1.0f) {}
 
 Vector4 &Vector4::operator=(Vector2 &&v){
     this->x = v.x; this->y = v.y; this->z = 0.0f; this->w = 0.0f;
+    return *this;
+}
+
+Vector4 &Vector4::operator=(Point2 &&v){
+    this->x = v.x; this->y = v.y; this->z = 0.0f; this->w = 1.0f;
     return *this;
 }
 
@@ -343,13 +374,28 @@ Vector4 &Vector4::operator=(Vector3 &&v){
     return *this;
 }
 
+Vector4 &Vector4::operator=(Point3 &&v){
+    this->x = v.x; this->y = v.y; this->z = v.z; this->w = 1.0f;
+    return *this;
+}
+
 Vector4 &Vector4::operator=(const Vector2 &v){
     this->x = v.x; this->y = v.y; this->z = 0.0f; this->w = 0.0f;
     return *this;
 }
 
+Vector4 &Vector4::operator=(const Point2 &v){
+    this->x = v.x; this->y = v.y; this->z = 0.0f; this->w = 1.0f;
+    return *this;
+}
+
 Vector4 &Vector4::operator=(const Vector3 &v){
     this->x = v.x; this->y = v.y; this->z = v.z; this->w = 0.0f;
+    return *this;
+}
+
+Vector4 &Vector4::operator=(const Point3 &v){
+    this->x = v.x; this->y = v.y; this->z = v.z; this->w = 1.0f;
     return *this;
 }
 
@@ -950,11 +996,35 @@ Matrix4x4 Matrix4x4::operator~() const{
             _14, _24, _34, _44};
 }
 
+Vector3 Matrix4x4::operator*(Vector2 v) const{
+    return Vector3(
+        _11 * v.x + _12 * v.y,
+        _21 * v.x + _22 * v.y,
+        _31 * v.x + _32 * v.y
+    );
+}
+
+Point3 Matrix4x4::operator*(Point2 p) const{
+    return Point3(
+        _11 * p.x + _12 * p.y + _14,
+        _21 * p.x + _22 * p.y + _24,
+        _31 * p.x + _32 * p.y + _34
+    );
+}
+
 Vector3 Matrix4x4::operator*(Vector3 v) const{
     return Vector3(
         _11 * v.x + _12 * v.y + _13 * v.z,
         _21 * v.x + _22 * v.y + _23 * v.z,
         _31 * v.x + _32 * v.y + _33 * v.z
+    );
+}
+
+Point3 Matrix4x4::operator*(Point3 p) const{
+    return Point3(
+        _11 * p.x + _12 * p.y + _13 * p.z + _14,
+        _21 * p.x + _22 * p.y + _23 * p.z + _24,
+        _31 * p.x + _32 * p.y + _33 * p.z + _34
     );
 }
 

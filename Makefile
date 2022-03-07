@@ -26,7 +26,7 @@ PROGOBJ		= main\
 				utils\StringBuilder utils\DataBuffer utils\AudioUtils\
 				utils\math3d\Math utils\math3d\LinearAlgebra utils\math3d\Mesh\
 				utils\math3d\ViewObject utils\math3d\Geometry utils\math3d\Property\
-				utils\gl\GLFrameBuffer utils\gl\GLIndexBuffer\
+				utils\gl\GLFrameBuffer utils\gl\GLIndexBuffer utils\gl\GLSkyBox\
 				utils\gl\GLLights utils\gl\GLProgram utils\gl\GLShader\
 				utils\gl\GLUtils utils\gl\GLVertexArray utils\gl\GLVertexBuffer\
 				utils\gl\GLTexture2D utils\gl\GLRenderTexture2D utils\gl\GLComputeProgram\

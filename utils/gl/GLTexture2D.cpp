@@ -42,8 +42,8 @@ void GLTexture2D::InitData(DataBuffer& data, int x, int y, int channel){
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);// 纹理数据上传的对齐像素数
     //glPixelStorei(GL_UNPACK_ROW_LENGTH, bitmap.bmWidthBytes / channel);// 指定像素数据中原图的宽度
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);// S方向上贴图
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);// T方向上贴图
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);// S方向上贴图
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);// T方向上贴图
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);// 放大纹理过滤方式
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);// 缩小纹理过滤方式
 	
@@ -91,4 +91,28 @@ int GLTexture2D::GetHeight(){
 
 uenum GLTexture2D::GetFormat(){
     return format;
+}
+
+void GLTexture2D::SetXWarp(uenum val){
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, val);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void GLTexture2D::SetYWarp(uenum val){
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, val);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void GLTexture2D::SetMinFilter(uenum val){
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, val);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void GLTexture2D::SetMagFilter(uenum val){
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, val);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }

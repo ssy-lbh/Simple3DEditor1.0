@@ -15,7 +15,12 @@ private:
     List<AViewObject*> objectList;
     int depth;
 
+    Menu* basicMenu;
+
     AViewObject* dragObject = NULL;
+    AViewObject* selObject = NULL;
+
+    void AddObject(AViewObject* o);
 
 public:
     TreeWindow();

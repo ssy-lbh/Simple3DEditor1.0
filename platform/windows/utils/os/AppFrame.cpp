@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <windowsx.h>
+#include <dbt.h>
 
 #include <main.h>
 #include <res.h>
@@ -309,6 +310,19 @@ LRESULT CALLBACK AppFrame::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         case 1:
             data->OnMenuAccel(LOWORD(wParam), true);
             Main::data->scene->OnMenuAccel(LOWORD(wParam), true);
+            break;
+        }
+        break;
+    case WM_DEVICECHANGE:
+        switch (wParam){
+        case DBT_DEVNODES_CHANGED:
+            DebugLog("System Device Change %d", wParam);
+            break;
+        case DBT_DEVICEARRIVAL:
+            break;
+        case DBT_DEVICEREMOVEPENDING:
+            break;
+        case DBT_DEVICEREMOVECOMPLETE:
             break;
         }
         break;

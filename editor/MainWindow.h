@@ -36,6 +36,8 @@ private:
 
     ITool* curTool = NULL;
 
+    GLSkyBox* skyBox = NULL;
+
     class MoveButton final : public IButton {
     private:
         Vector2 center;
@@ -59,6 +61,8 @@ private:
         Vector2 center;
         float radius;
         Quaternion start;
+        Vector3 up;
+        Vector3 right;
         MainWindow* main;
         GLTexture2D* texture = NULL;
 

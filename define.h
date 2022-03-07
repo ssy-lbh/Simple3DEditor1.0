@@ -43,11 +43,15 @@ class Mesh;
 
 // vecmath
 class Vector2;
+class Point2;
 class Vector3;
+class Point3;
 class Vector4;
 class Complex;
 class Quaternion;
 class Matrix4x4;
+class Matrix2x3;
+class Matrix2x4;
 
 // viewobject
 class Transform;
@@ -107,6 +111,7 @@ class GLShader;
 class GLVertexArray;
 class GLVertexBuffer;
 class GLIndexBuffer;
+class GLSkyBox;
 
 // menu
 class IMenuItem;

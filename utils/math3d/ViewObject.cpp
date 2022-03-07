@@ -4,6 +4,7 @@
 
 #include <main.h>
 #include <res.h>
+#include <editor/AudioPlayerWindow.h>
 #include <utils/AudioUtils.h>
 #include <utils/os/Time.h>
 #include <utils/math3d/Math.h>
@@ -615,6 +616,8 @@ AudioSourceObject::~AudioSourceObject(){
 
     alDeleteSources(1, &alSrc);
     alDeleteBuffers(1, &alBuf);
+
+    if (window) window->LoadObject(NULL);
 }
 
 void AudioSourceObject::OnTimer(int id){
@@ -675,6 +678,10 @@ float AudioSourceObject::GetGain(){
     return gain;
 }
 
+AudioPlayerWindow* AudioSourceObject::GetWindowRef(){
+    return window;
+}
+
 void AudioSourceObject::SetOffset(int offset){
     if (IsPlaying())
         alSourcei(alSrc, AL_SAMPLE_OFFSET, offset);
@@ -687,6 +694,10 @@ void AudioSourceObject::SetLoop(bool loop){
 
 void AudioSourceObject::SetGain(float gain){
     alSourcef(alSrc, AL_GAIN, gain);
+}
+
+void AudioSourceObject::SetWindowRef(AudioPlayerWindow* window){
+    this->window = window;
 }
 
 void AudioSourceObject::Play(){

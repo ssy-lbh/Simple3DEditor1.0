@@ -3,6 +3,7 @@
 #include <windows.h>
 
 #include <res.h>
+#include <utils/os/Log.h>
 
 /* synchronized */
 void DialogTextInput(wchar_t* str, size_t size){

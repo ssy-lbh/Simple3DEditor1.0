@@ -77,10 +77,16 @@
 
 #define IDR_MAINFRAME                       901
 
-#define IDB_EARTH_WATER                     1001
-#define IDB_NODEMAP_BACKGROUND              1002
-#define IDB_BUTTON_MOVE                     1003
-#define IDB_BUTTON_ROTATE                   1004
+#define IDT_SKYBOX_LEFT                     1001
+#define IDT_SKYBOX_RIGHT                    1002
+#define IDT_SKYBOX_FRONT                    1003
+#define IDT_SKYBOX_BACK                     1004
+#define IDT_SKYBOX_TOP                      1005
+#define IDT_SKYBOX_DOWN                     1006
+#define IDT_EARTH_WATER                     1007
+#define IDT_NODEMAP_BACKGROUND              1008
+#define IDT_BUTTON_MOVE                     1009
+#define IDT_BUTTON_ROTATE                   1010
 
 #define IDS_OBJFILE_FORM_WARNING            1101
 #define IDS_OBJFILE_FORM_WARNING_CAPTION    1102

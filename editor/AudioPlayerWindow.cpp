@@ -242,15 +242,11 @@ AudioPlayerWindow::AudioPlayerWindow(){
         window->OnMenuAccel(IDM_LOAD, false);
     }, this));
     basicMenu->AddItem(new MenuItem(L"加载当前对象", MENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](AudioPlayerWindow* window){
-        if (!Main::data->curObject){
-            DebugError("Current Selected Object Is NULL");
+        if (Main::data->curObject && Main::data->curObject->GetType() != ViewObjectType::OBJECT_AUDIO_SOURCE){
+            DebugError("AudioPlayerWindow::LoadObject Object Type Error");
             return;
         }
-        if (Main::data->curObject->GetType() != ViewObjectType::OBJECT_AUDIO_SOURCE){
-            DebugError("Current Selected Object Is Not An AudioSourceObject");
-            return;
-        }
-        window->source = (AudioSourceObject*)Main::data->curObject;
+        window->LoadObject((AudioSourceObject*)Main::data->curObject);
     }, this));
     basicMenu->AddItem(new LoopItem(this));
     basicMenu->AddItem(new DisplayModeItem(this));
@@ -258,6 +254,7 @@ AudioPlayerWindow::AudioPlayerWindow(){
 
 AudioPlayerWindow::~AudioPlayerWindow(){
     DebugLog("AudioPlayerWindow Destroyed");
+    LoadObject(NULL);
     if (uiMgr) delete uiMgr;
 }
 
@@ -600,11 +597,31 @@ void AudioPlayerWindow::LoadFile(WString file){
         wav.nBlockAlign = 2;
     }
 
-    source = (AudioSourceObject*)Main::AddObject(new AudioSourceObject(format, fileData, dataLen, wav.nSamplesPerSec));
     // 频率 8000 11025 16000 22050 44100 48000 96000 192000
+    AudioSourceObject* audioSrc = new AudioSourceObject(format, fileData, dataLen, wav.nSamplesPerSec);
+    Main::AddObject(audioSrc);
+    LoadObject(audioSrc);
+    
     src.Close();
 
     DebugLog("AudioPlayerWindow::LoadFile Success");
+}
+
+void AudioPlayerWindow::LoadObject(AudioSourceObject* o){
+    if (o){
+        if (o->GetWindowRef()){
+            DebugError("AudioPlayerWindow::LoadObject Object Has Already Been Loaded By Another Window");
+            return;
+        }
+        if (source)
+            source->SetWindowRef(NULL);
+        source = o;
+        o->SetWindowRef(this);
+    }else{
+        if (source)
+            source->SetWindowRef(NULL);
+        source = NULL;
+    }
 }
 
 bool AudioPlayerWindow::IsLoaded(){

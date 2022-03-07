@@ -124,6 +124,10 @@ GlobalData::~GlobalData(){
 }
 
 void GlobalData::SelectObject(AViewObject* o){
+    if (!o){
+        DebugError("Warning: GlobalData::SelectObject Object Is NULL");
+        return;
+    }
     curObject = o;
     selObjects.Clear();
     selPoints.Clear();
@@ -137,8 +141,13 @@ void GlobalData::OnAnimationFrame(float frame){
 }
 
 Main::Main(){
+    MeshObject* mesh;
+
     data = new GlobalData();
-    SelectObject(AddObject(new MeshObject()));
+    mesh = new MeshObject();
+    
+    AddObject(mesh);
+    SelectObject(mesh);
 }
 
 Main::~Main(){
@@ -177,9 +186,18 @@ void Main::SelectObject(AViewObject* o){
     data->SelectObject(o);
 }
 
-AViewObject* Main::AddObject(AViewObject* o){
+void Main::AddObject(AViewObject* o){
     data->scene->AddChild(o);
-    return o;
+}
+
+void Main::DeleteObject(AViewObject* o){
+    if (o == data->scene){
+        DebugError("Main::DeleteObject Trying To Delete Scene Object");
+        return;
+    }
+    delete o;
+    if (o == data->curObject)
+        data->SelectObject(data->scene);
 }
 
 void Main::OnAnimationFrame(float frame){

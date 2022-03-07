@@ -16,6 +16,7 @@
 #include <utils/math3d/ViewObject.h>
 #include <utils/os/Shell.h>
 #include <utils/gl/GLTexture2D.h>
+#include <utils/gl/GLSkyBox.h>
 
 MainWindow::MoveButton::MoveButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
 
@@ -30,7 +31,7 @@ bool MainWindow::MoveButton::Trigger(Vector2 pos){
 void MainWindow::MoveButton::Render(){
     glColor3f(1.0f, 1.0f, 1.0f);
     if (!texture)
-        texture = new GLTexture2D(IDB_BUTTON_MOVE);
+        texture = new GLTexture2D(IDT_BUTTON_MOVE);
     texture->Enable();
     GLUtils::DrawCornerWithUV(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
     GLTexture2D::Disable();
@@ -65,7 +66,7 @@ bool MainWindow::RotateButton::Trigger(Vector2 pos){
 void MainWindow::RotateButton::Render(){
     glColor3f(1.0f, 1.0f, 1.0f);
     if (!texture)
-        texture = new GLTexture2D(IDB_BUTTON_ROTATE);
+        texture = new GLTexture2D(IDT_BUTTON_ROTATE);
     texture->Enable();
     GLUtils::DrawCornerWithUV(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
     GLTexture2D::Disable();
@@ -74,12 +75,15 @@ void MainWindow::RotateButton::Render(){
 void MainWindow::RotateButton::Click(Vector2 pos){
     DebugLog("RotateButton Click");
     start = main->camDir;
+    up = main->camUp;
+    right = main->camRight;
 }
 
 void MainWindow::RotateButton::Drag(Vector2 dir){
     //DebugLog("RotateButton Drag %f %f", dir.x, dir.y);
-    main->camDir = Quaternion::AxisAngle(main->camUp, -dir.x * 100.0f) *
-                            Quaternion::AxisAngle(main->camRight, dir.y * 100.0f) * start;
+    main->camDir = Quaternion::AxisAngle(up, -dir.x * 100.0f) *
+                            Quaternion::AxisAngle(right, dir.y * 100.0f) * start;
+    main->UpdateRotation();
 }
 
 void MainWindow::RotateButton::ClickEnd(Vector2 pos, IButton* end){
@@ -443,6 +447,9 @@ MainWindow::MainWindow(){
     basicMenu->AddItem(new MenuItem(L"纹理", texMenu));
 
     Menu* objectMenu = new Menu();
+    objectMenu->AddItem(new MenuItem(L"空对象", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::AddObject(new AViewObject());
+    }, this));
     objectMenu->AddItem(new MenuItem(L"网格体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
         Main::AddObject(new MeshObject());
     }, this));
@@ -520,6 +527,7 @@ MainWindow::~MainWindow(){
     if (insertMenu) delete insertMenu;
     if (uiMgr) delete uiMgr;
     if (curOp) delete curOp;
+    if (skyBox) delete skyBox;
 }
 
 void MainWindow::InitCamera(){
@@ -539,7 +547,7 @@ void MainWindow::InitCamera(){
 
 void MainWindow::RenderModelView(){
     // 这些暂定是默认设置
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
     glEnable(GL_AUTO_NORMAL);
     glEnable(GL_BLEND);
     glDisable(GL_STENCIL_TEST);
@@ -558,6 +566,10 @@ void MainWindow::RenderModelView(){
     InitCamera();
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+    glDisable(GL_DEPTH_TEST);
+    skyBox->Render(camPos, camDis);
+    glEnable(GL_DEPTH_TEST);
 
     // xyz坐标线
     glDisable(GL_LIGHTING);
@@ -831,7 +843,15 @@ bool MainWindow::LoadMesh(Mesh* mesh, WString path){
     return true;
 }
 
-void MainWindow::OnCreate(){}
+void MainWindow::OnCreate(){
+    skyBox = new GLSkyBox();
+    skyBox->Set(GLSkyBox::LEFT, new GLTexture2D(IDT_SKYBOX_LEFT));
+    skyBox->Set(GLSkyBox::RIGHT, new GLTexture2D(IDT_SKYBOX_RIGHT));
+    skyBox->Set(GLSkyBox::FRONT, new GLTexture2D(IDT_SKYBOX_FRONT));
+    skyBox->Set(GLSkyBox::BACK, new GLTexture2D(IDT_SKYBOX_BACK));
+    skyBox->Set(GLSkyBox::TOP, new GLTexture2D(IDT_SKYBOX_TOP));
+    skyBox->Set(GLSkyBox::DOWN, new GLTexture2D(IDT_SKYBOX_DOWN));
+}
 
 void MainWindow::OnClose(){}
 
@@ -1164,7 +1184,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         Mesh* mesh = Main::GetMesh();
         if (!mesh)
             break;
-        mesh->SetTexture(IDB_EARTH_WATER);
+        mesh->SetTexture(IDT_EARTH_WATER);
     }
         break;
     case IDM_TEXTURE_DISABLE:{

@@ -179,6 +179,7 @@ public:
 
     void PreloadFile(WString file);
     void LoadFile(WString file);
+    void LoadObject(AudioSourceObject* o);
     bool IsLoaded();
     void Launch();
     void Stop();

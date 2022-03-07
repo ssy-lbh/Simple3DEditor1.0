@@ -223,6 +223,8 @@ private:
     Vector3 recPos;
     float recTime;
 
+    AudioPlayerWindow* window = NULL;
+
 public:
     // 输入的数据内部引用，自动回收，不能调用后释放data所在内存
     AudioSourceObject(uenum format, char* data, int size, int freq);
@@ -242,10 +244,12 @@ public:
     int GetOffset();
     bool IsLoop();
     float GetGain();
+    AudioPlayerWindow* GetWindowRef();
 
     void SetOffset(int offset);
     void SetLoop(bool loop);
     void SetGain(float gain);
+    void SetWindowRef(AudioPlayerWindow* window);
 
     void Play();
     void Stop();

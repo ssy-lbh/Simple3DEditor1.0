@@ -26,6 +26,10 @@ public:
     int GetWidth();
     int GetHeight();
     uenum GetFormat();
+    void SetXWarp(uenum val);
+    void SetYWarp(uenum val);
+    void SetMinFilter(uenum val);
+    void SetMagFilter(uenum val);
 };
 
 #endif

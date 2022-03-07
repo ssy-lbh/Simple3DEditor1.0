@@ -3,16 +3,73 @@
 #include <lib/opengl/gl/gl.h>
 
 #include <main.h>
+#include <res.h>
+#include <editor/gui/Menu.h>
+#include <editor/dialog/Tips.h>
 #include <utils/os/Font.h>
 #include <utils/gl/GLUtils.h>
 #include <utils/math3d/ViewObject.h>
 
 TreeWindow::TreeWindow(){
     DebugLog("TreeWindow Launched");
+
+    basicMenu = new Menu();
+
+    Menu* objectMenu = new Menu();
+    objectMenu->AddItem(new MenuItem(L"空对象", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
+        window->AddObject(new AViewObject());
+    }, this));
+    objectMenu->AddItem(new MenuItem(L"网格体", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
+        window->AddObject(new MeshObject());
+    }, this));
+    objectMenu->AddItem(new MenuItem(L"三次贝塞尔曲线", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
+        window->AddObject(new BezierCurveObject());
+    }, this));
+    objectMenu->AddItem(new MenuItem(L"点光源", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
+        window->AddObject(new PointLightObject());
+    }, this));
+    objectMenu->AddItem(new MenuItem(L"音频收听者", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
+        window->AddObject(new AudioListenerObject());
+    }, this));
+    objectMenu->AddItem(new MenuItem(L"摄像机", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
+        window->AddObject(new CameraObject());
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"添加对象", objectMenu));
+
+    basicMenu->AddItem(new MenuItem(L"删除对象", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
+        if (!window->selObject){
+            DebugError("No Object Selected");
+            return;
+        }
+        Main::DeleteObject(window->selObject);
+    }, this));
+    basicMenu->AddItem(new MenuItem(L"重命名", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
+        wchar_t name[DEFAULT_STRING_LENGTH];
+
+        if (!window->selObject){
+            DebugError("No Object Selected");
+            return;
+        }
+        DialogTextInput(name, DEFAULT_STRING_LENGTH);
+        if (*name == L'\0'){
+            DebugLog("Rename Operation Cancelled");
+            return;
+        }
+        window->selObject->name = name;
+    }, this));
 }
 
 TreeWindow::~TreeWindow(){
     DebugLog("TreeWindow Destroyed");
+    if (basicMenu) delete basicMenu;
+}
+
+void TreeWindow::AddObject(AViewObject* o){
+    if (selObject){
+        selObject->AddChild(o);
+        return;
+    }
+    Main::AddObject(o);
 }
 
 bool TreeWindow::IsFocus(){
@@ -155,7 +212,13 @@ void TreeWindow::OnLeftUp(int x, int y){
 }
 
 void TreeWindow::OnRightDown(int x, int y){
+    size_t selPos;
+
     UpdateCursor(x, y);
+    
+    selPos = (size_t)((1.0f - cursorPos.y) / (30.0f * cliInvSize.y));
+    selObject = (selPos < objectList.Size() ? objectList[selPos] : NULL);
+    Main::SetMenu(basicMenu);
 }
 
 void TreeWindow::OnRightUp(int x, int y){
@@ -176,4 +239,15 @@ void TreeWindow::OnKillFocus(){
 
 void TreeWindow::OnMouseWheel(int delta){}
 
-void TreeWindow::OnMenuAccel(int id, bool accel){}
+void TreeWindow::OnMenuAccel(int id, bool accel){
+    switch (id){
+    case IDM_DELETE:
+        if (Main::data->curObject)
+            Main::DeleteObject(Main::data->curObject);
+        break;
+    case IDM_MENU_BASIC:
+        selObject = Main::data->curObject;
+        Main::SetMenu(basicMenu);
+        break;
+    }
+}

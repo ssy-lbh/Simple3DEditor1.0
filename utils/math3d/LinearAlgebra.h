@@ -3,7 +3,7 @@
 
 #include <define.h>
 
-class Vector2 final : public Object {
+class Vector2 : public Object {
 public:
     float x;
     float y;
@@ -57,7 +57,21 @@ public:
     Vector2 Rotate(float) const;
 };
 
-class Vector3 final : public Object {
+//TODO 设计未完成
+class Point2 final : public Vector2 {
+public:
+    static const Point2 zero;
+
+    Point2();
+    Point2(Point2 &&) = default;
+    Point2(const Point2 &) = default;
+    Point2 &operator=(Point2 &&) = default;
+    Point2 &operator=(const Point2 &) = default;
+    Point2(float, float);
+    ~Point2();
+};
+
+class Vector3 : public Object {
 public:
     float x;
     float y;
@@ -120,6 +134,21 @@ public:
     Vector3 RotateZ(float) const;
 };
 
+//TODO 设计未完成
+class Point3 final : public Vector3 {
+public:
+    static const Point3 zero;
+
+    Point3();
+    Point3(Point3 &&) = default;
+    Point3(const Point3 &) = default;
+    Point3 &operator=(Point3 &&) = default;
+    Point3 &operator=(const Point3 &) = default;
+    Point3(float, float);
+    Point3(float, float, float);
+    ~Point3();
+};
+
 // 齐次三维坐标向量
 class Vector4 final : public Object {
 public:
@@ -145,16 +174,24 @@ public:
 
     Vector4();
     Vector4(Vector2 &&);
+    Vector4(Point2 &&);
     Vector4(Vector3 &&);
+    Vector4(Point3 &&);
     Vector4(Vector4 &&) = default;
     Vector4(const Vector2 &);
+    Vector4(const Point2 &);
     Vector4(const Vector3 &);
+    Vector4(const Point3 &);
     Vector4(const Vector4 &) = default;
     Vector4 &operator=(Vector2 &&);
+    Vector4 &operator=(Point2 &&);
     Vector4 &operator=(Vector3 &&);
+    Vector4 &operator=(Point3 &&);
     Vector4 &operator=(Vector4 &&) = default;
     Vector4 &operator=(const Vector2 &);
+    Vector4 &operator=(const Point2 &);
     Vector4 &operator=(const Vector3 &);
+    Vector4 &operator=(const Point3 &);
     Vector4 &operator=(const Vector4 &) = default;
     Vector4(float, float);
     Vector4(float, float, float);
@@ -305,29 +342,17 @@ public:
     Vector3 GetAxis() const;
 };
 
+// 4x4矩阵主要用于三维空间的平移、旋转、大小、投影变换
 class Matrix4x4 final : public Object {
 public:
     // OpenGL为列优先顺序
     // 此矩阵变量命名使用行优先顺序
-    float _11;
-    float _21;
-    float _31;
-    float _41;
-
-    float _12;
-    float _22;
-    float _32;
-    float _42;
-
-    float _13;
-    float _23;
-    float _33;
-    float _43;
-
-    float _14;
-    float _24;
-    float _34;
-    float _44;
+    // 第四行对象视角变换时都为[0 0 0 1]
+    // 所有运算符中仅有Vector4能参与投影变换
+    float _11; float _21; float _31; float _41;
+    float _12; float _22; float _32; float _42;
+    float _13; float _23; float _33; float _43;
+    float _14; float _24; float _34; float _44;
 
     static const Matrix4x4 zero;
     static const Matrix4x4 identity;
@@ -358,8 +383,92 @@ public:
     Matrix4x4 &operator*=(Matrix4x4);
     Matrix4x4 operator-() const;
     Matrix4x4 operator~() const;
+    Vector3 operator*(Vector2) const;
+    Point3 operator*(Point2) const;
     Vector3 operator*(Vector3) const;
+    Point3 operator*(Point3) const;
     Vector4 operator*(Vector4) const;
+};
+
+// 2x3矩阵用于表示二维空间的UI变换
+//TODO 设计未完成
+class Matrix2x3 final : public Object {
+public:
+    // 第三行默认为[0 0 1]
+    float _11; float _12; float _13;
+    float _21; float _22; float _23;
+
+    static const Matrix2x3 zero;
+    static const Matrix2x3 identity;
+
+    Matrix2x3();
+    Matrix2x3(Complex &&);
+    Matrix2x3(Matrix2x3 &&) = default;
+    Matrix2x3(const Complex &);
+    Matrix2x3(const Matrix2x3 &) = default;
+    Matrix2x3 &operator=(Complex &&);
+    Matrix2x3 &operator=(Matrix2x3 &&) = default;
+    Matrix2x3 &operator=(const Complex &);
+    Matrix2x3 &operator=(const Matrix2x3 &) = default;
+    Matrix2x3(float, float, float,
+              float, float, float);
+    ~Matrix2x3();
+    Matrix2x3 operator+(Matrix2x3) const;
+    Matrix2x3 operator-(Matrix2x3) const;
+    Matrix2x3 operator*(float) const;
+    Matrix2x3 operator/(float) const;
+    Matrix2x3 &operator+=(Matrix2x3);
+    Matrix2x3 &operator-=(Matrix2x3);
+    Matrix2x3 &operator*=(float);
+    Matrix2x3 &operator/=(float);
+    Matrix2x3 operator*(Matrix2x3) const;
+    Matrix2x3 &operator*=(Matrix2x3);
+    Matrix2x3 operator-() const;
+    Vector2 operator*(Vector2) const;
+    Point2 operator*(Point2) const;
+};
+
+// 2x4矩阵用于将三维空间坐标映射到二维UI空间坐标并加以变换
+//TODO 设计未完成
+class Matrix2x4 final : public Object {
+public:
+    // 第三行默认为[0 0 0 0]
+    // 第四行默认为[0 0 0 1]
+    float _11; float _12; float _13; float _14;
+    float _21; float _22; float _23; float _24;
+
+    static const Matrix2x4 zero;
+    // 此矩阵变换X、Y坐标一致，Z坐标将不被保留
+    static const Matrix2x4 identity;
+
+    Matrix2x4();
+    Matrix2x4(Quaternion &&);
+    Matrix2x4(Matrix2x4 &&) = default;
+    Matrix2x4(const Quaternion &);
+    Matrix2x4(const Matrix2x4 &) = default;
+    Matrix2x4 &operator=(Quaternion &&);
+    Matrix2x4 &operator=(Matrix2x4 &&) = default;
+    Matrix2x4 &operator=(const Quaternion &);
+    Matrix2x4 &operator=(const Matrix2x4 &) = default;
+    Matrix2x4(float, float, float, float,
+              float, float, float, float);
+    ~Matrix2x4();
+    Matrix2x4 operator+(Matrix2x4) const;
+    Matrix2x4 operator-(Matrix2x4) const;
+    Matrix2x4 operator*(float) const;
+    Matrix2x4 operator/(float) const;
+    Matrix2x4 &operator+=(Matrix2x4);
+    Matrix2x4 &operator-=(Matrix2x4);
+    Matrix2x4 &operator*=(float);
+    Matrix2x4 &operator/=(float);
+    Matrix2x4 operator*(Matrix2x4) const;
+    Matrix2x4 &operator*=(Matrix2x4);
+    Matrix2x4 operator-() const;
+    Vector2 operator*(Vector2) const;
+    Point2 operator*(Point2) const;
+    Vector2 operator*(Vector3) const;
+    Point2 operator*(Point3) const;
+    Vector2 operator*(Vector4) const;
 };
 
 #endif

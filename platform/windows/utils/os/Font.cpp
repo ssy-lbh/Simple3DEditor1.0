@@ -54,6 +54,7 @@ void glDrawCNString(const char* text){
 }
 
 void glDrawCNString(const wchar_t* text){
+    AppFrame* frame = AppFrame::GetLocalInst();
     HDC hDC;
     GLuint font;
 
@@ -61,6 +62,10 @@ void glDrawCNString(const wchar_t* text){
     font = glGenLists(1);
 
     for (; *text != L'\0'; text++){
+        if ((uint)*text < MAX_CHARS){
+            glCallList(frame->fontASCII + (uint)*text);
+            continue;
+        }
         wglUseFontBitmapsW(hDC, *text, 1, font);
         glCallList(font);
     }

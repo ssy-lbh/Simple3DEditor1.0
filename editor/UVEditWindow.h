@@ -14,7 +14,7 @@ private:
     float aspect;
 
     IOperation* curOp = NULL;
-    ITool* curTool;
+    ITool* curTool = NULL;
 
     class MoveOperation final : public IOperation {
     private:
