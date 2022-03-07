@@ -23,6 +23,10 @@ public:
     Menu* menu = NULL;
     Vector2 menuPos;
 
+    // 这两种对象在单个窗口中唯一
+    AudioListenerObject* audioListener = NULL;
+    CameraObject* camera = NULL;
+
     LocalData();
     ~LocalData();
 
@@ -40,6 +44,11 @@ public:
     void OnMenuAccel(int id, bool accel);
 
     void Render();
+
+    void CreateAudioListener();
+    void CreateCamera();
+    void DestoryAudioListener();
+    void DestoryCamera();
 };
 
 //TODO 可加入全局拖拽功能，在窗口之间传送数据
@@ -63,7 +72,8 @@ public:
     AViewObject* curObject = NULL;
 
     // 选择部分
-    SelectionType selType = SELECT_VERTICES;
+    //TODO 以后将选择部分信息移入线程本地
+    SelectionType selType = SELECT_OBJECT;
 
     List<AViewObject*> selObjects;
     List<Vertex*> selPoints;
@@ -74,6 +84,7 @@ public:
     ~GlobalData();
 
     void SelectObject(AViewObject* o);
+    void SelectType(GlobalData::SelectionType type);
 
     void OnAnimationFrame(float frame);
 };
@@ -91,6 +102,7 @@ public:
     static void SetCursor(const char* res);
     static void SetMenu(Menu* m);
     static void SelectObject(AViewObject* o);
+    static void SelectType(GlobalData::SelectionType type);
     static void AddObject(AViewObject* o);
     static void DeleteObject(AViewObject* o);
     static void OnAnimationFrame(float frame);

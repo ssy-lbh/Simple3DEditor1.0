@@ -215,16 +215,18 @@ void AudioPlayerWindow::LoopItem::OnClick(){
     DebugLog("AudioPlayerWindow::LoopItem State %s", loop ? "Looping" : "Default");
 }
 
-AudioPlayerWindow::DisplayModeItem::DisplayModeItem(AudioPlayerWindow* window) : window(window) {}
-AudioPlayerWindow::DisplayModeItem::~DisplayModeItem(){}
+AudioPlayerWindow::DopplerEffectItem::DopplerEffectItem(AudioPlayerWindow* window) : window(window) {}
+AudioPlayerWindow::DopplerEffectItem::~DopplerEffectItem(){}
 
-const wchar_t* AudioPlayerWindow::DisplayModeItem::GetName(){
-    return window->displayWave ? L"显示模式:波形" : L"显示模式:频谱";
+const wchar_t* AudioPlayerWindow::DopplerEffectItem::GetName(){
+    return window->HasDopplerEffect() ? L"多普勒效应:开" : L"多普勒效应:关";
 }
 
-void AudioPlayerWindow::DisplayModeItem::OnClick(){
-    window->displayWave = !window->displayWave;
-    DebugLog("AudioPlayerWindow::DisplayModeItem State %s", window->displayWave ? "Wave" : "Frequency");
+void AudioPlayerWindow::DopplerEffectItem::OnClick(){
+    bool state = window->HasDopplerEffect();
+    state = !state;
+    window->SetDopplerEffect(state);
+    DebugLog("AudioPlayerWindow::DopplerEffectItem State %s", state ? "On" : "Off");
 }
 
 AudioPlayerWindow::AudioPlayerWindow(){
@@ -249,7 +251,11 @@ AudioPlayerWindow::AudioPlayerWindow(){
         window->LoadObject((AudioSourceObject*)Main::data->curObject);
     }, this));
     basicMenu->AddItem(new LoopItem(this));
-    basicMenu->AddItem(new DisplayModeItem(this));
+    basicMenu->AddItem(new SwitchMenuItem(L"显示模式:波形", L"显示模式:频谱", SWITCHMENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](bool state, AudioPlayerWindow* window){
+        window->displayWave = state;
+        DebugLog("AudioPlayerWindow::DisplayModeItem State %s", window->displayWave ? "Wave" : "Frequency");
+    }, this, displayWave));
+    basicMenu->AddItem(new DopplerEffectItem(this));
 }
 
 AudioPlayerWindow::~AudioPlayerWindow(){
@@ -600,6 +606,7 @@ void AudioPlayerWindow::LoadFile(WString file){
     // 频率 8000 11025 16000 22050 44100 48000 96000 192000
     AudioSourceObject* audioSrc = new AudioSourceObject(format, fileData, dataLen, wav.nSamplesPerSec);
     Main::AddObject(audioSrc);
+    Main::SelectObject(audioSrc);
     LoadObject(audioSrc);
     
     src.Close();
@@ -667,6 +674,18 @@ ALint AudioPlayerWindow::GetOffset(){
     if (!source)
         return 0;
     return source->GetOffset();
+}
+
+bool AudioPlayerWindow::HasDopplerEffect(){
+    if (!source)
+        return false;
+    return source->HasDopplerEffect();
+}
+
+void AudioPlayerWindow::SetDopplerEffect(bool on){
+    if (!source)
+        return;
+    source->SetDopplerEffect(on);
 }
 
 ALint AudioPlayerWindow::GetWaveFormat(AudioWaveFormat* wav){

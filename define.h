@@ -50,6 +50,7 @@ class Vector4;
 class Complex;
 class Quaternion;
 class Matrix4x4;
+class Matrix3x4;
 class Matrix2x3;
 class Matrix2x4;
 
@@ -67,6 +68,7 @@ class CameraObject;
 
 // main
 class IUndo;
+enum class ObjectOperation;
 class MainWindow;
 class LocalData;
 class GlobalData;

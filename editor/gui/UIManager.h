@@ -31,6 +31,7 @@ public:
     bool LeftUp();
     bool RightDown();
     bool RightUp();
+    bool Wheel(int delta);
     bool Char(char c);
     bool Unichar(wchar_t c);
     void Foreach(void(*func)(IButton*));
@@ -55,6 +56,7 @@ public:
     virtual void RightClick(Vector2 pos);
     virtual void RightDrag(Vector2 dir);
     virtual void RightClickEnd(Vector2 pos, IButton* end);
+    virtual void OnWheel(int delta);
     virtual void Leave(Vector2 pos);
     virtual bool Char(char c);
     virtual bool Unichar(wchar_t c);

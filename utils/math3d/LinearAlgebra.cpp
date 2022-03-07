@@ -143,6 +143,20 @@ Vector2 Vector2::Rotate(float angle) const{
 
 Point2::Point2() : Vector2(0.0f, 0.0f) {}
 
+Point2::Point2(Vector2 &&v) : Vector2(v) {}
+
+Point2::Point2(const Vector2 &v) : Vector2(v) {}
+
+Point2 &Point2::operator=(Vector2 &&v){
+    x = v.x; y = v.y;
+    return *this;
+}
+
+Point2 &Point2::operator=(const Vector2 &v){
+    x = v.x; y = v.y;
+    return *this;
+}
+
 Point2::Point2(float x, float y) : Vector2(x, y) {}
 
 Point2::~Point2(){}
@@ -315,23 +329,61 @@ Vector3 Vector3::Refract(Vector3 n, float rate) const{
 
 Vector3 Vector3::RotateX(float angle) const{
     float vsin, vcos;
-    __builtin_sincosf(angle * 0.01745329251994329547f, &vsin, &vcos);
+    SinCosf(angle * 0.01745329251994329547f, &vsin, &vcos);
     return Vector3(x, z * vsin + y * vcos, z * vcos - y * vsin);
 }
 
 Vector3 Vector3::RotateY(float angle) const{
     float vsin, vcos;
-    __builtin_sincosf(angle * 0.01745329251994329547f, &vsin, &vcos);
+    SinCosf(angle * 0.01745329251994329547f, &vsin, &vcos);
     return Vector3(z * vsin + x * vcos, y, z * vcos - x * vsin);
 }
 
 Vector3 Vector3::RotateZ(float angle) const{
     float vsin, vcos;
-    __builtin_sincosf(angle * 0.01745329251994329547f, &vsin, &vcos);
+    SinCosf(angle * 0.01745329251994329547f, &vsin, &vcos);
     return Vector3(x * vcos - y * vsin, x * vsin + y * vcos, z);
 }
 
+Vector2 Vector3::XY() const{
+    return Vector2(x, y);
+}
+
+Vector2 Vector3::YZ() const{
+    return Vector2(y, z);
+}
+
+Vector2 Vector3::ZX() const{
+    return Vector2(z, x);
+}
+
+Vector2 Vector3::YX() const{
+    return Vector2(y, x);
+}
+
+Vector2 Vector3::ZY() const{
+    return Vector2(z, y);
+}
+
+Vector2 Vector3::XZ() const{
+    return Vector2(x, z);
+}
+
 Point3::Point3() : Vector3(0.0f, 0.0f, 0.0f) {}
+
+Point3::Point3(Vector3 &&v) : Vector3(v) {}
+
+Point3::Point3(const Vector3 &v) : Vector3(v) {}
+
+Point3 &Point3::operator=(Vector3 &&v){
+    x = v.x; y = v.y; z = v.z;
+    return *this;
+}
+
+Point3 &Point3::operator=(const Vector3 &v){
+    x = v.x; y = v.y; z = v.z;
+    return *this;
+}
 
 Point3::Point3(float x, float y) : Vector3(x, y, 0.0f) {}
 

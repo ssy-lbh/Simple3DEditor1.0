@@ -128,20 +128,28 @@ bool GLUtils::CheckGLError(const char* tag, const char* file, int line){
 }
 
 void GLUtils::DrawCorner(float x, float y, float start, float end, float radius, float step){
+    DrawCorner(Vector2(x, y), start, end, Vector2(radius, radius), step);
+}
+
+void GLUtils::DrawCorner(float x, float y, float start, float end, Vector2 radius, float step){
+    DrawCorner(Vector2(x, y), start, end, radius, step);
+}
+
+void GLUtils::DrawCorner(Vector2 center, float start, float end, float radius, float step){
+    DrawCorner(center, start, end, Vector2(radius, radius), step);
+}
+
+void GLUtils::DrawCorner(Vector2 center, float start, float end, Vector2 radius, float step){
     start = ToRadian(start);
     end = ToRadian(end);
 
     glBegin(GL_TRIANGLE_FAN);
-    glVertex2f(x, y);
+    glVertex2f(center.x, center.y);
     for (float i = start; i < end; i += step){
-        glVertex2f(x + radius * Cos(i), y + radius * Sin(i));
+        glVertex2f(center.x + radius.x * Cos(i), center.y + radius.y * Sin(i));
     }
-    glVertex2f(x + radius * Cos(end), y + radius * Sin(end));
+    glVertex2f(center.x + radius.x * Cos(end), center.y + radius.y * Sin(end));
     glEnd();
-}
-
-void GLUtils::DrawCorner(Vector2 center, float start, float end, float radius, float step){
-    DrawCorner(center.x, center.y, start, end, radius, step);
 }
 
 void GLUtils::DrawCornerWithUV(float x, float y, float start, float end, float radius, float step){
@@ -258,7 +266,7 @@ void GLUtils::DrawBezier(Vector2 p1, Vector2 p2, Vector2 p3, float step){
     glVertex2f(p1.x, p1.y);
     for (float i = step; i < 1.0f; i += step){
         float j = 1.0f - i;
-        Vector2 pos = p1 * j * j + p2 * 2.0f * i * j + p3 * i * i;
+        Vector2 pos = p1 * (j * j) + p2 * (2.0f * i * j) + p3 * (i * i);
         glVertex2f(pos.x, pos.y);
     }
     glVertex2f(p3.x, p3.y);
@@ -270,7 +278,7 @@ void GLUtils::DrawBezier(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float s
     glVertex2f(p1.x, p1.y);
     for (float i = step; i < 1.0f; i += step){
         float j = 1.0f - i;
-        Vector2 pos = p1 * j * j * j + p2 * 3.0f * i * j * j + p3 * 3.0f * i * i * j + p4 * i * i * i;
+        Vector2 pos = p1 * (j * j * j) + p2 * (3.0f * i * j * j) + p3 * (3.0f * i * i * j) + p4 * (i * i * i);
         glVertex2f(pos.x, pos.y);
     }
     glVertex2f(p4.x, p4.y);
@@ -282,7 +290,7 @@ void GLUtils::DrawBezier(Vector3 p1, Vector3 p2, Vector3 p3, float step){
     glVertex3f(p1.x, p1.y, p1.z);
     for (float i = step; i < 1.0f; i += step){
         float j = 1.0f - i;
-        Vector3 pos = p1 * j * j + p2 * 2.0f * i * j + p3 * i * i;
+        Vector3 pos = p1 * (j * j) + p2 * (2.0f * i * j) + p3 * (i * i);
         glVertex3f(pos.x, pos.y, pos.z);
     }
     glVertex3f(p3.x, p3.y, p3.z);
@@ -294,7 +302,7 @@ void GLUtils::DrawBezier(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, float s
     glVertex3f(p1.x, p1.y, p1.z);
     for (float i = step; i < 1.0f; i += step){
         float j = 1.0f - i;
-        Vector3 pos = p1 * j * j * j + p2 * 3.0f * i * j * j + p3 * 3.0f * i * i * j + p4 * i * i * i;
+        Vector3 pos = p1 * (j * j * j) + p2 * (3.0f * i * j * j) + p3 * (3.0f * i * i * j) + p4 * (i * i * i);
         glVertex3f(pos.x, pos.y, pos.z);
     }
     glVertex3f(p4.x, p4.y, p4.z);
@@ -302,8 +310,12 @@ void GLUtils::DrawBezier(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, float s
 }
 
 void GLUtils::DrawRoundRect(float x, float y, float width, float height, float radius, float step){
-    float xmin = x + radius, xmax = x + width - radius;
-    float ymax = y + height - radius, ymin = y + radius;
+    DrawRoundRect(x, y, width, height, Vector2(radius, radius), step);
+}
+
+void GLUtils::DrawRoundRect(float x, float y, float width, float height, Vector2 radius, float step){
+    float xmin = x + radius.x, xmax = x + width - radius.x;
+    float ymax = y + height - radius.y, ymin = y + radius.y;
     float xr = x + width, yr = y + height;
 
     GLUtils::DrawCorner(xmin, ymax, 90.0f, 180.0f, radius, step);
@@ -326,37 +338,10 @@ void GLUtils::DrawRoundRect(GLRect rect, float radius, float step){
 }
 
 void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, float step){
-    float width = rect.GetWidth(), height = rect.GetHeight();
-    float xmin = rect.left + radius, xmax = rect.left + width - radius;
-    float ymax = rect.bottom + height - radius, ymin = rect.bottom + radius;
-    float xr = rect.left + width, yr = rect.bottom + height;
-
-    float xminUV = rect.GetXRatio(xmin);
-    float xmaxUV = rect.GetXRatio(xmax);
-    float yminUV = 1.0f - rect.GetYRatio(ymin);
-    float ymaxUV = 1.0f - rect.GetYRatio(ymax);
-
-    GLUtils::DrawCornerWithUV(xmin, ymax, 90.0f, 180.0f, radius,
-        GLRect(0.0f, xminUV, ymaxUV, 0.0f), step);
-    GLUtils::DrawCornerWithUV(xmax, ymax, 0.0f, 90.0f, radius,
-        GLRect(xmaxUV, 1.0f, ymaxUV, 0.0f), step);
-    GLUtils::DrawCornerWithUV(xmin, ymin, 180.0f, 270.0f, radius,
-        GLRect(0.0f, xminUV, 1.0f, yminUV), step);
-    GLUtils::DrawCornerWithUV(xmax, ymin, 270.0f, 360.0f, radius,
-        GLRect(xmaxUV, 1.0f, 1.0f, yminUV), step);
-
-    GLUtils::DrawRectWithUV(
-        GLRect(xmin, xmax, rect.bottom, rect.top),
-        GLRect(xminUV, xmaxUV, 1.0f, 0.0f)
-    );
-    GLUtils::DrawRectWithUV(
-        GLRect(rect.left, xmin, ymin, ymax),
-        GLRect(0.0f, xminUV, yminUV, ymaxUV)
-    );
-    GLUtils::DrawRectWithUV(
-        GLRect(xmax, rect.right, ymin, ymax),
-        GLRect(xmaxUV, 1.0f, yminUV, ymaxUV)
-    );
+    GLRect uvBound;
+    uvBound.left = 0.0f; uvBound.right = 1.0f;
+    uvBound.bottom = 1.0f; uvBound.top = 0.0f;
+    DrawRoundRectWithUV(rect, radius, uvBound, step);
 }
 
 void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, GLRect uvBound, float step){
@@ -391,16 +376,6 @@ void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, GLRect uvBound, flo
         GLRect(xmax, rect.right, ymin, ymax),
         GLRect(xmaxUV, uvBound.right, yminUV, ymaxUV)
     );
-}
-
-float GLUtils::Clamp(float x, float a, float b){
-    if (x <= a){
-        return a;
-    }
-    if (x >= b){
-        return b;
-    }
-    return x;
 }
 
 void GLUtils::DrawRect(GLRect rect){

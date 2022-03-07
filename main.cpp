@@ -112,7 +112,43 @@ void LocalData::OnMenuAccel(int id, bool accel){
 
 void LocalData::Render(){
     if (menu)
-        menu->Render(menuPos.x, menuPos.y);
+        menu->Render(menuPos);
+}
+
+void LocalData::CreateAudioListener(){
+    if (audioListener){
+        DebugError("LocalData::CreateAudioListener Trying To Create Two AudioListenerObject");
+        return;
+    }
+    audioListener = new AudioListenerObject();
+    Main::data->scene->AddChild(audioListener);
+}
+
+void LocalData::CreateCamera(){
+    if (camera){
+        DebugError("LocalData::CreateCamera Trying To Create Two CameraObject");
+        return;
+    }
+    camera = new CameraObject();
+    Main::data->scene->AddChild(camera);
+}
+
+void LocalData::DestoryAudioListener(){
+    if (!audioListener){
+        DebugError("LocalData::DestoryAudioListener No AudioListenerObject Created");
+        return;
+    }
+    delete audioListener;
+    audioListener = NULL;
+}
+
+void LocalData::DestoryCamera(){
+    if (!camera){
+        DebugError("LocalData::DestoryCamera No CameraObject Created");
+        return;
+    }
+    delete camera;
+    camera = NULL;
 }
 
 GlobalData::GlobalData(){
@@ -129,10 +165,40 @@ void GlobalData::SelectObject(AViewObject* o){
         return;
     }
     curObject = o;
-    selObjects.Clear();
-    selPoints.Clear();
-    selEdges.Clear();
-    selFaces.Clear();
+    switch (selType){
+    case SELECT_OBJECT:
+        selObjects.Clear();
+        break;
+    case SELECT_VERTICES:
+        selPoints.Clear();
+        break;
+    case SELECT_EDGES:
+        selEdges.Clear();
+        break;
+    case SELECT_FACES:
+        selFaces.Clear();
+        break;
+    }
+}
+
+void GlobalData::SelectType(SelectionType type){
+    if (selType == type)
+        return;
+    switch (selType){
+    case SELECT_OBJECT:
+        selObjects.Clear();
+        break;
+    case SELECT_VERTICES:
+        selPoints.Clear();
+        break;
+    case SELECT_EDGES:
+        selEdges.Clear();
+        break;
+    case SELECT_FACES:
+        selFaces.Clear();
+        break;
+    }
+    selType = type;
 }
 
 void GlobalData::OnAnimationFrame(float frame){
@@ -184,6 +250,10 @@ void Main::SetMenu(Menu* m){
 
 void Main::SelectObject(AViewObject* o){
     data->SelectObject(o);
+}
+
+void Main::SelectType(GlobalData::SelectionType type){
+    data->SelectType(type);
 }
 
 void Main::AddObject(AViewObject* o){

@@ -92,6 +92,7 @@ void RenderWindow::OnRender(){
     options.edge = false;
     options.face = true;
     options.light = lightEnabled;
+    options.editor = false;
 
     Main::data->scene->OnChainRender(&options);
 

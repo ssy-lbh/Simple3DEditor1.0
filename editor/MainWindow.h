@@ -6,10 +6,16 @@
 #include <editor/gui/UIManager.h>
 #include <editor/gui/Menu.h>
 
+enum class ObjectOperation {
+    MOVE,
+    ROTATE,
+    SCALE
+};
+
 class MainWindow final : public IWindow {
 private:
     bool focus = false;
-    Vector2 cursorPos = Vector2::zero;
+    Point2 cursorPos = Point2::zero;
     Vector3 cursorDir = Vector3::zero;
     Vector2 cliSize, cliInvSize;
     float aspect;
@@ -18,10 +24,10 @@ private:
     bool audioControl = true;
     bool dopplerEffect = true;
 
-    Vector3 camLookat = Vector3::up;
+    Point3 camLookat = Point3(0.0f, 0.0f, 1.0f);
     Quaternion camDir = Quaternion::one;
     float camDis = 5.0f;
-    Vector3 camPos = Vector3::back * 5.0f + Vector3::up;
+    Point3 camPos = Point3(0.0f, -5.0f, 1.0f);
     Vector3 camRight = Vector3::right;
     Vector3 camUp = Vector3::up;
     Vector3 camForward = Vector3::forward;
@@ -38,11 +44,13 @@ private:
 
     GLSkyBox* skyBox = NULL;
 
+    ObjectOperation objOp = ObjectOperation::MOVE;
+
     class MoveButton final : public IButton {
     private:
-        Vector2 center;
+        Point2 center;
         float radius;
-        Vector3 start;
+        Point3 start;
         MainWindow* main;
         GLTexture2D* texture = NULL;
 
@@ -58,13 +66,12 @@ private:
 
     class RotateButton final : public IButton {
     private:
-        Vector2 center;
+        Point2 center;
         float radius;
         Quaternion start;
         Vector3 up;
         Vector3 right;
         MainWindow* main;
-        GLTexture2D* texture = NULL;
 
     public:
         RotateButton(Vector2 center, float radius, MainWindow* main);
@@ -79,11 +86,16 @@ private:
     class MoveOperation final : public IOperation {
     private:
         struct MoveInfo {
-            Vertex* vert;
+            union {
+                AViewObject* obj;
+                Vertex* vert;
+                Edge* e;
+                Face* f;
+            };
             Vector3 pos;
         };
 
-        Vector2 start;
+        Point2 start;
         List<MoveInfo> moveInfo;
         bool x, y, z;
         MainWindow* main;
@@ -102,10 +114,10 @@ private:
     private:
         struct MoveInfo {
             Vertex* vert;
-            Vector3 pos;
+            Point3 pos;
         };
 
-        Vector2 start;
+        Point2 start;
         List<MoveInfo> moveInfo;
         bool x, y, z;
         MainWindow* main;
@@ -123,8 +135,14 @@ private:
     class RotateOperation final : public IOperation {
     private:
         struct RotateInfo {
-            Vertex* vert;
-            Vector3 pos;
+            union {
+                AViewObject* obj;
+                Vertex* vert;
+                Edge* e;
+                Face* f;
+            };
+            Point3 pos;
+            Quaternion rot;
         };
 
         enum RotateMode {
@@ -134,12 +152,12 @@ private:
             MODE_Z
         };
 
-        Vector2 start;
+        Point2 start;
         List<RotateInfo> rotateInfo;
         RotateMode mode;
         MainWindow* main;
-        Vector3 center;
-        Vector2 screenCenter;
+        Point3 center;
+        Point2 screenCenter;
         float dis;
         Quaternion rotate;
 
@@ -156,16 +174,21 @@ private:
     class SizeOperation final : public IOperation {
     private:
         struct SizeInfo {
-            Vertex* vert;
-            Vector3 pos;
+            union {
+                AViewObject* obj;
+                Vertex* vert;
+                Edge* e;
+                Face* f;
+            };
+            Vector3 vec;
         };
 
-        Vector3 center;
-        Vector2 start;
+        Point3 center;
+        Point2 start;
         List<SizeInfo> sizeInfo;
         bool x, y, z;
         MainWindow* main;
-        Vector2 screenCenter;
+        Point2 screenCenter;
         float startSize;
         float scale;
 
@@ -192,8 +215,8 @@ private:
     class SelectTool final : public ITool {
     private:
         MainWindow* window;
-        Vector2 start;
-        Vector2 end;
+        Point2 start;
+        Point2 end;
         bool leftDown;
         
     public:
@@ -248,10 +271,10 @@ public:
     void AddPoint();
     void DeletePoint();
     bool SaveMesh(Mesh* mesh);
-    bool LoadMesh(Mesh* mesh);
-    bool LoadMesh(Mesh* mesh, WString path);
-    Vector3 GetLookPosition(Vector3 pos);
-    Vector2 GetScreenPosition(Vector3 pos);
+    bool LoadMesh(AViewObject* obj);
+    bool LoadMesh(AViewObject* obj, WString path);
+    Point3 GetLookPosition(Point3 pos);
+    Point2 GetScreenPosition(Point3 pos);
 };
 
 #endif

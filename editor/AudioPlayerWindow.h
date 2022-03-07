@@ -132,13 +132,13 @@ private:
         virtual void OnClick() override;
     };
 
-    class DisplayModeItem final : public IMenuItem {
+    class DopplerEffectItem final : public IMenuItem {
     private:
         AudioPlayerWindow* window;
 
     public:
-        DisplayModeItem(AudioPlayerWindow* window);
-        virtual ~DisplayModeItem() override;
+        DopplerEffectItem(AudioPlayerWindow* window);
+        virtual ~DopplerEffectItem() override;
 
         virtual const wchar_t* GetName() override;
 
@@ -187,6 +187,8 @@ public:
     bool IsLoop();
     void SetLoop(bool loop);
     int GetOffset();
+    bool HasDopplerEffect();
+    void SetDopplerEffect(bool on);
 
     int GetWaveFormat(AudioWaveFormat* wav);
 };

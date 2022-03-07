@@ -356,7 +356,9 @@ void AnimationWindow::OnKillFocus(){
     focus = false;
 }
 
-void AnimationWindow::OnMouseWheel(int delta){}
+void AnimationWindow::OnMouseWheel(int delta){
+    uiMgr->Wheel(delta);
+}
 
 void AnimationWindow::OnMenuAccel(int id, bool accel){
     switch (id){
@@ -384,8 +386,10 @@ void AnimationWindow::SetCurve(AnimationCurve* curve){
     if (this->curve)
         uiMgr->DeleteButton(this->curve);
     this->curve = curve;
-    if (curve)
+    if (curve){
         uiMgr->AddButton(curve);
+        curve->FlushRange();
+    }
 }
 
 void AnimationWindow::SetProperty(Property* prop){

@@ -4,6 +4,7 @@
 
 #include <main.h>
 #include <res.h>
+#include <editor/MainWindow.h>
 #include <editor/AudioPlayerWindow.h>
 #include <utils/AudioUtils.h>
 #include <utils/os/Time.h>
@@ -233,16 +234,34 @@ bool AViewObject::HasAncestor(AViewObject* o){
     return (parent == NULL ? false : parent->HasAncestor(o));
 }
 
+Matrix4x4 AViewObject::GetParentChainMat(){
+    return (parent == NULL ? Matrix4x4::identity : parent->transform.chainMat);
+}
+
+Matrix4x4 AViewObject::GetParentChainInvMat(){
+    return (parent == NULL ? Matrix4x4::identity : parent->transform.chainInvMat);
+}
+
+Point3 AViewObject::GetWorldPos(){
+    return transform.chainMat * Point3::zero;
+}
+
+void AViewObject::SetWorldPos(Point3 pos){
+    transform.position.Set(parent == NULL ? pos : parent->transform.chainInvMat * pos);
+}
+
+AViewObject* AViewObject::QueryObject(WString path){
+    size_t pos = path.FindChar('.');
+    WString name = path.SubString(0, pos);
+    size_t len = children.Size();
+    for (size_t i = 0; i < len; i++)
+        if (children[i]->name == name)
+            return (pos == -1 ? children[i] : children[i]->QueryObject(path.SubString(pos + 1)));
+    return NULL;
+}
+
 List<AViewObject*>& AViewObject::GetChildren(){
     return children;
-}
-
-Matrix4x4 AViewObject::GetObjectToWorldMatrix(){
-    return transform.chainMat;
-}
-
-Matrix4x4 AViewObject::GetWorldToObjectMatrix(){
-    return transform.chainInvMat;
 }
 
 void AViewObject::OnSelect(Vector3 ori, Vector3 dir){}
@@ -270,7 +289,33 @@ void AViewObject::OnChainRender(const RenderOptions* options){
     transform.PopMatrix();
 }
 
-void AViewObject::OnRender(const RenderOptions* options){}
+void AViewObject::OnRender(const RenderOptions* options){
+    if (options->editor && Main::data->selType == GlobalData::SELECT_OBJECT && Main::data->curObject == this){
+        glDisable(GL_LIGHTING);
+        glEnable(GL_POINT_SMOOTH);
+        glPointSize(10.0f);
+        glColor3f(1.0f, 1.0f, 0.0f);
+        glBegin(GL_POINTS);
+        glVertexv3(Point3::zero);
+        glEnd();
+        glDisable(GL_POINT_SMOOTH);
+
+        switch (options->objOp){
+        case ObjectOperation::MOVE:
+            glColor3f(1.0f, 0.0f, 0.0f);
+            GLUtils::Draw3DArrow(Point3::zero, Vector3::right, 0.3f, 0.3f, 5.0f);
+            glColor3f(0.0f, 1.0f, 0.0f);
+            GLUtils::Draw3DArrow(Point3::zero, Vector3::forward, 0.3f, 0.3f, 5.0f);
+            glColor3f(0.0f, 0.0f, 1.0f);
+            GLUtils::Draw3DArrow(Point3::zero, Vector3::up, 0.3f, 0.3f, 5.0f);
+            break;
+        case ObjectOperation::ROTATE:
+            break;
+        case ObjectOperation::SCALE:
+            break;
+        }
+    }
+}
 
 void AViewObject::OnRenderUVMap(){
     size_t len = children.Size();
@@ -383,6 +428,8 @@ Mesh* MeshObject::GetMesh(){
 }
 
 void MeshObject::OnRender(const RenderOptions* options){
+    AViewObject::OnRender(options);
+
     mesh->Render(options);
 }
 
@@ -463,6 +510,8 @@ void BezierCurveObject::OnSelectUV(Vector2 uv1, Vector2 uv2){
 }
 
 void BezierCurveObject::OnRender(const RenderOptions* options){
+    AViewObject::OnRender(options);
+
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
     glPointSize(4.0f);
@@ -539,6 +588,8 @@ void PointLightObject::OnSelect(const SelectInfo* info){
 }
 
 void PointLightObject::OnRender(const RenderOptions* options){
+    AViewObject::OnRender(options);
+
     UpdateLight();
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
@@ -621,11 +672,17 @@ AudioSourceObject::~AudioSourceObject(){
 }
 
 void AudioSourceObject::OnTimer(int id){
-    Vector3 pos = transform.chainMat * Vector4(Vector3::zero, 1.0f);
-    SetPosAutoVelv3(pos);
+    Point3 pos = transform.chainMat * Point3::zero;
+    if (dopplerEffect){
+        SetPosAutoVelv3(pos);
+    }else{
+        SetPosv3(pos);
+    }
 }
 
 void AudioSourceObject::OnRender(const RenderOptions* options){
+    AViewObject::OnRender(options);
+
     glDisable(GL_LIGHTING);
     glEnable(GL_POINT_SMOOTH);
     glPointSize(4.0f);
@@ -718,7 +775,7 @@ bool AudioSourceObject::IsPlaying(){
     return state == AL_PLAYING;
 }
 
-void AudioSourceObject::SetPosv3(Vector3 value){
+void AudioSourceObject::SetPosv3(Point3 value){
     alSource3f(alSrc, AL_POSITION, value.x, value.y, value.z);
 }
 
@@ -726,7 +783,7 @@ void AudioSourceObject::SetVelocityv3(Vector3 value){
     alSource3f(alSrc, AL_VELOCITY, value.x, value.y, value.z);
 }
 
-void AudioSourceObject::SetPosAutoVelv3(Vector3 value){
+void AudioSourceObject::SetPosAutoVelv3(Point3 value){
     float curTime = TimeUtils::GetTime();
     Vector3 vel = (value - recPos) / (curTime - recTime);
 
@@ -737,11 +794,34 @@ void AudioSourceObject::SetPosAutoVelv3(Vector3 value){
     alSource3f(alSrc, AL_VELOCITY, vel.x, vel.y, vel.z);
 }
 
-AudioListenerObject::AudioListenerObject() : AViewObject(L"AudioListener", ViewObjectType::OBJECT_AUDIO_LISTENER) {}
+void AudioSourceObject::SetDopplerEffect(bool on){
+    if (dopplerEffect == on)
+        return;
+    dopplerEffect = on;
+    if (on){
+        recPos = transform.chainMat * Point3::zero;
+        recTime = TimeUtils::GetTime();
+    }else{
+        SetVelocityv3(Vector3::zero);
+    }
+}
 
-AudioListenerObject::~AudioListenerObject(){}
+bool AudioSourceObject::HasDopplerEffect(){
+    return dopplerEffect;
+}
+
+AudioListenerObject::AudioListenerObject() : AViewObject(L"AudioListener", ViewObjectType::OBJECT_AUDIO_LISTENER) {
+    recPos = Vector3::zero;
+    recTime = TimeUtils::GetTime();
+}
+
+AudioListenerObject::~AudioListenerObject(){
+    LocalData::GetLocalInst()->audioListener = NULL;
+}
 
 void AudioListenerObject::OnRender(const RenderOptions* options){
+    AViewObject::OnRender(options);
+
     Vector3 pos = transform.chainMat * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
     Vector3 dir = (transform.chainMat * Vector4(Vector3::forward, 0.0f)).Normal();
     Vector3 up = (transform.chainMat * Vector4(Vector3::up, 0.0f)).Normal();
@@ -750,10 +830,45 @@ void AudioListenerObject::OnRender(const RenderOptions* options){
     alListenerDirv3(dir, up);
 
     glColor3f(1.0f, 0.0f, 0.0f);
-    GLUtils::Draw3DArrow(pos, dir, 0.3f, 0.3f, 10.0f);
+    GLUtils::Draw3DArrow(Point3::zero, Vector3::forward, 0.3f, 0.3f, 10.0f);
 
     glColor3f(0.0f, 0.0f, 1.0f);
-    GLUtils::Draw3DArrow(pos, up * 0.5f, 0.08f, 0.3f, 5.0f);
+    GLUtils::Draw3DArrow(Point3::zero, Vector3::up * 0.5f, 0.08f, 0.3f, 5.0f);
+}
+
+void AudioListenerObject::SetPosv3(Point3 value){
+    alListener3f(AL_POSITION, value.x, value.y, value.z);
+}
+
+void AudioListenerObject::SetVelocityv3(Vector3 value){
+    alListener3f(AL_VELOCITY, value.x, value.y, value.z);
+}
+
+void AudioListenerObject::SetPosAutoVelv3(Point3 value){
+    float curTime = TimeUtils::GetTime();
+    Vector3 vel = (value - recPos) / (curTime - recTime);
+
+    recPos = value;
+    recTime = curTime;
+
+    alListener3f(AL_POSITION, value.x, value.y, value.z);
+    alListener3f(AL_VELOCITY, vel.x, vel.y, vel.z);
+}
+
+void AudioListenerObject::SetDopplerEffect(bool on){
+    if (dopplerEffect == on)
+        return;
+    dopplerEffect = on;
+    if (on){
+        recPos = transform.chainMat * Point3::zero;
+        recTime = TimeUtils::GetTime();
+    }else{
+        SetVelocityv3(Vector3::zero);
+    }
+}
+
+bool AudioListenerObject::HasDopplerEffect(){
+    return dopplerEffect;
 }
 
 const float CameraObject::SCALE = 0.3f;
@@ -763,7 +878,9 @@ CameraObject::CameraObject() : AViewObject(L"Camera", ViewObjectType::OBJECT_CAM
     lookAt.object = this;
 }
 
-CameraObject::~CameraObject(){}
+CameraObject::~CameraObject(){
+    LocalData::GetLocalInst()->camera = NULL;
+}
 
 void CameraObject::OnSelect(Vector3 ori, Vector3 dir){
     ori = transform.chainInvMat * Vector4(ori, 1.0f);
@@ -811,6 +928,8 @@ void CameraObject::OnSelect(const SelectInfo* info){
 }
 
 void CameraObject::OnRender(const RenderOptions* options){
+    AViewObject::OnRender(options);
+
     Quaternion dir;
     Vector3 forward;
     Vector3 right;

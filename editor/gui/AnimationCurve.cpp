@@ -157,6 +157,10 @@ void AnimationCurve::Drag(Vector2 dir){
     }
 }
 
+void AnimationCurve::OnWheel(int delta){
+    ratio *= Pow(1.001f, delta);
+}
+
 void AnimationCurve::Render(){
     size_t size;
 

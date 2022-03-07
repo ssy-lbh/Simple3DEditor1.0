@@ -58,6 +58,8 @@ public:
     bool edge;
     bool face;
     bool light;
+    bool editor;
+    ObjectOperation objOp;
 };
 
 class SelectInfo final : public Object {
@@ -118,8 +120,13 @@ public:
     void SetParent(AViewObject* o);
     bool HasAncestor(AViewObject* o);
 
-    Matrix4x4 GetObjectToWorldMatrix();
-    Matrix4x4 GetWorldToObjectMatrix();
+    Matrix4x4 GetParentChainMat();
+    Matrix4x4 GetParentChainInvMat();
+    Point3 GetWorldPos();
+    void SetWorldPos(Point3 pos);
+    
+    // 用字符'.'分隔各级对象名称
+    AViewObject* QueryObject(WString path);
 
     // 具体选择什么应取决于选择模式，计划放置于全局数据中
     // 除了网格体，也应有其它类型对象被选中
@@ -220,8 +227,9 @@ private:
     int alAudioFreq;
     int alAudioOffset;
 
-    Vector3 recPos;
+    Point3 recPos;
     float recTime;
+    bool dopplerEffect = true;
 
     AudioPlayerWindow* window = NULL;
 
@@ -255,19 +263,34 @@ public:
     void Stop();
     bool IsPlaying();
 
-    void SetPosv3(Vector3 value);
+    void SetPosv3(Point3 value);
     void SetVelocityv3(Vector3 value);
-    void SetPosAutoVelv3(Vector3 value);
+    void SetPosAutoVelv3(Point3 value);
+    
+    void SetDopplerEffect(bool on);
+    bool HasDopplerEffect();
 };
 
 //TODO 可修改为附着于一个物体，以transform确定位置
 class AudioListenerObject final : public AViewObject {
+private:
+    Point3 recPos;
+    float recTime;
+    bool dopplerEffect = true;
+
 public:
     AudioListenerObject();
     virtual ~AudioListenerObject() override;
 
     // 使用渲染回调获取最新位置信息，并更新AudioListener
     virtual void OnRender(const RenderOptions* options) override;
+
+    void SetPosv3(Point3 value);
+    void SetVelocityv3(Vector3 value);
+    void SetPosAutoVelv3(Point3 value);
+    
+    void SetDopplerEffect(bool on);
+    bool HasDopplerEffect();
 };
 
 class CameraObject final : public AViewObject {

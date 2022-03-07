@@ -76,6 +76,7 @@ public:
     virtual void Hover(Vector2 pos) override;
     virtual void Click(Vector2 pos) override;
     virtual void Drag(Vector2 dir) override;
+    virtual void OnWheel(int delta) override;
     virtual void Render() override;
 
     size_t GetSegment(float pos);

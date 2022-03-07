@@ -63,9 +63,13 @@ public:
     static const Point2 zero;
 
     Point2();
+    Point2(Vector2 &&);
     Point2(Point2 &&) = default;
+    Point2(const Vector2 &);
     Point2(const Point2 &) = default;
+    Point2 &operator=(Vector2 &&);
     Point2 &operator=(Point2 &&) = default;
+    Point2 &operator=(const Vector2 &);
     Point2 &operator=(const Point2 &) = default;
     Point2(float, float);
     ~Point2();
@@ -132,6 +136,12 @@ public:
     Vector3 RotateX(float) const;
     Vector3 RotateY(float) const;
     Vector3 RotateZ(float) const;
+    Vector2 XY() const;
+    Vector2 YZ() const;
+    Vector2 ZX() const;
+    Vector2 YX() const;
+    Vector2 ZY() const;
+    Vector2 XZ() const;
 };
 
 //TODO 设计未完成
@@ -140,9 +150,13 @@ public:
     static const Point3 zero;
 
     Point3();
+    Point3(Vector3 &&);
     Point3(Point3 &&) = default;
+    Point3(const Vector3 &);
     Point3(const Point3 &) = default;
+    Point3 &operator=(Vector3 &&);
     Point3 &operator=(Point3 &&) = default;
+    Point3 &operator=(const Vector3 &);
     Point3 &operator=(const Point3 &) = default;
     Point3(float, float);
     Point3(float, float, float);
@@ -383,6 +397,54 @@ public:
     Matrix4x4 &operator*=(Matrix4x4);
     Matrix4x4 operator-() const;
     Matrix4x4 operator~() const;
+    Vector3 operator*(Vector2) const;
+    Point3 operator*(Point2) const;
+    Vector3 operator*(Vector3) const;
+    Point3 operator*(Point3) const;
+    Vector4 operator*(Vector4) const;
+};
+
+// 3x4矩阵为4x4矩阵的简化版，第四行默认为[0 0 0 1]
+//TODO 设计未完成
+class Matrix3x4 final : public Object {
+public:
+    // 第四行默认为[0 0 0 1]
+    float _11; float _12; float _13; float _14;
+    float _21; float _22; float _23; float _24;
+    float _31; float _32; float _33; float _34;
+
+    static const Matrix3x4 zero;
+    static const Matrix3x4 identity;
+
+    Matrix3x4();
+    Matrix3x4(Quaternion &&);
+    Matrix3x4(Matrix3x4 &&) = default;
+    Matrix3x4(Matrix4x4 &&);
+    Matrix3x4(const Quaternion &);
+    Matrix3x4(const Matrix3x4 &) = default;
+    Matrix3x4(const Matrix4x4 &);
+    Matrix3x4 &operator=(Quaternion &&);
+    Matrix3x4 &operator=(Matrix3x4 &&) = default;
+    Matrix3x4 &operator=(Matrix4x4 &&);
+    Matrix3x4 &operator=(const Quaternion &);
+    Matrix3x4 &operator=(const Matrix3x4 &) = default;
+    Matrix3x4 &operator=(const Matrix4x4 &);
+    Matrix3x4(float, float, float, float,
+              float, float, float, float,
+              float, float, float, float);
+    ~Matrix3x4();
+    Matrix3x4 operator+(Matrix3x4) const;
+    Matrix3x4 operator-(Matrix3x4) const;
+    Matrix3x4 operator*(float) const;
+    Matrix3x4 operator/(float) const;
+    Matrix3x4 &operator+=(Matrix3x4);
+    Matrix3x4 &operator-=(Matrix3x4);
+    Matrix3x4 &operator*=(float);
+    Matrix3x4 &operator/=(float);
+    Matrix3x4 operator*(Matrix3x4) const;
+    Matrix3x4 &operator*=(Matrix3x4);
+    Matrix3x4 operator-() const;
+    Matrix3x4 operator~() const;
     Vector3 operator*(Vector2) const;
     Point3 operator*(Point2) const;
     Vector3 operator*(Vector3) const;

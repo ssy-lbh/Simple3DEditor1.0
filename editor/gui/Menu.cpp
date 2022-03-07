@@ -94,6 +94,10 @@ void ConditionalMenuItem::OnClick(){
         click(judge(judgeData), userData);
 }
 
+const float Menu::WIDTH_PIXELS = 250.0f;
+const float Menu::CORNER_PIXELS = 10.0f;
+const float Menu::LINE_PIXELS = 30.0f;
+
 Menu::Menu(){}
 
 Menu::~Menu(){
@@ -114,9 +118,9 @@ void Menu::SetClientSize(Vector2 size){
 }
 
 bool Menu::InMenu(Vector2 relaPos){
-    float cornWidth = 10.0f * cliInvSize.y;
-    float x = 2.0f * cornWidth + 250.0f * cliInvSize.y;
-    float y = 2.0f * cornWidth + items.Size() * 30.0f * cliInvSize.y;
+    Vector2 cornWidth = cliInvSize * CORNER_PIXELS;
+    float x = 2.0f * cornWidth.x + WIDTH_PIXELS * cliInvSize.x;
+    float y = 2.0f * cornWidth.y + items.Size() * LINE_PIXELS * cliInvSize.y;
     return relaPos.x >= 0.0f && relaPos.x <= x && relaPos.y <= 0.0f && relaPos.y >= -y;
 }
 
@@ -129,7 +133,7 @@ bool Menu::InChainMenu(Vector2 relaPos){
 
 void Menu::CursorMove(Vector2 relaPos){
     if (InMenu(relaPos)){
-        selected = (int)((-10.0f * cliInvSize.y - relaPos.y) / (30.0f * cliInvSize.y));
+        selected = (int)((-CORNER_PIXELS * cliInvSize.y - relaPos.y) / (LINE_PIXELS * cliInvSize.y));
         openMenu = true;
     }
     cursorPos = relaPos;
@@ -150,12 +154,12 @@ void Menu::Click(){
 }
 
 void Menu::RenderItem(IMenuItem* item){
-    minPos.y -= 30.0f * cliInvSize.y;
+    minPos.y -= LINE_PIXELS * cliInvSize.y;
     switch (item->GetType()){
     case IMenuItem::ItemType::DEFAULT:{
         if (drawCounter == selected){
             SetMenu(NULL, -1);
-            float height = 30.0f * cliInvSize.y, width = 250.0f * cliInvSize.y;
+            float height = LINE_PIXELS * cliInvSize.y, width = WIDTH_PIXELS * cliInvSize.x;
             glColor3f(0.1f, 0.4f, 1.0f);
             glBegin(GL_TRIANGLES);
             glVertex2f(minPos.x, minPos.y); glVertex2f(minPos.x + width, minPos.y); glVertex2f(minPos.x + width, minPos.y + height);
@@ -163,7 +167,7 @@ void Menu::RenderItem(IMenuItem* item){
             glEnd();
         }
         glColor3f(1.0f, 0.5f, 0.0f);
-        glRasterPos2f(minPos.x + 5.0f * cliInvSize.y, minPos.y + 6.0f * cliInvSize.y);
+        glRasterPos2f(minPos.x + (0.5f * CORNER_PIXELS) * cliInvSize.x, minPos.y + (0.2f * LINE_PIXELS) * cliInvSize.y);
         glDrawCNString(item->GetName());
     }
         break;
@@ -174,13 +178,13 @@ void Menu::RenderItem(IMenuItem* item){
         glColor3f(0.5f, 0.5f, 0.5f);
         glLineWidth(3.0f);
         glBegin(GL_LINES);
-        glVertex2f(minPos.x, minPos.y + 15.0f * cliInvSize.y);
-        glVertex2f(minPos.x + 250.0f * cliInvSize.y, minPos.y + 15.0f * cliInvSize.y);
+        glVertex2f(minPos.x, minPos.y + (0.5f * LINE_PIXELS) * cliInvSize.y);
+        glVertex2f(minPos.x + WIDTH_PIXELS * cliInvSize.x, minPos.y + (0.5f * LINE_PIXELS) * cliInvSize.y);
         glEnd();
         glLineWidth(1.0f);
         break;
     case IMenuItem::ItemType::GROUP:{
-        float height = 30.0f * cliInvSize.y, width = 250.0f * cliInvSize.y;
+        float height = LINE_PIXELS * cliInvSize.y, width = WIDTH_PIXELS * cliInvSize.x;
         if (drawCounter == selected){
             glColor3f(0.1f, 0.4f, 1.0f);
             glBegin(GL_TRIANGLES);
@@ -193,12 +197,12 @@ void Menu::RenderItem(IMenuItem* item){
             }else{
                 if (openMenu){
                     SetMenu(itemMenu, drawCounter);
-                    itemMenu->Render(minPos.x + width + 10.0f * cliInvSize.y, minPos.y + 40.0f * cliInvSize.y);
+                    itemMenu->Render(Vector2(minPos.x + menuPos.x, minPos.y + (LINE_PIXELS + CORNER_PIXELS) * cliInvSize.y));
                 }
             }
         }
         glColor3f(1.0f, 0.5f, 0.0f);
-        glRasterPos2f(minPos.x + 5.0f * cliInvSize.y, minPos.y + 6.0f * cliInvSize.y);
+        glRasterPos2f(minPos.x + (0.5f * CORNER_PIXELS) * cliInvSize.x, minPos.y + (0.2f * LINE_PIXELS) * cliInvSize.y);
         glDrawCNString(item->GetName());
         glColor3f(1.0f, 1.0f, 1.0f);
         glBegin(GL_TRIANGLES);
@@ -212,14 +216,16 @@ void Menu::RenderItem(IMenuItem* item){
     drawCounter++;
 }
 
-void Menu::Render(float x, float y){
-    float cornWidth = 10.0f * cliInvSize.y;
+void Menu::Render(Vector2 pos){
+    Vector2 cornWidth = cliInvSize * CORNER_PIXELS;
 
-    float xmin = x + cornWidth;
-    float ymax = y - cornWidth;
+    float width = cornWidth.x * 2.0f + WIDTH_PIXELS * cliInvSize.x;
+    float height = cornWidth.y * 2.0f + items.Size() * LINE_PIXELS * cliInvSize.y;
 
-    float width = cornWidth * 2.0f + 250.0f * cliInvSize.y;
-    float height = cornWidth * 2.0f + items.Size() * 30.0f * cliInvSize.y;
+    float xmin = pos.x + cornWidth.x;
+    float ymax = pos.y - cornWidth.y;
+
+    renderPos = pos;
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -232,12 +238,11 @@ void Menu::Render(float x, float y){
     
     glColor3f(0.1f, 0.1f, 0.1f);
     GLUtils::DrawRoundRect(
-        x,
-        y - height,
+        pos.x,
+        pos.y - height,
         width,
         height,
-        cornWidth,
-        0.05f
+        cornWidth
     );
     
     minPos = Vector2(xmin, ymax);
@@ -266,8 +271,11 @@ void Menu::SetMenu(Menu* m, size_t pos){
         if (curMenu)
             curMenu->ResetSelect();
         curMenu = m;
-        menuPos = Vector2(250.0f * cliInvSize.y + 10.0f * cliInvSize.y, -(pos * 30.0f * cliInvSize.y) - 10.0f * cliInvSize.y);
+        menuPos = Vector2((WIDTH_PIXELS + CORNER_PIXELS) * cliInvSize.x,
+                        -(pos * LINE_PIXELS * cliInvSize.y) - CORNER_PIXELS * cliInvSize.y);
         // size_t pos; 无正负号，需要先与浮点数相乘再取负
+        if (menuPos.x + renderPos.x >= 1.0f)
+            menuPos.x -= 2.0f * (WIDTH_PIXELS + 2.0f * CORNER_PIXELS) * cliInvSize.x;
         m->SetClientSize(cliSize);
         m->CursorMove(cursorPos - menuPos);
     }

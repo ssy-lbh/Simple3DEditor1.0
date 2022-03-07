@@ -8,7 +8,7 @@
 
 class Vertex final : public Object {
 public:
-    Vector3 pos;
+    Point3 pos;
     Vector3 normal = Vector3::forward;
     Vector2 uv = Vector2::zero;
     Vector3 color = Vector3::one;
@@ -20,11 +20,11 @@ public:
     size_t index;
 
     Vertex();
-    Vertex(Vector3 pos);
+    Vertex(Point3 pos);
     ~Vertex();
 
-    Vector3 GetWorldPos();
-    void SetWorldPos(Vector3 pos);
+    Point3 GetWorldPos();
+    void SetWorldPos(Point3 pos);
     void UpdateNormal();
     void AddEdge(Edge* e);
     void AddFace(Face* f);

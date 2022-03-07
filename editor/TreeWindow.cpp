@@ -29,10 +29,10 @@ TreeWindow::TreeWindow(){
         window->AddObject(new PointLightObject());
     }, this));
     objectMenu->AddItem(new MenuItem(L"音频收听者", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
-        window->AddObject(new AudioListenerObject());
+        LocalData::GetLocalInst()->CreateAudioListener();
     }, this));
     objectMenu->AddItem(new MenuItem(L"摄像机", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
-        window->AddObject(new CameraObject());
+        LocalData::GetLocalInst()->CreateCamera();
     }, this));
     basicMenu->AddItem(new MenuItem(L"添加对象", objectMenu));
 

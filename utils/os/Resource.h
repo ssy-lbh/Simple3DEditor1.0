@@ -11,6 +11,7 @@ public:
     static DataBuffer GetTexture(int id, int* x, int* y, int* comp, int reqComp);
     static DataBuffer GetTexture(String path, int* x, int* y, int* comp, int reqComp);
     static DataBuffer GetShader(int id);
+    static DataBuffer GetBinary(int id);
     static void StoreImage(String path, DataBuffer data, int x, int y, int comp);
     static void StoreImage(String path, const void* data, int x, int y, int comp);
     static void StoreBMP(String path, DataBuffer data, int x, int y, int comp);

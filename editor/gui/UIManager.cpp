@@ -120,6 +120,14 @@ bool UIManager::RightUp(){
     return false;
 }
 
+bool UIManager::Wheel(int delta){
+    if (cur){
+        cur->OnWheel(delta);
+        return true;
+    }
+    return false;
+}
+
 bool UIManager::Char(char c){
     if (cur){
         return cur->Char(c);
@@ -173,6 +181,7 @@ void IButton::OnKillFocus(Vector2 pos, IButton* focus){}
 void IButton::RightClick(Vector2 pos){}
 void IButton::RightDrag(Vector2 dir){}
 void IButton::RightClickEnd(Vector2 pos, IButton* end){}
+void IButton::OnWheel(int delta){}
 bool IButton::Char(char c){ return false; }
 bool IButton::Unichar(wchar_t c){ return false; }
 void IButton::Render(){}

@@ -116,7 +116,7 @@ void LRContainer::OnResize(int x, int y){
     if (x == 0 && y == 0){
         return;
     }
-    dis = __builtin_roundf(GLUtils::Clamp(dis * x / size.x, 0.0f, x));
+    dis = Round(Clamp(dis * x / size.x, 0.0f, (float)x));
     size.x = x;
     size.y = y;
     if (lWindow) lWindow->OnResize(dis, y);
@@ -376,7 +376,7 @@ void UDContainer::OnResize(int x, int y){
     if (x == 0 && y == 0){
         return;
     }
-    dis = __builtin_roundf(GLUtils::Clamp(dis * y / size.y, 0.0f, y));
+    dis = Round(Clamp(dis * y / size.y, 0.0f, (float)y));
     size.x = x;
     size.y = y;
     if (uWindow) uWindow->OnResize(x, y - dis);

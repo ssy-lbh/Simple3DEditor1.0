@@ -75,6 +75,9 @@ public:
     virtual void OnClick() override;
 };
 
+#define CONDITIONALMENUITEM_LAMBDA_TRANS_JUDGE(t) (bool(*)(void*))(bool(*)(t*))
+#define CONDITIONALMENUITEM_LAMBDA_TRANS_CLICK(t) (void(*)(bool, void*))(void(*)(bool, t*))
+
 class ConditionalMenuItem final : public IMenuItem {
 public:
     const wchar_t* nameTrue = NULL;
@@ -101,8 +104,13 @@ public:
 // 可以继承以实现多种样式的菜单
 class Menu : public Object {
 protected:
+    static const float WIDTH_PIXELS;
+    static const float CORNER_PIXELS;
+    static const float LINE_PIXELS;
+
     List<IMenuItem*> items;
 
+    Vector2 renderPos;
     Vector2 minPos;
     size_t drawCounter;
     size_t selected = -1;
@@ -128,7 +136,7 @@ public:
     void CursorMove(Vector2 relaPos);
     void Click();
     void RenderItem(IMenuItem* item);
-    void Render(float x, float y);
+    void Render(Vector2 pos);
     void ResetSelect();
 
     void PressUp();

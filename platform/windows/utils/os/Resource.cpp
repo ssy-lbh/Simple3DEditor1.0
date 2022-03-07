@@ -116,6 +116,28 @@ DataBuffer Resource::GetShader(int id){
     return res;
 }
 
+DataBuffer Resource::GetBinary(int id){
+    HINSTANCE hInst = GetModuleHandleA(NULL);
+    HRSRC kernelSrc;
+    HGLOBAL resIdx;
+    LPVOID resPtr;
+    DWORD resSize;
+    char* srcData;
+
+    kernelSrc = FindResourceA(hInst, MAKEINTRESOURCE(id), MAKEINTRESOURCE(BINARY));
+    resIdx = LoadResource(hInst, kernelSrc);
+    resPtr = LockResource(resIdx);
+    resSize = SizeofResource(hInst, kernelSrc);
+    srcData = new char[resSize];
+    RtlCopyMemory(srcData, resPtr, resSize);
+    FreeResource(resIdx);
+
+    DataBuffer res(srcData, resSize);
+    delete[] srcData;
+
+    return res;
+}
+
 void Resource::StoreImage(String path, DataBuffer data, int x, int y, int comp){
     if (path.EndsWith(".png")){
         StorePNG(path, data.Buffer(), x, y, comp);

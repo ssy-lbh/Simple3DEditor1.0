@@ -7,24 +7,24 @@
 
 Vertex::Vertex(){}
 
-Vertex::Vertex(Vector3 pos) : pos(pos) {}
+Vertex::Vertex(Point3 pos) : pos(pos) {}
 
 Vertex::~Vertex(){}
 
-Vector3 Vertex::GetWorldPos(){
+Point3 Vertex::GetWorldPos(){
     if (!object)
         return pos;
     
-    return object->GetObjectToWorldMatrix() * Vector4(pos, 1.0f);
+    return object->transform.chainMat * pos;
 }
 
-void Vertex::SetWorldPos(Vector3 pos){
+void Vertex::SetWorldPos(Point3 pos){
     if (!object){
         this->pos = pos;
         return;
     }
 
-    this->pos = object->GetWorldToObjectMatrix() * Vector4(pos, 1.0f);
+    this->pos = object->transform.chainInvMat * pos;
 }
 
 void Vertex::UpdateNormal(){

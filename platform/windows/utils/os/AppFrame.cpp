@@ -280,6 +280,14 @@ LRESULT CALLBACK AppFrame::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         data->UpdateCursor(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_LBUTTONDOWN:
+        // 这一段是临时补的，为了出现菜单时的左键事件不发送至窗口
+        if (data->menu){
+            data->OnLeftDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            if (!cursorSelected)
+                Main::SetCursor(IDC_CLICKED);
+            cursorSelected = false;
+            return DefWindowProcA(hWnd, uMsg, wParam, lParam);
+        }
         data->OnLeftDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         SetCapture(hWnd);
         break;
