@@ -11,9 +11,11 @@ PLATFORM 	= windows
 PLATFORM_U	= WINDOWS
 
 GCC			= g++.exe
+DLLTOOL		= dlltool.exe
 RM			= del
 CFLAGS 		= -I"." -m64 -O3
 OFLAGS		= -m64 -s
+LFLAGS		= -m64 -shared
 LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 "lib\openal\OpenAL32.lib"
 RES  		= windres.exe
 MKDIR   	= mkdir
@@ -42,6 +44,10 @@ PLATOBJ		= utils\String utils\File\
 EXTRAOBJ	= lib\soundtouch\mmx_optimized lib\soundtouch\sse_optimized lib\soundtouch\cpu_detect_x86
 RESOBJ		= res string
 OUTPUT 		= main.exe
+# 动态库
+OUTPUTDLIB	= main.dll
+# 静态导入库
+OUTPUTSLIB	= libmain.a
 
 SIGNTOOL	= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe"
 CERT 		= "D:\code\.Certificate\lin-boheng.pfx"
@@ -62,21 +68,29 @@ PLATOBJ 	:= $(addprefix $(BUILD_PATH)\, $(addsuffix .o, $(PLATOBJ)))
 EXTRAOBJ 	:= $(addprefix $(BUILD_PATH)\, $(addsuffix .o, $(EXTRAOBJ)))
 RESOBJ		:= $(addprefix $(BUILD_PATH)\, $(addsuffix .o, $(RESOBJ)))
 
-.PHONY:all build clean run rebuild reexec commit merge sign
+.PHONY:all build clean run rebuild reexec commit merge sign lib
 
-all: build
+all: build lib
 
 run: build
 	$(OUTPUT)
 
 build: $(OUTPUT)
 
+lib: $(OUTPUTDLIB) $(OUTPUTSLIB)
+
 rebuild: clean build
 
 reexec: clean run
 
+$(OUTPUTSLIB): $(OUTPUTDLIB)
+	$(DLLTOOL) --dllname $< --output-lib $(OUTPUTSLIB)
+
+$(OUTPUTDLIB): $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
+	$(GCC) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ) -o $@ $(LIB) $(LFLAGS)
+
 $(OUTPUT): $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
-	$(GCC) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ) -o $(OUTPUT) $(LIB) $(OFLAGS)
+	$(GCC) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ) -o $@ $(LIB) $(OFLAGS)
 
 $(PROGOBJ): $(BUILD_PATH)\\%.o: %.cpp %.h
 	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
@@ -129,5 +143,5 @@ sign: $(OUTPUT)
 	$(SIGNTOOL) timestamp /t $(TIMESTAMP) $(OUTPUT)
 
 clean:
-	-$(RM) $(OUTPUT) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
+	-$(RM) $(OUTPUT) $(OUTPUTSLIB) $(OUTPUTDLIB) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
 
