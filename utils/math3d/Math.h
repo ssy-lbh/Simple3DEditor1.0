@@ -12,7 +12,7 @@
 #define Cos(x) (__builtin_cos(x))
 #define Cosf(x) (__builtin_cosf(x))
 #define Exp(x) (__builtin_exp(x))
-#define Exp(x) (__builtin_expf(x))
+#define Expf(x) (__builtin_expf(x))
 #define Log(x) (__builtin_log(x))
 #define Logf(x) (__builtin_logf(x))
 #define Log2(x) (__builtin_log2(x))
