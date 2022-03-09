@@ -87,16 +87,20 @@ $(OUTPUTDLIB): $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
 $(OUTPUT): $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
 	$(GCC) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ) -o $@ $(LIB) $(OFLAGS)
 
+# 常规的源代码
 $(PROGOBJ): $(BUILD_PATH)\\%.o: %.cpp %.h
 	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
 
+# 这一类为平台相关代码源文件
 $(PLATOBJ): $(BUILD_PATH)\\%.o: platform\$(PLATFORM)\\%.cpp %.h
 	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
 
+# 这一类源文件没有头文件，直接编译
 $(EXTRAOBJ): $(BUILD_PATH)\\%.o: %.cpp
 	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
 
 # 其实我个人觉得，把nasm的内置指令incbin用好了当资源表用是相当可行的，理论上只要不乱加汇编代码跨平台是没问题的
+# 采用nasm的话，res.h里面就不是各种id了，而是一堆extern char[0]，指向资源数据的指针，借助了符号链接的功能
 $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 	$(RES) -i $< -o $@
 
