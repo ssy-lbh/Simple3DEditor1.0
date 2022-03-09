@@ -34,14 +34,14 @@ bool Thread::Join(){
     return WaitForSingleObject(hThread, INFINITE) == WAIT_OBJECT_0;
 }
 
-DWORD CALLBACK Thread::RunThread(LPVOID data){
+ulong __stdcall Thread::RunThread(void* data){
     ThreadData* th = (ThreadData*)data;
-    DWORD ret = th->func(th->user);
+    ulong ret = th->func(th->user);
     delete th;
     return ret;
 }
 
-DWORD ThreadLocal::tlsIndex[THREAD_LOCAL_SIZE] = {TLS_OUT_OF_INDEXES};
+ulong ThreadLocal::tlsIndex[THREAD_LOCAL_SIZE] = {TLS_OUT_OF_INDEXES};
 
 bool ThreadLocal::Alloc(int idx){
     if (idx >= THREAD_LOCAL_SIZE){

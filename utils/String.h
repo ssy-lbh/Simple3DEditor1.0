@@ -13,7 +13,6 @@ protected:
 
 public:
     String();
-    String(int resid);
     String(char c);
     String(const char*);
     String(const char*, size_t);
@@ -81,7 +80,6 @@ protected:
 
 public:
     WString();
-    WString(int resid);
     WString(wchar_t c);
     WString(const char*);
     WString(const char*, size_t);

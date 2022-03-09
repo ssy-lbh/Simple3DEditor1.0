@@ -12,12 +12,13 @@
 #include <utils/String.h>
 #include <utils/DataBuffer.h>
 #include <utils/os/Log.h>
+#include <utils/os/System.h>
 
 String Resource::GetString(int id){
     const char* pstr;
     size_t len;
 
-    len = LoadStringA(GetModuleHandleA(NULL), id, (LPSTR)&pstr, 0);
+    len = LoadStringA(GetModule(), id, (LPSTR)&pstr, 0);
     if (!pstr){
         DebugError("Critical: Resource::GetString(%d) LoadStringA Return NULL", id);
         return String();
@@ -29,7 +30,7 @@ WString Resource::GetWString(int id){
     const wchar_t* pstr;
     size_t len;
 
-    len = LoadStringW(GetModuleHandleA(NULL), id, (LPWSTR)&pstr, 0);
+    len = LoadStringW(GetModule(), id, (LPWSTR)&pstr, 0);
     if (!pstr){
         DebugError("Critical: Resource::GetWString(%d) LoadStringW Return NULL", id);
         return WString();
@@ -43,7 +44,7 @@ DataBuffer Resource::GetBitmap(int id, int* x, int* y, int* comp){
     unsigned char* pBits;
     DWORD dwSize;
 
-    hBitmap = LoadBitmapA(GetModuleHandleA(NULL), MAKEINTRESOURCEA(id));
+    hBitmap = LoadBitmapA(GetModule(), MAKEINTRESOURCEA(id));
     GetObjectA(hBitmap, sizeof(BITMAP), &bitmap);
     dwSize = bitmap.bmHeight * bitmap.bmWidthBytes;
     pBits = new unsigned char[dwSize];
@@ -60,7 +61,7 @@ DataBuffer Resource::GetBitmap(int id, int* x, int* y, int* comp){
 }
 
 DataBuffer Resource::GetTexture(int id, int* x, int* y, int* comp, int reqComp){
-    HINSTANCE hInst = GetModuleHandleA(NULL);
+    HINSTANCE hInst;
     HRSRC resSrc;
     HGLOBAL resIdx;
     LPVOID resPtr;
@@ -68,6 +69,7 @@ DataBuffer Resource::GetTexture(int id, int* x, int* y, int* comp, int reqComp){
     char* srcData;
     stbi_uc* image;
 
+    hInst = GetModule();
     resSrc = FindResourceA(hInst, MAKEINTRESOURCE(id), MAKEINTRESOURCE(TEXTURE));
     resIdx = LoadResource(hInst, resSrc);
     resPtr = LockResource(resIdx);
@@ -94,13 +96,14 @@ DataBuffer Resource::GetTexture(String path, int* x, int* y, int* comp, int reqC
 }
 
 DataBuffer Resource::GetShader(int id){
-    HINSTANCE hInst = GetModuleHandleA(NULL);
+    HINSTANCE hInst;
     HRSRC kernelSrc;
     HGLOBAL resIdx;
     LPVOID resPtr;
     DWORD resSize;
     char* srcData;
 
+    hInst = GetModule();
     kernelSrc = FindResourceA(hInst, MAKEINTRESOURCE(id), MAKEINTRESOURCE(SHADER));
     resIdx = LoadResource(hInst, kernelSrc);
     resPtr = LockResource(resIdx);
@@ -117,13 +120,14 @@ DataBuffer Resource::GetShader(int id){
 }
 
 DataBuffer Resource::GetBinary(int id){
-    HINSTANCE hInst = GetModuleHandleA(NULL);
+    HINSTANCE hInst;
     HRSRC kernelSrc;
     HGLOBAL resIdx;
     LPVOID resPtr;
     DWORD resSize;
     char* srcData;
 
+    hInst = GetModule();
     kernelSrc = FindResourceA(hInst, MAKEINTRESOURCE(id), MAKEINTRESOURCE(BINARY));
     resIdx = LoadResource(hInst, kernelSrc);
     resPtr = LockResource(resIdx);

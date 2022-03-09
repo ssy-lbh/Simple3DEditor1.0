@@ -5,10 +5,10 @@
 #define NULL __null
 #endif
 
-#ifdef _WIN64
-typedef unsigned long long size_t;
-#else
+#ifndef _WIN64
 typedef unsigned int size_t;
+#else
+typedef unsigned long long size_t;
 #endif
 
 #ifndef interface
@@ -18,8 +18,13 @@ typedef unsigned int size_t;
 typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
+typedef unsigned long ulong;
 
 typedef unsigned int uenum;
+
+#ifdef PLATFORM_WINDOWS
+typedef void* handle;
+#endif
 
 // utils
 class String;

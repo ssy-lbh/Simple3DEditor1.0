@@ -1,12 +1,12 @@
-# OpenGL Program Makefile
+# Simple3DEditor Makefile
+# Author: lin-boheng@gitee.com
 
 # 依赖库:
-# OpenGL
+# OpenGL OpenAL stb_image
 # 可能加入的依赖库:
-# OpenAL ffmpeg stb_image glfw glm glew
+# ffmpeg glfw glm glew
 
 # 大小写平台名称
-# 关于跨平台方面，以后将资源部分进行抽象后将完成
 PLATFORM 	= windows
 PLATFORM_U	= WINDOWS
 
@@ -19,13 +19,15 @@ LFLAGS		= -m64 -shared
 LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 "lib\openal\OpenAL32.lib"
 RES  		= windres.exe
 MKDIR   	= mkdir
+GIT  		= git
 
 BUILD_PATH	= build
+TEST_PATH	= test
 PROGOBJ		= main\
 				lib\soundtouch\SoundTouch lib\soundtouch\TDStretch lib\soundtouch\RateTransposer\
 				lib\soundtouch\AAFilter lib\soundtouch\FIRFilter lib\soundtouch\FIFOSampleBuffer\
 				lib\soundtouch\PeakFinder lib\soundtouch\BPMDetect\
-				utils\StringBuilder utils\DataBuffer utils\AudioUtils\
+				utils\String utils\StringBuilder utils\DataBuffer utils\AudioUtils\
 				utils\math3d\Math utils\math3d\LinearAlgebra utils\math3d\Mesh\
 				utils\math3d\ViewObject utils\math3d\Geometry utils\math3d\Property\
 				utils\gl\GLFrameBuffer utils\gl\GLIndexBuffer utils\gl\GLSkyBox\
@@ -35,19 +37,15 @@ PROGOBJ		= main\
 				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
 				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
 				editor\MainWindow editor\RenderWindow editor\gui\Container editor\gui\Menu\
-				editor\gui\UIManager editor\gui\AnimationCurve
-PLATOBJ		= utils\String utils\File\
-				utils\os\Shell utils\os\Log utils\os\GLFunc utils\os\Thread\
+				editor\gui\UIManager editor\gui\AnimationCurve editor\gui\ViewManager
+PLATOBJ		=  utils\File utils\os\Shell utils\os\Log utils\os\GLFunc utils\os\Thread utils\os\System\
 				utils\os\Time utils\os\Font utils\os\Appframe utils\os\Resource\
-				editor\gui\ViewManager\
 				editor\dialog\ColorBoard editor\dialog\Tips
 EXTRAOBJ	= lib\soundtouch\mmx_optimized lib\soundtouch\sse_optimized lib\soundtouch\cpu_detect_x86
 RESOBJ		= res string
 OUTPUT 		= main.exe
 # 动态库
 OUTPUTDLIB	= main.dll
-# 静态导入库
-OUTPUTSLIB	= libmain.a
 
 SIGNTOOL	= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe"
 CERT 		= "D:\code\.Certificate\lin-boheng.pfx"
@@ -77,14 +75,11 @@ run: build
 
 build: $(OUTPUT)
 
-lib: $(OUTPUTDLIB) $(OUTPUTSLIB)
+lib: $(OUTPUTDLIB)
 
 rebuild: clean build
 
 reexec: clean run
-
-$(OUTPUTSLIB): $(OUTPUTDLIB)
-	$(DLLTOOL) --dllname $< --output-lib $(OUTPUTSLIB)
 
 $(OUTPUTDLIB): $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
 	$(GCC) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ) -o $@ $(LIB) $(LFLAGS)
@@ -101,27 +96,32 @@ $(PLATOBJ): $(BUILD_PATH)\\%.o: platform\$(PLATFORM)\\%.cpp %.h
 $(EXTRAOBJ): $(BUILD_PATH)\\%.o: %.cpp
 	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
 
+# 其实我个人觉得，把nasm的内置指令incbin用好了当资源表用是相当可行的，理论上只要不乱加汇编代码跨平台是没问题的
 $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 	$(RES) -i $< -o $@
 
+# 当前分支
 BRANCH		= AVdevelop
+# 提交信息
 COMMITMSG	= "update"
+# 合并分支时的目标分支
 MERGE 		= AVDevelop
 
+# 一键提交代码
 commit:
-	-$(RM) temp.wav
-	git checkout $(BRANCH)
-	git add *
-	git commit -m $(COMMITMSG)
-	git push -u origin $(BRANCH)
+	$(GIT) checkout $(BRANCH)
+	$(GIT) add *
+	$(GIT) commit -m $(COMMITMSG)
+	$(GIT) push -u origin $(BRANCH)
 
+# 一键合并分支
 merge:
-	git checkout $(MERGE)
-	git pull origin $(MERGE)
-	git merge $(BRANCH)
-	git status
-	git push origin $(MERGE)
-	git checkout $(BRANCH)
+	$(GIT) checkout $(MERGE)
+	$(GIT) pull origin $(MERGE)
+	$(GIT) merge $(BRANCH)
+	$(GIT) status
+	$(GIT) push origin $(MERGE)
+	$(GIT) checkout $(BRANCH)
 
 # git log 日志 ('q'退出)
 # git reflog 历史操作日志 (包含回退操作)('q'退出)
@@ -143,5 +143,14 @@ sign: $(OUTPUT)
 	$(SIGNTOOL) timestamp /t $(TIMESTAMP) $(OUTPUT)
 
 clean:
-	-$(RM) $(OUTPUT) $(OUTPUTSLIB) $(OUTPUTDLIB) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
+	-$(RM) $(OUTPUT) $(OUTPUTDLIB) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
 
+# 测试
+.PHONY: dllboot
+
+# 后面的测试如果只链接一个类的.o文件，include对应的.h，加上启动测试代码，不就是单元测试了么
+
+# 第一个测试，将整个程序当成库使用并启动
+dllboot: $(OUTPUTDLIB)
+	$(GCC) $(TEST_PATH)\dllboot\boot.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)\boot.exe
+	$(TEST_PATH)\boot.exe

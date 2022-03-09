@@ -65,6 +65,7 @@ public:
 
     String GetCaption();
     void SetSize(size_t height, size_t width);
+    GLRect GetClientRect();
     size_t GetHeight();
     size_t GetWidth();
     IWindow* GetMainFrame();

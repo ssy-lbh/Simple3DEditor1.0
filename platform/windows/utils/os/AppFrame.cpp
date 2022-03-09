@@ -9,6 +9,7 @@
 #include <utils/os/GLFunc.h>
 #include <utils/os/Font.h>
 #include <utils/os/Thread.h>
+#include <utils/os/System.h>
 #include <utils/math3d/ViewObject.h>
 #include <editor/gui/UIManager.h>
 #include <editor/gui/ViewManager.h>
@@ -18,7 +19,7 @@ bool AppFrame::init = false;
 AppFrame::AppFrame(String name, IWindow* mainFrame, size_t height, size_t width, bool async) : name(name), mainFrame(mainFrame), height(height), width(width) {
     DebugLog("AppFrame %p Launched", this);
     
-    hInst = GetModuleHandleA(NULL);
+    hInst = GetModule();
     
     Initialize();
 
@@ -57,7 +58,7 @@ void AppFrame::Initialize(){
 
         init = true;
 
-        hInst = GetModuleHandleA(NULL);
+        hInst = GetModule();
 
         wc.cbSize = sizeof(WNDCLASSEXA);
         wc.cbClsExtra = 0;
@@ -92,12 +93,27 @@ void AppFrame::SetSize(size_t height, size_t width){
     SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, width, height, SWP_NOMOVE);
 }
 
+GLRect AppFrame::GetClientRect(){
+    RECT cliRect;
+    GLRect rect;
+
+    ::GetClientRect(hWnd, &cliRect);
+    rect.left = cliRect.left; rect.right = cliRect.right;
+    rect.top = cliRect.bottom; rect.bottom = cliRect.top;
+
+    return rect;
+}
+
 size_t AppFrame::GetHeight(){
-    return height;
+    RECT cliRect;
+    ::GetClientRect(hWnd, &cliRect);
+    return cliRect.bottom - cliRect.top;
 }
 
 size_t AppFrame::GetWidth(){
-    return width;
+    RECT cliRect;
+    ::GetClientRect(hWnd, &cliRect);
+    return cliRect.right - cliRect.left;
 }
 
 IWindow* AppFrame::GetMainFrame(){
@@ -360,7 +376,7 @@ LRESULT CALLBACK AppFrame::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
 void AppFrame::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     RECT cliRect;
-    GetClientRect(hWnd, &cliRect);
+    ::GetClientRect(hWnd, &cliRect);
     // 事件中鼠标坐标上下需反转
     int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
     switch (uMsg){

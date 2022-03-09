@@ -9,10 +9,6 @@
 #define THREAD_LOCAL_LOCALDATA 1
 #define THREAD_LOCAL_VIEWMGR 2
 
-#ifdef PLATFORM_WINDOWS
-#include <handleapi.h>
-#endif
-
 class ThreadUtils final {
 public:
     static void ExitThread(int code);
@@ -22,14 +18,14 @@ public:
 class Thread final : public Object {
 private:
 #ifdef PLATFORM_WINDOWS
-    HANDLE hThread = INVALID_HANDLE_VALUE;
+    handle hThread = (handle)(-1);
 
     struct ThreadData {
         int(*func)(void*);
         void* user;
     };
 
-    static DWORD CALLBACK RunThread(LPVOID data);
+    static ulong __stdcall RunThread(void* data);
 #endif
 
     int(*func)(void*);
@@ -47,7 +43,7 @@ public:
 class ThreadLocal final {
 private:
 #ifdef PLATFORM_WINDOWS
-    static DWORD tlsIndex[THREAD_LOCAL_SIZE];
+    static ulong tlsIndex[THREAD_LOCAL_SIZE];
 #endif
 
 public:

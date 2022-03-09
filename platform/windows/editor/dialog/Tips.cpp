@@ -4,6 +4,7 @@
 
 #include <res.h>
 #include <utils/os/Log.h>
+#include <utils/os/System.h>
 
 /* synchronized */
 void DialogTextInput(wchar_t* str, size_t size){
@@ -19,7 +20,7 @@ void DialogTextInput(wchar_t* str, size_t size){
     pstr = str;
     ssize = size;
     inputConfirm = false;
-    DialogBoxA(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDD_TEXT), NULL,
+    DialogBoxA(GetModule(), MAKEINTRESOURCE(IDD_TEXT), NULL,
         (DLGPROC)[]
 #if (!_WIN64) && _WIN32
         __attribute__((__stdcall__))
@@ -52,7 +53,7 @@ void DialogTextInput(wchar_t* str, size_t size){
 }
 
 void DialogVersionInfo(){
-    DialogBoxA(GetModuleHandleA(NULL), MAKEINTRESOURCEA(IDD_ABOUTBOX), NULL,
+    DialogBoxA(GetModule(), MAKEINTRESOURCEA(IDD_ABOUTBOX), NULL,
         (DLGPROC)[]
 #if (!_WIN64) && _WIN32
         __attribute__((__stdcall__))

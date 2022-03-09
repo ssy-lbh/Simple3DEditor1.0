@@ -4,6 +4,7 @@
 
 #include <utils/os/Log.h>
 #include <utils/os/GLFunc.h>
+#include <utils/os/System.h>
 #include <utils/math3d/Math.h>
 
 static void EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC){
@@ -81,7 +82,7 @@ void ColorBoard::Init(HINSTANCE hInstance){
 
 ColorBoard* ColorBoard::GetInst(){
     if (!inst)
-        Init(GetModuleHandleA(NULL));
+        Init(GetModule());
     return inst;
 }
 

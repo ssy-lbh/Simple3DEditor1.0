@@ -13,16 +13,8 @@ ViewManager* ViewManager::GetLocalInst(){
 }
 
 void ViewManager::Reset(){
-    RECT cliRect;
-    GLRect rect;
-
     rects.Clear();
-
-    GetClientRect(frame->hWnd, &cliRect);
-    rect.left = cliRect.left; rect.right = cliRect.right;
-    rect.top = cliRect.bottom; rect.bottom = cliRect.top;
-
-    PushView(rect);
+    PushView(frame->GetClientRect());
 }
 
 void ViewManager::PushView(GLRect rect){

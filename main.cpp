@@ -76,7 +76,7 @@ void LocalData::OnRightUp(int x, int y){
 void LocalData::OnMenuAccel(int id, bool accel){
     switch (id){
     case IDM_EXIT:
-        if (ShellMsgBox(WString(IDS_EXIT_CONFIRM_CAPTION), WString(IDS_EXIT_CONFIRM)) == MSGBOX_YES)
+        if (ShellMsgBox(Resource::GetWString(IDS_EXIT_CONFIRM_CAPTION), Resource::GetWString(IDS_EXIT_CONFIRM)) == MSGBOX_YES)
             PostQuitMessage(0);
         break;
     case IDM_ABOUT:
@@ -227,9 +227,11 @@ void Main::RequestRender(){
 }
 
 #ifdef PLATFORM_WINDOWS
+#include <utils/os/System.h>
+
 void Main::SetCursor(int id){
     AppFrame* frame = AppFrame::GetLocalInst();
-    ::SetCursor(LoadCursorA(GetModuleHandleA(NULL), MAKEINTRESOURCEA(id)));
+    ::SetCursor(LoadCursorA(GetModule(), MAKEINTRESOURCEA(id)));
     if (frame)
         frame->cursorSelected = true;
 }

@@ -3,10 +3,6 @@
 
 #include <define.h>
 
-#ifdef PLATFORM_WINDOWS
-#include <handleapi.h>
-#endif
-
 #include <utils/String.h>
 
 // 设计中
@@ -15,7 +11,7 @@ protected:
     String path;
 
 #ifdef PLATFORM_WINDOWS
-    HANDLE hFile = INVALID_HANDLE_VALUE;
+    handle hFile = (handle)(-1);
     bool ref = false;
 #endif
 

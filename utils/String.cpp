@@ -3,6 +3,7 @@
 #include <windows.h>
 
 #include <utils/os/Log.h>
+#include <utils/os/System.h>
 
 String::String(bool alloc){
     if (alloc){
@@ -16,21 +17,6 @@ String::String(){
     str = new char[1];
     str[0] = '\0';
     len = 0;
-}
-
-String::String(int resid){
-    const char* pstr;
-    len = LoadStringA(GetModuleHandleA(NULL), resid, (LPSTR)&pstr, 0);
-    if (!pstr){
-        DebugError("Critical: String::String(%d) LoadStringA Return NULL", resid);
-        str = new char[1];
-        str[0] = '\0';
-        len = 0;
-        return;
-    }
-    str = new char[len + 1];
-    str[len] = '\0';
-    memcpy(str, pstr, len * sizeof(char));
 }
 
 String::String(char c){
@@ -439,21 +425,6 @@ WString::WString(){
     str = new wchar_t[1];
     str[0] = L'\0';
     len = 0;
-}
-
-WString::WString(int resid){
-    const wchar_t* pstr;
-    len = LoadStringW(GetModuleHandleW(NULL), resid, (LPWSTR)&pstr, 0);
-    if (!pstr){
-        DebugError("Critical: WString::WString(%d) LoadStringW Return NULL", resid);
-        str = new wchar_t[1];
-        str[0] = L'\0';
-        len = 0;
-        return;
-    }
-    str = new wchar_t[len + 1];
-    str[len] = L'\0';
-    memcpy(str, pstr, len * sizeof(wchar_t));
 }
 
 WString::WString(wchar_t c){

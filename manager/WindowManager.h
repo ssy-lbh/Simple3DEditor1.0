@@ -7,10 +7,11 @@
 
 class IWindowRegistry : public Object {
 public:
-    // 获取窗口名称
-    WString GetName();
+    // 窗口名称
+    WString name;
+
     // 获取新窗口
-    IWindow* NewWindow();
+    IWindow*(*NewWindow)();
 };
 
 class WindowManager {
@@ -23,8 +24,9 @@ public:
 
     void RegisterWindow(WindowRegistry* window);
     void UnregisterWindow(WindowRegistry* window);
-    WindowRegistry* GetWindow();
-    IWindow* NewWindow();
+    WindowRegistry* GetWindow(WString name);
+    IWindow* NewWindow(WString name);
+    List<IWindowRegistry*>& GetWindows();
 };
 
 #endif

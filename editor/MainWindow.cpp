@@ -15,6 +15,7 @@
 #include <utils/math3d/Mesh.h>
 #include <utils/math3d/ViewObject.h>
 #include <utils/os/Shell.h>
+#include <utils/os/Resource.h>
 #include <utils/gl/GLTexture2D.h>
 #include <utils/gl/GLSkyBox.h>
 #include <utils/gl/GLSimplified.h>
@@ -987,7 +988,7 @@ void MainWindow::DeletePoint(){
 bool MainWindow::SaveMesh(Mesh* mesh){
     if (!mesh)
         return false;
-    WString file = ShellFileSelectWindow(WString(IDS_OBJFILE_FILTER), FILESELECT_REQ_PATH, true);
+    WString file = ShellFileSelectWindow(Resource::GetWString(IDS_OBJFILE_FILTER), FILESELECT_REQ_PATH, true);
     if (file.GetLength() == 0){
         DebugError("Stop Saving");
         return false;
@@ -1006,7 +1007,7 @@ bool MainWindow::SaveMesh(Mesh* mesh){
 bool MainWindow::LoadMesh(AViewObject* obj){
     if (!obj->GetMesh())
         return false;
-    WString file = ShellFileSelectWindow(WString(IDS_OBJFILE_FILTER), FILESELECT_REQ_FILE | FILESELECT_REQ_PATH);
+    WString file = ShellFileSelectWindow(Resource::GetWString(IDS_OBJFILE_FILTER), FILESELECT_REQ_FILE | FILESELECT_REQ_PATH);
     if (file.GetLength() == 0){
         DebugLog("Stop Loading");
         return false;
@@ -1443,7 +1444,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         Mesh* mesh = Main::GetMesh();
         if (!mesh)
             break;
-        WString file = ShellFileSelectWindow(WString(IDS_PICFILE_FILTER), FILESELECT_REQ_FILE | FILESELECT_REQ_PATH);
+        WString file = ShellFileSelectWindow(Resource::GetWString(IDS_PICFILE_FILTER), FILESELECT_REQ_FILE | FILESELECT_REQ_PATH);
         if (file.GetLength() == 0){
             DebugLog("Stop Loading");
             break;
@@ -1464,8 +1465,8 @@ void MainWindow::OnMenuAccel(int id, bool accel){
 void MainWindow::OnDropFileW(const wchar_t* path){
     wchar_t* suffix = wcsrchr(path, L'.');
     if (wcscmp(suffix, L".obj")){
-        WString message(IDS_OBJFILE_FORM_WARNING);
-        WString caption(IDS_OBJFILE_FORM_WARNING_CAPTION);
+        WString message = Resource::GetWString(IDS_OBJFILE_FORM_WARNING);
+        WString caption = Resource::GetWString(IDS_OBJFILE_FORM_WARNING_CAPTION);
         if (ShellMsgBox(caption, message) != MSGBOX_YES){
             DebugLog("MainWindow::OnDropFileW Stop Load File");
             return;

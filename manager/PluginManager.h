@@ -5,33 +5,19 @@
 
 #include <utils/List.h>
 
-#ifdef PLATFORM_WINDOWS
-#include <windef.h>
-#include <winuser.h>
-#include <handleapi.h>
-#endif
-
-//TODO 先就试做一下这个功能吧
+// 先就试做一下这个功能吧
 // 看来有必要将一部分代码做成库，交给插件共享，共通加载同一个动态库
 
 //TODO 待设计
 class Plugin : public Object {
 private:
-#ifdef PLATFORM_WINDOWS
-    HMODULE hPlugin;
-#endif
+    handle hModule;
 
     WString name;
 
 public:
     Plugin(WString name);
     ~Plugin();
-};
-
-class IPluginInterface : public Object {
-public:
-    // 获取的对象应都是接口
-    virtual AViewObject* GetScene();
 };
 
 //TODO 待设计
@@ -46,6 +32,7 @@ public:
     void LoadPlugin(WString name);
     void UnloadPlugin(WString name);
     Plugin* GetPlugin(WString name);
+    List<Plugin*>& GetPlugins();
 };
 
 #endif

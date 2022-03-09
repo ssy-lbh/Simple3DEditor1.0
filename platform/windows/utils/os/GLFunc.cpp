@@ -1,10 +1,17 @@
 #include <utils/os/GLFunc.h>
 
-#include <gl/wgl.h>
+#include <windows.h>
+
+#include <lib/opengl/gl/wgl.h>
 
 static bool init = false;
 
 #define GL_GETFUNC(x) (x = (decltype(x))wglGetProcAddress(#x))
+
+PFNGLDRAWRANGEELEMENTSPROC glDrawRangeElements;
+PFNGLTEXIMAGE3DPROC glTexImage3D;
+PFNGLTEXSUBIMAGE3DPROC glTexSubImage3D;
+PFNGLCOPYTEXSUBIMAGE3DPROC glCopyTexSubImage3D;
 
 PFNGLCOLORMASKIPROC glColorMaski;
 PFNGLGETBOOLEANI_VPROC glGetBooleani_v;
@@ -336,6 +343,11 @@ void glInitEXTFunctions(){
         return;
 
     init = true;
+
+    GL_GETFUNC(glDrawRangeElements);
+    GL_GETFUNC(glTexImage3D);
+    GL_GETFUNC(glTexSubImage3D);
+    GL_GETFUNC(glCopyTexSubImage3D);
 
     GL_GETFUNC(glColorMaski);
     GL_GETFUNC(glGetBooleani_v);
