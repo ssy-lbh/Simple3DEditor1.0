@@ -2,9 +2,9 @@
 # Author: lin-boheng@gitee.com
 
 # 依赖库:
-# OpenGL OpenAL stb_image
+# OpenGL OpenAL stb_image SoundTouch FFmpeg
 # 可能加入的依赖库:
-# ffmpeg glfw glm glew
+# glfw glm glew FreeType "FBX SDK" OpenRL json-cpp ShaderConductor
 
 # 大小写平台名称
 PLATFORM 	= windows
