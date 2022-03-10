@@ -317,8 +317,6 @@ Mesh* Main::GetMesh(){
     return data->curObject->GetMesh();
 }
 
-#include <utils/RBTree.h>
-
 int Main::MainEntry(int argc, char** argv){
     AudioUtils::InitOpenAL();
 
