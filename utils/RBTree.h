@@ -110,7 +110,7 @@ public:
         }
         RBTreeNode<K, V>*& node = son[this->key < key];
         if (!node){
-            node = new Node<K, V>(key, val, this, false);
+            node = new RBTreeNode<K, V>(key, val, this, false);
             node->Update(root);
             return node;
         }
@@ -133,7 +133,7 @@ public:
 
     RBTreeNode<K, V>* Insert(K key, V val){
         if(!root)
-            return (root = new Node<K, V>(key, val, NULL, true));
+            return (root = RBTreeNode<K, V>(key, val, NULL, true));
         RBTreeNode<K, V>* ret = root->Insert(root, key, val);
         while (root->father)
             root = root->father;
@@ -157,8 +157,8 @@ public:
         if (target->son[0]){
             // 存在两个子节点，我就随便找到右侧值最邻近的节点代替自身
             if (target->son[1]){
-                RBTreeNode<K, V>** src = &t->son[1];
-                while((*src)->son[0])
+                RBTreeNode<K, V>** src = &target->son[1];
+                while ((*src)->son[0])
                     src = &(*src)->son[0];
                 Replace(target, *src);
                 return;
