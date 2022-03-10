@@ -90,9 +90,16 @@ StringBuilder& StringBuilder::Append(double d){
     return *this;
 
 }
-StringBuilder& StringBuilder::Append(String s){
+StringBuilder& StringBuilder::Append(String& s){
     Check(s.GetLength() + 2);
     ptr += __builtin_snprintf(data + ptr, s.GetLength() + 1, "%s", s.GetString());
+    return *this;
+}
+
+StringBuilder& StringBuilder::Append(WString& s){
+    size_t len = s.GetLength() << 2;
+    Check(len + 2);
+    ptr += __builtin_snprintf(data + ptr, len + 1, "%s", s.GetString());
     return *this;
 }
 
@@ -104,7 +111,7 @@ StringBuilder& StringBuilder::Append(const char* s){
 }
 
 StringBuilder& StringBuilder::Append(const wchar_t* s){
-    size_t len = wcslen(s);
+    size_t len = wcslen(s) << 2;
     Check(len + 2);
     ptr += __builtin_snprintf(data + ptr, len + 1, "%S", s);
     return *this;

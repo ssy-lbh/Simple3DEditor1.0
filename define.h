@@ -21,6 +21,8 @@ typedef unsigned int uint;
 typedef unsigned long ulong;
 
 typedef unsigned int uenum;
+// 暂时我也用不到64位整数
+typedef unsigned long uhash;
 
 #ifdef PLATFORM_WINDOWS
 typedef void* handle;

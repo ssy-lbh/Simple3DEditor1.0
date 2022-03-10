@@ -28,7 +28,8 @@ public:
     StringBuilder& Append(bool b);
     StringBuilder& Append(float f);
     StringBuilder& Append(double d);
-    StringBuilder& Append(String s);
+    StringBuilder& Append(String& s);
+    StringBuilder& Append(WString& s);
     StringBuilder& Append(const char* s);
     StringBuilder& Append(const wchar_t* s);
 };

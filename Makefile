@@ -13,7 +13,7 @@ PLATFORM_U	= WINDOWS
 GCC			= g++.exe
 DLLTOOL		= dlltool.exe
 RM			= del
-CFLAGS 		= -I"." -m64 -O3
+CFLAGS 		= -I"." -m64 -O3 -std=c++11
 OFLAGS		= -m64 -s
 LFLAGS		= -m64 -shared
 LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 "lib\openal\OpenAL32.lib"

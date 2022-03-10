@@ -31,6 +31,7 @@ public:
 
     void LoadPlugin(WString name);
     void UnloadPlugin(WString name);
+    // 计划这里内部的实现以后改为HashMap加速
     Plugin* GetPlugin(WString name);
     List<Plugin*>& GetPlugins();
 };

@@ -5,79 +5,121 @@
 
 #define PI 3.1415926535897932384626433832795
 
-#define Sqrt(x) (__builtin_sqrt(x))
-#define Sqrtf(x) (__builtin_sqrtf(x))
-#define Sin(x) (__builtin_sin(x))
-#define Sinf(x) (__builtin_sinf(x))
-#define Cos(x) (__builtin_cos(x))
-#define Cosf(x) (__builtin_cosf(x))
-#define Exp(x) (__builtin_exp(x))
-#define Expf(x) (__builtin_expf(x))
-#define Log(x) (__builtin_log(x))
-#define Logf(x) (__builtin_logf(x))
-#define Log2(x) (__builtin_log2(x))
-#define Log2f(x) (__builtin_log2f(x))
-#define Log10(x) (__builtin_log10(x))
-#define Log10f(x) (__builtin_log10f(x))
-#define Pow(x, y) (__builtin_pow(x, y))
-#define Powf(x, y) (__builtin_powf(x, y))
-#define Abs(x) (__builtin_fabs(x))
-#define Absf(x) (__builtin_fabsf(x))
-#define Mod(x) (__builtin_fmod(x, y))
-#define Modf(x) (__builtin_fmodf(x, y))
-#define Max(x, y) (__builtin_fmax(x, y))
-#define Maxf(x, y) (__builtin_fmaxf(x, y))
-#define Min(x, y) (__builtin_fmin(x, y))
-#define Minf(x, y) (__builtin_fminf(x, y))
-#define Floor(x) (__builtin_floor(x))
-#define Floorf(x) (__builtin_floorf(x))
-#define Ceil(x) (__builtin_ceil(x))
-#define Ceilf(x) (__builtin_ceilf(x))
-#define Round(x) (__builtin_round(x))
-#define Roundf(x) (__builtin_roundf(x))
-#define SinCos(x, y, z) (__builtin_sincos(x, y, z))
-#define SinCosf(x, y, z) (__builtin_sincosf(x, y, z))
-#define Asin(x) (__builtin_asin(x))
-#define Asinf(x) (__builtin_asinf(x))
-#define Acos(x) (__builtin_acos(x))
-#define Acosf(x) (__builtin_acosf(x))
-#define Atan(x) (__builtin_atan(x))
-#define Atanf(x) (__builtin_atanf(x))
-#define Sinh(x) (__builtin_sinh(x))
-#define Sinhf(x) (__builtin_sinhf(x))
-#define Cosh(x) (__builtin_cosh(x))
-#define Coshf(x) (__builtin_coshf(x))
-#define Tanh(x) (__builtin_tanh(x))
-#define Tanhf(x) (__builtin_tanhf(x))
-#define Asinh(x) (__builtin_asinh(x))
-#define Asinhf(x) (__builtin_asinhf(x))
-#define Acosh(x) (__builtin_acosh(x))
-#define Acoshf(x) (__builtin_acoshf(x))
-#define Atanh(x) (__builtin_atanh(x))
-#define Atanhf(x) (__builtin_atanhf(x))
+constexpr float Sqrt(float x){ return __builtin_sqrtf(x); }
+constexpr double Sqrt(double x){ return __builtin_sqrt(x); }
+constexpr long double Sqrt(long double x){ return __builtin_sqrtl(x); }
+constexpr float Sin(float x){ return __builtin_sinf(x); }
+constexpr double Sin(double x){ return __builtin_sin(x); }
+constexpr long double Sin(long double x){ return __builtin_sinl(x); }
+constexpr float Cos(float x){ return __builtin_cosf(x); }
+constexpr double Cos(double x){ return __builtin_cos(x); }
+constexpr long double Cos(long double x){ return __builtin_cosl(x); }
+constexpr float Exp(float x){ return __builtin_expf(x); }
+constexpr double Exp(double x){ return __builtin_exp(x); }
+constexpr long double Exp(long double x){ return __builtin_expl(x); }
+constexpr float Log(float x){ return __builtin_logf(x); }
+constexpr double Log(double x){ return __builtin_log(x); }
+constexpr long double Log(long double x){ return __builtin_logl(x); }
+constexpr float Log2(float x){ return __builtin_log2f(x); }
+constexpr double Log2(double x){ return __builtin_log2(x); }
+constexpr long double Log2(long double x){ return __builtin_log2l(x); }
+constexpr float Log10(float x){ return __builtin_log10f(x); }
+constexpr double Log10(double x){ return __builtin_log10(x); }
+constexpr long double Log10(long double x){ return __builtin_log10l(x); }
+constexpr float Pow(float x, float y){ return __builtin_powf(x, y); }
+constexpr double Pow(double x, double y){ return __builtin_pow(x, y); }
+constexpr long double Pow(long double x, long double y){ return __builtin_powl(x, y); }
+constexpr int Abs(int x){ return __builtin_abs(x); }
+constexpr float Abs(float x){ return __builtin_fabsf(x); }
+constexpr double Abs(double x){ return __builtin_fabs(x); }
+constexpr long double Abs(long double x){ return __builtin_fabsl(x); }
+constexpr float Mod(float x, float y){ return __builtin_fmodf(x, y); }
+constexpr double Mod(double x, double y){ return __builtin_fmod(x, y); }
+constexpr long double Mod(long double x, long double y){ return __builtin_fmodl(x, y); }
+constexpr float Max(float x, float y){ return __builtin_fmaxf(x, y); }
+constexpr double Max(double x, double y){ return __builtin_fmax(x, y); }
+constexpr long double Max(long double x, long double y){ return __builtin_fmaxl(x, y); }
+constexpr float Min(float x, float y){ return __builtin_fminf(x, y); }
+constexpr double Min(double x, double y){ return __builtin_fmin(x, y); }
+constexpr long double Min(long double x, long double y){ return __builtin_fminl(x, y); }
+constexpr float Floor(float x){ return __builtin_floorf(x); }
+constexpr double Floor(double x){ return __builtin_floor(x); }
+constexpr long double Floor(long double x){ return __builtin_floorl(x); }
+constexpr float Ceil(float x){ return __builtin_ceilf(x); }
+constexpr double Ceil(double x){ return __builtin_ceil(x); }
+constexpr long double Ceil(long double x){ return __builtin_ceill(x); }
+constexpr float Round(float x){ return __builtin_roundf(x); }
+constexpr double Round(double x){ return __builtin_round(x); }
+constexpr long double Round(long double x){ return __builtin_roundl(x); }
+inline void SinCos(float x, float* vsin, float* vcos){ return __builtin_sincosf(x, vsin, vcos); }
+inline void SinCos(double x, double* vsin, double* vcos){ return __builtin_sincos(x, vsin, vcos); }
+inline void SinCos(long double x, long double* vsin, long double* vcos){ return __builtin_sincosl(x, vsin, vcos); }
+constexpr float Asin(float x){ return __builtin_asinf(x); }
+constexpr double Asin(double x){ return __builtin_asin(x); }
+constexpr long double Asin(long double x){ return __builtin_asinl(x); }
+constexpr float Acos(float x){ return __builtin_acosf(x); }
+constexpr double Acos(double x){ return __builtin_acos(x); }
+constexpr long double Acos(long double x){ return __builtin_acosl(x); }
+constexpr float Atan(float x){ return __builtin_atanf(x); }
+constexpr double Atan(double x){ return __builtin_atan(x); }
+constexpr long double Atan(long double x){ return __builtin_atanl(x); }
+constexpr float Sinh(float x){ return __builtin_sinhf(x); }
+constexpr double Sinh(double x){ return __builtin_sinh(x); }
+constexpr long double Sinh(long double x){ return __builtin_sinhl(x); }
+constexpr float Cosh(float x){ return __builtin_coshf(x); }
+constexpr double Cosh(double x){ return __builtin_cosh(x); }
+constexpr long double Cosh(long double x){ return __builtin_coshl(x); }
+constexpr float Tanh(float x){ return __builtin_tanhf(x); }
+constexpr double Tanh(double x){ return __builtin_tanh(x); }
+constexpr long double Tanh(long double x){ return __builtin_tanhl(x); }
+constexpr float Asinh(float x){ return __builtin_asinhf(x); }
+constexpr double Asinh(double x){ return __builtin_asinh(x); }
+constexpr long double Asinh(long double x){ return __builtin_asinhl(x); }
+constexpr float Acosh(float x){ return __builtin_acoshf(x); }
+constexpr double Acosh(double x){ return __builtin_acosh(x); }
+constexpr long double Acosh(long double x){ return __builtin_acoshl(x); }
+constexpr float Atanh(float x){ return __builtin_atanhf(x); }
+constexpr double Atanh(double x){ return __builtin_atanh(x); }
+constexpr long double Atanh(long double x){ return __builtin_atanhl(x); }
 
-#define ToRadian(x) ((x) * 0.017453292519f)
-#define ToAngle(x) ((x) * 57.29577951308f)
+constexpr float ToRadian(float x){ return x * 0.017453292519f; }
+constexpr float ToAngle(float x){ return x * 57.29577951308f; }
+
+// 参数需要为定点数
+template <typename T>
+constexpr T Factorial(T x){ return (x == 0 ? 1 : x * Factorial(x - 1)); }
 
 template <typename T>
-inline T Square(T x){ return x * x; }
+constexpr T Square(T x){ return x * x; }
 
-float GetRate(float x, float a, float b);
+template <typename T>
+constexpr T GetRate(T x, T a, T b){
+    return (x - a) / (b - a);
+}
 
-float Lerp(float a, float b, float t);
-Vector2 Lerp(Vector2 a, Vector2 b, float t);
-Vector3 Lerp(Vector3 a, Vector3 b, float t);
+template <typename T>
+constexpr T Lerp(T a, T b, float t){
+    return (b - a) * t + a;
+}
+
 Quaternion Slerp(Quaternion a, Quaternion b, float t);
 
-int Clamp(int x, int a, int b);
-float Clamp(float x, float a, float b);
+template <typename T>
+constexpr T Clamp(T x, T a, T b){
+    return (x <= a ? a : (x >= b ? b : x));
+}
 
 // 排序为前小后大
-void Sort(float& x, float& y);
+inline void Sort(float& x, float& y){
+    float t;
+    if (x > y){
+        t = x; x = y; y = t;
+    }
+}
 
 template <typename T>
-inline T Min(T a, T b){ return a < b ? a : b; }
+constexpr T Min(T a, T b){ return a < b ? a : b; }
 template <typename T>
-inline T Max(T a, T b){ return a > b ? a : b; }
+constexpr T Max(T a, T b){ return a > b ? a : b; }
 
 #endif

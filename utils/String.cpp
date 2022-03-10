@@ -152,7 +152,7 @@ char String::operator[](size_t index) const{
     return str[index];
 }
 
-String String::operator+(String s) const{
+String String::operator+(const String& s) const{
     String res(false);
     res.len = len + s.len;
     res.str = new char[res.len + 1];
@@ -162,28 +162,63 @@ String String::operator+(String s) const{
     return res;
 }
 
-bool String::operator==(const String s) const{
+String String::operator+(const char* s) const{
+    String res(false);
+    size_t size = strlen(s);
+    res.len = len + size;
+    res.str = new char[res.len + 1];
+    res.str[res.len] = '\0';
+    memcpy(res.str, str, len * sizeof(char));
+    memcpy(res.str + len, s, size * sizeof(char));
+    return res;
+}
+
+bool String::operator==(const String& s) const{
     return strcmp(str, s.str) == 0;
 }
 
-bool String::operator!=(const String s) const{
+bool String::operator!=(const String& s) const{
     return strcmp(str, s.str) != 0;
 }
 
-bool String::operator<(const String s) const{
+bool String::operator<(const String& s) const{
     return strcmp(str, s.str) < 0;
 }
 
-bool String::operator>(const String s) const{
+bool String::operator>(const String& s) const{
     return strcmp(str, s.str) > 0;
 }
 
-bool String::operator<=(const String s) const{
+bool String::operator<=(const String& s) const{
     return strcmp(str, s.str) <= 0;
 }
 
-bool String::operator>=(const String s) const{
+bool String::operator>=(const String& s) const{
     return strcmp(str, s.str) >= 0;
+}
+
+bool String::operator==(const char* s) const{
+    return strcmp(str, s) == 0;
+}
+
+bool String::operator!=(const char* s) const{
+    return strcmp(str, s) != 0;
+}
+
+bool String::operator<(const char* s) const{
+    return strcmp(str, s) < 0;
+}
+
+bool String::operator>(const char* s) const{
+    return strcmp(str, s) > 0;
+}
+
+bool String::operator<=(const char* s) const{
+    return strcmp(str, s) <= 0;
+}
+
+bool String::operator>=(const char* s) const{
+    return strcmp(str, s) >= 0;
 }
 
 const char* String::GetString() const{
@@ -267,50 +302,50 @@ size_t String::FindString(const char* s, size_t beg) const{
     return pos ? pos - str : -1;
 }
 
-size_t String::FindString(const String s) const{
+size_t String::FindString(const String& s) const{
     char* pos = strstr(str, s.str);
     return pos ? pos - str : -1;
 }
 
-size_t String::FindString(const String s, size_t beg) const{
+size_t String::FindString(const String& s, size_t beg) const{
     char* pos = strstr(str + beg, s.str);
     return pos ? pos - str : -1;
 }
 
-bool String::StartsWith(const String s) const{
+bool String::StartsWith(const String& s) const{
     if (s.len > len)
         return false;
     return strncmp(str, s.str, s.len) == 0;
 }
 
-bool String::EndsWith(const String s) const{
+bool String::EndsWith(const String& s) const{
     if (s.len > len)
         return false;
     size_t off = len - s.len;
     return strncmp(str + off, s.str, s.len) == 0;
 }
 
-bool String::IgnoreCaseEqual(const String s) const{
+bool String::IgnoreCaseEqual(const String& s) const{
     return stricmp(str, s.str) == 0;
 }
 
-bool String::IgnoreCaseNotEqual(const String s) const{
+bool String::IgnoreCaseNotEqual(const String& s) const{
     return stricmp(str, s.str) != 0;
 }
 
-bool String::IgnoreCaseLess(const String s) const{
+bool String::IgnoreCaseLess(const String& s) const{
     return stricmp(str, s.str) < 0;
 }
 
-bool String::IgnoreCaseGreater(const String s) const{
+bool String::IgnoreCaseGreater(const String& s) const{
     return stricmp(str, s.str) > 0;
 }
 
-bool String::IgnoreCaseLessEqual(const String s) const{
+bool String::IgnoreCaseLessEqual(const String& s) const{
     return stricmp(str, s.str) <= 0;
 }
 
-bool String::IgnoreCaseGreaterEqual(const String s) const{
+bool String::IgnoreCaseGreaterEqual(const String& s) const{
     return stricmp(str, s.str) >= 0;
 }
 
@@ -353,7 +388,7 @@ size_t String::Count(const char* s) const{
     return cnt;
 }
 
-size_t String::Count(const String s) const{
+size_t String::Count(const String& s) const{
     size_t cnt = 0;
     char* pstr = str;
     while (pstr = strstr(pstr, s.str)){
@@ -397,7 +432,7 @@ size_t String::Split(const char* s, String* arr, size_t len) const{
     return Count(s) + 1;
 }
 
-size_t String::Split(const String s, String* arr, size_t len) const{
+size_t String::Split(const String& s, String* arr, size_t len) const{
     size_t p = 0;
     if (len == 0)
         return Count(s) + 1;
@@ -560,9 +595,8 @@ wchar_t WString::operator[](size_t index) const{
     return str[index];
 }
 
-WString WString::operator+(WString s) const{
-    WString res;
-    delete[] res.str;
+WString WString::operator+(const WString& s) const{
+    WString res(false);
     res.len = len + s.len;
     res.str = new wchar_t[res.len + 1];
     res.str[res.len] = L'\0';
@@ -571,28 +605,63 @@ WString WString::operator+(WString s) const{
     return res;
 }
 
-bool WString::operator==(const WString s) const{
+WString WString::operator+(const wchar_t* s) const{
+    WString res(false);
+    size_t size = wcslen(s);
+    res.len = len + size;
+    res.str = new wchar_t[res.len + 1];
+    res.str[res.len] = L'\0';
+    memcpy(res.str, str, len * sizeof(wchar_t));
+    memcpy(res.str + len, s, size * sizeof(wchar_t));
+    return res;
+}
+
+bool WString::operator==(const WString& s) const{
     return wcscmp(str, s.str) == 0;
 }
 
-bool WString::operator!=(const WString s) const{
+bool WString::operator!=(const WString& s) const{
     return wcscmp(str, s.str) != 0;
 }
 
-bool WString::operator<(const WString s) const{
+bool WString::operator<(const WString& s) const{
     return wcscmp(str, s.str) < 0;
 }
 
-bool WString::operator>(const WString s) const{
+bool WString::operator>(const WString& s) const{
     return wcscmp(str, s.str) > 0;
 }
 
-bool WString::operator<=(const WString s) const{
+bool WString::operator<=(const WString& s) const{
     return wcscmp(str, s.str) <= 0;
 }
 
-bool WString::operator>=(const WString s) const{
+bool WString::operator>=(const WString& s) const{
     return wcscmp(str, s.str) >= 0;
+}
+
+bool WString::operator==(const wchar_t* s) const{
+    return wcscmp(str, s) == 0;
+}
+
+bool WString::operator!=(const wchar_t* s) const{
+    return wcscmp(str, s) != 0;
+}
+
+bool WString::operator<(const wchar_t* s) const{
+    return wcscmp(str, s) < 0;
+}
+
+bool WString::operator>(const wchar_t* s) const{
+    return wcscmp(str, s) > 0;
+}
+
+bool WString::operator<=(const wchar_t* s) const{
+    return wcscmp(str, s) <= 0;
+}
+
+bool WString::operator>=(const wchar_t* s) const{
+    return wcscmp(str, s) >= 0;
 }
 
 const wchar_t* WString::GetString() const{
@@ -676,47 +745,47 @@ size_t WString::FindString(const wchar_t* s, size_t beg) const{
     return pos ? pos - str : -1;
 }
 
-size_t WString::FindString(const WString s) const{
+size_t WString::FindString(const WString& s) const{
     wchar_t* pos = wcsstr(str, s.str);
     return pos ? pos - str : -1;
 }
 
-size_t WString::FindString(const WString s, size_t beg) const{
+size_t WString::FindString(const WString& s, size_t beg) const{
     wchar_t* pos = wcsstr(str + beg, s.str);
     return pos ? pos - str : -1;
 }
 
-bool WString::IgnoreCaseEqual(const WString s) const{
+bool WString::IgnoreCaseEqual(const WString& s) const{
     return wcsicmp(str, s.str) == 0;
 }
 
-bool WString::IgnoreCaseNotEqual(const WString s) const{
+bool WString::IgnoreCaseNotEqual(const WString& s) const{
     return wcsicmp(str, s.str) != 0;
 }
 
-bool WString::IgnoreCaseLess(const WString s) const{
+bool WString::IgnoreCaseLess(const WString& s) const{
     return wcsicmp(str, s.str) < 0;
 }
 
-bool WString::IgnoreCaseGreater(const WString s) const{
+bool WString::IgnoreCaseGreater(const WString& s) const{
     return wcsicmp(str, s.str) > 0;
 }
 
-bool WString::IgnoreCaseLessEqual(const WString s) const{
+bool WString::IgnoreCaseLessEqual(const WString& s) const{
     return wcsicmp(str, s.str) <= 0;
 }
 
-bool WString::IgnoreCaseGreaterEqual(const WString s) const{
+bool WString::IgnoreCaseGreaterEqual(const WString& s) const{
     return wcsicmp(str, s.str) >= 0;
 }
 
-bool WString::StartsWith(const WString s) const{
+bool WString::StartsWith(const WString& s) const{
     if (s.len > len)
         return false;
     return wcsncmp(str, s.str, s.len) == 0;
 }
 
-bool WString::EndsWith(const WString s) const{
+bool WString::EndsWith(const WString& s) const{
     if (s.len > len)
         return false;
     size_t off = len - s.len;
@@ -762,7 +831,7 @@ size_t WString::Count(const wchar_t* s) const{
     return cnt;
 }
 
-size_t WString::Count(const WString s) const{
+size_t WString::Count(const WString& s) const{
     size_t cnt = 0;
     wchar_t* pstr = str;
     while (pstr = wcsstr(pstr, s.str)){
@@ -806,7 +875,7 @@ size_t WString::Split(const wchar_t* s, WString* arr, size_t len) const{
     return Count(s) + 1;
 }
 
-size_t WString::Split(const WString s, WString* arr, size_t len) const{
+size_t WString::Split(const WString& s, WString* arr, size_t len) const{
     size_t p = 0;
     if (len == 0)
         return Count(s) + 1;

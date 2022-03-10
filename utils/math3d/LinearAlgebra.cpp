@@ -329,19 +329,19 @@ Vector3 Vector3::Refract(Vector3 n, float rate) const{
 
 Vector3 Vector3::RotateX(float angle) const{
     float vsin, vcos;
-    SinCosf(angle * 0.01745329251994329547f, &vsin, &vcos);
+    SinCos(angle * 0.01745329251994329547f, &vsin, &vcos);
     return Vector3(x, z * vsin + y * vcos, z * vcos - y * vsin);
 }
 
 Vector3 Vector3::RotateY(float angle) const{
     float vsin, vcos;
-    SinCosf(angle * 0.01745329251994329547f, &vsin, &vcos);
+    SinCos(angle * 0.01745329251994329547f, &vsin, &vcos);
     return Vector3(z * vsin + x * vcos, y, z * vcos - x * vsin);
 }
 
 Vector3 Vector3::RotateZ(float angle) const{
     float vsin, vcos;
-    SinCosf(angle * 0.01745329251994329547f, &vsin, &vcos);
+    SinCos(angle * 0.01745329251994329547f, &vsin, &vcos);
     return Vector3(x * vcos - y * vsin, x * vsin + y * vcos, z);
 }
 
@@ -726,7 +726,7 @@ Complex Complex::Reflection(Vector2 axis, Vector2 v){
 
 Complex Complex::Rotation(float angle){
     float vsin, vcos;
-    SinCosf(ToRadian(angle), &vsin, &vcos);
+    SinCos(ToRadian(angle), &vsin, &vcos);
     return Complex(vcos, vsin);
 }
 
@@ -829,7 +829,7 @@ Quaternion Quaternion::Reflection(Vector3 axis, Vector3 v){
 
 Quaternion Quaternion::AxisAngle(Vector3 axis, float angle){
     float vsin, vcos;
-    SinCosf(angle * 0.00872664625997164788F, &vsin, &vcos);
+    SinCos(angle * 0.00872664625997164788F, &vsin, &vcos);
     return Quaternion(axis.Normal() * vsin, vcos);
 }
 

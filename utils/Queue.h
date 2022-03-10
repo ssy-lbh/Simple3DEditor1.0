@@ -270,7 +270,7 @@ public:
 };
 
 template <typename T>
-void Free(Queue<T*> queue){
+void Free(Queue<T*>& queue){
     queue.Foreach([](T* item){
         delete item;
     });

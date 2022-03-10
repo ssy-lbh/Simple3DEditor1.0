@@ -126,6 +126,7 @@ public:
     void SetWorldPos(Point3 pos);
     
     // 用字符'.'分隔各级对象名称
+    // 计划这里内部的实现以后改为HashMap加速
     AViewObject* QueryObject(WString path);
 
     // 具体选择什么应取决于选择模式，计划放置于全局数据中

@@ -235,7 +235,7 @@ public:
 };
 
 template <typename T>
-void Free(List<T*> list){
+void Free(List<T*>& list){
     list.Foreach([](T* item){
         delete item;
     });

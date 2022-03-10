@@ -31,8 +31,8 @@ public:
     void CursorMove(Vector2 pos);
     void AddButton(IButton* btn);
     void DeleteButton(IButton* btn);
+    // 在调用之前设置深度测试
     void Render();
-    void RenderWithDepth();
     bool LeftDown();
     bool LeftUp();
     bool RightDown();
