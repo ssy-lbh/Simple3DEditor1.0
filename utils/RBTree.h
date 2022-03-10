@@ -67,12 +67,13 @@ public:
     // 红黑树规则：红色不相邻，黑色可相邻，根节点必须为黑色
     // 路径上黑节点数量决定了最大深度和最小深度差别不会大于两倍
     // 每一次都是变红的节点才需要刷新
-    void Update(RBTreeNode<K, V>* root){
+    void Update(RBTreeNode<K, V>*& root){
         while (root->father)
             root = root->father;
         // 根节点固定为黑色，如果被变红则在这里变回
         root->black = true;
         // 刚刚插入的节点为红色，因此在父节点存在且为红时才需要更新
+        // 不存在时也就是根节点了
         if (father && !father->black){
             // 相邻节点存在且为红，则父节点变黑，父节点相邻节点变黑，祖父节点变红并刷新
             RBTreeNode<K, V>* rel = father->Relative();
@@ -102,7 +103,7 @@ public:
         }
     }
 
-    RBTreeNode<K, V>* Insert(RBTreeNode<K, V>* root, K key, V val){
+    RBTreeNode<K, V>* Insert(RBTreeNode<K, V>*& root, K key, V val){
         if (this->key == key){
             this->val = val;
             return this;
@@ -140,7 +141,7 @@ public:
         return ret;
     }
 
-    void DeleteAndCopy(RBTreeNode<K, V>* target, RBTreeNode<K, V>*& src){
+    void Replace(RBTreeNode<K, V>* target, RBTreeNode<K, V>*& src){
         target->key = src->key;
         target->val = src->val;
         delete src;
@@ -159,14 +160,14 @@ public:
                 RBTreeNode<K, V>* src = t->son[1];
                 while(src->son[0])
                     src = src->son[0];
-                DeleteAndCopy(target, src);
+                Replace(target, src);
                 return;
             }
             // 只有一个左节点，以子节点替换自身
-            DeleteAndCopy(target, target->son[0]);
+            Replace(target, target->son[0]);
         } else if (target->son[1]){
             // 只有一个右节点，以子节点替换自身
-            DeleteAndCopy(target, target->son[1]);
+            Replace(target, target->son[1]);
         } else {
             // 都没有，直接删除
             if (target == root)

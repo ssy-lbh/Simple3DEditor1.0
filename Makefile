@@ -107,7 +107,7 @@ $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 # 当前分支
 BRANCH		= AVdevelop
 # 提交信息
-COMMITMSG	= "update"
+COMMITMSG	= "bugfix"
 # 合并分支时的目标分支
 MERGE 		= AVDevelop
 
