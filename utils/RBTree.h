@@ -75,9 +75,10 @@ public:
         // 刚刚插入的节点为红色，因此在父节点存在且为红时才需要更新
         if (father && !father->black){
             // 相邻节点存在且为红，则父节点变黑，父节点相邻节点变黑，祖父节点变红并刷新
-            if (father->Relative() && !father->Relative()->black){
+            RBTreeNode<K, V>* rel = father->Relative();
+            if (rel && !rel->black){
                 father->black = true;
-                father->Relative()->black = true;
+                rel->black = true;
                 father->father->black = false;
                 father->father->Update(root);
                 return;
@@ -153,6 +154,7 @@ public:
         if (!target)
             return;
         if (target->son[0]){
+            // 存在两个子节点，我就随便找到右侧值最邻近的节点代替自身
             if (target->son[1]){
                 RBTreeNode<K, V>* src = t->son[1];
                 while(src->son[0])
@@ -160,11 +162,14 @@ public:
                 DeleteAndCopy(target, src);
                 return;
             }
+            // 只有一个左节点，以子节点替换自身
             DeleteAndCopy(target, target->son[0]);
         } else if (target->son[1]){
+            // 只有一个右节点，以子节点替换自身
             DeleteAndCopy(target, target->son[1]);
         } else {
-            if (root)
+            // 都没有，直接删除
+            if (target == root)
                 root = NULL;
             delete target;
         }
