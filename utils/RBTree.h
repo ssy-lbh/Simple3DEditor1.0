@@ -157,10 +157,10 @@ public:
         if (target->son[0]){
             // 存在两个子节点，我就随便找到右侧值最邻近的节点代替自身
             if (target->son[1]){
-                RBTreeNode<K, V>* src = t->son[1];
-                while(src->son[0])
-                    src = src->son[0];
-                Replace(target, src->father->son[0]);
+                RBTreeNode<K, V>** src = &t->son[1];
+                while((*src)->son[0])
+                    src = &(*src)->son[0];
+                Replace(target, *src);
                 return;
             }
             // 只有一个左节点，以子节点替换自身
