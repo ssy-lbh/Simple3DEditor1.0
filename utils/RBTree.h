@@ -160,7 +160,7 @@ public:
                 RBTreeNode<K, V>* src = t->son[1];
                 while(src->son[0])
                     src = src->son[0];
-                Replace(target, src);
+                Replace(target, src->father->son[0]);
                 return;
             }
             // 只有一个左节点，以子节点替换自身
