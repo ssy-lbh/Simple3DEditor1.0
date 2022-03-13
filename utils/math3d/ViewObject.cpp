@@ -264,7 +264,7 @@ List<AViewObject*>& AViewObject::GetChildren(){
     return children;
 }
 
-void AViewObject::OnSelect(Vector3 ori, Vector3 dir){}
+void AViewObject::OnSelect(Point3 ori, Vector3 dir){}
 void AViewObject::OnSelect(const SelectInfo* info){}
 void AViewObject::OnSelectUV(Vector2 uv, float err){}
 void AViewObject::OnSelectUV(Vector2 uv1, Vector2 uv2){}
@@ -364,9 +364,9 @@ MeshObject::~MeshObject(){
     if (mesh) delete mesh;
 }
 
-void MeshObject::OnSelect(Vector3 ori, Vector3 dir){
-    ori = transform.chainInvMat * Vector4(ori, 1.0f);
-    dir = transform.chainInvMat * Vector4(dir, 0.0f);
+void MeshObject::OnSelect(Point3 ori, Vector3 dir){
+    ori = transform.chainInvMat * ori;
+    dir = transform.chainInvMat * dir;
 
     switch (Main::data->selType){
     case GlobalData::SELECT_VERTICES:{
@@ -449,9 +449,9 @@ BezierCurveObject::BezierCurveObject() : AViewObject(L"BezierCurve", ViewObjectT
 
 BezierCurveObject::~BezierCurveObject(){}
 
-void BezierCurveObject::OnSelect(Vector3 ori, Vector3 dir){
-    ori = transform.chainInvMat * Vector4(ori, 1.0f);
-    dir = transform.chainInvMat * Vector4(dir, 0.0f);
+void BezierCurveObject::OnSelect(Point3 ori, Vector3 dir){
+    ori = transform.chainInvMat * ori;
+    dir = transform.chainInvMat * dir;
 
     bool hit = false;
     for (int i = 0; i < 4; i++){
@@ -471,7 +471,7 @@ void BezierCurveObject::OnSelect(Vector3 ori, Vector3 dir){
 void BezierCurveObject::OnSelect(const SelectInfo* info){
     bool hit = false;
     for (int i = 0; i < 4; i++){
-        if (info->Inside(transform.chainMat * Vector4(v[i].pos, 1.0f))){
+        if (info->Inside(transform.chainMat * Point3(v[i].pos))){
             if (Main::data->selPoints.HasValue(&v[i]))
                 return;
             Main::data->selPoints.Add(&v[i]);
@@ -560,9 +560,9 @@ PointLightObject::~PointLightObject(){
     GLLights::Destroy(light);
 }
 
-void PointLightObject::OnSelect(Vector3 ori, Vector3 dir){
-    ori = transform.chainInvMat * Vector4(ori, 1.0f);
-    dir = transform.chainInvMat * Vector4(dir, 0.0f);
+void PointLightObject::OnSelect(Point3 ori, Vector3 dir){
+    ori = transform.chainInvMat * ori;
+    dir = transform.chainInvMat * dir;
 
     if (v.Hit(ori, dir)){
         if (Main::data->selPoints.HasValue(&v))
@@ -576,7 +576,7 @@ void PointLightObject::OnSelect(Vector3 ori, Vector3 dir){
 }
 
 void PointLightObject::OnSelect(const SelectInfo* info){
-    if (info->Inside(transform.chainMat * Vector4(v.pos, 1.0f))){
+    if (info->Inside(transform.chainMat * Point3(v.pos))){
         if (Main::data->selPoints.HasValue(&v))
             return;
         Main::data->selPoints.Add(&v);
@@ -606,7 +606,7 @@ void PointLightObject::OnTimer(int id){
 }
 
 void PointLightObject::UpdateLight(){
-    Vector3 pos = transform.chainMat * Vector4(v.pos, 1.0f);
+    Vector3 pos = transform.chainMat * Point3(v.pos);
 
     GLfloat position[] = {pos.x, pos.y, pos.z, 1.0};// 最后一个参数为1.0表示该光源是point light
 
@@ -822,9 +822,9 @@ AudioListenerObject::~AudioListenerObject(){
 void AudioListenerObject::OnRender(const RenderOptions* options){
     AViewObject::OnRender(options);
 
-    Vector3 pos = transform.chainMat * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
-    Vector3 dir = (transform.chainMat * Vector4(Vector3::forward, 0.0f)).Normal();
-    Vector3 up = (transform.chainMat * Vector4(Vector3::up, 0.0f)).Normal();
+    Vector3 pos = transform.chainMat * Point3::zero;
+    Vector3 dir = (transform.chainMat * Vector3::forward).Normal();
+    Vector3 up = (transform.chainMat * Vector3::up).Normal();
 
     alListenerPosv3(pos);
     alListenerDirv3(dir, up);
@@ -882,9 +882,9 @@ CameraObject::~CameraObject(){
     LocalData::GetLocalInst()->camera = NULL;
 }
 
-void CameraObject::OnSelect(Vector3 ori, Vector3 dir){
-    ori = transform.chainInvMat * Vector4(ori, 1.0f);
-    dir = transform.chainInvMat * Vector4(dir, 0.0f);
+void CameraObject::OnSelect(Point3 ori, Vector3 dir){
+    ori = transform.chainInvMat * ori;
+    dir = transform.chainInvMat * dir;
     
     if (pos.Hit(ori, dir)){
         if (Main::data->selPoints.HasValue(&pos))
@@ -905,7 +905,7 @@ void CameraObject::OnSelect(Vector3 ori, Vector3 dir){
 void CameraObject::OnSelect(const SelectInfo* info){
     bool hit = false;
 
-    if (info->Inside(transform.chainMat * Vector4(pos.pos, 1.0f))){
+    if (info->Inside(transform.chainMat * Point3(pos.pos))){
         hit = true;
         if (Main::data->selPoints.HasValue(&pos))
             return;
@@ -913,7 +913,7 @@ void CameraObject::OnSelect(const SelectInfo* info){
         DebugLog("Select Point %f %f %f", pos.pos.x, pos.pos.y, pos.pos.z);
     }
     
-    if (info->Inside(transform.chainMat * Vector4(lookAt.pos, 1.0f))){
+    if (info->Inside(transform.chainMat * Point3(lookAt.pos))){
         hit = true;
         if (Main::data->selPoints.HasValue(&lookAt))
             return;

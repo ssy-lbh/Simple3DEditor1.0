@@ -133,7 +133,7 @@ public:
     // 除了网格体，也应有其它类型对象被选中
     // 已实现的父类方法中，都是对子对象的遍历调用
     //TODO 待实现对象、边、面选择
-    virtual void OnSelect(Vector3 ori, Vector3 dir);
+    virtual void OnSelect(Point3 ori, Vector3 dir);
     virtual void OnSelect(const SelectInfo* info);
     virtual void OnSelectUV(Vector2 uv, float err = 0.01f);
     virtual void OnSelectUV(Vector2 uv1, Vector2 uv2);
@@ -160,7 +160,7 @@ public:
     MeshObject();
     virtual ~MeshObject() override;
 
-    virtual void OnSelect(Vector3 ori, Vector3 dir) override;
+    virtual void OnSelect(Point3 ori, Vector3 dir) override;
     virtual void OnSelect(const SelectInfo* info) override;
     virtual void OnSelectUV(Vector2 uv, float err = 0.01f) override;
     virtual void OnSelectUV(Vector2 uv1, Vector2 uv2) override;
@@ -180,7 +180,7 @@ public:
     BezierCurveObject();
     virtual ~BezierCurveObject() override;
 
-    virtual void OnSelect(Vector3 ori, Vector3 dir) override;
+    virtual void OnSelect(Point3 ori, Vector3 dir) override;
     virtual void OnSelect(const SelectInfo* info) override;
     virtual void OnSelectUV(Vector2 uv, float err = 0.01f) override;
     virtual void OnSelectUV(Vector2 uv1, Vector2 uv2) override;
@@ -198,7 +198,7 @@ public:
     PointLightObject();
     virtual ~PointLightObject() override;
 
-    virtual void OnSelect(Vector3 ori, Vector3 dir) override;
+    virtual void OnSelect(Point3 ori, Vector3 dir) override;
     virtual void OnSelect(const SelectInfo* info) override;
 
     virtual void OnRender(const RenderOptions* options) override;
@@ -305,7 +305,7 @@ public:
     CameraObject();
     virtual ~CameraObject() override;
 
-    virtual void OnSelect(Vector3 ori, Vector3 dir) override;
+    virtual void OnSelect(Point3 ori, Vector3 dir) override;
     virtual void OnSelect(const SelectInfo* info) override;
 
     virtual void OnRender(const RenderOptions* options) override;

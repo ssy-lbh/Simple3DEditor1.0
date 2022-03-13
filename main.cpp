@@ -206,20 +206,6 @@ void GlobalData::OnAnimationFrame(float frame){
     scene->OnAnimationFrame(frame);
 }
 
-Main::Main(){
-    MeshObject* mesh;
-
-    data = new GlobalData();
-    mesh = new MeshObject();
-    
-    AddObject(mesh);
-    SelectObject(mesh);
-}
-
-Main::~Main(){
-    if (data) delete data;
-}
-
 void Main::RequestRender(){
     AppFrame* frame = AppFrame::GetLocalInst();
     if (frame)
@@ -318,6 +304,7 @@ Mesh* Main::GetMesh(){
 }
 
 int Main::MainEntry(int argc, char** argv){
+    Init();
     AudioUtils::InitOpenAL();
 
     IWindow* mainFrame = new SelectionWindow(new MainWindow());
@@ -361,16 +348,27 @@ int Main::MainEntry(int argc, char** argv){
     delete appFrame;
 
     AudioUtils::UninitOpenAL();
+    Uninit();
 
     return code;
 }
 
-Main* Main::inst = NULL;
+void Main::Init(){
+    MeshObject* mesh;
+
+    data = new GlobalData();
+    mesh = new MeshObject();
+    
+    AddObject(mesh);
+    SelectObject(mesh);
+}
+
+void Main::Uninit(){
+    if (data) delete data;
+}
+
 GlobalData* Main::data = NULL;
 
 int main(int argc, char** argv){
-    Main::inst = new Main();
-    int ret = Main::inst->MainEntry(argc, argv);
-    delete Main::inst;
-    return ret;
+    return Main::MainEntry(argc, argv);
 }

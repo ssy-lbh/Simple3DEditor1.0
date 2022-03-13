@@ -1,6 +1,5 @@
 #include <utils/os/System.h>
 
-
 static HMODULE GetCurrentModule(){
 	HMODULE hModule;
 

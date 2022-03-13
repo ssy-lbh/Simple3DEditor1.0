@@ -61,7 +61,7 @@ size_t Mesh::FindScreenRect(const SelectInfo* info, Matrix4x4 mat, List<Vertex*>
     pack.mat = mat;
     pack.list = &result;
     vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
-        if (m->info->Inside(m->mat * Vector4(p->pos, 1.0f))){
+        if (m->info->Inside(m->mat * Point3(p->pos))){
             if (m->list->HasValue(p))
                 return;
             m->cnt++;

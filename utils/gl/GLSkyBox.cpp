@@ -1,10 +1,9 @@
 #include <utils/gl/GLSkyBox.h>
 
-#include <lib/opengl/gl/gl.h>
+#include <lib/glew/gl/glew.h>
 
 #include <utils/gl/GLTexture2D.h>
 #include <utils/gl/GLSimplified.h>
-#include <utils/os/GLFunc.h>
 
 static inline void Set(GLTexture2D** tex, GLTexture2D* newTex){
     if (*tex)

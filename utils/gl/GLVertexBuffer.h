@@ -10,6 +10,8 @@ private:
 public:
     GLVertexBuffer();
     ~GLVertexBuffer();
+
+    uint GetBuffer();
 };
 
 #endif

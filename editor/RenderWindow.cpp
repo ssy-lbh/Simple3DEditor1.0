@@ -1,7 +1,6 @@
 #include <editor/RenderWindow.h>
 
-#include <lib/opengl/gl/gl.h>
-#include <lib/opengl/gl/glu.h>
+#include <lib/glew/gl/glew.h>
 
 #include <main.h>
 #include <res.h>
@@ -11,6 +10,8 @@
 #include <utils/DataBuffer.h>
 #include <utils/os/Shell.h>
 #include <utils/os/Resource.h>
+#include <utils/gl/GLShader.h>
+#include <utils/gl/GLProgram.h>
 #include <utils/math3d/ViewObject.h>
 
 RenderWindow::RenderWindow(){
@@ -35,6 +36,7 @@ RenderWindow::~RenderWindow(){
     DebugLog("RenderWindow Destroyed");
     if (basicMenu) delete basicMenu;
     if (uiMgr) delete uiMgr;
+    if (glProg) delete glProg;
 }
 
 void RenderWindow::InitCamera(){
@@ -107,7 +109,7 @@ void RenderWindow::OnRender(){
     uiMgr->Render();
 }
 
-void RenderWindow::OnClose(){}
+void RenderWindow::OnCreate(){}
 
 void RenderWindow::OnTimer(int id){}
 

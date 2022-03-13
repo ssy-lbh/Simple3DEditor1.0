@@ -2,9 +2,9 @@
 
 STRINGTABLE
 BEGIN
-    IDS_OBJFILE_FORM_WARNING "未识别的文件格式，是否继续导入？"
+    IDS_OBJFILE_FORM_WARNING "未识别的3D对象文件格式，是否继续导入？"
     IDS_OBJFILE_FORM_WARNING_CAPTION "文件格式错误"
-    IDS_WAVFILE_FORM_WARNING "未识别的文件格式，是否转换格式，或者取消导入？"
+    IDS_WAVFILE_FORM_WARNING "未识别的音频文件格式，是否转换格式，或者取消导入？"
     IDS_WAVFILE_FORM_WARNING_CAPTION "文件格式错误"
     IDS_OBJFILE_FILTER "3D对象(*.obj)\0*.obj\0"
     IDS_WAVFILE_FILTER "PCM音频文件(*.wav)\0*.wav\0"

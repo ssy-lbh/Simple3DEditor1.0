@@ -10,6 +10,10 @@ private:
 public:
     GLVertexArray();
     ~GLVertexArray();
+
+    void BindBuffer(GLVertexBuffer* buffer);
+    void SetFormat(uint idx, uint size, uenum type, uint offset);
+    uint GetArray();
 };
 
 #endif

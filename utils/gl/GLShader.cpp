@@ -1,12 +1,11 @@
 #include <utils/gl/GLShader.h>
 
-#include <lib/opengl/gl/gl.h>
+#include <lib/glew/gl/glew.h>
 
 #include <utils/String.h>
 #include <utils/DataBuffer.h>
 #include <utils/os/Log.h>
 #include <utils/os/Resource.h>
-#include <utils/os/GLFunc.h>
 
 GLShader::GLShader(uenum stage){
     shader = glCreateShader(stage);

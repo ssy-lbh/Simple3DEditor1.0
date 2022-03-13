@@ -5,6 +5,7 @@
 # OpenGL OpenAL stb_image SoundTouch FFmpeg
 # 可能加入的依赖库:
 # glfw glm glew FreeType "FBX SDK" OpenRL json-cpp ShaderConductor
+# 以后创建发行版带上glew32和OpenAL32的动态库
 
 # 大小写平台名称
 PLATFORM 	= windows
@@ -13,10 +14,11 @@ PLATFORM_U	= WINDOWS
 GCC			= g++.exe
 DLLTOOL		= dlltool.exe
 RM			= del
-CFLAGS 		= -I"." -m64 -O3 -std=c++11
+CFLAGS 		= -I"." -I".\\lib\\freetype" -m64 -O3 -std=c++11
 OFLAGS		= -m64 -s
 LFLAGS		= -m64 -shared
-LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 "lib\openal\OpenAL32.lib"
+LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32\
+				"lib\openal\OpenAL32.lib" "lib\glew\glew32.lib" "lib\freetype\freetype.lib"
 RES  		= windres.exe
 MKDIR   	= mkdir
 GIT  		= git
@@ -31,14 +33,14 @@ PROGOBJ		= main\
 				utils\math3d\Math utils\math3d\LinearAlgebra utils\math3d\Mesh\
 				utils\math3d\ViewObject utils\math3d\Geometry utils\math3d\Property\
 				utils\gl\GLFrameBuffer utils\gl\GLIndexBuffer utils\gl\GLSkyBox\
-				utils\gl\GLLights utils\gl\GLProgram utils\gl\GLShader\
+				utils\gl\GLLights utils\gl\GLProgram utils\gl\GLShader utils\gl\GLEW\
 				utils\gl\GLUtils utils\gl\GLVertexArray utils\gl\GLVertexBuffer\
 				utils\gl\GLTexture2D utils\gl\GLRenderTexture2D utils\gl\GLComputeProgram\
 				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
 				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
 				editor\MainWindow editor\RenderWindow editor\gui\Container editor\gui\Menu\
 				editor\gui\UIManager editor\gui\AnimationCurve editor\gui\ViewManager
-PLATOBJ		=  utils\File utils\os\Shell utils\os\Log utils\os\GLFunc utils\os\Thread utils\os\System\
+PLATOBJ		=  utils\File utils\os\Shell utils\os\Log utils\os\Thread utils\os\System\
 				utils\os\Time utils\os\Font utils\os\Appframe utils\os\Resource\
 				editor\dialog\ColorBoard editor\dialog\Tips
 EXTRAOBJ	= lib\soundtouch\mmx_optimized lib\soundtouch\sse_optimized lib\soundtouch\cpu_detect_x86
@@ -150,11 +152,11 @@ clean:
 	-$(RM) $(OUTPUT) $(OUTPUTDLIB) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
 
 # 测试
-.PHONY: dllboot
+.PHONY: dllboot freetype
 
 # 后面的测试如果只链接一个类的.o文件，include对应的.h，加上启动测试代码，不就是单元测试了么
 
 # 第一个测试，将整个程序当成库使用并启动
 dllboot: $(OUTPUTDLIB)
-	$(GCC) $(TEST_PATH)\dllboot\boot.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)\boot.exe
-	$(TEST_PATH)\boot.exe
+	$(GCC) $(TEST_PATH)\$@\boot.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)\$@\boot.exe
+	$(TEST_PATH)\$@\boot.exe

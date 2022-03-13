@@ -1,13 +1,17 @@
 #include <utils/gl/GLVertexBuffer.h>
 
-#include <lib/opengl/gl/gl.h>
+#include <lib/glew/gl/glew.h>
+
 #include <utils/os/Log.h>
-#include <utils/os/GLFunc.h>
 
 GLVertexBuffer::GLVertexBuffer(){
-    DebugError("GLVertexBuffer::GLVertexBuffer [Unimplemented]");
+    glGenBuffers(1, &buffer);
 }
 
 GLVertexBuffer::~GLVertexBuffer(){
-    DebugError("GLVertexBuffer::~GLVertexBuffer [Unimplemented]");
+    glDeleteBuffers(1, &buffer);
+}
+
+uint GLVertexBuffer::GetBuffer(){
+    return buffer;
 }

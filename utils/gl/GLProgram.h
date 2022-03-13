@@ -14,8 +14,11 @@ public:
 
     void AddShader(GLShader* shader);
     void RemoveShader(GLShader* shader);
+    // 发生错误返回true
     bool Link();
     void PrintLog();
+    bool Enable();
+    static void Disable();
     uint GetProgram();
 };
 

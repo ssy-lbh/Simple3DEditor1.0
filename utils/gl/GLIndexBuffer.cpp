@@ -1,13 +1,13 @@
 #include <utils/gl/GLIndexBuffer.h>
 
-#include <lib/opengl/gl/gl.h>
+#include <lib/glew/gl/glew.h>
+
 #include <utils/os/Log.h>
-#include <utils/os/GLFunc.h>
 
 GLIndexBuffer::GLIndexBuffer(){
-    DebugError("GLIndexBuffer::GLIndexBuffer [Unimplemented]");
+    glGenBuffers(1, &buffer);
 }
 
 GLIndexBuffer::~GLIndexBuffer(){
-    DebugError("GLIndexBuffer::~GLIndexBuffer [Unimplemented]");
+    glDeleteBuffers(1, &buffer);
 }

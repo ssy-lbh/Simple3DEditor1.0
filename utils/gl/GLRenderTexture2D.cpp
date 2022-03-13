@@ -1,9 +1,8 @@
 #include <utils/gl/GLRenderTexture2D.h>
 
-#include <lib/opengl/gl/gl.h>
+#include <lib/glew/gl/glew.h>
 
 #include <utils/os/Log.h>
-#include <utils/os/GLFunc.h>
 
 GLRenderTexture2D::GLRenderTexture2D(int x, int y, uenum format) : x(x), y(y), format(format) {
     glGenTextures(1, &tex);

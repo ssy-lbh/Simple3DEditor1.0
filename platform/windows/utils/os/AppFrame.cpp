@@ -6,10 +6,10 @@
 
 #include <main.h>
 #include <res.h>
-#include <utils/os/GLFunc.h>
 #include <utils/os/Font.h>
 #include <utils/os/Thread.h>
 #include <utils/os/System.h>
+#include <utils/gl/GLEW.h>
 #include <utils/math3d/ViewObject.h>
 #include <editor/gui/UIManager.h>
 #include <editor/gui/ViewManager.h>
@@ -17,7 +17,7 @@
 bool AppFrame::init = false;
 
 AppFrame::AppFrame(String name, IWindow* mainFrame, size_t height, size_t width, bool async) : name(name), mainFrame(mainFrame), height(height), width(width) {
-    DebugLog("AppFrame %p Launched", this);
+    DebugLog("AppFrame %s Launched", name.GetString());
     
     hInst = GetModule();
     
@@ -158,7 +158,7 @@ void AppFrame::EnableOpenGL(){
 }
 
 void AppFrame::EnableOpenGLEXT(){
-    glInitEXTFunctions();
+    glInitGLEW();
 }
 
 void AppFrame::DisableOpenGL(){
@@ -229,7 +229,6 @@ int AppFrame::GetExitCode(){
 
 int AppFrame::MainLoop(){
     EnableOpenGL();
-    EnableOpenGLEXT();
 
     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);

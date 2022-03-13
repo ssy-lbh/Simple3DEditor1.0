@@ -1,8 +1,7 @@
 #include <utils/gl/GLProgram.h>
 
-#include <lib/opengl/gl/gl.h>
+#include <lib/glew/gl/glew.h>
 
-#include <utils/os/GLFunc.h>
 #include <utils/os/Log.h>
 #include <utils/gl/GLShader.h>
 
@@ -40,6 +39,15 @@ void GLProgram::PrintLog(){
         DebugError("%s", log);
         delete[] log;
     }
+}
+
+bool GLProgram::Enable(){
+    glUseProgram(prog);
+    return true;
+}
+
+void GLProgram::Disable(){
+    glUseProgram(0);
 }
 
 uint GLProgram::GetProgram(){

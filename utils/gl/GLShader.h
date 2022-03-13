@@ -15,6 +15,7 @@ public:
 
     void Source(String src);
     void Source(DataBuffer src);
+    // 发生错误返回true
     bool Compile();
     void PrintLog();
     uint GetShader();

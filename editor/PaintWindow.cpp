@@ -1,6 +1,6 @@
 #include <editor/PaintWindow.h>
 
-#include <lib/opengl/gl/gl.h>
+#include <lib/glew/gl/glew.h>
 
 #include <main.h>
 #include <res.h>
@@ -8,7 +8,6 @@
 #include <editor/dialog/ColorBoard.h>
 #include <utils/math3d/Math.h>
 #include <utils/math3d/Mesh.h>
-#include <utils/os/GLFunc.h>
 #include <utils/gl/GLTexture2D.h>
 #include <utils/gl/GLRenderTexture2D.h>
 #include <utils/gl/GLComputeProgram.h>

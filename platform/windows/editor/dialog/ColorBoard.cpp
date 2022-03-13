@@ -2,8 +2,9 @@
 
 #include <windows.h>
 
+#include <lib/opengl/gl/gl.h>
+
 #include <utils/os/Log.h>
-#include <utils/os/GLFunc.h>
 #include <utils/os/System.h>
 #include <utils/math3d/Math.h>
 

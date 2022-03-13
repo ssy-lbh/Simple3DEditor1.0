@@ -1,6 +1,7 @@
 #include <utils/gl/GLLights.h>
 
 #include <lib/opengl/gl/gl.h>
+
 #include <utils/os/Log.h>
 
 bool GLLights::use[8] = {false, false, false, false,

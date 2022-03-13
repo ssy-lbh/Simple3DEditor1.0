@@ -91,11 +91,7 @@ public:
 
 class Main final : public Object {
 public:
-    static Main* inst;
     static GlobalData* data;
-
-    Main();
-    ~Main();
 
     static void RequestRender();
     static void SetCursor(int id);
@@ -111,7 +107,9 @@ public:
 
     static Mesh* GetMesh();
 
-    int MainEntry(int argc, char** argv);
+    static int MainEntry(int argc, char** argv);
+    static void Init();
+    static void Uninit();
 };
 
 #endif

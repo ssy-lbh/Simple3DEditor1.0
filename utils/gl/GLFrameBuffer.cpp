@@ -1,9 +1,8 @@
 #include <utils/gl/GLFrameBuffer.h>
 
-#include <lib/opengl/gl/gl.h>
+#include <lib/glew/gl/glew.h>
 
 #include <editor/gui/ViewManager.h>
-#include <utils/os/GLFunc.h>
 #include <utils/gl/GLRenderTexture2D.h>
 
 GLFrameBuffer::GLFrameBuffer(){

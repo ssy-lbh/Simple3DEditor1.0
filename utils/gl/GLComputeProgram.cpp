@@ -1,12 +1,11 @@
 #include <utils/gl/GLComputeProgram.h>
 
-#include <lib/opengl/gl/gl.h>
+#include <lib/glew/gl/glew.h>
 
 #include <res.h>
 #include <utils/DataBuffer.h>
 #include <utils/os/Resource.h>
 #include <utils/os/Log.h>
-#include <utils/os/GLFunc.h>
 #include <utils/gl/GLTexture2D.h>
 #include <utils/gl/GLRenderTexture2D.h>
 

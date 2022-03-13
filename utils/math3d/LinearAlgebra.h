@@ -245,6 +245,7 @@ public:
 
 // 复数在二维上有与四元数在三维上相似的功能，即表示一个旋转
 // 不同的是复数满足交换律，而四元数不满足
+// X对应实部，Y对应虚部
 class Complex final : public Object {
 public:
     union {
@@ -402,10 +403,16 @@ public:
     Vector3 operator*(Vector3) const;
     Point3 operator*(Point3) const;
     Vector4 operator*(Vector4) const;
+
+    Matrix4x4 &AddTranslation(Vector3);
+    Matrix4x4 &AddScale(Vector3);
+    Vector3 GetTranslation() const;
+    Quaternion GetRotation() const;
+    Vector3 GetScale() const;
 };
 
 // 3x4矩阵为4x4矩阵的简化版，第四行默认为[0 0 0 1]
-//TODO 设计未完成
+// 如果transform使用此矩阵，应该能在不缺功能的情况下提升不少性能
 class Matrix3x4 final : public Object {
 public:
     // 第四行默认为[0 0 0 1]
@@ -444,16 +451,20 @@ public:
     Matrix3x4 operator*(Matrix3x4) const;
     Matrix3x4 &operator*=(Matrix3x4);
     Matrix3x4 operator-() const;
-    Matrix3x4 operator~() const;
     Vector3 operator*(Vector2) const;
     Point3 operator*(Point2) const;
     Vector3 operator*(Vector3) const;
     Point3 operator*(Point3) const;
     Vector4 operator*(Vector4) const;
+
+    Matrix3x4 &AddTranslation(Vector3);
+    Matrix3x4 &AddScale(Vector3);
+    Vector3 GetTranslation() const;
+    Quaternion GetRotation() const;
+    Vector3 GetScale() const;
 };
 
 // 2x3矩阵用于表示二维空间的UI变换
-//TODO 设计未完成
 class Matrix2x3 final : public Object {
 public:
     // 第三行默认为[0 0 1]
@@ -488,6 +499,12 @@ public:
     Matrix2x3 operator-() const;
     Vector2 operator*(Vector2) const;
     Point2 operator*(Point2) const;
+
+    Matrix2x3 &AddTranslation(Vector2);
+    Matrix2x3 &AddScale(Vector2);
+    Vector2 GetTranslation() const;
+    Complex GetRotation() const;
+    Vector2 GetScale() const;
 };
 
 // 2x4矩阵用于将三维空间坐标映射到二维UI空间坐标并加以变换
@@ -531,6 +548,10 @@ public:
     Vector2 operator*(Vector3) const;
     Point2 operator*(Point3) const;
     Vector2 operator*(Vector4) const;
+
+    Vector2 GetTranslation() const;
+    Complex GetRotation() const;
+    Vector2 GetScale() const;
 };
 
 #endif
