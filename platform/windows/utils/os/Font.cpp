@@ -152,12 +152,12 @@ void Font::Uninit(){
 
 Font::Font(String path){
     FT_New_Face(ftLib, path.GetString(), 0, &face);
-    FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+    FT_Select_Charmap(face, FT_ENCODING_GB2312);
 }
 
 Font::Font(String path, uint width, uint height){
     FT_New_Face(ftLib, path.GetString(), 0, &face);
-    FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+    FT_Select_Charmap(face, FT_ENCODING_GB2312);
     FT_Set_Pixel_Sizes(face, width, height);
 }
 

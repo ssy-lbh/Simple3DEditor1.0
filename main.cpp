@@ -335,7 +335,7 @@ int Main::MainEntry(int argc, char** argv){
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 
-    Font* font = new Font("res\\fonts\\arial.ttf", 0, 72);
+    //Font* font = new Font("res\\fonts\\arial.ttf", 0, 72);
 
     appFrame->Show();
     while (appFrame->WaitHandleEvent()){
