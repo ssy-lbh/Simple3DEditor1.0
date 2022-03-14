@@ -335,15 +335,13 @@ int Main::MainEntry(int argc, char** argv){
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 
-    Font* font = new Font("res\\fonts\\arial.ttf", 0, 72);
+    //Font* font = new Font("res\\fonts\\arial.ttf", 0, 72);
 
     appFrame->Show();
     while (appFrame->WaitHandleEvent()){
         if (appFrame->reqRender || appFrame->GetLastMessageType() != AppFrame::MESSAGE_TIMER){
             appFrame->reqRender = false;
             appFrame->Render();
-            glColor3f(1.0f, 1.0f, 0.0f);
-            font->DrawString(L"\u6211你好", 0.0f, 0.0f, 0.1f, 1.0f);
             appFrame->SwapBuffer();
         }
     }
