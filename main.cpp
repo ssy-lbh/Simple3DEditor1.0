@@ -305,6 +305,7 @@ Mesh* Main::GetMesh(){
 
 int Main::MainEntry(int argc, char** argv){
     Init();
+    Font::Init();
     AudioUtils::InitOpenAL();
 
     IWindow* mainFrame = new SelectionWindow(new MainWindow());
@@ -333,6 +334,8 @@ int Main::MainEntry(int argc, char** argv){
     mainFrame->OnCreate();
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
+
+    Font* font = new Font("res\\fonts\\arial.ttf", 0, 72);
 
     appFrame->Show();
     while (appFrame->WaitHandleEvent()){

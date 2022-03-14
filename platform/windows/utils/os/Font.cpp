@@ -143,6 +143,13 @@ void Font::Init(){
         FT_Init_FreeType(&ftLib);
 }
 
+void Font::Uninit(){
+    if (ftLib){
+        FT_Done_FreeType(ftLib);
+        ftLib = NULL;
+    }
+}
+
 Font::Font(String path){
     FT_New_Face(ftLib, path.GetString(), 0, &face);
     FT_Select_Charmap(face, FT_ENCODING_UNICODE);
@@ -154,7 +161,9 @@ Font::Font(String path, uint width, uint height){
     FT_Set_Pixel_Sizes(face, width, height);
 }
 
-Font::~Font(){}
+Font::~Font(){
+    FT_Done_Face(face);
+}
 
 void Font::SetSize(Vector2 size){
     SetSize(Round(size.x), Round(size.y));
@@ -176,22 +185,13 @@ void Font::SetTransform(Matrix2x3 m){
     FT_Set_Transform(face, &mat, &pos);
 }
 
-uint Font::GetIndex(uint c){
-    return FT_Get_Char_Index(face, c);
-}
-
-const uchar* Font::LoadIndex(uint idx){
-    FT_Load_Glyph(face, idx, FT_LOAD_DEFAULT);
-    FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
-    return face->glyph->bitmap.buffer;
-
-}
-
-uint Font::LoadChar(wchar_t c){
+uint Font::LoadChar(uint c){
     FT_Glyph glyph;
     FT_BitmapGlyph bitmap;
     uint width;
     uint height;
+    uint advY;
+    float invAdvY;
     uint bmpWidth;
     uint bmpRows;
     uchar* buf;
@@ -200,7 +200,8 @@ uint Font::LoadChar(wchar_t c){
     CharTexture& chTex = tex[c];
     if (chTex.tex)
         return chTex.tex;
-    FT_Load_Char(face, c, FT_LOAD_FORCE_AUTOHINT | FT_LOAD_TARGET_NORMAL);
+    // 加了FT_LOAD_FORCE_AUTOHINT以后会报错
+    FT_Load_Char(face, c, FT_LOAD_TARGET_NORMAL);
     FT_Get_Glyph(face->glyph, &glyph);
     FT_Render_Glyph(face->glyph, FT_RENDER_MODE_LCD);
     FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, NULL, TRUE);
@@ -208,13 +209,14 @@ uint Font::LoadChar(wchar_t c){
 
     width = bitmap->bitmap.width;
     height = bitmap->bitmap.rows;
+    advY = face->size->metrics.y_ppem;
+    invAdvY = 1.0f / (float)advY;
 
-    chTex.width = width;
-    chTex.height = height;
-    chTex.deltaX = bitmap->left;
-    chTex.deltaY = bitmap->top - height;
-    chTex.advX = face->glyph->advance.x >> 6;
-    chTex.advY = face->size->metrics.y_ppem;
+    chTex.width = (float)width * invAdvY;
+    chTex.height = (float)height * invAdvY;
+    chTex.deltaX = (float)bitmap->left * invAdvY;
+    chTex.deltaY = ((float)bitmap->top - height) * invAdvY;
+    chTex.advX = (float)(face->glyph->advance.x >> 6) * invAdvY;
 
     bmpWidth = bitmap->bitmap.width;
     bmpRows = bitmap->bitmap.rows;
@@ -222,9 +224,11 @@ uint Font::LoadChar(wchar_t c){
 
     glGenTextures(1, &chTex.tex);
     glBindTexture(GL_TEXTURE_2D, chTex.tex);
+
     buf = new uchar[(width * height) << 2];
-    for(uint i = 0; i < width; i++){
-        for(uint j = 0; j < height; j++){
+
+    for (uint i = 0; i < width; i++){
+        for (uint j = 0; j < height; j++){
             uchar alpha = ((i >= bmpWidth || j >= bmpRows) ? 0 : bmpBuf[i + bmpWidth * j]);
             uint idx = ((i + (height - j - 1) * width) << 2);
             buf[idx] = 0xFF;
@@ -233,6 +237,9 @@ uint Font::LoadChar(wchar_t c){
             buf[idx | 3] = alpha;
         }
     }
+
+    FT_Done_Glyph(glyph);
+
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
     
@@ -248,24 +255,31 @@ uint Font::LoadChar(wchar_t c){
     return chTex.tex;
 }
 
-void Font::DrawString(const wchar_t* text, uint x, uint y, uint maxX, uint lineHeight, float depth){
+void Font::DrawString(const char* text, float x, float y, float h, float lineX, float depth){
     WString s(text);
-    DrawString(s, x, y, maxX, lineHeight, depth);
+    DrawString(s, x, y, h, lineX, depth);
 }
 
-void Font::DrawString(const WString& text, uint x, uint y, uint maxX, uint lineHeight, float depth){
-    uint sx = x;
-    uint sy = y;
+void Font::DrawString(const wchar_t* text, float x, float y, float h, float lineX, float depth){
+    WString s(text);
+    DrawString(s, x, y, h, lineX, depth);
+}
+
+void Font::DrawString(const WString& text, float x, float y, float h, float lineX, float depth){
+    float sx = x;
+    float sy = y - 2.0f * h;
     size_t len = text.GetLength();
 
     glEnable(GL_TEXTURE_2D);
 
+    glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     for (uint i = 0; i < len; i++){
         if (text[i] == '\n'){
-            sx = x; sy += lineHeight + 12;
+            sx = x;
+            sy -= h;
             continue;
         }
 
@@ -274,20 +288,23 @@ void Font::DrawString(const WString& text, uint x, uint y, uint maxX, uint lineH
 
         glBindTexture(GL_TEXTURE_2D, chTex.tex);
 
-        uint chX = sx + chTex.deltaX;
-        uint chY = sy - lineHeight - chTex.deltaY;
+        float chX = sx + chTex.deltaX * h;
+        float chY = sy + chTex.deltaY * h;
+        float chX2 = chX + chTex.width * h;
+        float chY2 = chY + chTex.height * h;
 
         glBegin(GL_TRIANGLE_FAN);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(chX, chY, depth);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f(chX + chTex.width, chY, depth);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f(chX + chTex.width, chY + lineHeight, depth);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(chX, chY + lineHeight, depth);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(chX, chY, depth);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(chX2, chY, depth);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(chX2, chY2, depth);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(chX, chY2, depth);
         glEnd();
 
-        sx += chTex.advX;
+        sx += chTex.advX * h;
 
-        if(sx > x + maxX){
-            sx = x ; sy += lineHeight + 12;
+        if(sx > x + lineX){
+            sx = x;
+            sy -= h;
         }
     }
 

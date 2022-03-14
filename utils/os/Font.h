@@ -22,18 +22,17 @@ typedef struct FT_FaceRec_* FT_Face;
 
 #define MAX_FONT_CHARS 0x10000
 
-// 未投入使用，存在问题
+// 目前已经可以基本使用
 class Font final : public Object {
 private:
     struct CharTexture {
         uint tex = 0;
-        wchar_t ch;
-        uint width;
-        uint height;
-        uint advX;
-        uint advY;
-        uint deltaX;
-        uint deltaY;
+        // 以下变量大小相对于Y间距
+        float width;
+        float height;
+        float deltaX;
+        float deltaY;
+        float advX;
     };
 
     static FT_Library ftLib;
@@ -47,15 +46,16 @@ public:
     ~Font();
 
     static void Init();
+    static void Uninit();
 
     void SetSize(Vector2 size);
     void SetSize(uint x, uint y);
     void SetTransform(Matrix2x3 m);
-    uint GetIndex(uint c);
-    const uchar* LoadIndex(uint idx);
-    uint LoadChar(wchar_t c);
-    void DrawString(const wchar_t* text, uint x, uint y, uint maxX, uint lineHeight, float depth = 0.0f);
-    void DrawString(const WString& text, uint x, uint y, uint maxX, uint lineHeight, float depth = 0.0f);
+    uint LoadChar(uint c);
+    // h决定字体高度与大小
+    void DrawString(const char* text, float x, float y, float h, float lineX, float depth = 0.0f);
+    void DrawString(const wchar_t* text, float x, float y, float h, float lineX, float depth = 0.0f);
+    void DrawString(const WString& text, float x, float y, float h, float lineX, float depth = 0.0f);
 };
 
 #endif
