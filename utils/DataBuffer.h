@@ -3,12 +3,20 @@
 
 #include <define.h>
 
-class DataBuffer final : public Object {
-private:
+class DataBuffer : public Object {
+protected:
     char* data;
     size_t size;
     size_t ptr;
-    size_t rptr = 0;
+    mutable size_t rptr = 0;
+
+    inline DataBuffer(bool alloc){
+        if (alloc){
+            data = new char[32];
+            size = 32;
+            ptr = 0;
+        }
+    }
 
     void Check(size_t reserve);
 
@@ -20,23 +28,58 @@ public:
     DataBuffer &operator=(const DataBuffer &);
     DataBuffer(size_t len);
     DataBuffer(const void* buf, size_t len);
-    ~DataBuffer();
+    // const DataBuffer 构造器，commit = true时，托管buf内存指针
+    DataBuffer(const void* buf, size_t len, bool commit);
+    virtual ~DataBuffer();
 
     void Write(char c);
     void Write(const void* buf, size_t len);
-    char Read();
-    size_t Read(void* buf, size_t len);
+    char Read() const;
+    size_t Read(void* buf, size_t len) const;
+
     // 设置读取位置
-    void Seek(size_t pos);
+    inline void Seek(size_t pos) const{
+        rptr = pos;
+    }
+
     // 获取读取位置
-    size_t Tell();
+    inline size_t Tell() const{
+        return rptr;
+    }
+
     // 获取写入位置
-    size_t GetPtr();
+    inline size_t GetPtr() const{
+        return ptr;
+    }
+
     // 设置写入位置
-    void SetPtr(size_t pos);
+    inline void SetPtr(size_t pos){
+        ptr = pos;
+    }
+
     // 写入数据后记得SetPtr以记录已使用存储
-    void* Buffer();
-    size_t Size();
+    inline void* Buffer(){
+        return data;
+    }
+
+    inline const void* ReadOnlyBuffer() const{
+        return data;
+    }
+
+    inline size_t Size() const{
+        return ptr;
+    }
+};
+
+// const DataBuffer构造类
+class PackDataBuffer : public DataBuffer {
+public:
+    // 确保PackDataBuffer回收之前DataBuffer不会回收
+    // 可用于传递参数
+    PackDataBuffer(DataBuffer &&);
+    PackDataBuffer(const DataBuffer &);
+    PackDataBuffer(const void* data, size_t size);
+    virtual ~PackDataBuffer() override;
 };
 
 #endif

@@ -5,14 +5,6 @@
 #include <utils/os/Log.h>
 #include <utils/os/System.h>
 
-String::String(bool alloc){
-    if (alloc){
-        str = new char[1];
-        str[0] = '\0';
-        len = 0;
-    }
-}
-
 String::String(){
     str = new char[1];
     str[0] = '\0';
@@ -137,11 +129,7 @@ String &String::operator=(const WString &s){
 }
 
 String::~String(){
-    if (!str){
-        DebugError("Critical: String::~String() When str Is NULL");
-        return;
-    }
-    delete[] str;
+    if (str) delete[] str;
 }
 
 char String::operator[](size_t index) const{
@@ -219,14 +207,6 @@ bool String::operator<=(const char* s) const{
 
 bool String::operator>=(const char* s) const{
     return strcmp(str, s) >= 0;
-}
-
-const char* String::GetString() const{
-    return str;
-}
-
-size_t String::GetLength() const{
-    return len;
 }
 
 char String::CharAt(size_t index) const{
@@ -448,14 +428,6 @@ size_t String::Split(const String& s, String* arr, size_t len) const{
     return Count(s) + 1;
 }
 
-WString::WString(bool alloc){
-    if (alloc){
-        str = new wchar_t[1];
-        str[0] = L'\0';
-        len = 0;
-    }
-}
-
 WString::WString(){
     str = new wchar_t[1];
     str[0] = L'\0';
@@ -580,11 +552,7 @@ WString &WString::operator=(const WString &s){
 }
 
 WString::~WString(){
-    if (!str){
-        DebugError("Critical: WString::~WString() When str Is NULL");
-        return;
-    }
-    delete[] str;
+    if (str) delete[] str;
 }
 
 wchar_t WString::operator[](size_t index) const{
@@ -662,14 +630,6 @@ bool WString::operator<=(const wchar_t* s) const{
 
 bool WString::operator>=(const wchar_t* s) const{
     return wcscmp(str, s) >= 0;
-}
-
-const wchar_t* WString::GetString() const{
-    return str;
-}
-
-size_t WString::GetLength() const{
-    return len;
 }
 
 wchar_t WString::CharAt(size_t index) const{
@@ -889,4 +849,36 @@ size_t WString::Split(const WString& s, WString* arr, size_t len) const{
         p = pos + s.GetLength();
     }
     return Count(s) + 1;
+}
+
+PackString::PackString(String &&s) : String(false) {
+    this->str = const_cast<char*>(s.GetString()); this->len = s.GetLength();
+}
+
+PackString::PackString(const String &s) : String(false) {
+    this->str = const_cast<char*>(s.GetString()); this->len = s.GetLength();
+}
+
+PackString::PackString(const char* s, size_t len) : String(false) {
+    this->str = const_cast<char*>(s); this->len = len;
+}
+
+PackString::~PackString(){
+    str = NULL;
+}
+
+PackWString::PackWString(WString &&s) : WString(false) {
+    this->str = const_cast<wchar_t*>(s.GetString()); this->len = s.GetLength();
+}
+
+PackWString::PackWString(const WString &s) : WString(false) {
+    this->str = const_cast<wchar_t*>(s.GetString()); this->len = s.GetLength();
+}
+
+PackWString::PackWString(const wchar_t* s, size_t len) : WString(false) {
+    this->str = const_cast<wchar_t*>(s); this->len = len;
+}
+
+PackWString::~PackWString(){
+    str = NULL;
 }

@@ -965,7 +965,8 @@ void MainWindow::DeletePoint(){
 bool MainWindow::SaveMesh(Mesh* mesh){
     if (!mesh)
         return false;
-    WString file = ShellFileSelectWindow(Resource::GetWString(IDS_OBJFILE_FILTER), FILESELECT_REQ_PATH, true);
+    static const WString filter = Resource::GetWString(IDS_OBJFILE_FILTER);
+    WString file = ShellFileSelectWindow(filter, FILESELECT_REQ_PATH, true);
     if (file.GetLength() == 0){
         DebugError("Stop Saving");
         return false;
@@ -984,7 +985,8 @@ bool MainWindow::SaveMesh(Mesh* mesh){
 bool MainWindow::LoadMesh(AViewObject* obj){
     if (obj->GetType() != ViewObjectType::OBJECT_MESH)
         return false;
-    WString file = ShellFileSelectWindow(Resource::GetWString(IDS_OBJFILE_FILTER), FILESELECT_REQ_FILE | FILESELECT_REQ_PATH);
+    static const WString filter = Resource::GetWString(IDS_OBJFILE_FILTER);
+    WString file = ShellFileSelectWindow(filter, FILESELECT_REQ_FILE | FILESELECT_REQ_PATH);
     if (file.GetLength() == 0){
         DebugLog("Stop Loading");
         return false;
@@ -1309,10 +1311,10 @@ void MainWindow::OnMenuAccel(int id, bool accel){
                 mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
             }
         }
-        for (int i = 0; i < round; i++){
+        for (int i = 0, off = (loops - 1) * round; i < round; i++){
             int j = (i == round - 1 ? 0 : i + 1);
             mesh->AddTriFace(floor, vert[i], vert[j]);
-            mesh->AddTriFace(ceil, vert[(loops - 1) * round + i], vert[(loops - 1) * round + j]);
+            mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
         }
     }
         break;
@@ -1343,10 +1345,10 @@ void MainWindow::OnMenuAccel(int id, bool accel){
                 mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
             }
         }
-        for (int i = 0; i < round; i++){
+        for (int i = 0, off = (loops - 1) * round; i < round; i++){
             int j = (i == round - 1 ? 0 : i + 1);
             mesh->AddTriFace(floor, vert[i], vert[j]);
-            mesh->AddTriFace(ceil, vert[(loops - 1) * round + i], vert[(loops - 1) * round + j]);
+            mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
         }
     }
         break;
@@ -1396,10 +1398,10 @@ void MainWindow::OnMenuAccel(int id, bool accel){
                 mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
             }
         }
-        for (int i = 0; i < round; i++){
+        for (int i = 0, off = (loops - 1) * round; i < round; i++){
             int j = (i == round - 1 ? 0 : i + 1);
             mesh->AddTriFace(floor, vert[i], vert[j]);
-            mesh->AddTriFace(ceil, vert[(loops - 1) * round + i], vert[(loops - 1) * round + j]);
+            mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
         }
     }
         break;
@@ -1433,7 +1435,8 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         Mesh* mesh = Main::GetMesh();
         if (!mesh)
             break;
-        WString file = ShellFileSelectWindow(Resource::GetWString(IDS_PICFILE_FILTER), FILESELECT_REQ_FILE | FILESELECT_REQ_PATH);
+        static const WString filter = Resource::GetWString(IDS_PICFILE_FILTER);
+        WString file = ShellFileSelectWindow(filter, FILESELECT_REQ_FILE | FILESELECT_REQ_PATH);
         if (file.GetLength() == 0){
             DebugLog("Stop Loading");
             break;
@@ -1454,8 +1457,8 @@ void MainWindow::OnMenuAccel(int id, bool accel){
 void MainWindow::OnDropFileW(const wchar_t* path){
     wchar_t* suffix = wcsrchr(path, L'.');
     if (wcscmp(suffix, L".obj")){
-        WString message = Resource::GetWString(IDS_OBJFILE_FORM_WARNING);
-        WString caption = Resource::GetWString(IDS_OBJFILE_FORM_WARNING_CAPTION);
+        static const WString message = Resource::GetWString(IDS_OBJFILE_FORM_WARNING);
+        static const WString caption = Resource::GetWString(IDS_OBJFILE_FORM_WARNING_CAPTION);
         if (ShellMsgBox(caption, message) != MSGBOX_YES){
             DebugLog("MainWindow::OnDropFileW Stop Load File");
             return;

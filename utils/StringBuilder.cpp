@@ -42,17 +42,9 @@ String StringBuilderA::ToString(){
     return String(data, ptr);
 }
 
-const char* StringBuilderA::GetString(){
+const String StringBuilderA::ToPackString(){
     data[ptr] = '\0';
-    return data;
-}
-
-size_t StringBuilderA::GetLength(){
-    return ptr;
-}
-
-void StringBuilderA::Clear(){
-    ptr = 0;
+    return PackString(data, ptr);
 }
 
 StringBuilderA& StringBuilderA::Append(char c){
@@ -160,17 +152,9 @@ WString StringBuilderW::ToString(){
     return WString(data, ptr);
 }
 
-const wchar_t* StringBuilderW::GetString(){
+const WString StringBuilderW::ToPackString(){
     data[ptr] = L'\0';
-    return data;
-}
-
-size_t StringBuilderW::GetLength(){
-    return ptr;
-}
-
-void StringBuilderW::Clear(){
-    ptr = 0;
+    return PackWString(data, ptr);
 }
 
 StringBuilderW& StringBuilderW::Append(char c){

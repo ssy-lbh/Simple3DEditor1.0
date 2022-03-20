@@ -31,9 +31,12 @@ typedef void* handle;
 // utils
 class String;
 class WString;
+class PackString;
+class PackWString;
 class StringBuilder;
 class File;
 class DataBuffer;
+class PackDataBuffer;
 
 // 对象基类
 class Object;

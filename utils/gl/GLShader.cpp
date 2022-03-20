@@ -39,12 +39,10 @@ bool GLShader::Compile(){
 }
 
 void GLShader::PrintLog(){
-    char* log;
-
     if (shaderLog == -1)
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &shaderLog);
     if (shaderLog > 0){
-        log = new char[shaderLog];
+        char* log = new char[shaderLog];
         glGetShaderInfoLog(shader, shaderLog, &shaderLog, log);
         DebugError("%s", log);
         delete[] log;

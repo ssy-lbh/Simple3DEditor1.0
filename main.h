@@ -28,7 +28,7 @@ class LocalData final : public Object {
 public:
     Vector2 cursorPos;
     Vector2 cliSize;
-    float aspect;
+    float aspect = 1.0f;
 
     Menu* menu = NULL;
     Vector2 menuPos;

@@ -163,7 +163,6 @@ void AudioCaptureWindow::UpdateWindowSize(int x, int y){
 void AudioCaptureWindow::ProcessInput(){
     ALint cnt;
     ALint offset = (capOffset & SAMPLE_MASK);
-    float sum;
 
     alcGetIntegerv(capDev, ALC_CAPTURE_SAMPLES, 1, &cnt);
     cnt = Min(cnt, (SAMPLE_SIZE) - offset);
@@ -177,6 +176,7 @@ void AudioCaptureWindow::ProcessInput(){
     capOffset += cnt;
     
     if (displayWave && adjustWave){
+        float sum = 0.0f;
         for (int i = 0; i < (SAMPLE_SIZE); i++){
             short val = ((short*)capBuf)[(i + capOffset) & SAMPLE_MASK];
             freqBuf[i] = val;

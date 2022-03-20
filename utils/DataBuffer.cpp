@@ -59,12 +59,21 @@ DataBuffer::DataBuffer(const void* buf, size_t len){
     memcpy(data, buf, len);
 }
 
-DataBuffer::~DataBuffer(){
-    if (!data){
-        DebugError("Critical: StringBuilder::~StringBuilder() When data Is NULL");
-        return;
+DataBuffer::DataBuffer(const void* buf, size_t len, bool commit){
+    if (commit){
+        data = (char*)const_cast<void*>(buf);
+        size = len;
+        ptr = len;
+    }else{
+        data = new char[len];
+        size = len;
+        ptr = 0;
+        memcpy(data, buf, len);
     }
-    delete[] data;
+}
+
+DataBuffer::~DataBuffer(){
+    if (data) delete[] data;
 }
 
 void DataBuffer::Check(size_t reserve){
@@ -90,13 +99,13 @@ void DataBuffer::Write(const void* buf, size_t len){
     ptr += len;
 }
 
-char DataBuffer::Read(){
+char DataBuffer::Read() const{
     if (rptr >= ptr)
         return -1;
     return data[rptr++];
 }
 
-size_t DataBuffer::Read(void* buf, size_t len){
+size_t DataBuffer::Read(void* buf, size_t len) const{
     if (rptr >= ptr)
         return 0;
     len = (len >= ptr - rptr ? len : ptr - rptr);
@@ -105,26 +114,18 @@ size_t DataBuffer::Read(void* buf, size_t len){
     return len;
 }
 
-void DataBuffer::Seek(size_t pos){
-    rptr = pos;
+PackDataBuffer::PackDataBuffer(DataBuffer &&d) : DataBuffer(false) {
+    this->data = (char*)d.Buffer(); this->ptr = d.Size();
 }
 
-size_t DataBuffer::Tell(){
-    return rptr;
+PackDataBuffer::PackDataBuffer(const DataBuffer &d) : DataBuffer(false) {
+    this->data = (char*)const_cast<void*>(d.ReadOnlyBuffer()); this->ptr = d.Size();
 }
 
-size_t DataBuffer::GetPtr(){
-    return ptr;
+PackDataBuffer::PackDataBuffer(const void* s, size_t size) : DataBuffer(false) {
+    this->data = const_cast<char*>(data); this->ptr = size;
 }
 
-void DataBuffer::SetPtr(size_t pos){
-    ptr = pos;
-}
-
-void* DataBuffer::Buffer(){
-    return data;
-}
-
-size_t DataBuffer::Size(){
-    return ptr;
+PackDataBuffer::~PackDataBuffer(){
+    data = NULL;
 }

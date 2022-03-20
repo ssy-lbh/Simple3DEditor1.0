@@ -111,8 +111,8 @@ constexpr T Clamp(T x, T a, T b){
 
 // 排序为前小后大
 inline void Sort(float& x, float& y){
-    float t;
     if (x > y){
+        float t;
         t = x; x = y; y = t;
     }
 }

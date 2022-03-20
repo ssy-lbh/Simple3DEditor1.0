@@ -467,7 +467,8 @@ void AudioPlayerWindow::OnDropFileW(const wchar_t* path){
 void AudioPlayerWindow::OnInsLoad(){
     // 暂不使用 L"PCM音频文件(*.wav)\0*.wav\0所有音频类型(.*)\0*.*\0"，此状态下发现Shell时可能的环境错误
     // 若要使用请拖入文件
-    WString file = ShellFileSelectWindow(Resource::GetWString(IDS_WAVFILE_FILTER), FILESELECT_REQ_PATH | FILESELECT_REQ_FILE);
+    static const WString filter = Resource::GetWString(IDS_WAVFILE_FILTER);
+    WString file = ShellFileSelectWindow(filter, FILESELECT_REQ_PATH | FILESELECT_REQ_FILE);
     if (file.GetLength() == 0){
         DebugLog("Stop Loading");
         return;
@@ -477,8 +478,8 @@ void AudioPlayerWindow::OnInsLoad(){
 
 void AudioPlayerWindow::PreloadFile(WString file){
     if (!file.EndsWith(L".wav")){
-        WString message = Resource::GetWString(IDS_WAVFILE_FORM_WARNING);
-        WString caption = Resource::GetWString(IDS_WAVFILE_FORM_WARNING_CAPTION);
+        static const WString message = Resource::GetWString(IDS_WAVFILE_FORM_WARNING);
+        static const WString caption = Resource::GetWString(IDS_WAVFILE_FORM_WARNING_CAPTION);
         switch (ShellMsgBox(caption, message)){
         case MSGBOX_NO:
             DebugLog("AudioPlayerWindow::PreloadFile Stop Load File");

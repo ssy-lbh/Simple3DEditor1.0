@@ -7,6 +7,9 @@
 # glfw glm glew FreeType "FBX SDK" OpenRL json-cpp ShaderConductor
 # 以后创建发行版带上glew32和OpenAL32的动态库
 
+# 说明一下，我写过Vulkan，但是因为不够熟练才没使用
+# 今后我会挑战一下
+
 # 大小写平台名称
 PLATFORM 	= windows
 PLATFORM_U	= WINDOWS
@@ -166,3 +169,4 @@ clean:
 dllboot: $(OUTPUTDLIB)
 	$(GCC) $(TEST_PATH)\$@\boot.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)\$@\boot.exe
 	$(TEST_PATH)\$@\boot.exe
+	del $(TEST_PATH)\$@\boot.exe

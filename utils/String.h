@@ -4,12 +4,18 @@
 #include <define.h>
 
 #define DEFAULT_STRING_LENGTH 512
-class String final : public Object {
+class String : public Object {
 protected:
     char* str;
     size_t len;
 
-    String(bool alloc);
+    inline String(bool alloc){
+        if (alloc){
+            str = new char[1];
+            str[0] = '\0';
+            len = 0;
+        }
+    }
 
 public:
     String();
@@ -28,7 +34,7 @@ public:
     String &operator=(WString &&);
     String &operator=(const String &);
     String &operator=(const WString &);
-    ~String();
+    virtual ~String();
     char operator[](size_t index) const;
     String operator+(const String&) const;
     String operator+(const char*) const;
@@ -45,8 +51,14 @@ public:
     bool operator<=(const char*) const;
     bool operator>=(const char*) const;
 
-    const char* GetString() const;
-    size_t GetLength() const;
+    inline const char* GetString() const{
+        return str;
+    }
+
+    inline size_t GetLength() const{
+        return len;
+    }
+
     char CharAt(size_t index) const;
     String Reverse() const;
     String SubString(size_t start) const;
@@ -78,12 +90,18 @@ public:
     size_t Split(const String& s, String* arr, size_t len) const;
 };
 
-class WString final : public Object {
+class WString : public Object {
 protected:
     wchar_t* str;
     size_t len;
 
-    WString(bool alloc);
+    inline WString(bool alloc){
+        if (alloc){
+            str = new wchar_t[1];
+            str[0] = L'\0';
+            len = 0;
+        }
+    }
 
 public:
     WString();
@@ -102,7 +120,7 @@ public:
     WString &operator=(WString &&);
     WString &operator=(const String &);
     WString &operator=(const WString &);
-    ~WString();
+    virtual ~WString();
     wchar_t operator[](size_t index) const;
     WString operator+(const WString&) const;
     WString operator+(const wchar_t*) const;
@@ -119,8 +137,14 @@ public:
     bool operator<=(const wchar_t*) const;
     bool operator>=(const wchar_t*) const;
 
-    const wchar_t* GetString() const;
-    size_t GetLength() const;
+    inline const wchar_t* GetString() const{
+        return str;
+    }
+
+    inline size_t GetLength() const{
+        return len;
+    }
+    
     wchar_t CharAt(size_t index) const;
     WString Reverse() const;
     WString SubString(size_t start) const;
@@ -150,6 +174,28 @@ public:
     size_t Spilt(wchar_t c, WString* arr, size_t len) const;
     size_t Split(const wchar_t* s, WString* arr, size_t len) const;
     size_t Split(const WString& s, WString* arr, size_t len) const;
+};
+
+// const String构造类
+class PackString : public String {
+public:
+    // 确保PackString回收之前String不会回收
+    // 可用于传递参数
+    PackString(String &&);
+    PackString(const String &);
+    PackString(const char* s, size_t len);
+    virtual ~PackString() override;
+};
+
+// const WString构造类
+class PackWString : public WString {
+public:
+    // 确保PackWString回收之前WString不会回收
+    // 可用于传递参数
+    PackWString(WString &&);
+    PackWString(const WString &);
+    PackWString(const wchar_t* s, size_t len);
+    virtual ~PackWString() override;
 };
 
 #endif

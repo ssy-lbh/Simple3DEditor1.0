@@ -1,0 +1,102 @@
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 10
+; Bound: 65
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main" %gl_GlobalInvocationID
+               OpExecutionMode %main LocalSize 8 8 1
+               OpSource GLSL 430
+               OpName %main "main"
+               OpName %curPos "curPos"
+               OpName %gl_GlobalInvocationID "gl_GlobalInvocationID"
+               OpName %Brush "Brush"
+               OpMemberName %Brush 0 "offset"
+               OpMemberName %Brush 1 "position"
+               OpMemberName %Brush 2 "radius"
+               OpMemberName %Brush 3 "color"
+               OpName %_ ""
+               OpName %paint "paint"
+               OpDecorate %gl_GlobalInvocationID BuiltIn GlobalInvocationId
+               OpMemberDecorate %Brush 0 Offset 0
+               OpMemberDecorate %Brush 1 Offset 8
+               OpMemberDecorate %Brush 2 Offset 16
+               OpMemberDecorate %Brush 3 Offset 32
+               OpDecorate %Brush Block
+               OpDecorate %_ DescriptorSet 0
+               OpDecorate %_ Binding 1
+               OpDecorate %paint DescriptorSet 0
+               OpDecorate %paint Binding 0
+               OpDecorate %gl_WorkGroupSize BuiltIn WorkgroupSize
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+        %int = OpTypeInt 32 1
+      %v2int = OpTypeVector %int 2
+%_ptr_Function_v2int = OpTypePointer Function %v2int
+       %uint = OpTypeInt 32 0
+     %v3uint = OpTypeVector %uint 3
+%_ptr_Input_v3uint = OpTypePointer Input %v3uint
+%gl_GlobalInvocationID = OpVariable %_ptr_Input_v3uint Input
+     %v2uint = OpTypeVector %uint 2
+      %float = OpTypeFloat 32
+    %v3float = OpTypeVector %float 3
+      %Brush = OpTypeStruct %v2int %v2int %float %v3float
+%_ptr_Uniform_Brush = OpTypePointer Uniform %Brush
+          %_ = OpVariable %_ptr_Uniform_Brush Uniform
+      %int_0 = OpConstant %int 0
+%_ptr_Uniform_v2int = OpTypePointer Uniform %v2int
+      %int_1 = OpConstant %int 1
+    %v2float = OpTypeVector %float 2
+      %int_2 = OpConstant %int 2
+%_ptr_Uniform_float = OpTypePointer Uniform %float
+       %bool = OpTypeBool
+         %44 = OpTypeImage %float 2D 0 0 0 2 Rgba32f
+%_ptr_UniformConstant_44 = OpTypePointer UniformConstant %44
+      %paint = OpVariable %_ptr_UniformConstant_44 UniformConstant
+      %int_3 = OpConstant %int 3
+%_ptr_Uniform_v3float = OpTypePointer Uniform %v3float
+    %float_1 = OpConstant %float 1
+    %v4float = OpTypeVector %float 4
+     %uint_8 = OpConstant %uint 8
+     %uint_1 = OpConstant %uint 1
+%gl_WorkGroupSize = OpConstantComposite %v3uint %uint_8 %uint_8 %uint_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+     %curPos = OpVariable %_ptr_Function_v2int Function
+         %15 = OpLoad %v3uint %gl_GlobalInvocationID
+         %16 = OpVectorShuffle %v2uint %15 %15 0 1
+         %17 = OpBitcast %v2int %16
+         %25 = OpAccessChain %_ptr_Uniform_v2int %_ %int_0
+         %26 = OpLoad %v2int %25
+         %27 = OpIAdd %v2int %17 %26
+               OpStore %curPos %27
+         %28 = OpLoad %v2int %curPos
+         %30 = OpAccessChain %_ptr_Uniform_v2int %_ %int_1
+         %31 = OpLoad %v2int %30
+         %32 = OpISub %v2int %28 %31
+         %34 = OpConvertSToF %v2float %32
+         %35 = OpExtInst %float %1 Length %34
+         %38 = OpAccessChain %_ptr_Uniform_float %_ %int_2
+         %39 = OpLoad %float %38
+         %41 = OpFOrdLessThanEqual %bool %35 %39
+               OpSelectionMerge %43 None
+               OpBranchConditional %41 %42 %43
+         %42 = OpLabel
+         %47 = OpLoad %44 %paint
+         %48 = OpLoad %v2int %curPos
+         %49 = OpCompositeExtract %int %48 0
+         %50 = OpCompositeExtract %int %48 1
+         %51 = OpCompositeConstruct %v2int %49 %50
+         %54 = OpAccessChain %_ptr_Uniform_v3float %_ %int_3
+         %55 = OpLoad %v3float %54
+         %58 = OpCompositeExtract %float %55 0
+         %59 = OpCompositeExtract %float %55 1
+         %60 = OpCompositeExtract %float %55 2
+         %61 = OpCompositeConstruct %v4float %58 %59 %60 %float_1
+               OpImageWrite %47 %51 %61
+               OpBranch %43
+         %43 = OpLabel
+               OpReturn
+               OpFunctionEnd

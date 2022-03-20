@@ -246,7 +246,6 @@ void GLUtils::DrawRoundRectWithUV(Rect rect, float radius, Rect uvBound, float s
     float width = rect.GetWidth(), height = rect.GetHeight();
     float xmin = rect.left + radius, xmax = rect.left + width - radius;
     float ymax = rect.bottom + height - radius, ymin = rect.bottom + radius;
-    float xr = rect.left + width, yr = rect.bottom + height;
 
     float xminUV = uvBound.GetXRatioPos(rect.GetXRatio(xmin));
     float xmaxUV = uvBound.GetXRatioPos(rect.GetXRatio(xmax));

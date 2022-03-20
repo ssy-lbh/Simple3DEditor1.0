@@ -41,21 +41,17 @@ WString Resource::GetWString(int id){
 DataBuffer Resource::GetBitmap(int id, int* x, int* y, int* comp){
     HBITMAP hBitmap;
     BITMAP bitmap;
-    unsigned char* pBits;
     DWORD dwSize;
 
     hBitmap = LoadBitmapA(GetModule(), MAKEINTRESOURCEA(id));
     GetObjectA(hBitmap, sizeof(BITMAP), &bitmap);
     dwSize = bitmap.bmHeight * bitmap.bmWidthBytes;
-    pBits = new unsigned char[dwSize];
-    GetBitmapBits(hBitmap, dwSize, pBits);
+    DataBuffer res((size_t)dwSize);
+    GetBitmapBits(hBitmap, dwSize, res.Buffer());
 
     *x = bitmap.bmWidth;
     *y = bitmap.bmHeight;
     *comp = bitmap.bmBitsPixel >> 3;
-
-    DataBuffer res(pBits, dwSize);
-    delete[] pBits;
 
     return res;
 }
@@ -79,20 +75,16 @@ DataBuffer Resource::GetTexture(int id, int* x, int* y, int* comp, int reqComp){
     FreeResource(resIdx);
 
     image = stbi_load_from_memory((stbi_uc*)srcData, resSize, x, y, comp, reqComp);
-    DataBuffer res(image, *x * *y * *comp);
-    stbi_image_free(image);
 
-    return res;
+    return DataBuffer(image, *x * *y * *comp, true);
 }
 
 DataBuffer Resource::GetTexture(String path, int* x, int* y, int* comp, int reqComp){
     stbi_uc* image;
 
     image = stbi_load(path.GetString(), x, y, comp, reqComp);
-    DataBuffer res(image, *x * *y * *comp);
-    stbi_image_free(image);
 
-    return res;
+    return DataBuffer(image, *x * *y * *comp, true);
 }
 
 DataBuffer Resource::GetShader(int id){
@@ -108,13 +100,12 @@ DataBuffer Resource::GetShader(int id){
     resIdx = LoadResource(hInst, kernelSrc);
     resPtr = LockResource(resIdx);
     resSize = SizeofResource(hInst, kernelSrc);
-    srcData = new char[resSize + 1];
+    DataBuffer res((size_t)resSize + 1);
+    srcData = (char*)res.Buffer();
     RtlCopyMemory(srcData, resPtr, resSize);
     FreeResource(resIdx);
 
     srcData[resSize] = '\0';
-    DataBuffer res(srcData, resSize + 1);
-    delete[] srcData;
 
     return res;
 }
@@ -132,30 +123,27 @@ DataBuffer Resource::GetBinary(int id){
     resIdx = LoadResource(hInst, kernelSrc);
     resPtr = LockResource(resIdx);
     resSize = SizeofResource(hInst, kernelSrc);
-    srcData = new char[resSize];
-    RtlCopyMemory(srcData, resPtr, resSize);
+    DataBuffer res((size_t)resSize);
+    RtlCopyMemory(res.Buffer(), resPtr, resSize);
     FreeResource(resIdx);
-
-    DataBuffer res(srcData, resSize);
-    delete[] srcData;
 
     return res;
 }
 
-void Resource::StoreImage(String path, DataBuffer data, int x, int y, int comp){
+void Resource::StoreImage(String path, PackDataBuffer data, int x, int y, int comp){
     if (path.EndsWith(".png")){
-        StorePNG(path, data.Buffer(), x, y, comp);
+        StorePNG(path, data.ReadOnlyBuffer(), x, y, comp);
     }else if (path.EndsWith(".jpg")){
-        StoreJPG(path, data.Buffer(), x, y, comp, 100);
+        StoreJPG(path, data.ReadOnlyBuffer(), x, y, comp, 100);
     }else if (path.EndsWith(".tga")){
-        StoreTGA(path, data.Buffer(), x, y, comp);
+        StoreTGA(path, data.ReadOnlyBuffer(), x, y, comp);
     }else if (path.EndsWith(".bmp")){
-        StoreBMP(path, data.Buffer(), x, y, comp);
+        StoreBMP(path, data.ReadOnlyBuffer(), x, y, comp);
     }else if (path.EndsWith(".hdr")){
-        StoreHDR(path, data.Buffer(), x, y, comp);
+        StoreHDR(path, data.ReadOnlyBuffer(), x, y, comp);
     }else{
         DebugError("Resource::StoreImage File Format Not Supported, Default To '.png'");
-        StorePNG(path + ".png", data.Buffer(), x, y, comp);
+        StorePNG(path + ".png", data.ReadOnlyBuffer(), x, y, comp);
     }
 }
 
@@ -176,25 +164,25 @@ void Resource::StoreImage(String path, const void* data, int x, int y, int comp)
     }
 }
 
-void Resource::StoreBMP(String path, DataBuffer data, int x, int y, int comp){
-    stbi_write_bmp(path.GetString(), x, y, comp, data.Buffer());
+void Resource::StoreBMP(String path, PackDataBuffer data, int x, int y, int comp){
+    stbi_write_bmp(path.GetString(), x, y, comp, data.ReadOnlyBuffer());
 }
 
-void Resource::StorePNG(String path, DataBuffer data, int x, int y, int comp){
-    stbi_write_png(path.GetString(), x, y, comp, data.Buffer(), x * comp);
+void Resource::StorePNG(String path, PackDataBuffer data, int x, int y, int comp){
+    stbi_write_png(path.GetString(), x, y, comp, data.ReadOnlyBuffer(), x * comp);
 }
 
-void Resource::StoreJPG(String path, DataBuffer data, int x, int y, int comp, int quality){
-    stbi_write_jpg(path.GetString(), x, y, comp, data.Buffer(), quality);
+void Resource::StoreJPG(String path, PackDataBuffer data, int x, int y, int comp, int quality){
+    stbi_write_jpg(path.GetString(), x, y, comp, data.ReadOnlyBuffer(), quality);
 }
 
-void Resource::StoreTGA(String path, DataBuffer data, int x, int y, int comp){
-    stbi_write_tga(path.GetString(), x, y, comp, data.Buffer());
+void Resource::StoreTGA(String path, PackDataBuffer data, int x, int y, int comp){
+    stbi_write_tga(path.GetString(), x, y, comp, data.ReadOnlyBuffer());
 }
 
-void Resource::StoreHDR(String path, DataBuffer data, int x, int y, int comp){
+void Resource::StoreHDR(String path, PackDataBuffer data, int x, int y, int comp){
     size_t size = data.Size();
-    unsigned char* src = (unsigned char*)data.Buffer();
+    const unsigned char* src = (const unsigned char*)data.ReadOnlyBuffer();
     float* buf = new float[size];
 
     for (size_t i = 0; i < size; i++)
@@ -223,7 +211,7 @@ void Resource::StoreTGA(String path, const void* data, int x, int y, int comp){
 
 void Resource::StoreHDR(String path, const void* data, int x, int y, int comp){
     size_t size = (size_t)x * y * comp;
-    unsigned char* src = (unsigned char*)data;
+    const unsigned char* src = (const unsigned char*)data;
     float* buf = new float[size];
 
     for (size_t i = 0; i < size; i++)

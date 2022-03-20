@@ -79,7 +79,9 @@ void LocalData::OnRightUp(int x, int y){
 void LocalData::OnMenuAccel(int id, bool accel){
     switch (id){
     case IDM_EXIT:
-        if (ShellMsgBox(Resource::GetWString(IDS_EXIT_CONFIRM_CAPTION), Resource::GetWString(IDS_EXIT_CONFIRM)) == MSGBOX_YES)
+        static const WString caption = Resource::GetWString(IDS_EXIT_CONFIRM_CAPTION);
+        static const WString text = Resource::GetWString(IDS_EXIT_CONFIRM);
+        if (ShellMsgBox(caption, text) == MSGBOX_YES)
             PostQuitMessage(0);
         break;
     case IDM_ABOUT:
@@ -344,7 +346,6 @@ int Main::MainEntry(int argc, char** argv){
     DebugLog("Main Window Created");
 
     appFrame->EnableOpenGL();
-    appFrame->EnableOpenGLEXT();
 
     DebugLog("OpenGL Enabled");
     DebugLog("OpenGL Version %s", glGetString(GL_VERSION));

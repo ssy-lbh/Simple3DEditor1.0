@@ -11,10 +11,10 @@
 
 GLComputeProgram::GLComputeProgram(int resid){
     int resSize;
-    char* srcData;
+    const char* srcData;
 
     DataBuffer data = Resource::GetShader(resid);
-    srcData = (char*)data.Buffer();
+    srcData = (const char*)data.ReadOnlyBuffer();
     resSize = data.Size();
 
     prog = glCreateProgram();
@@ -57,12 +57,10 @@ bool GLComputeProgram::CompileShader(){
 }
 
 void GLComputeProgram::PrintProgramLog(){
-    char* log;
-
     if (progLog == -1)
         glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &progLog);
     if (progLog > 0){
-        log = new char[progLog];
+        char* log = new char[progLog];
         glGetProgramInfoLog(prog, progLog, &progLog, log);
         DebugError("%s", log);
         delete[] log;
@@ -70,12 +68,10 @@ void GLComputeProgram::PrintProgramLog(){
 }
 
 void GLComputeProgram::PrintShaderLog(){
-    char* log;
-
     if (shaderLog == -1)
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &shaderLog);
     if (shaderLog > 0){
-        log = new char[shaderLog];
+        char* log = new char[shaderLog];
         glGetShaderInfoLog(shader, shaderLog, &shaderLog, log);
         DebugError("%s", log);
         delete[] log;

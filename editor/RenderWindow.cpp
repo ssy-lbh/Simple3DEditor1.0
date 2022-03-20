@@ -161,7 +161,8 @@ void RenderWindow::OnDropFileA(const char* path){}
 void RenderWindow::OnDropFileW(const wchar_t* path){}
 
 void RenderWindow::OnInsSave(){
-    WString file = ShellFileSelectWindow(Resource::GetWString(IDS_PICFILE_FILTER), FILESELECT_REQ_PATH, true);
+    static const WString filter = Resource::GetWString(IDS_PICFILE_FILTER);
+    WString file = ShellFileSelectWindow(filter, FILESELECT_REQ_PATH, true);
     if (file.GetLength() == 0){
         DebugError("Stop Saving");
         return;

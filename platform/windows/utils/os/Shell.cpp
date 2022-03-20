@@ -6,7 +6,7 @@
 #include <utils/os/Log.h>
 #include <utils/String.h>
 
-String ShellFileSelectWindow(String filter, int flags, bool save){
+String ShellFileSelectWindow(const String filter, int flags, bool save){
     OPENFILENAMEA ofn;
     char buffer[DEFAULT_STRING_LENGTH];
     AppFrame* frame = AppFrame::GetLocalInst();
@@ -57,7 +57,7 @@ String ShellFileSelectWindow(String filter, int flags, bool save){
     return String(buffer);
 }
 
-WString ShellFileSelectWindow(WString filter, int flags, bool save){
+WString ShellFileSelectWindow(const WString filter, int flags, bool save){
     OPENFILENAMEW ofn;
     wchar_t buffer[DEFAULT_STRING_LENGTH];
     AppFrame* frame = AppFrame::GetLocalInst();
@@ -108,22 +108,23 @@ WString ShellFileSelectWindow(WString filter, int flags, bool save){
     return WString(buffer);
 }
 
-bool ShellCommandLine(String s){
+bool ShellCommandLine(const String s){
     DWORD_PTR res;
     size_t argsIdx = s.FindChar(' ');
+    String cmd;
     String args;
 
     if (argsIdx != -1){
         args = s.SubString(argsIdx + 1);
-        s = s.SubString(0, argsIdx);
+        cmd = s.SubString(0, argsIdx);
 
-        DebugLog("[Shell] %s", s.GetString());
+        DebugLog("[Shell] %s", cmd.GetString());
         DebugLog("[Shell] Arguments %s", args.GetString());
     }else{
-        DebugLog("[Shell] %s", s.GetString());
+        DebugLog("[Shell] %s", cmd.GetString());
     }
 
-    res = (DWORD_PTR)ShellExecuteA(NULL, "open", s.GetString(), (args.GetLength() == 0 ? NULL : args.GetString()), NULL, SW_HIDE);
+    res = (DWORD_PTR)ShellExecuteA(NULL, "open", cmd.GetString(), (args.GetLength() == 0 ? NULL : args.GetString()), NULL, SW_HIDE);
     
     if (res >= 32){
         return true;
@@ -133,22 +134,23 @@ bool ShellCommandLine(String s){
     }
 }
 
-bool ShellCommandLine(WString s){
+bool ShellCommandLine(const WString s){
     DWORD_PTR res;
     size_t argsIdx = s.FindChar(L' ');
+    WString cmd;
     WString args;
 
     if (argsIdx != -1){
         args = s.SubString(argsIdx + 1);
-        s = s.SubString(0, argsIdx);
+        cmd = s.SubString(0, argsIdx);
 
-        DebugLog("[Shell] %S", s.GetString());
+        DebugLog("[Shell] %S", cmd.GetString());
         DebugLog("[Shell] Arguments %S", args.GetString());
     }else{
-        DebugLog("[Shell] %S", s.GetString());
+        DebugLog("[Shell] %S", cmd.GetString());
     }
 
-    res = (DWORD_PTR)ShellExecuteW(NULL, L"open", s.GetString(), (args.GetLength() == 0 ? NULL : args.GetString()), NULL, SW_HIDE);
+    res = (DWORD_PTR)ShellExecuteW(NULL, L"open", cmd.GetString(), (args.GetLength() == 0 ? NULL : args.GetString()), NULL, SW_HIDE);
     
     if (res >= 32){
         return true;
@@ -158,7 +160,7 @@ bool ShellCommandLine(WString s){
     }
 }
 
-bool ShellFFmpeg(String src, String dst){
+bool ShellFFmpeg(const String src, const String dst){
     String cmd = String(".\\lib\\ffmpeg\\ffmpeg -i \"") + src + "\" -y " + dst;
 
     if (!ShellCommandLine(cmd)){
@@ -184,7 +186,7 @@ bool ShellFFmpeg(String src, String dst){
     return false;
 }
 
-bool ShellFFmpeg(WString src, WString dst){
+bool ShellFFmpeg(const WString src, const WString dst){
     WString cmd = WString(L".\\lib\\ffmpeg\\ffmpeg -i \"") + src + L"\" -y " + dst;
 
     if (!ShellCommandLine(cmd)){
@@ -210,17 +212,17 @@ bool ShellFFmpeg(WString src, WString dst){
     return false;
 }
 
-int ShellMsgBox(String caption, String text){
+int ShellMsgBox(const String caption, const String text){
     AppFrame* frame = AppFrame::GetLocalInst();
     return MessageBoxA((frame == NULL ? NULL : frame->hWnd), text.GetString(), caption.GetString(), MB_YESNOCANCEL | MB_ICONINFORMATION);
 }
 
-int ShellMsgBox(WString caption, WString text){
+int ShellMsgBox(const WString caption, const WString text){
     AppFrame* frame = AppFrame::GetLocalInst();
     return MessageBoxW((frame == NULL ? NULL : frame->hWnd), text.GetString(), caption.GetString(), MB_YESNOCANCEL | MB_ICONINFORMATION);
 }
 
-bool ShellPrint(String file){
+bool ShellPrint(const String file){
     DWORD_PTR res;
 
     res = (DWORD_PTR)ShellExecuteA(NULL, "print", file.GetString(), NULL, NULL, SW_HIDE);
@@ -233,7 +235,7 @@ bool ShellPrint(String file){
     }
 }
 
-bool ShellPrint(WString file){
+bool ShellPrint(const WString file){
     DWORD_PTR res;
 
     res = (DWORD_PTR)ShellExecuteW(NULL, L"print", file.GetString(), NULL, NULL, SW_SHOWDEFAULT);

@@ -29,12 +29,10 @@ bool GLProgram::Link(){
 }
 
 void GLProgram::PrintLog(){
-    char* log;
-
     if (progLog == -1)
         glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &progLog);
     if (progLog > 0){
-        log = new char[progLog];
+        char* log = new char[progLog];
         glGetProgramInfoLog(prog, progLog, &progLog, log);
         DebugError("%s", log);
         delete[] log;

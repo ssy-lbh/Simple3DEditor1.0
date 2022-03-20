@@ -17,11 +17,21 @@ public:
     ~StringBuilderA();
 
     String ToString();
+    const String ToPackString();
 
-    const char* GetString();
-    size_t GetLength();
+    inline const char* GetString(){
+        data[ptr] = '\0';
+        return data;
+    }
 
-    void Clear();
+    inline size_t GetLength(){
+        return ptr;
+    }
+
+    inline void Clear(){
+        ptr = 0;
+    }
+
     StringBuilderA& Append(char c);
     StringBuilderA& Append(wchar_t c);
     StringBuilderA& Append(int i);
@@ -49,11 +59,21 @@ public:
     ~StringBuilderW();
 
     WString ToString();
+    const WString ToPackString();
 
-    const wchar_t* GetString();
-    size_t GetLength();
+    inline const wchar_t* GetString(){
+        data[ptr] = L'\0';
+        return data;
+    }
 
-    void Clear();
+    inline size_t GetLength(){
+        return ptr;
+    }
+
+    inline void Clear(){
+        ptr = 0;
+    }
+
     StringBuilderW& Append(char c);
     StringBuilderW& Append(wchar_t c);
     StringBuilderW& Append(int i);
