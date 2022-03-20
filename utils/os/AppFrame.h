@@ -75,7 +75,6 @@ public:
     void Show();
     void Hide();
     void EnableOpenGL();
-    void EnableOpenGLEXT();
     void DisableOpenGL();
     // 返回否为退出
     bool WaitHandleEvent();

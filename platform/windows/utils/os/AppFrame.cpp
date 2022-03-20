@@ -155,9 +155,7 @@ void AppFrame::EnableOpenGL(){
 
     hRC = wglCreateContext(hDC);
     wglMakeCurrent(hDC, hRC);
-}
 
-void AppFrame::EnableOpenGLEXT(){
     glInitGLEW();
 }
 
