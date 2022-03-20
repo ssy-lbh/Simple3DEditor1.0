@@ -115,7 +115,7 @@ $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 # 当前分支
 BRANCH		= master-2.0
 # 提交信息
-COMMITMSG	= "bugfix"
+COMMITMSG	= "update"
 # 合并分支时的目标分支
 MERGE 		= master-2.0
 
