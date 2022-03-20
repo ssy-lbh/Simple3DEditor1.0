@@ -160,7 +160,8 @@ void UVEditWindow::OnRender(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    Main::data->scene->OnRenderUVMap();
+    if (Main::data->curObject)
+        Main::data->curObject->OnRenderUVMap();
 
     // 已选择点绘制
     glDisable(GL_LIGHTING);

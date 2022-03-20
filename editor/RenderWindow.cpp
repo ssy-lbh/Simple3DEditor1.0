@@ -93,7 +93,7 @@ void RenderWindow::OnRender(){
     options->face = true;
     options->light = lightEnabled;
 
-    Main::data->scene->OnChainRender();
+    Main::RenderScene();
 
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);

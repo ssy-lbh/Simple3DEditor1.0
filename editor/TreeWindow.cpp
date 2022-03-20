@@ -97,6 +97,7 @@ void TreeWindow::OnRender(){
 
     depth = 0;
     RenderItem(Main::data->scene);
+    RenderItem(Main::data->screen);
 }
 
 void TreeWindow::RenderItem(AViewObject* o){

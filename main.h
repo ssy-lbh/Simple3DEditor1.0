@@ -73,12 +73,9 @@ enum class SelectionType {
 //TODO 可加入全局拖拽功能，在窗口之间传送数据
 class GlobalData final : public Object {
 public:
-    Vector3 audioPos = Vector3::zero;
-
-    float animFrame = 0.0f;
-
     // 总场景对象
     AViewObject* scene = NULL;
+    AViewObject* screen = NULL;
 
     // 当前选中的对象
     AViewObject* curObject = NULL;
@@ -92,11 +89,15 @@ public:
     List<Edge*> selEdges;
     List<Face*> selFaces;
 
+    float animFrame = 0.0f;
+
     GlobalData();
     ~GlobalData();
 
     void SelectObject(AViewObject* o);
     void SelectType(SelectionType type);
+
+    void OnTimer(int id);
 
     void OnAnimationFrame(float frame);
 };
@@ -112,10 +113,14 @@ public:
     static void SelectObject(AViewObject* o);
     static void SelectType(SelectionType type);
     static void AddObject(AViewObject* o);
+    static void AddObjectToScreen(AViewObject* o);
     static void DeleteObject(AViewObject* o);
     static void OnAnimationFrame(float frame);
     static void SaveImage(String file, Rect rect);
     static void RenderAnimation(String dir, size_t start, size_t end, Rect rect);
+
+    static void RenderScene();
+    static void RenderScreen();
 
     static Mesh* GetMesh();
 

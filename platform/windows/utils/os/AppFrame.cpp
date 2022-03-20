@@ -286,7 +286,7 @@ LRESULT CALLBACK AppFrame::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         PostQuitMessage(0);
         break;
     case WM_TIMER:
-        Main::data->scene->OnTimer(wParam);
+        Main::data->OnTimer(wParam);
         break;
     case WM_SIZE:
         data->UpdateWindowSize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -316,23 +316,13 @@ LRESULT CALLBACK AppFrame::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     case WM_RBUTTONUP:
         data->OnRightUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
-    case WM_CHAR:
-        Main::data->scene->OnChar(wParam);
-        break;
-    case WM_UNICHAR:
-        if (wParam == UNICODE_NOCHAR)
-            break;
-        Main::data->scene->OnUnichar(wParam);
-        break;
     case WM_COMMAND:
         switch (HIWORD(wParam)){
         case 0:
             data->OnMenuAccel(LOWORD(wParam), false);
-            Main::data->scene->OnMenuAccel(LOWORD(wParam), false);
             break;
         case 1:
             data->OnMenuAccel(LOWORD(wParam), true);
-            Main::data->scene->OnMenuAccel(LOWORD(wParam), true);
             break;
         }
         break;

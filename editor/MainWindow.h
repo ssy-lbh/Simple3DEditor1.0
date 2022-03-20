@@ -51,11 +51,11 @@ private:
     public:
         MoveButton(Vector2 center, float radius, MainWindow* main);
         virtual ~MoveButton() override;
+
         virtual bool Trigger(Vector2 pos) override;
         virtual void Render() override;
         virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
-        virtual void ClickEnd(Vector2 pos, IButton* end) override;
     };
 
     class RotateButton final : public IButton {
@@ -70,11 +70,11 @@ private:
     public:
         RotateButton(Vector2 center, float radius, MainWindow* main);
         virtual ~RotateButton() override;
+
         virtual bool Trigger(Vector2 pos) override;
         virtual void Render() override;
         virtual void Click(Vector2 pos) override;
         virtual void Drag(Vector2 dir) override;
-        virtual void ClickEnd(Vector2 pos, IButton* end) override;
     };
 
     class MoveOperation final : public IOperation {
@@ -97,6 +97,7 @@ private:
     public:
         MoveOperation(MainWindow* main);
         virtual ~MoveOperation() override;
+
         virtual void OnEnter() override;
         virtual void OnMove() override;
         virtual void OnCommand(int id) override;
@@ -119,6 +120,7 @@ private:
     public:
         ExcludeOperation(MainWindow* main);
         virtual ~ExcludeOperation() override;
+
         virtual void OnEnter() override;
         virtual void OnMove() override;
         virtual void OnCommand(int id) override;
@@ -158,6 +160,7 @@ private:
     public:
         RotateOperation(MainWindow* main);
         virtual ~RotateOperation() override;
+
         virtual void OnEnter() override;
         virtual void OnMove() override;
         virtual void OnCommand(int id) override;
@@ -189,6 +192,7 @@ private:
     public:
         SizeOperation(MainWindow* main);
         virtual ~SizeOperation() override;
+
         virtual void OnEnter() override;
         virtual void OnMove() override;
         virtual void OnCommand(int id) override;
@@ -203,6 +207,7 @@ private:
     public:
         EmptyTool(MainWindow* window);
         ~EmptyTool() override;
+
         virtual void OnLeftDown() override;
     };
 
@@ -216,6 +221,7 @@ private:
     public:
         SelectTool(MainWindow* window);
         virtual ~SelectTool() override;
+        
         virtual void OnLeftDown() override;
         virtual void OnLeftUp() override;
         virtual void OnMove() override;

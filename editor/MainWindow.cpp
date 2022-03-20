@@ -49,8 +49,6 @@ void MainWindow::MoveButton::Drag(Vector2 dir){
     main->SetLookAt(start - (main->camRight * dir.x + main->camUp * dir.y) * main->camDis);
 }
 
-void MainWindow::MoveButton::ClickEnd(Vector2 pos, IButton* end){}
-
 MainWindow::RotateButton::RotateButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
 MainWindow::RotateButton::~RotateButton(){}
 
@@ -90,8 +88,6 @@ void MainWindow::RotateButton::Drag(Vector2 dir){
     main->SetRotation(Quaternion::AxisAngle(up, -dir.x * 100.0f) *
                             Quaternion::AxisAngle(right, dir.y * 100.0f) * start);
 }
-
-void MainWindow::RotateButton::ClickEnd(Vector2 pos, IButton* end){}
 
 MainWindow::MoveOperation::MoveOperation(MainWindow* main) : main(main) {}
 MainWindow::MoveOperation::~MoveOperation(){}
@@ -825,7 +821,7 @@ void MainWindow::RenderModelView(){
     options->objOp = objOp;
 
     //TODO 后续光照设置法线
-    Main::data->scene->OnChainRender();
+    Main::RenderScene();
 
     // 已选择点绘制
     glDisable(GL_LIGHTING);

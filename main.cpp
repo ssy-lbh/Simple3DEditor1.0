@@ -156,10 +156,12 @@ void LocalData::DestoryCamera(){
 
 GlobalData::GlobalData(){
     scene = new AViewObject(L"Scene");
+    screen = new AViewObject(L"Screen");
 }
 
 GlobalData::~GlobalData(){
     if (scene) delete scene;
+    if (screen) delete screen;
 }
 
 void GlobalData::SelectObject(AViewObject* o){
@@ -204,9 +206,15 @@ void GlobalData::SelectType(SelectionType type){
     selType = type;
 }
 
+void GlobalData::OnTimer(int id){
+    scene->OnTimer(id);
+    screen->OnTimer(id);
+}
+
 void GlobalData::OnAnimationFrame(float frame){
     animFrame = frame;
     scene->OnAnimationFrame(frame);
+    screen->OnAnimationFrame(frame);
 }
 
 void Main::RequestRender(){
@@ -251,9 +259,17 @@ void Main::AddObject(AViewObject* o){
     data->scene->AddChild(o);
 }
 
+void Main::AddObjectToScreen(AViewObject* o){
+    data->screen->AddChild(o);
+}
+
 void Main::DeleteObject(AViewObject* o){
     if (o == data->scene){
         DebugError("Main::DeleteObject Trying To Delete Scene Object");
+        return;
+    }
+    if (o == data->screen){
+        DebugError("Main::DeleteObject Trying To Delete Screen Object");
         return;
     }
     delete o;
@@ -298,6 +314,14 @@ void Main::RenderAnimation(String dir, size_t start, size_t end, Rect rect){
         SaveImage(builder.ToString(), rect);
         builder.Clear();
     }
+}
+
+void Main::RenderScene(){
+    data->scene->OnChainRender();
+}
+
+void Main::RenderScreen(){
+    data->scene->OnChainRender();
 }
 
 Mesh* Main::GetMesh(){
