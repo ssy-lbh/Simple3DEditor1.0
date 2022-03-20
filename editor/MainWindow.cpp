@@ -1295,12 +1295,13 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         Vertex** vert = new Vertex*[loops * round];
         Vertex* ceil;
         Vertex* floor;
+        float angle = (2.0f * PI / round);
         ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 1.0f) + camLookat);
         floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -1.0f) + camLookat);
         for (int i = 0; i < loops; i++){
             for (int j = 0; j < round; j++){
                 float vsin, vcos;
-                SinCos(2.0f * PI * j / round, &vsin, &vcos);
+                SinCos(j * angle, &vsin, &vcos);
                 vert[i * round + j] = mesh->AddVertex(Vector3(vcos, vsin, 2.0f * i / (loops - 1) - 1.0f) + camLookat);
             }
         }
@@ -1327,15 +1328,17 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         Vertex** vert = new Vertex*[loops * round];
         Vertex* ceil;
         Vertex* floor;
+        float angle = (2.0f * PI / round);
         ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 1.0f) + camLookat);
         floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -1.0f) + camLookat);
         for (int i = 0; i < loops; i++){
+            int off = i * round;
             for (int j = 0; j < round; j++){
                 float height, radius;
                 float vsin, vcos;
                 SinCos(PI * (i + 1) / (loops + 1) - 0.5f * PI, &height, &radius);
-                SinCos(2.0f * PI * j / round, &vsin, &vcos);
-                vert[i * round + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height) + camLookat);
+                SinCos(j * angle, &vsin, &vcos);
+                vert[off + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height) + camLookat);
             }
         }
         for (int i = 0; i < loops - 1; i++){
@@ -1363,6 +1366,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         Vertex** vert = new Vertex*[loops * round];
         Vertex* ceil;
         Vertex* floor;
+        float angle = (2.0f * PI / round);
         ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 2.0f) + camLookat);
         floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -2.0f) + camLookat);
         for (int i = 0; i < loops; i++){
@@ -1370,7 +1374,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
                 int loopCnt = i - ballLoops;
                 for (int j = 0; j < round; j++){
                     float vsin, vcos;
-                    SinCos(2.0f * PI * j / round, &vsin, &vcos);
+                    SinCos(j * angle, &vsin, &vcos);
                     vert[i * round + j] = mesh->AddVertex(Vector3(vcos, vsin, 2.0f * loopCnt / (cylinderLoops - 1) - 1.0f) + camLookat);
                 }
             }else if (i < ballLoops){
@@ -1386,7 +1390,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
                     float height, radius;
                     float vsin, vcos;
                     SinCos(0.5f * PI * (i - ballLoops - cylinderLoops) / ballLoops, &height, &radius);
-                    SinCos(2.0f * PI * j / round, &vsin, &vcos);
+                    SinCos(j * angle, &vsin, &vcos);
                     vert[i * round + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height + 1.0f) + camLookat);
                 }
             }
