@@ -152,12 +152,12 @@ void Font::Uninit(){
 
 Font::Font(String path){
     FT_New_Face(ftLib, path.GetString(), 0, &face);
-    FT_Select_Charmap(face, FT_ENCODING_GB2312);
+    FT_Select_Charmap(face, FT_ENCODING_UNICODE);
 }
 
 Font::Font(String path, uint width, uint height){
     FT_New_Face(ftLib, path.GetString(), 0, &face);
-    FT_Select_Charmap(face, FT_ENCODING_GB2312);
+    FT_Select_Charmap(face, FT_ENCODING_UNICODE);
     FT_Set_Pixel_Sizes(face, width, height);
 }
 
@@ -188,6 +188,7 @@ void Font::SetTransform(Matrix2x3 m){
 uint Font::LoadChar(uint c){
     FT_Glyph glyph;
     FT_BitmapGlyph bitmap;
+    uint idx;
     uint width;
     uint height;
     uint advY;
@@ -201,7 +202,8 @@ uint Font::LoadChar(uint c){
     if (chTex.tex)
         return chTex.tex;
     // 加了FT_LOAD_FORCE_AUTOHINT以后会报错
-    FT_Load_Char(face, c, FT_LOAD_TARGET_NORMAL);
+    idx = FT_Get_Char_Index(face, c);
+    FT_Load_Glyph(face, idx, FT_LOAD_TARGET_NORMAL);
     FT_Get_Glyph(face->glyph, &glyph);
     FT_Render_Glyph(face->glyph, FT_RENDER_MODE_LCD);
     FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, NULL, TRUE);

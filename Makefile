@@ -31,7 +31,7 @@ PROGOBJ		= main\
 				lib\soundtouch\PeakFinder lib\soundtouch\BPMDetect\
 				utils\String utils\StringBuilder utils\DataBuffer utils\AudioUtils\
 				utils\math3d\Math utils\math3d\LinearAlgebra utils\math3d\Mesh\
-				utils\math3d\ViewObject utils\math3d\Geometry utils\math3d\Property\
+				utils\math3d\Geometry utils\math3d\Property utils\math3d\Camera\
 				utils\gl\GLFrameBuffer utils\gl\GLIndexBuffer utils\gl\GLSkyBox\
 				utils\gl\GLLights utils\gl\GLProgram utils\gl\GLShader utils\gl\GLEW\
 				utils\gl\GLUtils utils\gl\GLVertexArray utils\gl\GLVertexBuffer\
@@ -39,7 +39,13 @@ PROGOBJ		= main\
 				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
 				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
 				editor\MainWindow editor\RenderWindow editor\gui\Container editor\gui\Menu\
-				editor\gui\UIManager editor\gui\AnimationCurve editor\gui\ViewManager
+				editor\gui\UIManager editor\gui\GUIManager editor\gui\AnimationCurve editor\gui\ViewManager\
+				editor\main\ViewObject\
+				editor\object\AudioListenerObject editor\object\AudioSourceObject\
+				editor\object\CameraObject editor\object\CubicBezierObject\
+				editor\object\MeshObject editor\object\PointLightObject\
+				editor\main\Window editor\main\Tool editor\main\Operation\
+				editor\main\Transform
 PLATOBJ		=  utils\File utils\os\Shell utils\os\Log utils\os\Thread utils\os\System\
 				utils\os\Time utils\os\Font utils\os\Appframe utils\os\Resource\
 				editor\dialog\ColorBoard editor\dialog\Tips
@@ -107,11 +113,11 @@ $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 	$(RES) -i $< -o $@
 
 # 当前分支
-BRANCH		= AVdevelop
+BRANCH		= master-2.0
 # 提交信息
 COMMITMSG	= "bugfix"
 # 合并分支时的目标分支
-MERGE 		= AVDevelop
+MERGE 		= master-2.0
 
 # 一键提交代码
 commit:
@@ -152,7 +158,7 @@ clean:
 	-$(RM) $(OUTPUT) $(OUTPUTDLIB) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
 
 # 测试
-.PHONY: dllboot freetype
+.PHONY: dllboot
 
 # 后面的测试如果只链接一个类的.o文件，include对应的.h，加上启动测试代码，不就是单元测试了么
 

@@ -13,10 +13,11 @@
 #include <utils/gl/GLSimplified.h>
 #include <utils/math3d/Math.h>
 #include <utils/math3d/LinearAlgebra.h>
-#include <utils/math3d/ViewObject.h>
 #include <utils/AudioUtils.h>
 #include <utils/String.h>
 #include <utils/StringBuilder.h>
+#include <editor/main/ViewObject.h>
+#include <editor/object/AudioSourceObject.h>
 
 const float AudioPlayerWindow::PlayButton::BOUND_LEFT = -0.5f;
 const float AudioPlayerWindow::PlayButton::BOUND_RIGHT = 0.5f;
@@ -302,42 +303,42 @@ void AudioPlayerWindow::RenderGraph(){
     ALint channels = source->GetChannelCount();
     char* data = source->GetData();
 
-    Complex samples[1 << bit];
-    float height[1 << 10];
+    Complex samples[SAMPLE_SIZE];
+    float height[GRAPH_SIZE];
 
-    if (offset + (1 << bit) >= source->GetSize()){
+    if (offset + SAMPLE_SIZE >= source->GetSize()){
         return;
     }
 
     if (sampleSize == 4 && channels == 2){
-        for (int i = 0; i < (1 << bit); i++){
+        for (int i = 0; i < SAMPLE_SIZE; i++){
             samples[i] = Complex(((short*)data)[(i + offset) << 1]);
         }
     }else if (sampleSize == 2 && channels == 1){
-        for (int i = 0; i < (1 << bit); i++){
+        for (int i = 0; i < SAMPLE_SIZE; i++){
             samples[i] = Complex(((short*)data)[i + offset]);
         }
     }else if (sampleSize == 2 && channels == 2){
-        for (int i = 0; i < (1 << bit); i++){
+        for (int i = 0; i < SAMPLE_SIZE; i++){
             samples[i] = Complex(((short)(((char*)data)[(i + offset) << 1] - 0x80) << 8));
         }
     }else if (sampleSize == 1 && channels == 1){
-        for (int i = 0; i < (1 << bit); i++){
+        for (int i = 0; i < SAMPLE_SIZE; i++){
             samples[i] = Complex(((short)(((char*)data)[i + offset] - 0x80) << 8));
         }
     }
 
     if (displayWave){
-        for (int i = 0; i < (1 << 10); i++){
-            height[i] = samples[i << (bit - 10)].real * 0.0000152587890625f + 0.5f;
+        for (int i = 0; i < GRAPH_SIZE; i++){
+            height[i] = samples[i << (SAMPLE_SIZE_BIT - 10)].real * 0.0000152587890625f + 0.5f;
         }
-        DrawLineGraph(height, 1 << 10);
+        DrawLineGraph(height, GRAPH_SIZE);
     }else{
-        AudioUtils::FFT(samples, bit, false);
-        for (int i = 0; i < (1 << 10); i++){
-            height[i] = Log(samples[i << (bit - 10)].SqrMagnitude()) * 0.1f;
+        AudioUtils::FFT(samples, SAMPLE_SIZE_BIT, false);
+        for (int i = 0; i < GRAPH_SIZE; i++){
+            height[i] = Log(samples[i << (SAMPLE_SIZE_BIT - 10)].SqrMagnitude()) * 0.1f;
         }
-        DrawAmplitudeGraph(height, 1 << 10);
+        DrawAmplitudeGraph(height, GRAPH_SIZE);
     }
 }
 
@@ -433,10 +434,6 @@ void AudioPlayerWindow::OnRightUp(int x, int y){
     cursorPos.y = 2.0f * y / size.y - 1.0f;
     uiMgr->CursorMove(cursorPos);
 }
-
-void AudioPlayerWindow::OnMouseHover(int key, int x, int y){}
-
-void AudioPlayerWindow::OnMouseLeave(){}
 
 void AudioPlayerWindow::OnFocus(){
     focus = true;

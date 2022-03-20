@@ -7,13 +7,8 @@
 #include <editor/gui/Menu.h>
 #include <utils/gl/GLUtils.h>
 
-class NodeMapWindow final : public IWindow {
+class NodeMapWindow final : public AWindow {
 private:
-    bool focus = false;
-
-    Vector2 cliSize;
-    float aspect;
-    Vector2 cursorPos;
     Vector2 viewPos;
 
     UIManager* uiMgr;
@@ -78,12 +73,15 @@ private:
     };
 
     List<Node*> selectedNodes;
-    
+
+protected:
+    void UpdateCursor(int x, int y);
+    void UpdateWindowSize(int x, int y);
+
 public:
     NodeMapWindow();
     virtual ~NodeMapWindow() override;
 
-    virtual bool IsFocus() override;
     virtual void OnRender() override;
     virtual void OnCreate() override;
     virtual void OnChar(char c) override;
@@ -94,15 +92,9 @@ public:
     virtual void OnLeftUp(int x, int y) override;
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
-    virtual void OnMouseHover(int key, int x, int y) override;
-    virtual void OnMouseLeave() override;
-    virtual void OnFocus() override;
-    virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
 
-    void UpdateCursor(int x, int y);
-    void UpdateWindowSize(int x, int y);
     void AddNode();
 };
 

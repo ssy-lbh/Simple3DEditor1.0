@@ -1,31 +1,32 @@
 #include <utils/StringBuilder.h>
 
+#include <stdio.h>
 #include <cstring>
 
 #include <utils/String.h>
 #include <utils/os/Log.h>
 
-StringBuilder::StringBuilder(){
+StringBuilderA::StringBuilderA(){
     data = new char[32];
     size = 32;
     ptr = 0;
 }
 
-StringBuilder::StringBuilder(size_t length){
+StringBuilderA::StringBuilderA(size_t length){
     data = new char[length];
     size = length;
     ptr = 0;
 }
 
-StringBuilder::~StringBuilder(){
+StringBuilderA::~StringBuilderA(){
     if (!data){
-        DebugError("Critical: StringBuilder::~StringBuilder() When data Is NULL");
+        DebugError("Critical: StringBuilderA::~StringBuilderA() When data Is NULL");
         return;
     }
     delete data;
 }
 
-void StringBuilder::Check(size_t reserve){
+void StringBuilderA::Check(size_t reserve){
     if (ptr + reserve < size)
         return;
     size <<= 1;
@@ -37,82 +38,206 @@ void StringBuilder::Check(size_t reserve){
     data = newData;
 }
 
-String StringBuilder::ToString(){
+String StringBuilderA::ToString(){
     return String(data, ptr);
 }
 
-const char* StringBuilder::GetString(){
+const char* StringBuilderA::GetString(){
     data[ptr] = '\0';
     return data;
 }
 
-size_t StringBuilder::GetLength(){
+size_t StringBuilderA::GetLength(){
     return ptr;
 }
 
-void StringBuilder::Clear(){
+void StringBuilderA::Clear(){
     ptr = 0;
 }
 
-StringBuilder& StringBuilder::Append(char c){
+StringBuilderA& StringBuilderA::Append(char c){
     Check(2);
     data[ptr++] = c;
     return *this;
 }
 
-StringBuilder& StringBuilder::Append(int i){
+StringBuilderA& StringBuilderA::Append(wchar_t c){
+    Check(4);
+    ptr += __builtin_snprintf(data + ptr, 3, "%C", c);
+    return *this;
+}
+
+StringBuilderA& StringBuilderA::Append(int i){
     Check(12);
     ptr += __builtin_snprintf(data + ptr, 11, "%d", i);
     return *this;
 }
 
-StringBuilder& StringBuilder::Append(size_t s){
+StringBuilderA& StringBuilderA::Append(size_t s){
     Check(24);
     ptr += __builtin_snprintf(data + ptr, 23, "%llu", s);
     return *this;
 }
 
-StringBuilder& StringBuilder::Append(bool b){
+StringBuilderA& StringBuilderA::Append(bool b){
     Check(6);
     ptr += __builtin_snprintf(data + ptr, 5, "%s", b ? "true" : "false");
     return *this;
 }
 
-StringBuilder& StringBuilder::Append(float f){
+StringBuilderA& StringBuilderA::Append(float f){
     Check(20);
     ptr += __builtin_snprintf(data + ptr, 19, "%g", f);
     return *this;
 }
 
-StringBuilder& StringBuilder::Append(double d){
+StringBuilderA& StringBuilderA::Append(double d){
     Check(20);
     ptr += __builtin_snprintf(data + ptr, 19, "%g", d);
     return *this;
 
 }
-StringBuilder& StringBuilder::Append(String& s){
+StringBuilderA& StringBuilderA::Append(String& s){
     Check(s.GetLength() + 2);
     ptr += __builtin_snprintf(data + ptr, s.GetLength() + 1, "%s", s.GetString());
     return *this;
 }
 
-StringBuilder& StringBuilder::Append(WString& s){
+StringBuilderA& StringBuilderA::Append(WString& s){
     size_t len = s.GetLength() << 2;
     Check(len + 2);
     ptr += __builtin_snprintf(data + ptr, len + 1, "%s", s.GetString());
     return *this;
 }
 
-StringBuilder& StringBuilder::Append(const char* s){
+StringBuilderA& StringBuilderA::Append(const char* s){
     size_t len = strlen(s);
     Check(len + 2);
     ptr += __builtin_snprintf(data + ptr, len + 1, "%s", s);
     return *this;
 }
 
-StringBuilder& StringBuilder::Append(const wchar_t* s){
+StringBuilderA& StringBuilderA::Append(const wchar_t* s){
     size_t len = wcslen(s) << 2;
     Check(len + 2);
     ptr += __builtin_snprintf(data + ptr, len + 1, "%S", s);
+    return *this;
+}
+
+StringBuilderW::StringBuilderW(){
+    data = new wchar_t[32];
+    size = 32;
+    ptr = 0;
+}
+
+StringBuilderW::StringBuilderW(size_t length){
+    data = new wchar_t[length];
+    size = length;
+    ptr = 0;
+}
+
+StringBuilderW::~StringBuilderW(){
+    if (!data){
+        DebugError("Critical: StringBuilderW::~StringBuilderW() When data Is NULL");
+        return;
+    }
+    delete data;
+}
+
+void StringBuilderW::Check(size_t reserve){
+    if (ptr + reserve < size)
+        return;
+    size <<= 1;
+    while (ptr + reserve >= size)
+        size <<= 1;
+    wchar_t* newData = new wchar_t[size];
+    memcpy(newData, data, ptr * sizeof(wchar_t));
+    delete[] data;
+    data = newData;
+}
+
+WString StringBuilderW::ToString(){
+    return WString(data, ptr);
+}
+
+const wchar_t* StringBuilderW::GetString(){
+    data[ptr] = L'\0';
+    return data;
+}
+
+size_t StringBuilderW::GetLength(){
+    return ptr;
+}
+
+void StringBuilderW::Clear(){
+    ptr = 0;
+}
+
+StringBuilderW& StringBuilderW::Append(char c){
+    Check(2);
+    ptr += __mingw_snwprintf(data + ptr, 1, L"%c", c);
+    return *this;
+}
+
+StringBuilderW& StringBuilderW::Append(wchar_t c){
+    Check(2);
+    data[ptr++] = c;
+    return *this;
+}
+
+StringBuilderW& StringBuilderW::Append(int i){
+    Check(12);
+    ptr += __mingw_snwprintf(data + ptr, 11, L"%d", i);
+    return *this;
+}
+
+StringBuilderW& StringBuilderW::Append(size_t s){
+    Check(24);
+    ptr += __mingw_snwprintf(data + ptr, 23, L"%llu", s);
+    return *this;
+}
+
+StringBuilderW& StringBuilderW::Append(bool b){
+    Check(6);
+    ptr += __mingw_snwprintf(data + ptr, 5, L"%s", b ? "true" : "false");
+    return *this;
+}
+
+StringBuilderW& StringBuilderW::Append(float f){
+    Check(20);
+    ptr += __mingw_snwprintf(data + ptr, 19, L"%g", f);
+    return *this;
+}
+
+StringBuilderW& StringBuilderW::Append(double d){
+    Check(20);
+    ptr += __mingw_snwprintf(data + ptr, 19, L"%g", d);
+    return *this;
+
+}
+StringBuilderW& StringBuilderW::Append(String& s){
+    Check(s.GetLength() + 2);
+    ptr += __mingw_snwprintf(data + ptr, s.GetLength() + 1, L"%s", s.GetString());
+    return *this;
+}
+
+StringBuilderW& StringBuilderW::Append(WString& s){
+    size_t len = s.GetLength();
+    Check(len + 2);
+    ptr += __mingw_snwprintf(data + ptr, len + 1, L"%s", s.GetString());
+    return *this;
+}
+
+StringBuilderW& StringBuilderW::Append(const char* s){
+    size_t len = strlen(s);
+    Check(len + 2);
+    ptr += __mingw_snwprintf(data + ptr, len + 1, L"%s", s);
+    return *this;
+}
+
+StringBuilderW& StringBuilderW::Append(const wchar_t* s){
+    size_t len = wcslen(s);
+    Check(len + 2);
+    ptr += __mingw_snwprintf(data + ptr, len + 1, L"%S", s);
     return *this;
 }

@@ -6,14 +6,8 @@
 #include <editor/gui/UIManager.h>
 #include <utils/math3d/LinearAlgebra.h>
 
-class PaintWindow final : public IWindow {
+class PaintWindow final : public AWindow {
 private:
-    bool focus = false;
-
-    Vector2 cursorPos = Vector2::zero;
-    Vector2 cliSize;
-    float aspect;
-
     Menu* basicMenu;
 
     IOperation* curOp = NULL;
@@ -61,11 +55,14 @@ private:
         void Draw();
     };
 
+protected:
+    void UpdateCursor(int x, int y);
+    void UpdateWindowSize(int x, int y);
+
 public:
     PaintWindow();
     virtual ~PaintWindow();
 
-    virtual bool IsFocus() override;
     virtual void OnCreate() override;
     virtual void OnRender() override;
     virtual void OnResize(int x, int y) override;
@@ -74,12 +71,7 @@ public:
     virtual void OnLeftUp(int x, int y) override;
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
-    virtual void OnFocus() override;
-    virtual void OnKillFocus() override;
     virtual void OnMenuAccel(int id, bool accel) override;
-
-    void UpdateCursor(int x, int y);
-    void UpdateWindowSize(int x, int y);
 
     void SetOperation(IOperation* op);
     void SetBrush(ITool* tool);

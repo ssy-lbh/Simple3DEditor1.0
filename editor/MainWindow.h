@@ -3,6 +3,10 @@
 
 #include <define.h>
 
+#include <utils/math3d/LinearAlgebra.h>
+#include <utils/math3d/Camera.h>
+#include <editor/main/Window.h>
+//#include <editor/gui/GUIManager.h>
 #include <editor/gui/UIManager.h>
 #include <editor/gui/Menu.h>
 
@@ -12,31 +16,21 @@ enum class ObjectOperation {
     SCALE
 };
 
-class MainWindow final : public IWindow {
+class MainWindow final : public AWindow, public Camera {
 private:
-    bool focus = false;
-    Point2 cursorPos = Point2::zero;
-    Vector3 cursorDir = Vector3::zero;
-    Vector2 cliSize, cliInvSize;
-    float aspect;
+    Vector3 cursorDir;
 
     bool lightEnabled = false;
     bool audioControl = true;
     bool dopplerEffect = true;
 
-    Point3 camLookat = Point3(0.0f, 0.0f, 1.0f);
-    Quaternion camDir = Quaternion::one;
-    float camDis = 5.0f;
-    Point3 camPos = Point3(0.0f, -5.0f, 1.0f);
-    Vector3 camRight = Vector3::right;
-    Vector3 camUp = Vector3::up;
-    Vector3 camForward = Vector3::forward;
     float camRange = 100.0f;
 
     Menu* basicMenu;
     Menu* insertMenu;
 
     UIManager* uiMgr;
+    //GUIManager* guiMgr;
 
     IOperation* curOp = NULL;
 
@@ -228,23 +222,26 @@ private:
         virtual void OnRender() override;
     };
 
+protected:
+    // 覆盖了父类函数
+    void UpdateWindowSize(int x, int y);
+    void UpdateCursor(int x, int y);
+
+    void SetLookAt(Point3 at);
+    void SetRotation(Quaternion rot);
+    void SetDistance(float dis);
+    Point3 GetLookPosition(Point3 pos);
+    Point2 GetScreenPosition(Point3 pos);
+    void InitCamera();
+
 public:
     MainWindow();
     virtual ~MainWindow() override;
-
-    void InitCamera();
 
     void RenderModelView();
     void SetOperation(IOperation* op);
     void SetTool(ITool* tool);
 
-    void UpdateWindowSize(int x, int y);
-    void UpdateCursor(int x, int y);
-    void UpdateLookAtLocation();
-    void UpdateRotation();
-    void UpdateDistance();
-
-    virtual bool IsFocus() override;
     virtual void OnCreate() override;
     virtual void OnRender() override;
     virtual void OnClose() override;
@@ -258,8 +255,6 @@ public:
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
     virtual void OnMouseWheel(int delta) override;
-    virtual void OnFocus() override;
-    virtual void OnKillFocus() override;
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileW(const wchar_t* path) override;
 
@@ -273,8 +268,6 @@ public:
     bool SaveMesh(Mesh* mesh);
     bool LoadMesh(AViewObject* obj);
     bool LoadMesh(AViewObject* obj, WString path);
-    Point3 GetLookPosition(Point3 pos);
-    Point2 GetScreenPosition(Point3 pos);
 };
 
 #endif

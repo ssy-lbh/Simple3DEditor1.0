@@ -10,18 +10,15 @@
 
 typedef struct ALCdevice_struct ALCdevice;
 
-class AudioCaptureWindow final : public IWindow {
+class AudioCaptureWindow final : public AWindow {
 private:
-    static const int bit = 14;
-    static const int queueBit = 2;
-    static const int queueMask = ((1 << queueBit) - 1);
-
-    static const int freq = 44100;
-
-    bool focus = false;
-
-    Vector2 size;
-    Vector2 cursorPos;
+    static const int SAMPLE_SIZE_BIT = 14;
+    static const int SAMPLE_SIZE = (1 << SAMPLE_SIZE_BIT);
+    static const int SAMPLE_MASK = (SAMPLE_SIZE - 1);
+    static const int QUEUE_SIZE_BIT = 2;
+    static const int QUEUE_SIZE = (1 << QUEUE_SIZE_BIT);
+    static const int QUEUE_MASK = (QUEUE_SIZE - 1);
+    static const int FREQUENCY = 44100;
 
     UIManager* uiMgr;
 
@@ -36,7 +33,7 @@ private:
 
     bool capture = false;
 
-    uint alBuf[1 << queueBit];
+    uint alBuf[QUEUE_SIZE];
     uint alSrc;
     int head = 0, tail = 0;
 
@@ -104,6 +101,10 @@ private:
         virtual void OnClick() override;
     };
 
+protected:
+    void UpdateCursor(int x, int y);
+    void UpdateWindowSize(int x, int y);
+
 public:
     AudioCaptureWindow();
     virtual ~AudioCaptureWindow() override;
@@ -111,7 +112,6 @@ public:
     void ProcessInput();
     void ProcessOutput();
 
-    virtual bool IsFocus() override;
     virtual void OnRender() override;
     virtual void OnCreate() override;
     virtual void OnClose() override;
@@ -124,10 +124,6 @@ public:
     virtual void OnLeftUp(int x, int y) override;
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
-    virtual void OnMouseHover(int key, int x, int y) override;
-    virtual void OnMouseLeave() override;
-    virtual void OnFocus() override;
-    virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileA(const char* path) override;

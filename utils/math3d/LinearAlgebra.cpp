@@ -1489,3 +1489,105 @@ Vector2 Matrix2x3::GetScale() const{
         Sqrt(_12 * _12 + _22 * _22)
     );
 }
+
+Rect::Rect(){}
+
+Rect::Rect(Vector2 p1, Vector2 p2) : left(p1.x), right(p2.x), top(p1.y), bottom(p2.y) {
+    Sort(left, right); Sort(bottom, top);
+}
+
+Rect::Rect(float left, float right, float bottom, float top)
+    : left(left), right(right), bottom(bottom), top(top) {
+    Sort(left, right); Sort(bottom, top);
+}
+
+Rect::~Rect(){}
+
+const Rect Rect::zero = Rect(0.0f, 0.0f, 0.0f, 0.0f);
+
+float Rect::GetAspect() const{
+    return (right - left) / (top - bottom);
+}
+
+float Rect::GetWidth() const{
+    return right - left;
+}
+
+float Rect::GetHeight() const{
+    return top - bottom;
+}
+
+Vector2 Rect::GetSize() const{
+    return Vector2(right - left, top - bottom);
+}
+
+bool Rect::Inside(Vector2 pos) const{
+    return pos.x >= left && pos.x <= right &&
+            pos.y >= bottom && pos.y <= top;
+}
+
+float Rect::GetXRatio(float x) const{
+    return GetRate(x, left, right);
+}
+
+float Rect::GetYRatio(float y) const{
+    return GetRate(y, bottom, top);
+}
+
+Vector2 Rect::GetRatio(float x, float y) const{
+    return Vector2(GetRate(x, left, right), GetRate(y, bottom, top));
+}
+
+Vector2 Rect::GetRatio(Vector2 pos) const{
+    return GetRatio(pos.x, pos.y);
+}
+
+float Rect::GetXRatioPos(float ratio) const{
+    return Lerp(left, right, ratio);
+}
+
+float Rect::GetYRatioPos(float ratio) const{
+    return Lerp(bottom, top, ratio);
+}
+
+Vector2 Rect::GetRatioPos(float ratioX, float ratioY) const{
+    return Vector2(Lerp(left, right, ratioX), Lerp(bottom, top, ratioY));
+}
+
+Vector2 Rect::GetRatioPos(Vector2 ratio) const{
+    return GetRatioPos(ratio.x, ratio.y);
+}
+
+float Rect::MapXPos(Rect rect, float x) const{
+    return GetXRatioPos(rect.GetXRatio(x));
+}
+
+float Rect::MapYPos(Rect rect, float y) const{
+    return GetYRatioPos(rect.GetYRatio(y));
+}
+
+Vector2 Rect::MapPos(Rect rect, Vector2 pos) const{
+    return GetRatioPos(rect.GetRatio(pos));
+}
+
+Vector2 Rect::MapPos(Rect rect, float x, float y) const{
+    return GetRatioPos(rect.GetRatio(x, y));
+}
+
+Rect Rect::ChildRect(Rect ratio) const{
+    return ChildRect(ratio.left, ratio.right, ratio.bottom, ratio.top);
+}
+
+Rect Rect::ChildRect(float left, float right, float bottom, float top) const{
+    Rect rect;
+    Vector2 size;
+
+    size = GetSize();
+
+    rect.left = this->left + Round(size.x * Clamp((left + 1.0f) * 0.5f, 0.0f, 1.0f));
+    rect.right = this->left + Round(size.x * Clamp((right + 1.0f) * 0.5f, 0.0f, 1.0f));
+    rect.bottom = this->bottom + Round(size.y * Clamp((bottom + 1.0f) * 0.5f, 0.0f, 1.0f));
+    rect.top = this->bottom + Round(size.y * Clamp((top + 1.0f) * 0.5f, 0.0f, 1.0f));
+
+    return rect;
+}

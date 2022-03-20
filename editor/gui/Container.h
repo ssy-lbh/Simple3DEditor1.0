@@ -3,18 +3,16 @@
 
 #include <define.h>
 
-#include <editor/gui/UIManager.h>
+#include <editor/main/Window.h>
 
 //TODO 容器期望集成选择夹、属性窗口等容器
-class LRContainer final : public IWindow {
+class LRContainer final : public AWindow {
 private:
-    IWindow* lWindow;
-    IWindow* rWindow;
+    AWindow* lWindow;
+    AWindow* rWindow;
     int dis = 1;
-    IWindow* focus = NULL;
+    AWindow* focusWindow = NULL;
     bool right = false;
-    Vector2 size = Vector2(2.0f, 0.0f);
-    Vector2 cursorPos;
     bool adjustPos = false;
     bool dragEnable = true;
 
@@ -25,8 +23,8 @@ private:
     void InitMenu();
 
 public:
-    LRContainer(IWindow* lWindow, IWindow* rWindow);
-    LRContainer(IWindow* lWindow, IWindow* rWindow, SelectionWindow* selWindow);
+    LRContainer(AWindow* lWindow, AWindow* rWindow);
+    LRContainer(AWindow* lWindow, AWindow* rWindow, SelectionWindow* selWindow);
     ~LRContainer();
 
     virtual bool IsFocus() override;
@@ -42,8 +40,6 @@ public:
     virtual void OnLeftUp(int x, int y) override;
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
-    virtual void OnMouseHover(int key, int x, int y) override;
-    virtual void OnMouseLeave() override;
     virtual void OnFocus() override;
     virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
@@ -53,22 +49,20 @@ public:
 
     void UpdateFocus();
     void FreeWindow();
-    IWindow* GetLeftWindow();
-    IWindow* GetRightWindow();
+    AWindow* GetLeftWindow();
+    AWindow* GetRightWindow();
     void EnableDrag();
     void DisableDrag();
     bool DragEnabled();
 };
 
-class UDContainer final : public IWindow {
+class UDContainer final : public AWindow {
 private:
-    IWindow* uWindow;
-    IWindow* dWindow;
+    AWindow* uWindow;
+    AWindow* dWindow;
     int dis = 1;
-    IWindow* focus = NULL;
+    AWindow* focusWindow = NULL;
     bool up = false;
-    Vector2 size = Vector2(0.0f, 2.0f);
-    Vector2 cursorPos;
     bool adjustPos = false;
     bool dragEnable = true;
 
@@ -79,8 +73,8 @@ private:
     void InitMenu();
 
 public:
-    UDContainer(IWindow* uWindow, IWindow* dWindow);
-    UDContainer(IWindow* uWindow, IWindow* dWindow, SelectionWindow* selWindow);
+    UDContainer(AWindow* uWindow, AWindow* dWindow);
+    UDContainer(AWindow* uWindow, AWindow* dWindow, SelectionWindow* selWindow);
     virtual ~UDContainer() override;
 
     virtual bool IsFocus() override;
@@ -96,8 +90,6 @@ public:
     virtual void OnLeftUp(int x, int y) override;
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
-    virtual void OnMouseHover(int key, int x, int y) override;
-    virtual void OnMouseLeave() override;
     virtual void OnFocus() override;
     virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
@@ -107,26 +99,23 @@ public:
 
     void UpdateFocus();
     void FreeWindow();
-    IWindow* GetUpWindow();
-    IWindow* GetDownWindow();
+    AWindow* GetUpWindow();
+    AWindow* GetDownWindow();
     void EnableDrag();
     void DisableDrag();
     bool DragEnabled();
 };
 
-class SelectionWindow final : public IWindow {
+class SelectionWindow final : public AWindow {
 private:
-    IWindow* curWindow;
+    AWindow* curWindow;
     Menu* selMenu;
-
-    int sizeX, sizeY;
-    int cursorX, cursorY;
 
     void InitMenu();
 
 public:
     SelectionWindow();
-    SelectionWindow(IWindow* initialWnd);
+    SelectionWindow(AWindow* initialWnd);
     virtual ~SelectionWindow() override;
 
     virtual bool IsFocus() override;
@@ -142,8 +131,6 @@ public:
     virtual void OnLeftUp(int x, int y) override;
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
-    virtual void OnMouseHover(int key, int x, int y) override;
-    virtual void OnMouseLeave() override;
     virtual void OnFocus() override;
     virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
@@ -151,8 +138,8 @@ public:
     virtual void OnDropFileA(const char* path) override;
     virtual void OnDropFileW(const wchar_t* path) override;
 
-    IWindow* GetWindow();
-    void SetWindow(IWindow* window, bool del = true);
+    AWindow* GetWindow();
+    void SetWindow(AWindow* window, bool del = true);
 };
 
 #endif

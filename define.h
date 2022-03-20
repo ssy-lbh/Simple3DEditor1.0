@@ -49,6 +49,8 @@ class Face;
 class Mesh;
 
 // vecmath
+class Rect;
+class Camera;
 class Vector2;
 class Point2;
 class Vector3;
@@ -62,10 +64,10 @@ class Matrix2x3;
 class Matrix2x4;
 
 // viewobject
+enum class ViewObjectType;
 class Transform;
 class RenderOptions;
 class SelectInfo;
-enum class ViewObjectType;
 class AViewObject;
 class MeshObject;
 class BezierCurveObject;
@@ -74,6 +76,7 @@ class AudioListenerObject;
 class CameraObject;
 
 // main
+enum class SelectionType;
 class IUndo;
 enum class ObjectOperation;
 class MainWindow;
@@ -96,11 +99,6 @@ class ColorBoard;
 class AudioUtils;
 class AudioPlayerWindow;
 class AudioCaptureWindow;
-
-// attrtable
-enum class AttributeType;
-class Attribute;
-class AttributeTable;
 
 // anim
 class IAnimationFunction;
@@ -146,6 +144,7 @@ class TreeWindow;
 
 // uimgr
 class UIManager;
+class GUIManager;
 class IButton;
 class IconButton;
 class UIEditA;
@@ -153,6 +152,11 @@ class UIEditW;
 class IOperation;
 class ITool;
 class IWindow;
+class AWindow;
+enum class HoverType {
+    LEFT,
+    RIGHT
+};
 
 // appframe
 class AppFrame;

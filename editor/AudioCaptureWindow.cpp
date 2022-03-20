@@ -99,7 +99,7 @@ AudioCaptureWindow::AudioCaptureWindow(){
     //SoundTouch 貌似在我的电脑上性能有限，不能很好做到实时变音
     soundTouch = new soundtouch::SoundTouch();
     soundTouch->setChannels(1);
-    soundTouch->setSampleRate(freq);
+    soundTouch->setSampleRate(FREQUENCY);
     soundTouch->setPitchSemiTones(0);
     soundTouch->setTempo(1.0f);
     soundTouch->clear();
@@ -125,16 +125,16 @@ AudioCaptureWindow::AudioCaptureWindow(){
     }, this));
 
     alGenSources(1, &alSrc);
-    alGenBuffers(1 << queueBit, alBuf);
+    alGenBuffers(QUEUE_SIZE, alBuf);
     alSourcePlay(alSrc);
 
-    capBuf = new short[1 << bit];
-    memset(capBuf, 0, (1 << (bit + 1)));
+    capBuf = new short[SAMPLE_SIZE];
+    memset(capBuf, 0, (SAMPLE_SIZE << 1));
     
-    recBuf = new short[1 << bit];
-    memset(recBuf, 0, (1 << (bit + 1)));
+    recBuf = new short[SAMPLE_SIZE];
+    memset(recBuf, 0, (SAMPLE_SIZE << 1));
 
-    freqBuf = new Complex[1 << bit];
+    freqBuf = new Complex[SAMPLE_SIZE];
 }
 
 AudioCaptureWindow::~AudioCaptureWindow(){
@@ -152,42 +152,50 @@ AudioCaptureWindow::~AudioCaptureWindow(){
     }
 }
 
+void AudioCaptureWindow::UpdateCursor(int x, int y){
+    AWindow::UpdateCursor(x, y);
+}
+
+void AudioCaptureWindow::UpdateWindowSize(int x, int y){
+    AWindow::UpdateWindowSize(x, y);
+}
+
 void AudioCaptureWindow::ProcessInput(){
     ALint cnt;
-    ALint offset = (capOffset & ((1 << bit) - 1));
+    ALint offset = (capOffset & SAMPLE_MASK);
     float sum;
 
     alcGetIntegerv(capDev, ALC_CAPTURE_SAMPLES, 1, &cnt);
-    cnt = Min(cnt, (1 << bit) - offset);
+    cnt = Min(cnt, (SAMPLE_SIZE) - offset);
 
     alcCaptureSamples(capDev, (soundtouch::SAMPLETYPE*)capBuf + offset, cnt);
 
-    if (soundTouch->numUnprocessedSamples() <= (1 << (bit + queueBit)) && tail - head < (1 << queueBit) - 1){
+    if (soundTouch->numUnprocessedSamples() <= (1 << (SAMPLE_SIZE_BIT + QUEUE_SIZE_BIT)) && tail - head < (QUEUE_SIZE) - 1){
         soundTouch->putSamples((soundtouch::SAMPLETYPE*)capBuf + offset, cnt);
     }
 
     capOffset += cnt;
     
     if (displayWave && adjustWave){
-        for (int i = 0; i < (1 << bit); i++){
-            short val = ((short*)capBuf)[(i + capOffset) & ((1 << bit) - 1)];
+        for (int i = 0; i < (SAMPLE_SIZE); i++){
+            short val = ((short*)capBuf)[(i + capOffset) & SAMPLE_MASK];
             freqBuf[i] = val;
             sum += Abs((float)val);
         }
-        if (sum * ratio < (1ll << (bit + 15)) * 0.01f){
+        if (sum * ratio < (1ll << (SAMPLE_SIZE_BIT + 15)) * 0.01f){
             if (ratio < 100)
                 ratio *= 10;
-        }else if (sum * ratio > (1ll << (bit + 15))){
+        }else if (sum * ratio > (1ll << (SAMPLE_SIZE_BIT + 15))){
             if (ratio > 1)
                 ratio /= 10;
         }
     }else{
-        for (int i = 0; i < (1 << bit); i++){
-            freqBuf[i] = ((short*)capBuf)[(i + capOffset) & ((1 << bit) - 1)];
+        for (int i = 0; i < (SAMPLE_SIZE); i++){
+            freqBuf[i] = ((short*)capBuf)[(i + capOffset) & SAMPLE_MASK];
         }
     }
 
-    AudioUtils::FFT(freqBuf, bit, false);
+    AudioUtils::FFT(freqBuf, SAMPLE_SIZE_BIT, false);
 
     if (displayWave){
         glDisable(GL_LINE_SMOOTH);
@@ -197,13 +205,13 @@ void AudioCaptureWindow::ProcessInput(){
         if (adjustWave){
             for (int i = 0; i < 1024; i++){
                 float rate = i / 1024.0f;
-                float amp = Clamp(((short*)capBuf)[((i << (bit - 10)) + capOffset) & ((1 << bit) - 1)] * 0.000030517578125f * ratio, -1.0f, 1.0f);
+                float amp = Clamp(((short*)capBuf)[((i << (SAMPLE_SIZE_BIT - 10)) + capOffset) & SAMPLE_MASK] * 0.000030517578125f * ratio, -1.0f, 1.0f);
                 glVertex2f(rate * 2.0f - 1.0f, (amp + 1.0f) * 0.5f);
             }
         }else{
             for (int i = 0; i < 1024; i++){
                 float rate = i / 1024.0f;
-                float amp = Clamp(((short*)capBuf)[((i << (bit - 10)) + capOffset) & ((1 << bit) - 1)] * 0.000030517578125f, -1.0f, 1.0f);
+                float amp = Clamp(((short*)capBuf)[((i << (SAMPLE_SIZE_BIT - 10)) + capOffset) & SAMPLE_MASK] * 0.000030517578125f, -1.0f, 1.0f);
                 glVertex2f(rate * 2.0f - 1.0f, (amp + 1.0f) * 0.5f);
             }
         }
@@ -214,7 +222,7 @@ void AudioCaptureWindow::ProcessInput(){
         glBegin(GL_LINES);
         for (int i = 0; i < 1024; i++){
             float rate = i / 1024.0f;
-            float amp = Clamp(Log(freqBuf[i << (bit - 10)].SqrMagnitude()) * 0.1f, 2.0f / size.y, 1.0f);
+            float amp = Clamp(Log(freqBuf[i << (SAMPLE_SIZE_BIT - 10)].SqrMagnitude()) * 0.1f, 2.0f / cliSize.y, 1.0f);
             glColor3f(rate, 1.0f - rate, 0.0f);
             glVertex2f(rate * 2.0f - 1.0f, (-amp + 1.0f) * 0.5f);
             glVertex2f(rate * 2.0f - 1.0f, (amp + 1.0f) * 0.5f);
@@ -225,19 +233,19 @@ void AudioCaptureWindow::ProcessInput(){
 
 void AudioCaptureWindow::ProcessOutput(){
     ALint cnt;
-    ALint offset = (recOffset & ((1 << bit) - 1));
+    ALint offset = (recOffset & SAMPLE_MASK);
 
-    cnt = Min((ALint)soundTouch->numSamples(), (1 << bit) - offset);
+    cnt = Min((ALint)soundTouch->numSamples(), (SAMPLE_SIZE) - offset);
 
     soundTouch->receiveSamples((soundtouch::SAMPLETYPE*)recBuf + offset, cnt);
-    if (cnt == (1 << bit) - offset)
-        UpdateBuffer(recBuf, 1 << (bit + 1));
+    if (cnt == (SAMPLE_SIZE) - offset)
+        UpdateBuffer(recBuf, 1 << (SAMPLE_SIZE_BIT + 1));
     
     recOffset += cnt;
 
-    for (int i = 0; i < (1 << bit); i++)
-        freqBuf[i] = ((short*)recBuf)[(i + recOffset) & ((1 << bit) - 1)];
-    AudioUtils::FFT(freqBuf, bit, false);
+    for (int i = 0; i < (SAMPLE_SIZE); i++)
+        freqBuf[i] = ((short*)recBuf)[(i + recOffset) & SAMPLE_MASK];
+    AudioUtils::FFT(freqBuf, SAMPLE_SIZE_BIT, false);
 
     if (displayWave){
         glDisable(GL_LINE_SMOOTH);
@@ -247,13 +255,13 @@ void AudioCaptureWindow::ProcessOutput(){
         if (adjustWave){
             for (int i = 0; i < 1024; i++){
                 float rate = i / 1024.0f;
-                float amp = Clamp(((short*)recBuf)[((i << (bit - 10)) + recOffset) & ((1 << bit) - 1)] * 0.000030517578125f * ratio, -1.0f, 1.0f);
+                float amp = Clamp(((short*)recBuf)[((i << (SAMPLE_SIZE_BIT - 10)) + recOffset) & SAMPLE_MASK] * 0.000030517578125f * ratio, -1.0f, 1.0f);
                 glVertex2f(rate * 2.0f - 1.0f, (amp - 1.0f) * 0.5f);
             }
         }else{
             for (int i = 0; i < 1024; i++){
                 float rate = i / 1024.0f;
-                float amp = Clamp(((short*)recBuf)[((i << (bit - 10)) + recOffset) & ((1 << bit) - 1)] * 0.000030517578125f, -1.0f, 1.0f);
+                float amp = Clamp(((short*)recBuf)[((i << (SAMPLE_SIZE_BIT - 10)) + recOffset) & SAMPLE_MASK] * 0.000030517578125f, -1.0f, 1.0f);
                 glVertex2f(rate * 2.0f - 1.0f, (amp - 1.0f) * 0.5f);
             }
         }
@@ -264,17 +272,13 @@ void AudioCaptureWindow::ProcessOutput(){
         glBegin(GL_LINES);
         for (int i = 0; i < 1024; i++){
             float rate = i / 1024.0f;
-            float amp = Clamp(Log(freqBuf[i << (bit - 10)].SqrMagnitude()) * 0.1f, 2.0f / size.y, 1.0f);
+            float amp = Clamp(Log(freqBuf[i << (SAMPLE_SIZE_BIT - 10)].SqrMagnitude()) * 0.1f, 2.0f / cliSize.y, 1.0f);
             glColor3f(rate, 1.0f - rate, 0.0f);
             glVertex2f(rate * 2.0f - 1.0f, (-amp - 1.0f) * 0.5f);
             glVertex2f(rate * 2.0f - 1.0f, (amp - 1.0f) * 0.5f);
         }
         glEnd();
     }
-}
-
-bool AudioCaptureWindow::IsFocus(){
-    return focus;
 }
 
 void AudioCaptureWindow::OnRender(){
@@ -314,53 +318,35 @@ void AudioCaptureWindow::OnChar(char c){}
 void AudioCaptureWindow::OnUnichar(wchar_t c){}
 
 void AudioCaptureWindow::OnResize(int x, int y){
-    size.x = x;
-    size.y = y;
+    UpdateWindowSize(x, y);
 }
 
 void AudioCaptureWindow::OnMouseMove(int x, int y){
-    cursorPos.x = 2.0f * x / size.x - 1.0f;
-    cursorPos.y = 2.0f * y / size.y - 1.0f;
+    UpdateCursor(x, y);
     uiMgr->CursorMove(cursorPos);
 }
 
 void AudioCaptureWindow::OnLeftDown(int x, int y){
-    cursorPos.x = 2.0f * x / size.x - 1.0f;
-    cursorPos.y = 2.0f * y / size.y - 1.0f;
+    UpdateCursor(x, y);
     uiMgr->CursorMove(cursorPos);
     uiMgr->LeftDown();
 }
 
 void AudioCaptureWindow::OnLeftUp(int x, int y){
-    cursorPos.x = 2.0f * x / size.x - 1.0f;
-    cursorPos.y = 2.0f * y / size.y - 1.0f;
+    UpdateCursor(x, y);
     uiMgr->CursorMove(cursorPos);
     uiMgr->LeftUp();
 }
 
 void AudioCaptureWindow::OnRightDown(int x, int y){
-    cursorPos.x = 2.0f * x / size.x - 1.0f;
-    cursorPos.y = 2.0f * y / size.y - 1.0f;
+    UpdateCursor(x, y);
     uiMgr->CursorMove(cursorPos);
     Main::SetMenu(basicMenu);
 }
 
 void AudioCaptureWindow::OnRightUp(int x, int y){
-    cursorPos.x = 2.0f * x / size.x - 1.0f;
-    cursorPos.y = 2.0f * y / size.y - 1.0f;
+    UpdateCursor(x, y);
     uiMgr->CursorMove(cursorPos);
-}
-
-void AudioCaptureWindow::OnMouseHover(int key, int x, int y){}
-
-void AudioCaptureWindow::OnMouseLeave(){}
-
-void AudioCaptureWindow::OnFocus(){
-    focus = true;
-}
-
-void AudioCaptureWindow::OnKillFocus(){
-    focus = false;
 }
 
 void AudioCaptureWindow::OnMouseWheel(int delta){}
@@ -401,14 +387,14 @@ void AudioCaptureWindow::UpdateBuffer(void* buf, int size){
     int cnt;
     int state;
 
-    //DebugLog("AudioCaptureWindow %p Queue Buffer %d %d", this, head, alBuf[head & queueMask]);
-    alBufferData(alBuf[head & queueMask], AL_FORMAT_MONO16, buf, size, freq);
-    alSourceQueueBuffers(alSrc, 1, &alBuf[(head++) & queueMask]);
+    //DebugLog("AudioCaptureWindow %p Queue Buffer %d %d", this, head, alBuf[head & QUEUE_MASK]);
+    alBufferData(alBuf[head & QUEUE_MASK], AL_FORMAT_MONO16, buf, size, FREQUENCY);
+    alSourceQueueBuffers(alSrc, 1, &alBuf[(head++) & QUEUE_MASK]);
 
     alGetSourcei(alSrc, AL_BUFFERS_PROCESSED, &cnt);
     while (cnt--){
-        //DebugLog("AudioCaptureWindow %p Unqueue Buffer %d %d", this, tail, alBuf[tail & queueMask]);
-        alSourceUnqueueBuffers(alSrc, 1, &alBuf[(tail++) & queueMask]);
+        //DebugLog("AudioCaptureWindow %p Unqueue Buffer %d %d", this, tail, alBuf[tail & QUEUE_MASK]);
+        alSourceUnqueueBuffers(alSrc, 1, &alBuf[(tail++) & QUEUE_MASK]);
     }
 
     alGetSourcei(alSrc, AL_SOURCE_STATE, &state);
@@ -422,7 +408,7 @@ bool AudioCaptureWindow::SetCaptureDevice(const char* name){
         return true;
     }
 
-    capDev = alcCaptureOpenDevice(name, freq, AL_FORMAT_MONO16, 1 << (bit + queueBit));
+    capDev = alcCaptureOpenDevice(name, FREQUENCY, AL_FORMAT_MONO16, 1 << (SAMPLE_SIZE_BIT + QUEUE_SIZE_BIT));
 
     if (!capDev){
         DebugError("AudioCaptureWindow::SetCaptureDevice Capture Device %s Not Found", name ? name : "(default)");

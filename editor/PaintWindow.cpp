@@ -201,10 +201,6 @@ PaintWindow::~PaintWindow(){
     if (paintTex) delete paintTex;
 }
 
-bool PaintWindow::IsFocus(){
-    return focus;
-}
-
 void PaintWindow::OnCreate(){
     CreateImage(500, 500);
     SetBrush(new DefaultBrush(this, IDS_BRUSH_OVERLAY));
@@ -307,14 +303,6 @@ void PaintWindow::OnRightUp(int x, int y){
     }
 }
 
-void PaintWindow::OnFocus(){
-    focus = true;
-}
-
-void PaintWindow::OnKillFocus(){
-    focus = false;
-}
-
 void PaintWindow::OnMenuAccel(int id, bool accel){
     switch (id){
     case IDM_TEXTURE_USE_PAINT:{
@@ -354,8 +342,8 @@ void PaintWindow::OnMenuAccel(int id, bool accel){
 }
 
 void PaintWindow::UpdateCursor(int x, int y){
-    cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
-    cursorPos.y = 1.0f - 2.0f * y / cliSize.y;
+    AWindow::UpdateCursor(x, y);
+    cursorPos.y = -cursorPos.y;
     if (curOp)
         curOp->OnMove();
     if (brush)
@@ -363,9 +351,7 @@ void PaintWindow::UpdateCursor(int x, int y){
 }
 
 void PaintWindow::UpdateWindowSize(int x, int y){
-    cliSize.x = x;
-    cliSize.y = y;
-    aspect = cliSize.x / cliSize.y;
+    AWindow::UpdateWindowSize(x, y);
 }
 
 void PaintWindow::SetOperation(IOperation* op){

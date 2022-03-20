@@ -9,7 +9,7 @@
 #include <utils/gl/GLUtils.h>
 #include <utils/math3d/Mesh.h>
 #include <utils/math3d/Geometry.h>
-#include <utils/math3d/ViewObject.h>
+#include <editor/main/ViewObject.h>
 
 UVEditWindow::MoveOperation::MoveOperation(UVEditWindow* main) : main(main) {}
 UVEditWindow::MoveOperation::~MoveOperation(){}
@@ -116,10 +116,6 @@ UVEditWindow::~UVEditWindow(){
     DebugLog("UVEditWindow Destroyed");
     if (curOp) delete curOp;
     if (curTool) delete curTool;
-}
-
-bool UVEditWindow::IsFocus(){
-    return focus;
 }
 
 void UVEditWindow::OnRender(){
@@ -235,14 +231,6 @@ void UVEditWindow::OnRightUp(int x, int y){
     }
 }
 
-void UVEditWindow::OnFocus(){
-    focus = true;
-}
-
-void UVEditWindow::OnKillFocus(){
-    focus = false;
-}
-
 void UVEditWindow::OnMenuAccel(int id, bool accel){
     switch (id){
     case IDM_MOVE:
@@ -276,8 +264,7 @@ void UVEditWindow::OnDropFileW(const wchar_t* path){
 }
 
 void UVEditWindow::UpdateCursor(int x, int y){
-    cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
-    cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
+    AWindow::UpdateCursor(x, y);
     if (curOp)
         curOp->OnMove();
     if (curTool)
@@ -285,9 +272,7 @@ void UVEditWindow::UpdateCursor(int x, int y){
 }
 
 void UVEditWindow::UpdateWindowSize(int x, int y){
-    cliSize.x = x;
-    cliSize.y = y;
-    aspect = cliSize.x / cliSize.y;
+    AWindow::UpdateWindowSize(x, y);
 }
 
 void UVEditWindow::SetOperation(IOperation* op){

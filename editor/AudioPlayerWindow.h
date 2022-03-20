@@ -15,9 +15,13 @@ struct AudioWaveFormat {
     short wBitsPerSample;
 };
 
-class AudioPlayerWindow final : public IWindow {
+class AudioPlayerWindow final : public AWindow {
 private:
-    const int bit = 12;
+    static const int SAMPLE_SIZE_BIT = 12;
+    static const int SAMPLE_SIZE = (1 << SAMPLE_SIZE_BIT);
+    static const int SAMPLE_MASK = (SAMPLE_SIZE - 1);
+    static const int GRAPH_SIZE_BIT = 10;
+    static const int GRAPH_SIZE = (1 << GRAPH_SIZE_BIT);
     
     bool focus = false;
     Vector2 size = Vector2::one;
@@ -166,8 +170,6 @@ public:
     virtual void OnLeftUp(int x, int y) override;
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
-    virtual void OnMouseHover(int key, int x, int y) override;
-    virtual void OnMouseLeave() override;
     virtual void OnFocus() override;
     virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;

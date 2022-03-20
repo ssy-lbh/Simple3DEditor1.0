@@ -554,4 +554,40 @@ public:
     Vector2 GetScale() const;
 };
 
+class Rect final : public Object {
+public:
+    float left;
+    float right;
+    float bottom;
+    float top;
+
+    static const Rect zero;
+
+    Rect();
+    Rect(Vector2 p1, Vector2 p2);
+    Rect(float left, float right, float bottom, float top);
+    ~Rect();
+
+    float GetAspect() const;
+    float GetWidth() const;
+    float GetHeight() const;
+    Vector2 GetSize() const;
+    bool Inside(Vector2 pos) const;
+    float GetXRatio(float x) const;
+    float GetYRatio(float y) const;
+    Vector2 GetRatio(float x, float y) const;
+    Vector2 GetRatio(Vector2 pos) const;
+    float GetXRatioPos(float ratio) const;
+    float GetYRatioPos(float ratio) const;
+    Vector2 GetRatioPos(float ratioX, float ratioY) const;
+    Vector2 GetRatioPos(Vector2 ratio) const;
+    float MapXPos(Rect rect, float x) const;
+    float MapYPos(Rect rect, float y) const;
+    // 把pos在rect中所在的位置比例映射到自身中位置
+    Vector2 MapPos(Rect rect, Vector2 pos) const;
+    Vector2 MapPos(Rect rect, float x, float y) const;
+    Rect ChildRect(Rect ratio) const;
+    Rect ChildRect(float left, float right, float bottom, float top) const;
+};
+
 #endif

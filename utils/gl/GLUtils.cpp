@@ -7,108 +7,6 @@
 #include <utils/math3d/Math.h>
 #include <utils/math3d/LinearAlgebra.h>
 
-GLRect::GLRect(){}
-
-GLRect::GLRect(Vector2 p1, Vector2 p2) : left(p1.x), right(p2.x), top(p1.y), bottom(p2.y) {
-    Sort(left, right); Sort(bottom, top);
-}
-
-GLRect::GLRect(float left, float right, float bottom, float top)
-    : left(left), right(right), bottom(bottom), top(top) {
-    Sort(left, right); Sort(bottom, top);
-}
-
-GLRect::~GLRect(){}
-
-const GLRect GLRect::zero = GLRect(0.0f, 0.0f, 0.0f, 0.0f);
-
-float GLRect::GetAspect() const{
-    return (right - left) / (top - bottom);
-}
-
-float GLRect::GetWidth() const{
-    return right - left;
-}
-
-float GLRect::GetHeight() const{
-    return top - bottom;
-}
-
-Vector2 GLRect::GetSize() const{
-    return Vector2(right - left, top - bottom);
-}
-
-bool GLRect::Inside(Vector2 pos) const{
-    return pos.x >= left && pos.x <= right &&
-            pos.y >= bottom && pos.y <= top;
-}
-
-float GLRect::GetXRatio(float x) const{
-    return GetRate(x, left, right);
-}
-
-float GLRect::GetYRatio(float y) const{
-    return GetRate(y, bottom, top);
-}
-
-Vector2 GLRect::GetRatio(float x, float y) const{
-    return Vector2(GetRate(x, left, right), GetRate(y, bottom, top));
-}
-
-Vector2 GLRect::GetRatio(Vector2 pos) const{
-    return GetRatio(pos.x, pos.y);
-}
-
-float GLRect::GetXRatioPos(float ratio) const{
-    return Lerp(left, right, ratio);
-}
-
-float GLRect::GetYRatioPos(float ratio) const{
-    return Lerp(bottom, top, ratio);
-}
-
-Vector2 GLRect::GetRatioPos(float ratioX, float ratioY) const{
-    return Vector2(Lerp(left, right, ratioX), Lerp(bottom, top, ratioY));
-}
-
-Vector2 GLRect::GetRatioPos(Vector2 ratio) const{
-    return GetRatioPos(ratio.x, ratio.y);
-}
-
-float GLRect::MapXPos(GLRect rect, float x) const{
-    return GetXRatioPos(rect.GetXRatio(x));
-}
-
-float GLRect::MapYPos(GLRect rect, float y) const{
-    return GetYRatioPos(rect.GetYRatio(y));
-}
-
-Vector2 GLRect::MapPos(GLRect rect, Vector2 pos) const{
-    return GetRatioPos(rect.GetRatio(pos));
-}
-
-Vector2 GLRect::MapPos(GLRect rect, float x, float y) const{
-    return GetRatioPos(rect.GetRatio(x, y));
-}
-
-GLRect GLRect::ChildRect(GLRect ratio) const{
-    return ChildRect(ratio.left, ratio.right, ratio.bottom, ratio.top);
-}
-
-GLRect GLRect::ChildRect(float left, float right, float bottom, float top) const{
-    GLRect rect;
-    Vector2 size;
-
-    size = GetSize();
-
-    rect.left = this->left + Round(size.x * Clamp((left + 1.0f) * 0.5f, 0.0f, 1.0f));
-    rect.right = this->left + Round(size.x * Clamp((right + 1.0f) * 0.5f, 0.0f, 1.0f));
-    rect.bottom = this->bottom + Round(size.y * Clamp((bottom + 1.0f) * 0.5f, 0.0f, 1.0f));
-    rect.top = this->bottom + Round(size.y * Clamp((top + 1.0f) * 0.5f, 0.0f, 1.0f));
-
-    return rect;
-}
-
 bool GLUtils::CheckGLError(const char* tag, const char* file, int line){
     int loopCnt = 0;
 	for (GLenum error = glGetError(); loopCnt < 32 && error != GL_NO_ERROR; error = glGetError(), ++loopCnt){
@@ -176,11 +74,11 @@ void GLUtils::DrawCornerWithUV(Vector2 center, float start, float end, float rad
     DrawCornerWithUV(center.x, center.y, start, end, radius, step);
 }
 
-void GLUtils::DrawCornerWithUV(float x, float y, float start, float end, float radius, GLRect uvBound, float step){
+void GLUtils::DrawCornerWithUV(float x, float y, float start, float end, float radius, Rect uvBound, float step){
     DrawCornerWithUV(Vector2(x, y), start, end, radius, uvBound, step);
 }
 
-void GLUtils::DrawCornerWithUV(Vector2 center, float start, float end, float radius, GLRect uvBound, float step){
+void GLUtils::DrawCornerWithUV(Vector2 center, float start, float end, float radius, Rect uvBound, float step){
     float vsin, vcos;
 
     start = ToRadian(start);
@@ -253,11 +151,11 @@ void GLUtils::Clear3DViewport(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-bool GLUtils::InRect(float x, float y, GLRect rect){
+bool GLUtils::InRect(float x, float y, Rect rect){
     return x >= rect.left && x <= rect.right && y >= rect.bottom && y <= rect.top;
 }
 
-bool GLUtils::InRect(Vector2 v, GLRect rect){
+bool GLUtils::InRect(Vector2 v, Rect rect){
     return v.x >= rect.left && v.x <= rect.right && v.y >= rect.bottom && v.y <= rect.top;
 }
 
@@ -333,18 +231,18 @@ void GLUtils::DrawRoundRect(float x, float y, float width, float height, Vector2
     glEnd();
 }
 
-void GLUtils::DrawRoundRect(GLRect rect, float radius, float step){
+void GLUtils::DrawRoundRect(Rect rect, float radius, float step){
     DrawRoundRect(rect.left, rect.bottom, rect.GetWidth(), rect.GetHeight(), radius, step);
 }
 
-void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, float step){
-    GLRect uvBound;
+void GLUtils::DrawRoundRectWithUV(Rect rect, float radius, float step){
+    Rect uvBound;
     uvBound.left = 0.0f; uvBound.right = 1.0f;
     uvBound.bottom = 1.0f; uvBound.top = 0.0f;
     DrawRoundRectWithUV(rect, radius, uvBound, step);
 }
 
-void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, GLRect uvBound, float step){
+void GLUtils::DrawRoundRectWithUV(Rect rect, float radius, Rect uvBound, float step){
     float width = rect.GetWidth(), height = rect.GetHeight();
     float xmin = rect.left + radius, xmax = rect.left + width - radius;
     float ymax = rect.bottom + height - radius, ymin = rect.bottom + radius;
@@ -356,29 +254,29 @@ void GLUtils::DrawRoundRectWithUV(GLRect rect, float radius, GLRect uvBound, flo
     float ymaxUV = uvBound.GetYRatioPos(rect.GetYRatio(ymax));
 
     GLUtils::DrawCornerWithUV(xmin, ymax, 90.0f, 180.0f, radius,
-        GLRect(uvBound.left, xminUV, ymaxUV, uvBound.top), step);
+        Rect(uvBound.left, xminUV, ymaxUV, uvBound.top), step);
     GLUtils::DrawCornerWithUV(xmax, ymax, 0.0f, 90.0f, radius,
-        GLRect(xmaxUV, uvBound.right, ymaxUV, uvBound.top), step);
+        Rect(xmaxUV, uvBound.right, ymaxUV, uvBound.top), step);
     GLUtils::DrawCornerWithUV(xmin, ymin, 180.0f, 270.0f, radius,
-        GLRect(uvBound.left, xminUV, uvBound.bottom, yminUV), step);
+        Rect(uvBound.left, xminUV, uvBound.bottom, yminUV), step);
     GLUtils::DrawCornerWithUV(xmax, ymin, 270.0f, 360.0f, radius,
-        GLRect(xmaxUV, uvBound.right, uvBound.bottom, yminUV), step);
+        Rect(xmaxUV, uvBound.right, uvBound.bottom, yminUV), step);
 
     GLUtils::DrawRectWithUV(
-        GLRect(xmin, xmax, rect.bottom, rect.top),
-        GLRect(xminUV, xmaxUV, uvBound.bottom, uvBound.top)
+        Rect(xmin, xmax, rect.bottom, rect.top),
+        Rect(xminUV, xmaxUV, uvBound.bottom, uvBound.top)
     );
     GLUtils::DrawRectWithUV(
-        GLRect(rect.left, xmin, ymin, ymax),
-        GLRect(uvBound.left, xminUV, yminUV, ymaxUV)
+        Rect(rect.left, xmin, ymin, ymax),
+        Rect(uvBound.left, xminUV, yminUV, ymaxUV)
     );
     GLUtils::DrawRectWithUV(
-        GLRect(xmax, rect.right, ymin, ymax),
-        GLRect(xmaxUV, uvBound.right, yminUV, ymaxUV)
+        Rect(xmax, rect.right, ymin, ymax),
+        Rect(xmaxUV, uvBound.right, yminUV, ymaxUV)
     );
 }
 
-void GLUtils::DrawRect(GLRect rect){
+void GLUtils::DrawRect(Rect rect){
     glBegin(GL_TRIANGLE_FAN);
     glVertex2f(rect.left, rect.bottom);
     glVertex2f(rect.left, rect.top);
@@ -405,7 +303,7 @@ void GLUtils::DrawRect(float x1, float y1, float x2, float y2){
     glEnd();
 }
 
-void GLUtils::DrawRectWithUV(GLRect rect){
+void GLUtils::DrawRectWithUV(Rect rect){
     glBegin(GL_TRIANGLE_FAN);
     glTexCoord2f(0.0f, 1.0f); glVertex2f(rect.left, rect.bottom);
     glTexCoord2f(0.0f, 0.0f); glVertex2f(rect.left, rect.top);
@@ -414,7 +312,7 @@ void GLUtils::DrawRectWithUV(GLRect rect){
     glEnd();
 }
 
-void GLUtils::DrawRectWithUV(GLRect rect, GLRect uvBound){
+void GLUtils::DrawRectWithUV(Rect rect, Rect uvBound){
     glBegin(GL_TRIANGLE_FAN);
     glTexCoord2f(uvBound.left, uvBound.bottom); glVertex2f(rect.left, rect.bottom);
     glTexCoord2f(uvBound.left, uvBound.top); glVertex2f(rect.left, rect.top);

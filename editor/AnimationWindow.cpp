@@ -8,8 +8,8 @@
 #include <utils/os/Font.h>
 #include <utils/gl/GLUtils.h>
 #include <utils/math3d/Math.h>
-#include <utils/math3d/ViewObject.h>
 #include <utils/math3d/Property.h>
+#include <editor/main/ViewObject.h>
 #include <editor/gui/AnimationCurve.h>
 
 AnimationWindow::FrameIndicator::FrameIndicator(AnimationWindow* window) : window(window) {
@@ -277,10 +277,6 @@ AnimationWindow::~AnimationWindow(){
     if (basicMenu) delete basicMenu;
 }
 
-bool AnimationWindow::IsFocus(){
-    return focus;
-}
-
 void AnimationWindow::OnRender(){
     glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
     glClearDepth(1.0);
@@ -348,14 +344,6 @@ void AnimationWindow::OnRightUp(int x, int y){
     UpdateCursor(x, y);
 }
 
-void AnimationWindow::OnFocus(){
-    focus = true;
-}
-
-void AnimationWindow::OnKillFocus(){
-    focus = false;
-}
-
 void AnimationWindow::OnMouseWheel(int delta){
     uiMgr->Wheel(delta);
 }
@@ -369,17 +357,12 @@ void AnimationWindow::OnMenuAccel(int id, bool accel){
 }
 
 void AnimationWindow::UpdateCursor(int x, int y){
-    cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
-    cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
+    AWindow::UpdateCursor(x, y);
     uiMgr->CursorMove(cursorPos);
 }
 
 void AnimationWindow::UpdateWindowSize(int x, int y){
-    cliSize.x = x;
-    cliSize.y = y;
-    cliInvSize.x = 1.0f / cliSize.x;
-    cliInvSize.y = 1.0f / cliSize.y;
-    aspect = (float)cliSize.x / cliSize.y;
+    AWindow::UpdateWindowSize(x, y);
 }
 
 void AnimationWindow::SetCurve(AnimationCurve* curve){

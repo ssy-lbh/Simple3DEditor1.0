@@ -12,15 +12,19 @@
 #include <editor/UVEditWindow.h>
 #include <editor/RenderWindow.h>
 #include <editor/gui/Menu.h>
-#include <editor/gui/ViewManager.h>
+#include <editor/main/ViewManager.h>
 #include <utils/math3d/Math.h>
+#include <utils/math3d/LinearAlgebra.h>
+#include <utils/gl/GLUtils.h>
 #include <utils/os/Log.h>
 #include <utils/os/AppFrame.h>
-#include <utils/gl/GLUtils.h>
 
-LRContainer::LRContainer(IWindow* lWindow, IWindow* rWindow) : lWindow(lWindow), rWindow(rWindow) {}
+LRContainer::LRContainer(AWindow* lWindow, AWindow* rWindow) : lWindow(lWindow), rWindow(rWindow) {
+    cliSize = Vector2(2.0f, 0.0f);
+}
 
-LRContainer::LRContainer(IWindow* lWindow, IWindow* rWindow, SelectionWindow* selWindow) : selWindow(selWindow) {
+LRContainer::LRContainer(AWindow* lWindow, AWindow* rWindow, SelectionWindow* selWindow) : selWindow(selWindow) {
+    cliSize = Vector2(2.0f, 0.0f);
     this->lWindow = new SelectionWindow(lWindow);
     this->rWindow = new SelectionWindow(rWindow);
     InitMenu();
@@ -38,7 +42,7 @@ void LRContainer::InitMenu(){
         if (window->selWindow){
             delete window->rWindow;
             window->rWindow = NULL;
-            IWindow* curWindow = ((SelectionWindow*)window->lWindow)->GetWindow();
+            AWindow* curWindow = ((SelectionWindow*)window->lWindow)->GetWindow();
             ((SelectionWindow*)window->lWindow)->SetWindow(NULL, false);
             delete window->lWindow;
             window->lWindow = NULL;
@@ -49,7 +53,7 @@ void LRContainer::InitMenu(){
         if (window->selWindow){
             delete window->lWindow;
             window->lWindow = NULL;
-            IWindow* curWindow = ((SelectionWindow*)window->rWindow)->GetWindow();
+            AWindow* curWindow = ((SelectionWindow*)window->rWindow)->GetWindow();
             ((SelectionWindow*)window->rWindow)->SetWindow(NULL, false);
             delete window->rWindow;
             window->rWindow = NULL;
@@ -59,12 +63,12 @@ void LRContainer::InitMenu(){
 }
 
 bool LRContainer::IsFocus(){
-    return focus != NULL;
+    return focusWindow != NULL;
 }
 
 void LRContainer::OnRender(){
     ViewManager* viewMgr = ViewManager::GetLocalInst();
-    GLRect rect;
+    Rect rect;
 
     rect = viewMgr->GetRect();
     rect.right = rect.left + dis;
@@ -72,7 +76,7 @@ void LRContainer::OnRender(){
     if (lWindow){
         lWindow->OnRender();
     }else{
-        GLUtils::Clear3DViewport();
+        GLUtils::Clear2DViewport();
     }
     viewMgr->PopView();
 
@@ -82,7 +86,7 @@ void LRContainer::OnRender(){
     if (rWindow){
         rWindow->OnRender();
     }else{
-        GLUtils::Clear3DViewport();
+        GLUtils::Clear2DViewport();
     }
     viewMgr->PopView();
 }
@@ -103,64 +107,56 @@ void LRContainer::OnTimer(int id){
 }
 
 void LRContainer::OnChar(char c){
-    if (focus)
-        focus->OnChar(c);
+    if (focusWindow)
+        focusWindow->OnChar(c);
 }
 
 void LRContainer::OnUnichar(wchar_t c){
-    if (focus)
-        focus->OnUnichar(c);
+    if (focusWindow)
+        focusWindow->OnUnichar(c);
 }
 
 void LRContainer::OnResize(int x, int y){
-    if (x == 0 && y == 0){
-        return;
-    }
-    dis = Round(Clamp(dis * x / size.x, 0.0f, (float)x));
-    size.x = x;
-    size.y = y;
+    dis = Round(Clamp(dis * x / cliSize.x, 0.0f, (float)x));
+    AWindow::OnResize(x, y);
     if (lWindow) lWindow->OnResize(dis, y);
     if (rWindow) rWindow->OnResize(x - dis, y);
 }
 
 void LRContainer::OnMouseMove(int x, int y){
-    cursorPos.x = x;
-    cursorPos.y = y;
+    AWindow::OnMouseMove(x, y);
     if (adjustPos){
         Main::SetCursor(IDC_SIZEWE);
         dis = x;
-        if (lWindow) lWindow->OnResize(dis, size.y);
-        if (rWindow) rWindow->OnResize(size.x - dis, size.y);
+        if (lWindow) lWindow->OnResize(dis, cliSize.y);
+        if (rWindow) rWindow->OnResize(cliSize.x - dis, cliSize.y);
         return;
     }
-    if (focus)
-        focus->OnMouseMove(right ? x - dis : x, y);
+    if (focusWindow)
+        focusWindow->OnMouseMove(right ? x - dis : x, y);
 }
 
 void LRContainer::OnLeftDown(int x, int y){
-    cursorPos.x = x;
-    cursorPos.y = y;
+    AWindow::OnLeftDown(x, y);
     if (dragEnable && Abs(x - dis) < 4.0f){
         adjustPos = true;
         Main::SetCursor(IDC_SIZEWE);
         return;
     }
     UpdateFocus();
-    if (focus)
-        focus->OnLeftDown(right ? x - dis : x, y);
+    if (focusWindow)
+        focusWindow->OnLeftDown(right ? x - dis : x, y);
 }
 
 void LRContainer::OnLeftUp(int x, int y){
-    cursorPos.x = x;
-    cursorPos.y = y;
+    AWindow::OnLeftUp(x, y);
     adjustPos = false;
-    if (focus)
-        focus->OnLeftUp(right ? x - dis : x, y);
+    if (focusWindow)
+        focusWindow->OnLeftUp(right ? x - dis : x, y);
 }
 
 void LRContainer::OnRightDown(int x, int y){
-    cursorPos.x = x;
-    cursorPos.y = y;
+    AWindow::OnRightDown(x, y);
     if (selWindow && Abs(x - dis) < 4.0f){
         if (joinMenu){
             Main::SetMenu(joinMenu);
@@ -170,81 +166,76 @@ void LRContainer::OnRightDown(int x, int y){
         return;
     }
     UpdateFocus();
-    if (focus)
-        focus->OnRightDown(right ? x - dis : x, y);
+    if (focusWindow)
+        focusWindow->OnRightDown(right ? x - dis : x, y);
 }
 
 void LRContainer::OnRightUp(int x, int y){
-    cursorPos.x = x;
-    cursorPos.y = y;
-    if (focus)
-        focus->OnRightUp(right ? x - dis : x, y);
-}
-
-void LRContainer::OnMouseHover(int key, int x, int y){
-    if (focus)
-        focus->OnMouseHover(key, right ? x - dis : x, y);
-}
-
-void LRContainer::OnMouseLeave(){
-    if (focus)
-        focus->OnMouseLeave();
+    AWindow::OnRightUp(x, y);
+    if (focusWindow)
+        focusWindow->OnRightUp(right ? x - dis : x, y);
 }
 
 void LRContainer::OnFocus(){
+    AWindow::OnFocus();
     UpdateFocus();
 }
 
 void LRContainer::OnKillFocus(){
-    if (focus)
-        focus->OnKillFocus();
-    focus = NULL;
-    //DebugLog("LRContainer::focus %p", focus);
+    AWindow::OnKillFocus();
+    if (focusWindow)
+        focusWindow->OnKillFocus();
+    focusWindow = NULL;
+    //DebugLog("LRContainer::focusWindow %p", focusWindow);
 }
 
 void LRContainer::OnMouseWheel(int delta){
-    if (focus)
-        focus->OnMouseWheel(delta);
+    AWindow::OnMouseWheel(delta);
+    if (focusWindow)
+        focusWindow->OnMouseWheel(delta);
 }
 
 void LRContainer::OnMenuAccel(int id, bool accel){
-    if (focus)
-        focus->OnMenuAccel(id, accel);
+    AWindow::OnMenuAccel(id, accel);
+    if (focusWindow)
+        focusWindow->OnMenuAccel(id, accel);
 }
 
 void LRContainer::OnDropFileA(const char* path){
-    if (focus)
-        focus->OnDropFileA(path);
+    AWindow::OnDropFileA(path);
+    if (focusWindow)
+        focusWindow->OnDropFileA(path);
 }
 
 void LRContainer::OnDropFileW(const wchar_t* path){
-    if (focus)
-        focus->OnDropFileW(path);
+    AWindow::OnDropFileW(path);
+    if (focusWindow)
+        focusWindow->OnDropFileW(path);
 }
 
 void LRContainer::UpdateFocus(){
-    if (cursorPos.x < dis){
-        if (focus != lWindow){
-            if (focus)
-                focus->OnKillFocus();
+    if (cursorCoord.x < dis){
+        if (focusWindow != lWindow){
+            if (focusWindow)
+                focusWindow->OnKillFocus();
             if (lWindow)
                 lWindow->OnFocus();
         }
-        focus = lWindow;
+        focusWindow = lWindow;
         right = false;
     }else{
-        if (focus != rWindow){
-            if (focus)
-                focus->OnKillFocus();
+        if (focusWindow != rWindow){
+            if (focusWindow)
+                focusWindow->OnKillFocus();
             if (rWindow)
                 rWindow->OnFocus();
         }
-        focus = rWindow;
+        focusWindow = rWindow;
         right = true;
     }
-    if (focus)
-        focus->OnMouseMove(right ? cursorPos.x - dis : cursorPos.x, cursorPos.y);
-    //DebugLog("LRContainer::focus %p", focus);
+    if (focusWindow)
+        focusWindow->OnMouseMove(right ? cursorCoord.x - dis : cursorCoord.x, cursorCoord.y);
+    //DebugLog("LRContainer::focusWindow %p", focusWindow);
 }
 
 void LRContainer::FreeWindow(){
@@ -258,11 +249,11 @@ void LRContainer::FreeWindow(){
     }
 }
 
-IWindow* LRContainer::GetLeftWindow(){
+AWindow* LRContainer::GetLeftWindow(){
     return lWindow;
 }
 
-IWindow* LRContainer::GetRightWindow(){
+AWindow* LRContainer::GetRightWindow(){
     return rWindow;
 }
 
@@ -278,9 +269,12 @@ bool LRContainer::DragEnabled(){
     return dragEnable;
 }
 
-UDContainer::UDContainer(IWindow* uWindow, IWindow* dWindow) : uWindow(uWindow), dWindow(dWindow) {}
+UDContainer::UDContainer(AWindow* uWindow, AWindow* dWindow) : uWindow(uWindow), dWindow(dWindow) {
+    cliSize = Vector2(0.0f, 2.0f);
+}
 
-UDContainer::UDContainer(IWindow* uWindow, IWindow* dWindow, SelectionWindow* selWindow) : selWindow(selWindow) {
+UDContainer::UDContainer(AWindow* uWindow, AWindow* dWindow, SelectionWindow* selWindow) : selWindow(selWindow) {
+    cliSize = Vector2(0.0f, 2.0f);
     this->uWindow = new SelectionWindow(uWindow);
     this->dWindow = new SelectionWindow(dWindow);
     InitMenu();
@@ -298,7 +292,7 @@ void UDContainer::InitMenu(){
         if (window->selWindow){
             delete window->dWindow;
             window->dWindow = NULL;
-            IWindow* curWindow = ((SelectionWindow*)window->uWindow)->GetWindow();
+            AWindow* curWindow = ((SelectionWindow*)window->uWindow)->GetWindow();
             ((SelectionWindow*)window->uWindow)->SetWindow(NULL, false);
             delete window->uWindow;
             window->uWindow = NULL;
@@ -309,7 +303,7 @@ void UDContainer::InitMenu(){
         if (window->selWindow){
             delete window->uWindow;
             window->uWindow = NULL;
-            IWindow* curWindow = ((SelectionWindow*)window->dWindow)->GetWindow();
+            AWindow* curWindow = ((SelectionWindow*)window->dWindow)->GetWindow();
             ((SelectionWindow*)window->dWindow)->SetWindow(NULL, false);
             delete window->dWindow;
             window->dWindow = NULL;
@@ -319,12 +313,12 @@ void UDContainer::InitMenu(){
 }
 
 bool UDContainer::IsFocus(){
-    return focus != NULL;
+    return focusWindow != NULL;
 }
 
 void UDContainer::OnRender(){
     ViewManager* viewMgr = ViewManager::GetLocalInst();
-    GLRect rect;
+    Rect rect;
 
     rect = viewMgr->GetRect();
     rect.bottom = rect.bottom + dis;
@@ -332,7 +326,7 @@ void UDContainer::OnRender(){
     if (uWindow){
         uWindow->OnRender();
     }else{
-        GLUtils::Clear3DViewport();
+        GLUtils::Clear2DViewport();
     }
     viewMgr->PopView();
 
@@ -342,7 +336,7 @@ void UDContainer::OnRender(){
     if (dWindow){
         dWindow->OnRender();
     }else{
-        GLUtils::Clear3DViewport();
+        GLUtils::Clear2DViewport();
     }
     viewMgr->PopView();
 }
@@ -363,65 +357,57 @@ void UDContainer::OnTimer(int id){
 }
 
 void UDContainer::OnChar(char c){
-    if (focus)
-        focus->OnChar(c);
+    if (focusWindow)
+        focusWindow->OnChar(c);
 }
 
 void UDContainer::OnUnichar(wchar_t c){
-    if (focus)
-        focus->OnUnichar(c);
+    if (focusWindow)
+        focusWindow->OnUnichar(c);
 }
 
 void UDContainer::OnResize(int x, int y){
-    if (x == 0 && y == 0){
-        return;
-    }
-    dis = Round(Clamp(dis * y / size.y, 0.0f, (float)y));
-    size.x = x;
-    size.y = y;
+    dis = Round(Clamp(dis * y / cliSize.y, 0.0f, (float)y));
+    AWindow::OnResize(x, y);
     if (uWindow) uWindow->OnResize(x, y - dis);
     if (dWindow) dWindow->OnResize(x, dis);
 }
 
 void UDContainer::OnMouseMove(int x, int y){
-    cursorPos.x = x;
-    cursorPos.y = y;
+    AWindow::OnMouseMove(x, y);
     if (adjustPos){
-        Main::SetCursor(IDC_SIZENS);
-        dis = y;
-        if (uWindow) uWindow->OnResize(size.x, size.y - dis);
-        if (dWindow) dWindow->OnResize(size.x, dis);
+        Main::SetCursor(IDC_SIZEWE);
+        dis = x;
+        if (uWindow) uWindow->OnResize(cliSize.x, cliSize.y - dis);
+        if (dWindow) dWindow->OnResize(cliSize.x, dis);
         return;
     }
-    if (focus)
-        focus->OnMouseMove(x, up ? y - dis : y);
+    if (focusWindow)
+        focusWindow->OnMouseMove(x, up ? y - dis : y);
 }
 
 void UDContainer::OnLeftDown(int x, int y){
-    cursorPos.x = x;
-    cursorPos.y = y;
-    if (dragEnable && Abs(y - dis) < 4.0f){
+    AWindow::OnLeftDown(x, y);
+    if (dragEnable && Abs(x - dis) < 4.0f){
         adjustPos = true;
-        Main::SetCursor(IDC_SIZENS);
+        Main::SetCursor(IDC_SIZEWE);
         return;
     }
     UpdateFocus();
-    if (focus)
-        focus->OnLeftDown(x, up ? y - dis : y);
+    if (focusWindow)
+        focusWindow->OnLeftDown(x, up ? y - dis : y);
 }
 
 void UDContainer::OnLeftUp(int x, int y){
-    cursorPos.x = x;
-    cursorPos.y = y;
+    AWindow::OnLeftUp(x, y);
     adjustPos = false;
-    if (focus)
-        focus->OnLeftUp(x, up ? y - dis : y);
+    if (focusWindow)
+        focusWindow->OnLeftUp(x, up ? y - dis : y);
 }
 
 void UDContainer::OnRightDown(int x, int y){
-    cursorPos.x = x;
-    cursorPos.y = y;
-    if (selWindow && Abs(y - dis) < 4.0f){
+    AWindow::OnRightDown(x, y);
+    if (selWindow && Abs(x - dis) < 4.0f){
         if (joinMenu){
             Main::SetMenu(joinMenu);
         }else{
@@ -430,81 +416,75 @@ void UDContainer::OnRightDown(int x, int y){
         return;
     }
     UpdateFocus();
-    if (focus)
-        focus->OnRightDown(x, up ? y - dis : y);
+    if (focusWindow)
+        focusWindow->OnRightDown(x, up ? y - dis : y);
 }
 
 void UDContainer::OnRightUp(int x, int y){
-    cursorPos.x = x;
-    cursorPos.y = y;
-    if (focus)
-        focus->OnRightUp(x, up ? y - dis : y);
-}
-
-void UDContainer::OnMouseHover(int key, int x, int y){
-    if (focus)
-        focus->OnMouseHover(key, x, up ? y - dis : y);
-}
-
-void UDContainer::OnMouseLeave(){
-    if (focus)
-        focus->OnMouseLeave();
+    AWindow::OnRightUp(x, y);
+    if (focusWindow)
+        focusWindow->OnRightUp(x, up ? y - dis : y);
 }
 
 void UDContainer::OnFocus(){
+    AWindow::OnFocus();
     UpdateFocus();
 }
 
 void UDContainer::OnKillFocus(){
-    if (focus)
-        focus->OnKillFocus();
-    focus = NULL;
-    //DebugLog("UDContainer::focus %p", focus);
+    AWindow::OnKillFocus();
+    if (focusWindow)
+        focusWindow->OnKillFocus();
+    focusWindow = NULL;
 }
 
 void UDContainer::OnMouseWheel(int delta){
-    if (focus)
-        focus->OnMouseWheel(delta);
+    AWindow::OnMouseWheel(delta);
+    if (focusWindow)
+        focusWindow->OnMouseWheel(delta);
 }
 
 void UDContainer::OnMenuAccel(int id, bool accel){
-    if (focus)
-        focus->OnMenuAccel(id, accel);
+    AWindow::OnMenuAccel(id, accel);
+    if (focusWindow)
+        focusWindow->OnMenuAccel(id, accel);
 }
 
 void UDContainer::OnDropFileA(const char* path){
-    if (focus)
-        focus->OnDropFileA(path);
+    AWindow::OnDropFileA(path);
+    if (focusWindow)
+        focusWindow->OnDropFileA(path);
 }
 
 void UDContainer::OnDropFileW(const wchar_t* path){
-    if (focus)
-        focus->OnDropFileW(path);
+    AWindow::OnDropFileW(path);
+    if (focusWindow)
+        focusWindow->OnDropFileW(path);
 }
 
 void UDContainer::UpdateFocus(){
-    if (cursorPos.y < dis){
-        if (focus != dWindow){
-            if (focus)
-                focus->OnKillFocus();
+    if (cursorCoord.y < dis){
+        if (focusWindow != dWindow){
+            if (focusWindow)
+                focusWindow->OnKillFocus();
             if (dWindow)
                 dWindow->OnFocus();
         }
-        focus = dWindow;
+        focusWindow = dWindow;
         up = false;
     }else{
-        if (focus != uWindow){
-            if (focus)
-                focus->OnKillFocus();
+        if (focusWindow != uWindow){
+            if (focusWindow)
+                focusWindow->OnKillFocus();
             if (uWindow)
                 uWindow->OnFocus();
         }
-        focus = uWindow;
+        focusWindow = uWindow;
         up = true;
     }
-    if (focus)
-        focus->OnMouseMove(cursorPos.x, up ? cursorPos.y - dis : cursorPos.y);
-    //DebugLog("UDContainer::focus %p", focus);
+    if (focusWindow)
+        focusWindow->OnMouseMove(cursorCoord.x, up ? cursorCoord.y - dis : cursorCoord.y);
+    //DebugLog("UDContainer::focusWindow %p", focusWindow);
 }
 
 void UDContainer::FreeWindow(){
@@ -518,11 +498,11 @@ void UDContainer::FreeWindow(){
     }
 }
 
-IWindow* UDContainer::GetUpWindow(){
+AWindow* UDContainer::GetUpWindow(){
     return uWindow;
 }
 
-IWindow* UDContainer::GetDownWindow(){
+AWindow* UDContainer::GetDownWindow(){
     return dWindow;
 }
 
@@ -543,7 +523,7 @@ SelectionWindow::SelectionWindow() : curWindow(NULL) {
     InitMenu();
 }
 
-SelectionWindow::SelectionWindow(IWindow* initialWnd) : curWindow(initialWnd) {
+SelectionWindow::SelectionWindow(AWindow* initialWnd) : curWindow(initialWnd) {
     DebugLog("SelectionWindow %p Created", this);
     InitMenu();
 }
@@ -615,7 +595,7 @@ void SelectionWindow::OnRender(){
     if (curWindow){
         curWindow->OnRender();
     }else{
-        GLUtils::Clear3DViewport();
+        GLUtils::Clear2DViewport();
     }
 }
 
@@ -645,63 +625,61 @@ void SelectionWindow::OnUnichar(wchar_t c){
 }
 
 void SelectionWindow::OnResize(int x, int y){
-    sizeX = x; sizeY = y;
+    AWindow::OnResize(x, y);
     if (curWindow)
         curWindow->OnResize(x, y);
 }
 
 void SelectionWindow::OnMouseMove(int x, int y){
-    cursorX = x; cursorY = y;
+    AWindow::OnMouseMove(x, y);
     if (curWindow)
         curWindow->OnMouseMove(x, y);
 }
 
 void SelectionWindow::OnLeftDown(int x, int y){
+    AWindow::OnLeftDown(x, y);
     if (curWindow)
         curWindow->OnLeftDown(x, y);
 }
 
 void SelectionWindow::OnLeftUp(int x, int y){
+    AWindow::OnLeftUp(x, y);
     if (curWindow)
         curWindow->OnLeftUp(x, y);
 }
 
 void SelectionWindow::OnRightDown(int x, int y){
+    AWindow::OnRightDown(x, y);
     if (curWindow)
         curWindow->OnRightDown(x, y);
 }
 
 void SelectionWindow::OnRightUp(int x, int y){
+    AWindow::OnRightUp(x, y);
     if (curWindow)
         curWindow->OnRightUp(x, y);
 }
 
-void SelectionWindow::OnMouseHover(int key, int x, int y){
-    if (curWindow)
-        curWindow->OnMouseHover(key, x, y);
-}
-
-void SelectionWindow::OnMouseLeave(){
-    if (curWindow)
-        curWindow->OnMouseLeave();
-}
-
 void SelectionWindow::OnFocus(){
+    AWindow::OnFocus();
     if (curWindow)
         curWindow->OnFocus();
 }
 
 void SelectionWindow::OnKillFocus(){
+    AWindow::OnKillFocus();
     if (curWindow)
         curWindow->OnKillFocus();
 }
 
 void SelectionWindow::OnMouseWheel(int delta){
+    AWindow::OnMouseWheel(delta);
     if (curWindow)
         curWindow->OnMouseWheel(delta);
 }
 
 void SelectionWindow::OnMenuAccel(int id, bool accel){
+    AWindow::OnMenuAccel(id, accel);
     if (id == IDM_MENU_WINDOW){
         Main::SetMenu(selMenu);
     }
@@ -710,20 +688,22 @@ void SelectionWindow::OnMenuAccel(int id, bool accel){
 }
 
 void SelectionWindow::OnDropFileA(const char* path){
+    AWindow::OnDropFileA(path);
     if (curWindow)
         curWindow->OnDropFileA(path);
 }
 
 void SelectionWindow::OnDropFileW(const wchar_t* path){
+    AWindow::OnDropFileW(path);
     if (curWindow)
         curWindow->OnDropFileW(path);
 }
 
-IWindow* SelectionWindow::GetWindow(){
+AWindow* SelectionWindow::GetWindow(){
     return curWindow;
 }
 
-void SelectionWindow::SetWindow(IWindow* window, bool del){
+void SelectionWindow::SetWindow(AWindow* window, bool del){
     if (del){
         if (curWindow){
             curWindow->OnClose();
@@ -732,14 +712,14 @@ void SelectionWindow::SetWindow(IWindow* window, bool del){
         curWindow = window;
         if (curWindow){
             curWindow->OnCreate();
-            curWindow->OnResize(sizeX, sizeY);
-            curWindow->OnMouseMove(cursorX, cursorY);
+            curWindow->OnResize(cliSize.x, cliSize.y);
+            curWindow->OnMouseMove(cursorCoord.x, cursorCoord.y);
         }
     }else{
         curWindow = window;
         if (curWindow){
-            curWindow->OnResize(sizeX, sizeY);
-            curWindow->OnMouseMove(cursorX, cursorY);
+            curWindow->OnResize(cliSize.x, cliSize.y);
+            curWindow->OnMouseMove(cursorCoord.x, cursorCoord.y);
         }
     }
 }

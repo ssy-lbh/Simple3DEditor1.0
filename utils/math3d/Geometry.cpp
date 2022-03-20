@@ -3,7 +3,7 @@
 #include <utils/os/Log.h>
 #include <utils/gl/GLUtils.h>
 #include <utils/math3d/Math.h>
-#include <utils/math3d/ViewObject.h>
+#include <editor/main/ViewObject.h>
 
 Vertex::Vertex(){}
 
@@ -80,7 +80,7 @@ Edge* Vertex::EdgeRelateTo(Vertex* v){
     return pack.res;
 }
 
-bool Vertex::Hit(Vector3 pos, Vector3 camPos, Quaternion camDir, Vector2 zBound, GLRect rect){
+bool Vertex::Hit(Vector3 pos, Vector3 camPos, Quaternion camDir, Vector2 zBound, Rect rect){
     Vector3 lookPos = (-camDir) * (pos - camPos);
     if (lookPos.y < zBound.x || lookPos.y > zBound.y)
         return false;

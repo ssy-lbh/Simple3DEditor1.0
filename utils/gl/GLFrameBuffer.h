@@ -3,12 +3,12 @@
 
 #include <define.h>
 
-#include <utils/gl/GLUtils.h>
+#include <utils/math3d/LinearAlgebra.h>
 
 class GLFrameBuffer final : public Object {
 private:
     uint frame = 0;
-    GLRect rect = GLRect::zero;
+    Rect rect = Rect::zero;
 
 public:
     GLFrameBuffer();
@@ -17,7 +17,7 @@ public:
 
     void BindTexture(GLRenderTexture2D* texture);
     void BindTexture(GLRenderTexture2D* texture, uenum attachment);
-    void SetSize(GLRect rect);
+    void SetSize(Rect rect);
     void SetSize(GLRenderTexture2D* texture);
     void Enable();
     void Disable();

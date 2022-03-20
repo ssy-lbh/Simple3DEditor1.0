@@ -35,7 +35,7 @@ public:
     bool DeleteFace(Face* f);
     Edge* EdgeRelateTo(Vertex* v);
 
-    static bool Hit(Vector3 pos, Vector3 camPos, Quaternion camDir, Vector2 zBound, GLRect rect);
+    static bool Hit(Vector3 pos, Vector3 camPos, Quaternion camDir, Vector2 zBound, Rect rect);
 
     bool Hit(Vector3 ori, Vector3 dir);
     bool HitUV(Vector2 uv, float err);

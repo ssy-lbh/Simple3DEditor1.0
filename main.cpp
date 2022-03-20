@@ -15,7 +15,10 @@
 #include <utils/os/Shell.h>
 #include <utils/os/Resource.h>
 #include <utils/gl/GLUtils.h>
-#include <utils/math3d/ViewObject.h>
+#include <editor/main/ViewObject.h>
+#include <editor/object/MeshObject.h>
+#include <editor/object/CameraObject.h>
+#include <editor/object/AudioListenerObject.h>
 
 LocalData::LocalData(){}
 LocalData::~LocalData(){}
@@ -166,16 +169,16 @@ void GlobalData::SelectObject(AViewObject* o){
     }
     curObject = o;
     switch (selType){
-    case SELECT_OBJECT:
+    case SelectionType::SELECT_OBJECT:
         selObjects.Clear();
         break;
-    case SELECT_VERTICES:
+    case SelectionType::SELECT_VERTICES:
         selPoints.Clear();
         break;
-    case SELECT_EDGES:
+    case SelectionType::SELECT_EDGES:
         selEdges.Clear();
         break;
-    case SELECT_FACES:
+    case SelectionType::SELECT_FACES:
         selFaces.Clear();
         break;
     }
@@ -185,16 +188,16 @@ void GlobalData::SelectType(SelectionType type){
     if (selType == type)
         return;
     switch (selType){
-    case SELECT_OBJECT:
+    case SelectionType::SELECT_OBJECT:
         selObjects.Clear();
         break;
-    case SELECT_VERTICES:
+    case SelectionType::SELECT_VERTICES:
         selPoints.Clear();
         break;
-    case SELECT_EDGES:
+    case SelectionType::SELECT_EDGES:
         selEdges.Clear();
         break;
-    case SELECT_FACES:
+    case SelectionType::SELECT_FACES:
         selFaces.Clear();
         break;
     }
@@ -240,7 +243,7 @@ void Main::SelectObject(AViewObject* o){
     data->SelectObject(o);
 }
 
-void Main::SelectType(GlobalData::SelectionType type){
+void Main::SelectType(SelectionType type){
     data->SelectType(type);
 }
 
@@ -263,7 +266,7 @@ void Main::OnAnimationFrame(float frame){
     RequestRender();
 }
 
-void Main::SaveImage(String file, GLRect rect){
+void Main::SaveImage(String file, Rect rect){
     size_t width = (size_t)rect.GetWidth();
     size_t height = (size_t)rect.GetHeight();
     size_t size = (width * height) << 2;
@@ -279,9 +282,9 @@ void Main::SaveImage(String file, GLRect rect){
     delete[] buffer;
 }
 
-void Main::RenderAnimation(String dir, size_t start, size_t end, GLRect rect){
+void Main::RenderAnimation(String dir, size_t start, size_t end, Rect rect){
     AppFrame* frame = AppFrame::GetLocalInst();
-    StringBuilder builder;
+    StringBuilderA builder;
 
     for (size_t i = start; i <= end; i++){
         data->OnAnimationFrame(i);
@@ -300,7 +303,9 @@ void Main::RenderAnimation(String dir, size_t start, size_t end, GLRect rect){
 Mesh* Main::GetMesh(){
     if (!data->curObject)
         return NULL;
-    return data->curObject->GetMesh();
+    if (data->curObject->GetType() != ViewObjectType::OBJECT_MESH)
+        return NULL;
+    return ((MeshObject*)data->curObject)->GetMesh();
 }
 
 int Main::MainEntry(int argc, char** argv){
@@ -308,7 +313,7 @@ int Main::MainEntry(int argc, char** argv){
     Font::Init();
     AudioUtils::InitOpenAL();
 
-    IWindow* mainFrame = new SelectionWindow(new MainWindow());
+    AWindow* mainFrame = new SelectionWindow(new MainWindow());
 
     AppFrame* appFrame = new AppFrame("ModelView", mainFrame, 600, 600);
 

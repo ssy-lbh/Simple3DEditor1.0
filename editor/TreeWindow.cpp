@@ -8,7 +8,8 @@
 #include <editor/dialog/Tips.h>
 #include <utils/os/Font.h>
 #include <utils/gl/GLUtils.h>
-#include <utils/math3d/ViewObject.h>
+#include <editor/main/ViewObject.h>
+#include <editor/object/AllObjects.h>
 
 TreeWindow::TreeWindow(){
     DebugLog("TreeWindow Launched");
@@ -23,7 +24,7 @@ TreeWindow::TreeWindow(){
         window->AddObject(new MeshObject());
     }, this));
     objectMenu->AddItem(new MenuItem(L"三次贝塞尔曲线", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
-        window->AddObject(new BezierCurveObject());
+        window->AddObject(new CubicBezierObject());
     }, this));
     objectMenu->AddItem(new MenuItem(L"点光源", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
         window->AddObject(new PointLightObject());
@@ -70,10 +71,6 @@ void TreeWindow::AddObject(AViewObject* o){
         return;
     }
     Main::AddObject(o);
-}
-
-bool TreeWindow::IsFocus(){
-    return focus;
 }
 
 void TreeWindow::OnRender(){
@@ -152,20 +149,15 @@ void TreeWindow::OnResize(int x, int y){
 }
 
 void TreeWindow::UpdateCursor(int x, int y){
-    cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
-    cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
+    AWindow::UpdateCursor(x, y);
 }
 
 void TreeWindow::UpdateWindowSize(int x, int y){
-    cliSize.x = x;
-    cliSize.y = y;
-    cliInvSize.x = 1.0f / cliSize.x;
-    cliInvSize.y = 1.0f / cliSize.y;
+    AWindow::UpdateWindowSize(x, y);
 }
 
 void TreeWindow::OnMouseMove(int x, int y){
     UpdateCursor(x, y);
-
     if (dragObject)
         Main::SetCursor(IDC_UPARROW);
 }
@@ -223,18 +215,6 @@ void TreeWindow::OnRightDown(int x, int y){
 
 void TreeWindow::OnRightUp(int x, int y){
     UpdateCursor(x, y);
-}
-
-void TreeWindow::OnMouseHover(int key, int x, int y){}
-
-void TreeWindow::OnMouseLeave(){}
-
-void TreeWindow::OnFocus(){
-    focus = true;
-}
-
-void TreeWindow::OnKillFocus(){
-    focus = false;
 }
 
 void TreeWindow::OnMouseWheel(int delta){}

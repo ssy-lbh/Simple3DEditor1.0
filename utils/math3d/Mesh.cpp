@@ -11,7 +11,7 @@
 #include <utils/math3d/Math.h>
 #include <utils/math3d/LinearAlgebra.h>
 #include <utils/math3d/Geometry.h>
-#include <utils/math3d/ViewObject.h>
+#include <editor/main/ViewObject.h>
 
 Mesh::Mesh(){}
 
@@ -265,13 +265,7 @@ void Mesh::DeleteTriFace(Face* f){
 }
 
 void Mesh::Render(){
-    RenderOptions options;
-    options.vertex = true;
-    options.edge = true;
-    options.face = true;
-    options.light = false;
-
-    Render(&options);
+    Render(&LocalData::GetLocalInst()->renderOptions);
 }
 
 void Mesh::Render(const RenderOptions* options){

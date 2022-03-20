@@ -10,9 +10,10 @@
 #include <utils/DataBuffer.h>
 #include <utils/os/Shell.h>
 #include <utils/os/Resource.h>
+#include <utils/gl/GLUtils.h>
 #include <utils/gl/GLShader.h>
 #include <utils/gl/GLProgram.h>
-#include <utils/math3d/ViewObject.h>
+#include <editor/main/ViewObject.h>
 
 RenderWindow::RenderWindow(){
     DebugLog("RenderWindow Launched");
@@ -54,10 +55,6 @@ void RenderWindow::InitCamera(){
             camUp.x, camUp.y, camUp.z);
 }
 
-bool RenderWindow::IsFocus(){
-    return focus;
-}
-
 void RenderWindow::OnRender(){
     ViewManager* viewMgr = ViewManager::GetLocalInst();
 
@@ -89,14 +86,14 @@ void RenderWindow::OnRender(){
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-    RenderOptions options;
-    options.vertex = false;
-    options.edge = false;
-    options.face = true;
-    options.light = lightEnabled;
-    options.editor = false;
+    RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
+    options->editor = false;
+    options->vertex = false;
+    options->edge = false;
+    options->face = true;
+    options->light = lightEnabled;
 
-    Main::data->scene->OnChainRender(&options);
+    Main::data->scene->OnChainRender();
 
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -140,18 +137,6 @@ void RenderWindow::OnRightDown(int x, int y){
 
 void RenderWindow::OnRightUp(int x, int y){
     UpdateCursor(x, y);
-}
-
-void RenderWindow::OnMouseHover(int key, int x, int y){}
-
-void RenderWindow::OnMouseLeave(){}
-
-void RenderWindow::OnFocus(){
-    focus = true;
-}
-
-void RenderWindow::OnKillFocus(){
-    focus = false;
 }
 
 void RenderWindow::OnMouseWheel(int delta){}

@@ -17,7 +17,7 @@ void ViewManager::Reset(){
     PushView(frame->GetClientRect());
 }
 
-void ViewManager::PushView(GLRect rect){
+void ViewManager::PushView(Rect rect){
     rects.Add(rect);
     SetView(rect);
 }
@@ -27,13 +27,13 @@ void ViewManager::PopView(){
     SetView(rects.GetBack());
 }
 
-void ViewManager::SetView(GLRect rect){
+void ViewManager::SetView(Rect rect){
     curRect = rect;
     glViewport(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
     glScissor(curRect.left, curRect.bottom, curRect.right - curRect.left, curRect.top - curRect.bottom);
 }
 
-GLRect ViewManager::GetRect(){
+Rect ViewManager::GetRect(){
     return curRect;
 }
 
@@ -62,19 +62,19 @@ Vector2 ViewManager::GetSize(){
     return Vector2(curRect.right - curRect.left, curRect.top - curRect.bottom);
 }
 
-GLRect ViewManager::CalcChildRect(GLRect ratio){
+Rect ViewManager::CalcChildRect(Rect ratio){
     return curRect.ChildRect(ratio);
 }
 
-void ViewManager::PushChildView(GLRect ratio){
+void ViewManager::PushChildView(Rect ratio){
     PushView(curRect.ChildRect(ratio));
 }
 
-void ViewManager::SetScissor(GLRect rect){
+void ViewManager::SetScissor(Rect rect){
     glScissor(rect.left, rect.bottom, rect.right - rect.left, rect.top - rect.bottom);
 }
 
-void ViewManager::SetChildScissor(GLRect ratio){
+void ViewManager::SetChildScissor(Rect ratio){
     SetScissor(curRect.ChildRect(ratio));
 }
 

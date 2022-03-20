@@ -29,7 +29,7 @@ void GLFrameBuffer::BindTexture(GLRenderTexture2D* texture, uenum attachment){
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame);
         glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, attachment, GL_TEXTURE_2D, 0, 0);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        SetSize(GLRect::zero);
+        SetSize(Rect::zero);
         return;
     }
 
@@ -42,15 +42,15 @@ void GLFrameBuffer::BindTexture(GLRenderTexture2D* texture, uenum attachment){
     SetSize(texture);
 }
 
-void GLFrameBuffer::SetSize(GLRect rect){
+void GLFrameBuffer::SetSize(Rect rect){
     this->rect = rect;
 }
 
 void GLFrameBuffer::SetSize(GLRenderTexture2D* texture){
     if (texture){
-        rect = GLRect(0.0f, texture->GetWidth(), 0.0f, texture->GetHeight());
+        rect = Rect(0.0f, texture->GetWidth(), 0.0f, texture->GetHeight());
     }else{
-        rect = GLRect::zero;
+        rect = Rect::zero;
     }
 }
 

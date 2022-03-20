@@ -28,13 +28,13 @@ public:
 
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT CALLBACK LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    void FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void FireEvent(AWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     void InitWindow();
 #endif
 
 private:
     String name;
-    IWindow* mainFrame;
+    AWindow* mainFrame;
     size_t width;
     size_t height;
 
@@ -58,17 +58,17 @@ public:
 
     uint fontASCII;
 
-    AppFrame(String name, IWindow* mainFrame, size_t height, size_t width, bool async = false);
+    AppFrame(String name, AWindow* mainFrame, size_t height, size_t width, bool async = false);
     ~AppFrame();
 
     static AppFrame* GetLocalInst();
 
     String GetCaption();
     void SetSize(size_t height, size_t width);
-    GLRect GetClientRect();
+    Rect GetClientRect();
     size_t GetHeight();
     size_t GetWidth();
-    IWindow* GetMainFrame();
+    AWindow* GetMainFrame();
     LocalData* GetLocalData();
     ViewManager* GetViewManager();
 

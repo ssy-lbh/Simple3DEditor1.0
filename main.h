@@ -13,6 +13,16 @@ public:
     virtual void Execute() = 0;
 };
 
+struct RenderOptions {
+public:
+    bool vertex;
+    bool edge;
+    bool face;
+    bool light;
+    bool editor;
+    ObjectOperation objOp;
+};
+
 //TODO 可加入窗口内拖拽功能
 class LocalData final : public Object {
 public:
@@ -22,6 +32,8 @@ public:
 
     Menu* menu = NULL;
     Vector2 menuPos;
+
+    RenderOptions renderOptions;
 
     // 这两种对象在单个窗口中唯一
     AudioListenerObject* audioListener = NULL;
@@ -51,16 +63,16 @@ public:
     void DestoryCamera();
 };
 
+enum class SelectionType {
+    SELECT_OBJECT,
+    SELECT_VERTICES,
+    SELECT_EDGES,
+    SELECT_FACES
+};
+
 //TODO 可加入全局拖拽功能，在窗口之间传送数据
 class GlobalData final : public Object {
 public:
-    enum SelectionType {
-        SELECT_OBJECT,
-        SELECT_VERTICES,
-        SELECT_EDGES,
-        SELECT_FACES
-    };
-
     Vector3 audioPos = Vector3::zero;
 
     float animFrame = 0.0f;
@@ -73,7 +85,7 @@ public:
 
     // 选择部分
     //TODO 以后将选择部分信息移入线程本地
-    SelectionType selType = SELECT_OBJECT;
+    SelectionType selType = SelectionType::SELECT_OBJECT;
 
     List<AViewObject*> selObjects;
     List<Vertex*> selPoints;
@@ -84,7 +96,7 @@ public:
     ~GlobalData();
 
     void SelectObject(AViewObject* o);
-    void SelectType(GlobalData::SelectionType type);
+    void SelectType(SelectionType type);
 
     void OnAnimationFrame(float frame);
 };
@@ -98,12 +110,12 @@ public:
     static void SetCursor(const char* res);
     static void SetMenu(Menu* m);
     static void SelectObject(AViewObject* o);
-    static void SelectType(GlobalData::SelectionType type);
+    static void SelectType(SelectionType type);
     static void AddObject(AViewObject* o);
     static void DeleteObject(AViewObject* o);
     static void OnAnimationFrame(float frame);
-    static void SaveImage(String file, GLRect rect);
-    static void RenderAnimation(String dir, size_t start, size_t end, GLRect rect);
+    static void SaveImage(String file, Rect rect);
+    static void RenderAnimation(String dir, size_t start, size_t end, Rect rect);
 
     static Mesh* GetMesh();
 

@@ -210,10 +210,6 @@ NodeMapWindow::~NodeMapWindow(){
     if (bktex) delete bktex;
 }
 
-bool NodeMapWindow::IsFocus(){
-    return focus;
-}
-
 void NodeMapWindow::OnRender(){
     glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 
@@ -274,16 +270,13 @@ void NodeMapWindow::OnResize(int x, int y){
 }
 
 void NodeMapWindow::UpdateCursor(int x, int y){
-    cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
-    cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
+    AWindow::UpdateCursor(x, y);
     uiMgr->CursorMove(cursorPos);
     nodeMgr->CursorMove(cursorPos + viewPos);
 }
 
 void NodeMapWindow::UpdateWindowSize(int x, int y){
-    cliSize.x = x;
-    cliSize.y = y;
-    aspect = (float)cliSize.x / cliSize.y;
+    AWindow::UpdateWindowSize(x, y);
 }
 
 void NodeMapWindow::AddNode(){
@@ -326,18 +319,6 @@ void NodeMapWindow::OnRightDown(int x, int y){
 void NodeMapWindow::OnRightUp(int x, int y){
     UpdateCursor(x, y);
     nodeMgr->RightUp();
-}
-
-void NodeMapWindow::OnMouseHover(int key, int x, int y){}
-
-void NodeMapWindow::OnMouseLeave(){}
-
-void NodeMapWindow::OnFocus(){
-    focus = true;
-}
-
-void NodeMapWindow::OnKillFocus(){
-    focus = false;
 }
 
 void NodeMapWindow::OnMouseWheel(int delta){}

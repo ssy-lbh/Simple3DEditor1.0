@@ -7,16 +7,10 @@
 #include <editor/gui/Menu.h>
 #include <utils/List.h>
 
-class AnimationWindow : public IWindow {
+class AnimationWindow : public AWindow {
 private:
     static const float DEFAULT_START_FRAME;
     static const float DEFAULT_END_FRAME;
-
-    bool focus;
-
-    Vector2 cliSize, cliInvSize;
-    float aspect;
-    Vector2 cursorPos;
 
     UIManager* uiMgr;
 
@@ -90,11 +84,14 @@ private:
         virtual Menu* GetMenu() override;
     };
 
+protected:
+    void UpdateCursor(int x, int y);
+    void UpdateWindowSize(int x, int y);
+
 public:
     AnimationWindow();
     virtual ~AnimationWindow() override;
 
-    virtual bool IsFocus() override;
     virtual void OnRender() override;
     virtual void OnTimer(int id) override;
     virtual void OnResize(int x, int y) override;
@@ -103,13 +100,9 @@ public:
     virtual void OnLeftUp(int x, int y) override;
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
-    virtual void OnFocus() override;
-    virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
-
-    void UpdateCursor(int x, int y);
-    void UpdateWindowSize(int x, int y);
+    
     void SetCurve(AnimationCurve* curve);
     void SetProperty(Property* prop);
     void SetFrame(float frame);

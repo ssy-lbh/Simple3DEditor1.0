@@ -10,13 +10,13 @@
 #include <utils/os/Thread.h>
 #include <utils/os/System.h>
 #include <utils/gl/GLEW.h>
-#include <utils/math3d/ViewObject.h>
+#include <editor/main/ViewObject.h>
 #include <editor/gui/UIManager.h>
 #include <editor/gui/ViewManager.h>
 
 bool AppFrame::init = false;
 
-AppFrame::AppFrame(String name, IWindow* mainFrame, size_t height, size_t width, bool async) : name(name), mainFrame(mainFrame), height(height), width(width) {
+AppFrame::AppFrame(String name, AWindow* mainFrame, size_t height, size_t width, bool async) : name(name), mainFrame(mainFrame), height(height), width(width) {
     DebugLog("AppFrame %s Launched", name.GetString());
     
     hInst = GetModule();
@@ -93,9 +93,9 @@ void AppFrame::SetSize(size_t height, size_t width){
     SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, width, height, SWP_NOMOVE);
 }
 
-GLRect AppFrame::GetClientRect(){
+Rect AppFrame::GetClientRect(){
     RECT cliRect;
-    GLRect rect;
+    Rect rect;
 
     ::GetClientRect(hWnd, &cliRect);
     rect.left = cliRect.left; rect.right = cliRect.right;
@@ -116,7 +116,7 @@ size_t AppFrame::GetWidth(){
     return cliRect.right - cliRect.left;
 }
 
-IWindow* AppFrame::GetMainFrame(){
+AWindow* AppFrame::GetMainFrame(){
     return mainFrame;
 }
 
@@ -373,7 +373,7 @@ LRESULT CALLBACK AppFrame::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     return DefWindowProcA(hWnd, uMsg, wParam, lParam);
 }
 
-void AppFrame::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
+void AppFrame::FireEvent(AWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
     RECT cliRect;
     ::GetClientRect(hWnd, &cliRect);
     // 事件中鼠标坐标上下需反转
@@ -386,6 +386,8 @@ void AppFrame::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, L
         window->OnTimer(wParam);
         break;
     case WM_SIZE:
+        if (GET_X_LPARAM(lParam) == 0 || GET_Y_LPARAM(lParam) == 0)
+            break;
         window->OnResize(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
         break;
     case WM_MOUSEMOVE:
@@ -393,12 +395,6 @@ void AppFrame::FireEvent(IWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, L
         break;
     case WM_MOUSEWHEEL:
         window->OnMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
-        break;
-    case WM_MOUSELEAVE:
-        window->OnMouseLeave();
-        break;
-    case WM_MOUSEHOVER:
-        window->OnMouseHover(wParam, x, y);
         break;
     case WM_SETFOCUS:
         window->OnFocus();

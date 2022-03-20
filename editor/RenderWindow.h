@@ -5,15 +5,10 @@
 
 #include <editor/gui/UIManager.h>
 #include <editor/gui/Menu.h>
-#include <utils/gl/GLUtils.h>
 
-class RenderWindow final : public IWindow {
+class RenderWindow final : public AWindow {
 private:
-    bool focus = false;
-
-    Vector2 cursorPos;
-    Vector2 cliSize;
-    GLRect rect;
+    Rect rect;
 
     bool lightEnabled = false;
 
@@ -31,16 +26,16 @@ private:
 
     GLProgram* glProg = NULL;
 
+protected:
+    void UpdateWindowSize(int x, int y);
+    void UpdateCursor(int x, int y);
+
 public:
     RenderWindow();
     virtual ~RenderWindow() override;
 
     void InitCamera();
-
-    void UpdateWindowSize(int x, int y);
-    void UpdateCursor(int x, int y);
-
-    virtual bool IsFocus() override;
+    
     virtual void OnRender() override;
     virtual void OnCreate() override;
     virtual void OnTimer(int id) override;
@@ -52,10 +47,6 @@ public:
     virtual void OnLeftUp(int x, int y) override;
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
-    virtual void OnMouseHover(int key, int x, int y) override;
-    virtual void OnMouseLeave() override;
-    virtual void OnFocus() override;
-    virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileA(const char* path) override;
