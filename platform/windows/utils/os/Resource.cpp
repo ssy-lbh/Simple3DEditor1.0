@@ -116,7 +116,6 @@ DataBuffer Resource::GetBinary(int id){
     HGLOBAL resIdx;
     LPVOID resPtr;
     DWORD resSize;
-    char* srcData;
 
     hInst = GetModule();
     kernelSrc = FindResourceA(hInst, MAKEINTRESOURCE(id), MAKEINTRESOURCE(BINARY));

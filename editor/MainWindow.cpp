@@ -1317,6 +1317,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
             mesh->AddTriFace(floor, vert[i], vert[j]);
             mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
         }
+        delete[] vert;
     }
         break;
     case IDM_MESH_BASIC_SPHERE:{
@@ -1353,6 +1354,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
             mesh->AddTriFace(floor, vert[i], vert[j]);
             mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
         }
+        delete[] vert;
     }
         break;
     case IDM_MESH_BASIC_CAPSULE:{
@@ -1407,6 +1409,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
             mesh->AddTriFace(floor, vert[i], vert[j]);
             mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
         }
+        delete[] vert;
     }
         break;
     case IDM_MENU_BASIC:

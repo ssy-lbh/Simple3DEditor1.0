@@ -290,7 +290,6 @@ void GUIEditA::OnRender(){
 
     Vector2 cliSize = viewMgr->GetSize();
     Vector2 cliInvSize = Vector2(1.0f / cliSize.x, 1.0f / cliSize.y);
-    float strWidth;
 
     size.y = cliInvSize.y * 30.0f;
 
@@ -306,7 +305,7 @@ void GUIEditA::OnRender(){
     glDrawCNString(text);
 
     if (editing){
-        strWidth = glGetStringWidth(text);
+        float strWidth = glGetStringWidth(text);
         glColor3f(1.0f, 1.0f, 1.0f);
         GLUtils::DrawRect(position.x + (strWidth - 1.0f) * cliInvSize.x * 2.0f, position.y, position.x + (strWidth + 1.0f) * cliInvSize.x * 2.0f, position.y + size.y);
     }
@@ -388,7 +387,6 @@ void GUIEditW::OnRender(){
 
     Vector2 cliSize = viewMgr->GetSize();
     Vector2 cliInvSize = Vector2(1.0f / cliSize.x, 1.0f / cliSize.y);
-    float strWidth;
 
     size.y = cliInvSize.y * 30.0f;
 
@@ -404,7 +402,7 @@ void GUIEditW::OnRender(){
     glDrawCNString(text);
 
     if (editing){
-        strWidth = glGetCNStringWidth(text);
+        float strWidth = glGetCNStringWidth(text);
         glColor3f(1.0f, 1.0f, 1.0f);
         GLUtils::DrawRect(position.x + (strWidth - 1.0f) * cliInvSize.x * 2.0f, position.y, position.x + (strWidth + 1.0f) * cliInvSize.x * 2.0f, position.y + size.y);
     }

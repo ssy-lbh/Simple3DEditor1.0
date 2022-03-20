@@ -20,11 +20,14 @@
 #include <editor/object/CameraObject.h>
 #include <editor/object/AudioListenerObject.h>
 
-LocalData::LocalData(){}
+LocalData::LocalData(){
+    renderOptions.objOp = ObjectOperation::MOVE;
+}
+
 LocalData::~LocalData(){}
 
 LocalData* LocalData::GetLocalInst(){
-    return (LocalData*)ThreadLocal::Get(THREAD_LOCAL_LOCALDATA);
+    return static_cast<LocalData*>(ThreadLocal::Get(THREAD_LOCAL_LOCALDATA));
 }
 
 void LocalData::UpdateCursor(int x, int y){
@@ -331,7 +334,7 @@ Mesh* Main::GetMesh(){
         return NULL;
     if (data->curObject->GetType() != ViewObjectType::OBJECT_MESH)
         return NULL;
-    return ((MeshObject*)data->curObject)->GetMesh();
+    return (dynamic_cast<MeshObject*>(data->curObject))->GetMesh();
 }
 
 int Main::MainEntry(int argc, char** argv){

@@ -15,11 +15,11 @@ public:
 
 struct RenderOptions {
 public:
-    bool vertex;
-    bool edge;
-    bool face;
-    bool light;
-    bool editor;
+    bool vertex = true;
+    bool edge = true;
+    bool face = true;
+    bool light = false;
+    bool editor = false;
     ObjectOperation objOp;
 };
 
