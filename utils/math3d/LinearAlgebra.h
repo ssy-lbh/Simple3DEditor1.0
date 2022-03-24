@@ -126,6 +126,8 @@ public:
     static float Determinant(Vector3, Vector3, Vector3);
     static Vector3 Compose(Vector3 coord, Vector3 x, Vector3 y, Vector3 z);
     static Vector3 Decompose(Vector3 vec, Vector3 x, Vector3 y, Vector3 z);
+    // 主要是为了可以在调用之前做行列式值是否为零的检查
+    static Vector3 Decompose(Vector3 vec, Vector3 x, Vector3 y, Vector3 z, float det);
 
     Vector3 Normal() const;
     Vector3 &Normalize();

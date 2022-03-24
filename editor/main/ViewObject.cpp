@@ -217,13 +217,6 @@ void AViewObject::OnLeftUp(Point3 ori, Vector3 dir){
         children[i]->OnLeftUp(ori, dir);
 }
 
-void AViewObject::OnLeftDrag(Vector3 delta, Vector3 dir){
-    size_t len = children.Size();
-    cursorDir = dir;
-    for (size_t i = 0; i < len; i++)
-        children[i]->OnLeftDrag(delta, dir);
-}
-
 void AViewObject::OnRightDown(Point3 ori, Vector3 dir){
     size_t len = children.Size();
     cursorOri = ori; cursorDir = dir;
@@ -238,12 +231,14 @@ void AViewObject::OnRightUp(Point3 ori, Vector3 dir){
         children[i]->OnRightUp(ori, dir);
 }
 
-void AViewObject::OnRightDrag(Vector3 delta, Vector3 dir){
-    size_t len = children.Size();
-    cursorDir = dir;
-    for (size_t i = 0; i < len; i++)
-        children[i]->OnRightDrag(delta, dir);
-}
+void AViewObject::OnMouseMove2D(Point2 pos){}
+void AViewObject::OnLeftDown2D(Point2 pos){}
+void AViewObject::OnLeftUp2D(Point2 pos){}
+void AViewObject::OnLeftDrag2D(Vector2 dir){}
+void AViewObject::OnRightDown2D(Point2 pos){}
+void AViewObject::OnRightUp2D(Point2 pos){}
+void AViewObject::OnRightDrag2D(Vector2 dir){}
+bool AViewObject::OnHit2D(Point2 pos){ return false; }
 
 void AViewObject::OnFocus(){
     size_t len = children.Size();
@@ -281,10 +276,6 @@ void AViewObject::OnDropFileW(const wchar_t* path){
     size_t len = children.Size();
     for (size_t i = 0; i < len; i++)
         children[i]->OnDropFileW(path);
-}
-
-bool AViewObject::OnHit(Point3 ori, Vector3 dir){
-    return false;
 }
 
 void AViewObject::OnAnimationFrame(float frame){

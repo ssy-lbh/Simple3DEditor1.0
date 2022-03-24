@@ -299,6 +299,13 @@ Vector3 Vector3::Decompose(Vector3 vec, Vector3 x, Vector3 y, Vector3 z){
                    Determinant(x, y, vec) * detinv);
 }
 
+Vector3 Vector3::Decompose(Vector3 vec, Vector3 x, Vector3 y, Vector3 z, float det){
+    float detinv = 1.0f / det;
+    return Vector3(Determinant(vec, y, z) * detinv,
+                   Determinant(x, vec, z) * detinv,
+                   Determinant(x, y, vec) * detinv);
+}
+
 float Vector3::Magnitude() const{
     return Sqrt(x * x + y * y + z * z);
 }

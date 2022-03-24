@@ -83,6 +83,10 @@ public:
     void DeleteSelfReference();
     void DeleteSelfReferenceExcept(Vertex* v);
     void DeleteSelfReferenceExcept(Edge* e);
+
+    bool Hit(Point3 ori, Vector3 dir);
+    // 与三角形所在平面相交时写入bary, dis
+    bool Intersect(Point3 ori, Vector3 dir, Vector3* bary, float* dis);
 };
 
 #endif

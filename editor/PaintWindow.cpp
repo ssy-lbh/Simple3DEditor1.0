@@ -10,6 +10,7 @@
 #include <utils/math3d/Mesh.h>
 #include <utils/gl/GLTexture2D.h>
 #include <utils/gl/GLRenderTexture2D.h>
+#include <utils/gl/GLFrameBuffer.h>
 #include <utils/gl/GLComputeProgram.h>
 
 PaintWindow::ClearBrush::ClearBrush(PaintWindow* window) : window(window) {
@@ -204,16 +205,6 @@ PaintWindow::~PaintWindow(){
 void PaintWindow::OnCreate(){
     CreateImage(500, 500);
     SetBrush(new DefaultBrush(this, IDS_BRUSH_OVERLAY));
-}
-
-void PaintWindow::OnRender(){
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
 
     // 测试代码
 
@@ -224,16 +215,28 @@ void PaintWindow::OnRender(){
     // 所以目前顶点属性的插值尚未解决
 
     // GLFrameBuffer* frame = new GLFrameBuffer();
-    // frame->BindTexture(paintTex, 500, 500);
+    // frame->BindTexture(paintTex);
     // frame->Enable();
-    // glColor3f(1.0f, 1.0f, 1.0f);
+    // glPushMatrix();
+    // glScalef(1.0f, -1.0f, 1.0f);
     // glBegin(GL_TRIANGLES);
-    // glVertex2f(0.0f, 1.0f);
-    // glVertex2f(0.866f, -0.5f);
-    // glVertex2f(-0.866f, -0.5f);
+    // glColor3f(1.0f, 0.0f, 0.0f); glVertex2f(0.0f, 1.0f);
+    // glColor3f(0.0f, 1.0f, 0.0f); glVertex2f(0.866f, -0.5f);
+    // glColor3f(0.0f, 0.0f, 1.0f); glVertex2f(-0.866f, -0.5f);
     // glEnd();
+    // glPopMatrix();
     // frame->Disable();
     // delete frame;
+}
+
+void PaintWindow::OnRender(){
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
     if (paintTex->Enable()){
         glColor3f(1.0f, 1.0f, 1.0f);

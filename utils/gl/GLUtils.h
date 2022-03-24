@@ -43,8 +43,11 @@ public:
     static void PopMatrix();
     static Matrix4x4 GetProjectionMatrix();
     static Matrix4x4 GetModelViewMatrix();
+    static Matrix4x4 GetTextureMatrix();
     static void ResetProjection();
     static void ResetModelView();
+    static void ResetTexture();
+    static void PrintMatrix(Matrix4x4 mat);
 };
 
 #endif

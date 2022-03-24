@@ -42,11 +42,12 @@ PROGOBJ		= main\
 				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
 				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
 				editor\MainWindow editor\RenderWindow editor\gui\Container editor\gui\Menu\
-				editor\gui\UIManager editor\gui\GUIManager editor\gui\AnimationCurve editor\gui\ViewManager\
+				editor\gui\UIManager editor\gui\GUIUtils editor\gui\AnimationCurve editor\gui\ViewManager\
 				editor\main\ViewObject\
 				editor\object\AudioListenerObject editor\object\AudioSourceObject\
 				editor\object\CameraObject editor\object\CubicBezierObject\
-				editor\object\MeshObject editor\object\PointLightObject\
+				editor\object\MeshObject editor\object\PointLightObject editor\object\WindowObject\
+				editor\object\GUIManagerObject editor\object\GUIObject editor\object\GUIMeshObject\
 				editor\main\Window editor\main\Tool editor\main\Operation\
 				editor\main\Transform
 PLATOBJ		=  utils\File utils\os\Shell utils\os\Log utils\os\Thread utils\os\System\

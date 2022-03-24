@@ -6,7 +6,6 @@
 #include <utils/math3d/LinearAlgebra.h>
 #include <utils/math3d/Camera.h>
 #include <editor/main/Window.h>
-//#include <editor/gui/GUIManager.h>
 #include <editor/gui/UIManager.h>
 #include <editor/gui/Menu.h>
 
@@ -30,7 +29,7 @@ private:
     Menu* insertMenu;
 
     UIManager* uiMgr;
-    //GUIManager* guiMgr;
+    GUIMeshObject* guiMgr;
 
     IOperation* curOp = NULL;
 

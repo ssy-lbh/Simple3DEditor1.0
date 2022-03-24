@@ -119,6 +119,12 @@ public:
     static void SaveImage(String file, Rect rect);
     static void RenderAnimation(String dir, size_t start, size_t end, Rect rect);
 
+    static void OnMouseMove(Point3 ori, Vector3 dir);
+    static void OnLeftDown(Point3 ori, Vector3 dir);
+    static void OnLeftUp(Point3 ori, Vector3 dir);
+    static void OnRightDown(Point3 ori, Vector3 dir);
+    static void OnRightUp(Point3 ori, Vector3 dir);
+
     static void RenderScene();
     static void RenderScreen();
 

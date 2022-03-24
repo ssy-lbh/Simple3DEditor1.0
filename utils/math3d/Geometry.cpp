@@ -227,3 +227,31 @@ void Face::DeleteSelfReferenceExcept(Edge* e){
         if (e != p->e) e->DeleteFace(p->f);
     }, &pack);
 }
+
+bool Face::Hit(Point3 ori, Vector3 dir){
+    return Intersect(ori, dir, NULL, NULL);
+}
+
+bool Face::Intersect(Point3 ori, Vector3 dir, Vector3* bary, float* dis){
+    if (vertices.Size() != 3){
+        DebugError("Face::Intersect Only Triangle Permitted");
+        return false;
+    }
+    Vector3 v0 = vertices[0]->pos - ori;
+    Vector3 v1 = vertices[1]->pos - vertices[0]->pos;
+    Vector3 v2 = vertices[2]->pos - vertices[0]->pos;
+    float det = Vector3::Determinant(v0, v1, v2);
+    if (det == 0.0f)
+        return false;
+    Vector3 pos = Vector3::Decompose(dir, v0, v1, v2, det);
+    if (pos.x <= 0.0f)
+        return false;
+    float invX = 1.0f / pos.x;
+    pos.y *= invX; pos.z *= invX;
+    if (bary)
+        *bary = Vector3(1.0f - pos.y - pos.z, pos.y, pos.z);
+    if (dis)
+        *dis = dir.Magnitude() * invX;
+    return pos.y >= 0.0f && pos.y <= 1.0f &&
+            pos.z >= 0.0f && pos.z <= 1.0f;
+}

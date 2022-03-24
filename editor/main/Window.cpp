@@ -33,11 +33,7 @@ void AWindow::OnResize(int x, int y){
     if (x == 0 || y == 0){
         return;
     }
-    cliSize.x = x;
-    cliSize.y = y;
-    cliInvSize.x = 1.0f / cliSize.x;
-    cliInvSize.y = 1.0f / cliSize.y;
-    aspect = (float)cliSize.x / cliSize.y;
+    UpdateWindowSize(x, y);
 }
 
 void AWindow::OnMouseMove(int x, int y){

@@ -138,6 +138,43 @@ size_t Mesh::FindUVRect(Vector2 uv1, Vector2 uv2, List<Vertex*>& result){
     return pack.cnt;
 }
 
+Face* Mesh::Intersect(Point3 ori, Vector3 dir, Vector3* bary){
+    float dis, mindis;
+    Vector3 tmp;
+    Face* res = NULL;
+    size_t size = faces.Size();
+
+    for (size_t i = 0; i < size; i++){
+        if (faces[i]->Intersect(ori, dir, &tmp, &dis)){
+            if (!res){
+                mindis = dis;
+                res = faces[i];
+                if (bary) *bary = tmp;
+            }else if (dis < mindis){
+                mindis = dis;
+                res = faces[i];
+                if (bary) *bary = tmp;
+            }
+        }
+    }
+
+    return res;
+}
+
+bool Mesh::IntersectUV(Point3 ori, Vector3 dir, Vector2* uv){
+    Vector3 bary;
+    Face* f = Intersect(ori, dir, &bary);
+
+    if (f){
+        *uv = f->vertices[0]->uv * bary.x
+                + f->vertices[1]->uv * bary.y
+                + f->vertices[2]->uv * bary.z;
+        return true;
+    }
+
+    return false;
+}
+
 Vertex* Mesh::AddVertex(Vector3 pos){
     Vertex* v = new Vertex(pos);
     v->object = object;
@@ -264,6 +301,45 @@ void Mesh::DeleteTriFace(Face* f){
     delete f;
 }
 
+void Mesh::OnSelectVertex(Point3 ori, Vector3 dir, List<Vertex*>& list){
+    Vertex* v = Find(ori, dir);
+    if (!v){
+        list.Clear();
+        DebugLog("No Point Selected");
+    }else{
+        if (list.HasValue(v))
+            return;
+        list.Add(v);
+        DebugLog("Select Point %f %f %f", v->pos.x, v->pos.y, v->pos.z);
+    }
+}
+
+void Mesh::OnSelectEdge(Point3 ori, Vector3 dir, List<Edge*>& list){
+    Edge* e = FindEdge(ori, dir);
+    if (!e){
+        list.Clear();
+        DebugLog("No Edge Selected");
+    }else{
+        if (list.HasValue(e))
+            return;
+        list.Add(e);
+        DebugLog("Select Edge (%f,%f,%f) (%f,%f,%f)", e->v1->pos.x, e->v1->pos.y, e->v1->pos.z, e->v2->pos.x, e->v2->pos.y, e->v2->pos.z);
+    }
+}
+
+void Mesh::OnSelectUV(Vector2 uv, List<Vertex*>& list, float err){
+    Vertex* v = FindUV(uv, err);
+    if (!v){
+        list.Clear();
+        DebugLog("No Point Selected");
+    }else{
+        if (list.HasValue(v))
+            return;
+        list.Add(v);
+        DebugLog("Select Point %f %f", v->uv.x, v->uv.y);
+    }
+}
+
 void Mesh::Render(){
     Render(&LocalData::GetLocalInst()->renderOptions);
 }
@@ -328,6 +404,59 @@ void Mesh::Render(const RenderOptions* options){
             });
             glEnd();
         }
+        glShadeModel(GL_FLAT);
+    }
+}
+
+void Mesh::RenderWithUV(){
+    RenderWithUV(&LocalData::GetLocalInst()->renderOptions);
+}
+
+void Mesh::RenderWithUV(const RenderOptions* options){
+    glDisable(GL_LIGHTING);
+
+    if (options->vertex){
+        glEnable(GL_POINT_SMOOTH);
+        glPointSize(4.0f);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBegin(GL_POINTS);
+        vertices.Foreach([](Vertex* v){
+            glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+        });
+        glEnd();
+        glDisable(GL_POINT_SMOOTH);
+    }
+    
+    if (options->edge){
+        glEnable(GL_LINE_SMOOTH);
+        glLineWidth(1.0f);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBegin(GL_LINES);
+        edges.Foreach([](Edge* e){
+            glVertex3f(e->v1->pos.x, e->v1->pos.y, e->v1->pos.z);
+            glVertex3f(e->v2->pos.x, e->v2->pos.y, e->v2->pos.z);
+        });
+        glEnd();
+        glDisable(GL_LINE_SMOOTH);
+    }
+
+    if (options->face){
+        if (options->light)
+            glEnable(GL_LIGHTING);// 开启光照系统
+        glShadeModel(GL_SMOOTH);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBegin(GL_TRIANGLES);
+        faces.Foreach([](Face* f){
+            Vertex* v;
+            // V坐标已经反转
+            v = f->vertices[0];
+            glTexCoord2f(v->uv.x, v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+            v = f->vertices[1];
+            glTexCoord2f(v->uv.x, v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+            v = f->vertices[2];
+            glTexCoord2f(v->uv.x, v->uv.y); glColor3f(v->color.x, v->color.y, v->color.z); glNormal3f(v->normal.x, v->normal.y, v->normal.z); glVertex3f(v->pos.x, v->pos.y, v->pos.z);
+        });
+        glEnd();
         glShadeModel(GL_FLAT);
     }
 }

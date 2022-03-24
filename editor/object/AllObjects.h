@@ -4,3 +4,6 @@
 #include <editor/object/CubicBezierObject.h>
 #include <editor/object/MeshObject.h>
 #include <editor/object/PointLightObject.h>
+#include <editor/object/GUIManagerObject.h>
+#include <editor/object/GUIObject.h>
+#include <editor/object/GUIMeshObject.h>

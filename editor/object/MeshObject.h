@@ -5,9 +5,11 @@
 
 #include <editor/main/ViewObject.h>
 
-class MeshObject final : public AViewObject {
-private:
+class MeshObject : public AViewObject {
+protected:
     Mesh* mesh;
+
+    MeshObject(const wchar_t* name, ViewObjectType type);
 
 public:
     MeshObject();

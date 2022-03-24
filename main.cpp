@@ -17,6 +17,7 @@
 #include <utils/gl/GLUtils.h>
 #include <editor/main/ViewObject.h>
 #include <editor/object/MeshObject.h>
+#include <editor/object/GUIMeshObject.h>
 #include <editor/object/CameraObject.h>
 #include <editor/object/AudioListenerObject.h>
 
@@ -321,6 +322,26 @@ void Main::RenderAnimation(String dir, size_t start, size_t end, Rect rect){
     }
 }
 
+void Main::OnMouseMove(Point3 ori, Vector3 dir){
+    data->curObject->OnMouseMove(ori, dir);
+}
+
+void Main::OnLeftDown(Point3 ori, Vector3 dir){
+    data->curObject->OnLeftDown(ori, dir);
+}
+
+void Main::OnLeftUp(Point3 ori, Vector3 dir){
+    data->curObject->OnLeftUp(ori, dir);
+}
+
+void Main::OnRightDown(Point3 ori, Vector3 dir){
+    data->curObject->OnRightDown(ori, dir);
+}
+
+void Main::OnRightUp(Point3 ori, Vector3 dir){
+    data->curObject->OnRightUp(ori, dir);
+}
+
 void Main::RenderScene(){
     data->scene->OnChainRender();
 }
@@ -332,9 +353,13 @@ void Main::RenderScreen(){
 Mesh* Main::GetMesh(){
     if (!data->curObject)
         return NULL;
-    if (data->curObject->GetType() != ViewObjectType::OBJECT_MESH)
-        return NULL;
-    return (dynamic_cast<MeshObject*>(data->curObject))->GetMesh();
+    if (data->curObject->GetType() == ViewObjectType::OBJECT_MESH){
+        return (dynamic_cast<MeshObject*>(data->curObject))->GetMesh();
+    }
+    if (data->curObject->GetType() == ViewObjectType::OBJECT_GUI_MESH){
+        return (dynamic_cast<GUIMeshObject*>(data->curObject))->GetMesh();
+    }
+    return NULL;
 }
 
 int Main::MainEntry(int argc, char** argv){

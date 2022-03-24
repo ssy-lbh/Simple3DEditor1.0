@@ -341,6 +341,12 @@ Matrix4x4 GLUtils::GetModelViewMatrix(){
     return mat;
 }
 
+Matrix4x4 GLUtils::GetTextureMatrix(){
+    Matrix4x4 mat;
+    glGetFloatv(GL_TEXTURE_MATRIX, (float*)&mat);
+    return mat;
+}
+
 void GLUtils::ResetProjection(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -351,4 +357,17 @@ void GLUtils::ResetProjection(){
 void GLUtils::ResetModelView(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+}
+
+void GLUtils::ResetTexture(){
+    glMatrixMode(GL_TEXTURE);
+    glLoadIdentity();
+}
+
+void GLUtils::PrintMatrix(Matrix4x4 mat){
+    DebugLog("%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f",
+             mat._11, mat._12, mat._13, mat._14,
+             mat._21, mat._22, mat._23, mat._24,
+             mat._31, mat._32, mat._33, mat._34,
+             mat._41, mat._42, mat._43, mat._44);
 }

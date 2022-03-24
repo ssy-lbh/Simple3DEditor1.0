@@ -25,6 +25,9 @@ public:
     Edge* FindEdge(Vector3 ori, Vector3 dir);
     Vertex* FindUV(Vector2 uv, float err = 0.01f);
     size_t FindUVRect(Vector2 uv1, Vector2 uv2, List<Vertex*>& result);
+    Face* Intersect(Point3 ori, Vector3 dir, Vector3* bary);
+    // 相交完成时，uv不能为NULL且才会被写入
+    bool IntersectUV(Point3 ori, Vector3 dir, Vector2* uv);
 
     Vertex* AddVertex(Vector3 pos);
     Vertex* AddVertex(Vertex* v);
@@ -34,8 +37,14 @@ public:
     void DeleteEdge(Edge* e);
     void DeleteTriFace(Face* f);
 
+    void OnSelectVertex(Point3 ori, Vector3 dir, List<Vertex*>& list);
+    void OnSelectEdge(Point3 ori, Vector3 dir, List<Edge*>& list);
+    void OnSelectUV(Vector2 uv, List<Vertex*>& list, float err = 0.01f);
+
     void Render();
     void Render(const RenderOptions* options);
+    void RenderWithUV();
+    void RenderWithUV(const RenderOptions* options);
     void RenderUVMap();
 
     void WriteToOBJ(File file, bool uv = false, bool normal = false);

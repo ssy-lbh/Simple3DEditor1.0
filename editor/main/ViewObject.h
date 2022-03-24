@@ -30,10 +30,14 @@ enum class ViewObjectType {
     OBJECT_AUDIO_SOURCE,
     OBJECT_AUDIO_LISTENER,
     OBJECT_CAMERA,
-    GUI_MANAGER,
-    GUI_ICON_BUTTON,
-    GUI_EDIT_A,
-    GUI_EDIT_W
+    OBJECT_WINDOW,
+    
+    OBJECT_GUI_MESH,
+    OBJECT_GUI,
+    OBJECT_GUI_MANAGER,
+    OBJECT_GUI_ICON_BUTTON,
+    OBJECT_GUI_EDIT_A,
+    OBJECT_GUI_EDIT_W
 };
 
 class AViewObject : public Object {
@@ -97,7 +101,7 @@ public:
     virtual void OnSelectUV(Vector2 uv, float err = 0.01f);
     virtual void OnSelectUV(Vector2 uv1, Vector2 uv2);
 
-    void OnChainRender();
+    virtual void OnChainRender();
     // 基于OpenGL的渲染，如果渲染全过程已做好抽象可换用API
     virtual void OnRender();
     virtual void OnRenderUVMap();
@@ -109,20 +113,27 @@ public:
     virtual void OnChar(char c);
     virtual void OnUnichar(wchar_t c);
     virtual void OnResize(Vector2 size);
+    // 链式传递鼠标位移请使用3D
     virtual void OnMouseMove(Point3 ori, Vector3 dir);
     virtual void OnLeftDown(Point3 ori, Vector3 dir);
     virtual void OnLeftUp(Point3 ori, Vector3 dir);
-    virtual void OnLeftDrag(Vector3 delta, Vector3 dir);
     virtual void OnRightDown(Point3 ori, Vector3 dir);
     virtual void OnRightUp(Point3 ori, Vector3 dir);
-    virtual void OnRightDrag(Vector3 delta, Vector3 dir);
+    virtual void OnMouseMove2D(Point2 pos);
+    virtual void OnLeftDown2D(Point2 pos);
+    virtual void OnLeftUp2D(Point2 pos);
+    virtual void OnLeftDrag2D(Vector2 dir);
+    virtual void OnRightDown2D(Point2 pos);
+    virtual void OnRightUp2D(Point2 pos);
+    virtual void OnRightDrag2D(Vector2 dir);
+    // 返回是否在组件上方
+    virtual bool OnHit2D(Point2 pos);
     virtual void OnFocus();
     virtual void OnKillFocus();
     virtual void OnMouseWheel(int delta);
     virtual void OnMenuAccel(int id, bool accel);
     virtual void OnDropFileA(const char* path);
     virtual void OnDropFileW(const wchar_t* path);
-    virtual bool OnHit(Point3 ori, Vector3 dir);
 
     virtual void OnAnimationFrame(float frame);
 };

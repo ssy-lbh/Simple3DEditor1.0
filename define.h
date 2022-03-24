@@ -77,6 +77,9 @@ class BezierCurveObject;
 class AudioSourceObject;
 class AudioListenerObject;
 class CameraObject;
+class GUIManagerObject;
+class AGUIObject;
+class GUIMeshObject;
 
 // main
 enum class SelectionType;
@@ -148,6 +151,7 @@ class TreeWindow;
 // uimgr
 class UIManager;
 class GUIManager;
+class AGUI;
 class IButton;
 class IconButton;
 class UIEditA;

@@ -6,6 +6,7 @@
 #include <main.h>
 #include <res.h>
 #include <editor/gui/ViewManager.h>
+#include <editor/gui/GUIUtils.h>
 #include <editor/dialog/ColorBoard.h>
 #include <editor/dialog/Tips.h>
 #include <editor/main/ViewObject.h>
@@ -594,10 +595,6 @@ MainWindow::MainWindow() : Camera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f, 
     uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
     uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
 
-    //guiMgr = new GUIManager();
-    //guiMgr->transform.rotationXYZ.x.Set(90.0f);
-    //guiMgr->transform.scale.Set(Vector3(5.0f, 5.0f, 1.0f));
-
     SetTool(new EmptyTool(this));
 
     basicMenu = new Menu();
@@ -751,9 +748,75 @@ MainWindow::~MainWindow(){
     if (basicMenu) delete basicMenu;
     if (insertMenu) delete insertMenu;
     if (uiMgr) delete uiMgr;
-    //if (guiMgr) delete guiMgr;
+    if (guiMgr) delete guiMgr;
     if (curOp) delete curOp;
     if (skyBox) delete skyBox;
+}
+
+void MainWindow::OnCreate(){
+    skyBox = new GLSkyBox();
+    skyBox->Set(GLSkyBox::LEFT, new GLTexture2D(IDT_SKYBOX_LEFT));
+    skyBox->Set(GLSkyBox::RIGHT, new GLTexture2D(IDT_SKYBOX_RIGHT));
+    skyBox->Set(GLSkyBox::FRONT, new GLTexture2D(IDT_SKYBOX_FRONT));
+    skyBox->Set(GLSkyBox::BACK, new GLTexture2D(IDT_SKYBOX_BACK));
+    skyBox->Set(GLSkyBox::TOP, new GLTexture2D(IDT_SKYBOX_TOP));
+    skyBox->Set(GLSkyBox::DOWN, new GLTexture2D(IDT_SKYBOX_DOWN));
+
+    // GUI测试代码
+    guiMgr = new GUIMeshObject();
+    guiMgr->transform.rotationXYZ.x.Set(90.0f);
+    guiMgr->transform.scale.Set(Vector3(5.0f, 5.0f, 1.0f));
+    IconButton* iconBtn = new IconButton(Vector2::zero, Vector2::one, 0.1f);
+    iconBtn->SetIcon(IDT_NODEMAP_BACKGROUND);
+    iconBtn->OnClick([](void* p){
+        DebugLog("click");
+    });
+    iconBtn->SetMoveable(true);
+    guiMgr->AddChild(iconBtn);
+    Main::AddObject(guiMgr);
+}
+
+void MainWindow::OnClose(){}
+
+void MainWindow::OnTimer(int id){
+    if (audioControl){
+        if (dopplerEffect){
+            alListenerPosAutoVelv3(camPos);
+        }else{
+            alListenerPosv3(camPos);
+        }
+    }
+}
+
+void MainWindow::OnResize(int x, int y){
+    UpdateWindowSize(x, y);
+}
+
+void MainWindow::OnMouseMove(int x, int y){
+    UpdateCursor(x, y);
+}
+
+void MainWindow::OnRightDown(int x, int y){
+    AWindow::OnRightDown(x, y);
+    // 操作
+    if (curOp){
+        curOp->OnUndo();
+        delete curOp;
+        curOp = NULL;
+        return;
+    }
+    // 工具
+    if (curTool){
+        curTool->OnRightDown();
+    }
+    Main::SetMenu(basicMenu);
+}
+
+void MainWindow::OnRightUp(int x, int y){
+    AWindow::OnRightUp(x, y);
+    if (curTool){
+        curTool->OnRightUp();
+    }
 }
 
 void MainWindow::InitCamera(){
@@ -851,8 +914,6 @@ void MainWindow::RenderModelView(){
     glEnd();
     glLineWidth(1.0f);
     glDisable(GL_LINE_SMOOTH);
-
-    //guiMgr->OnChainRender();
 }
 
 void MainWindow::OnRender(){
@@ -912,8 +973,8 @@ void MainWindow::UpdateCursor(int x, int y){
     if (curTool){
         curTool->OnMove();
     }
-    // GUI测试
-    //guiMgr->OnMouseMove(camPos, cursorDir);
+    // GUI测试代码
+    Main::OnMouseMove(camPos, cursorDir);
 }
 
 void MainWindow::SetLookAt(Point3 at){
@@ -1067,67 +1128,6 @@ bool MainWindow::LoadMesh(AViewObject* obj, WString path){
     return true;
 }
 
-void MainWindow::OnCreate(){
-    skyBox = new GLSkyBox();
-    skyBox->Set(GLSkyBox::LEFT, new GLTexture2D(IDT_SKYBOX_LEFT));
-    skyBox->Set(GLSkyBox::RIGHT, new GLTexture2D(IDT_SKYBOX_RIGHT));
-    skyBox->Set(GLSkyBox::FRONT, new GLTexture2D(IDT_SKYBOX_FRONT));
-    skyBox->Set(GLSkyBox::BACK, new GLTexture2D(IDT_SKYBOX_BACK));
-    skyBox->Set(GLSkyBox::TOP, new GLTexture2D(IDT_SKYBOX_TOP));
-    skyBox->Set(GLSkyBox::DOWN, new GLTexture2D(IDT_SKYBOX_DOWN));
-
-    // GUI测试代码
-    // IconButton* iconBtn = new IconButton(Vector2::zero, Vector2::one, 0.1f);
-    // iconBtn->SetIcon(IDT_NODEMAP_BACKGROUND);
-    // iconBtn->OnClick([](void* p){
-    //     DebugLog("click");
-    // });
-    //guiMgr->AddChild(iconBtn);
-}
-
-void MainWindow::OnClose(){}
-
-void MainWindow::OnTimer(int id){
-    if (audioControl){
-        if (dopplerEffect){
-            alListenerPosAutoVelv3(camPos);
-        }else{
-            alListenerPosv3(camPos);
-        }
-    }
-}
-
-void MainWindow::OnResize(int x, int y){
-    UpdateWindowSize(x, y);
-}
-
-void MainWindow::OnMouseMove(int x, int y){
-    UpdateCursor(x, y);
-}
-
-void MainWindow::OnRightDown(int x, int y){
-    AWindow::OnRightDown(x, y);
-    // 操作
-    if (curOp){
-        curOp->OnUndo();
-        delete curOp;
-        curOp = NULL;
-        return;
-    }
-    // 工具
-    if (curTool){
-        curTool->OnRightDown();
-    }
-    Main::SetMenu(basicMenu);
-}
-
-void MainWindow::OnRightUp(int x, int y){
-    AWindow::OnRightUp(x, y);
-    if (curTool){
-        curTool->OnRightUp();
-    }
-}
-
 void MainWindow::OnInsSave(){
     SaveMesh(Main::GetMesh());
 }
@@ -1175,7 +1175,7 @@ void MainWindow::OnLeftDown(int x, int y){
         curTool->OnLeftDown();
     }
     // GUI测试
-    //guiMgr->OnLeftDown(camPos, cursorDir);
+    Main::OnLeftDown(camPos, cursorDir);
 }
 
 void MainWindow::OnLeftUp(int x, int y){
@@ -1185,7 +1185,7 @@ void MainWindow::OnLeftUp(int x, int y){
         curTool->OnLeftUp();
     }
     // GUI测试代码
-    //guiMgr->OnLeftUp(camPos, cursorDir);
+    Main::OnLeftUp(camPos, cursorDir);
 }
 
 void MainWindow::OnChar(char c){
@@ -1241,6 +1241,10 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, 0.0f) + camLookat);
         Vertex* v3 = new Vertex(Vector3(-1.0f,  1.0f, 0.0f) + camLookat);
         Vertex* v4 = new Vertex(Vector3( 1.0f,  1.0f, 0.0f) + camLookat);
+        v1->uv = Vector2(0.0f, 0.0f);
+        v2->uv = Vector2(1.0f, 0.0f);
+        v3->uv = Vector2(0.0f, 1.0f);
+        v4->uv = Vector2(1.0f, 1.0f);
         mesh->AddVertex(v1);
         mesh->AddVertex(v2);
         mesh->AddVertex(v3);

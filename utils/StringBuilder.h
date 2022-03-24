@@ -28,6 +28,8 @@ public:
         return ptr;
     }
 
+    void SetLength(size_t size);
+
     inline void Clear(){
         ptr = 0;
     }
@@ -69,6 +71,8 @@ public:
     inline size_t GetLength(){
         return ptr;
     }
+
+    void SetLength(size_t size);
 
     inline void Clear(){
         ptr = 0;

@@ -47,6 +47,11 @@ const String StringBuilderA::ToPackString(){
     return PackString(data, ptr);
 }
 
+void StringBuilderA::SetLength(size_t size){
+    Check(size - ptr + 2);
+    ptr = size;
+}
+
 StringBuilderA& StringBuilderA::Append(char c){
     Check(2);
     data[ptr++] = c;
@@ -155,6 +160,11 @@ WString StringBuilderW::ToString(){
 const WString StringBuilderW::ToPackString(){
     data[ptr] = L'\0';
     return PackWString(data, ptr);
+}
+
+void StringBuilderW::SetLength(size_t size){
+    Check(size - ptr + 2);
+    ptr = size;
 }
 
 StringBuilderW& StringBuilderW::Append(char c){

@@ -16,6 +16,8 @@ GLFrameBuffer::GLFrameBuffer(GLRenderTexture2D* texture){
 
 GLFrameBuffer::~GLFrameBuffer(){
     glDeleteFramebuffers(1, &frame);
+    if (glIsRenderbuffer(buffer))
+        glDeleteRenderbuffers(1, &buffer);
 }
 
 void GLFrameBuffer::BindTexture(GLRenderTexture2D* texture){
@@ -26,18 +28,18 @@ void GLFrameBuffer::BindTexture(GLRenderTexture2D* texture, uenum attachment){
     uint tex;
 
     if (!texture){
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame);
-        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, attachment, GL_TEXTURE_2D, 0, 0);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, frame);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, 0, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         SetSize(Rect::zero);
         return;
     }
 
     tex = texture->GetTexture();
     glBindTexture(GL_TEXTURE_2D, tex);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame);
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, attachment, GL_TEXTURE_2D, tex, 0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, frame);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, tex, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     SetSize(texture);
 }
@@ -55,11 +57,29 @@ void GLFrameBuffer::SetSize(GLRenderTexture2D* texture){
 }
 
 void GLFrameBuffer::Enable(){
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame);
+    glBindFramebuffer(GL_FRAMEBUFFER, frame);
     ViewManager::GetLocalInst()->PushView(rect);
 }
 
 void GLFrameBuffer::Disable(){
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     ViewManager::GetLocalInst()->PopView();
+}
+
+void GLFrameBuffer::EnableRenderBuffer(){
+    if (!buffer){
+        glGenRenderbuffers(1, &buffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, buffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, rect.GetWidth(), rect.GetHeight());
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, frame);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, buffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void GLFrameBuffer::DisableRenderBuffer(){
+    glBindFramebuffer(GL_FRAMEBUFFER, frame);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
