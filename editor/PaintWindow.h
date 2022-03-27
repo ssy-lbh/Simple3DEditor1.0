@@ -36,7 +36,14 @@ private:
     private:
         PaintWindow* window;
         bool draw = false;
-        uint paintLoc, offsetLoc, positionLoc, radiusLoc, colorLoc;
+
+        // Uniform位置
+        uint paintLoc;
+        uint offsetLoc;
+        uint positionLoc;
+        uint radiusLoc;
+        uint colorLoc;
+
         Vector3 color = Vector3::one;
 
         GLComputeProgram* prog = NULL;
