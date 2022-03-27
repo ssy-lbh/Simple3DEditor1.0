@@ -12,6 +12,7 @@
 #include <utils/os/Font.h>
 #include <editor/gui/ViewManager.h>
 
+IconButton::IconButton() : AGUIObject(L"IconButton", ViewObjectType::OBJECT_GUI_ICON_BUTTON) {}
 IconButton::IconButton(Vector2 position, Vector2 size) : AGUIObject(L"IconButton", ViewObjectType::OBJECT_GUI_ICON_BUTTON), position(position), size(size) {}
 IconButton::IconButton(Vector2 position, Vector2 size, float radius) : AGUIObject(L"IconButton", ViewObjectType::OBJECT_GUI_ICON_BUTTON), position(position), size(size), radius(radius) {}
 
@@ -20,13 +21,13 @@ IconButton::~IconButton(){
 }
 
 bool IconButton::OnHit2D(Point2 pos){
-    hover = pos.x >= position.x && pos.x <= position.x + size.x && pos.y >= position.y && pos.y <= position.y + size.y;
+    hover = pos.x >= position.x && pos.x <= position.x + size.x &&
+            pos.y >= position.y && pos.y <= position.y + size.y;
     return hover;
 }
 
 void IconButton::OnLeftDown2D(Point2 pos){
-    if (onClick)
-        onClick(userData);
+    onClick();
     startPos = position;
 }
 
@@ -44,14 +45,6 @@ void IconButton::OnRender(){
         radius, 0.05f
     );
     GLTexture2D::Disable();
-}
-
-void IconButton::OnClick(void(*func)(void*)){
-    onClick = func;
-}
-
-void IconButton::SetUserData(void* data){
-    userData = data;
 }
 
 void IconButton::SetIcon(const char* texPath){
@@ -72,20 +65,10 @@ void IconButton::SetIcon(GLTexture2D* tex){
     texture = tex;
 }
 
-bool IconButton::IsMoveable(){
-    return moveable;
-}
-
-void IconButton::SetMoveable(bool moveable){
-    this->moveable = moveable;
-}
-
+GUIEditA::GUIEditA() :
+    AGUIObject(L"GUIEditA", ViewObjectType::OBJECT_GUI_EDIT_A) {}
 GUIEditA::GUIEditA(Vector2 pos, float width) :
     AGUIObject(L"GUIEditA", ViewObjectType::OBJECT_GUI_EDIT_A), position(pos), size(Vector2(width, 0.0f)) {}
-GUIEditA::GUIEditA(Vector2 pos, float width, void(*onEdit)(String, void*)) :
-    AGUIObject(L"GUIEditA", ViewObjectType::OBJECT_GUI_EDIT_A), position(pos), size(Vector2(width, 0.0f)), onEdit(onEdit) {}
-GUIEditA::GUIEditA(Vector2 pos, float width, void(*onEdit)(String, void*), void* userData) :
-    AGUIObject(L"GUIEditA", ViewObjectType::OBJECT_GUI_EDIT_A), position(pos), size(Vector2(width, 0.0f)), onEdit(onEdit), userData(userData) {}
 GUIEditA::~GUIEditA(){}
 
 bool GUIEditA::OnHit2D(Point2 pos){
@@ -105,8 +88,7 @@ void GUIEditA::OnLeftDown2D(Point2 pos){
 void GUIEditA::OnKillFocus(){
     if (editing){
         editing = false;
-        if (onEdit)
-            onEdit(text.ToString(), userData);
+        onEdit(text.ToString());
     }
 }
 
@@ -119,8 +101,7 @@ void GUIEditA::OnChar(char c){
     case '\n':
         if (editing){
             editing = false;
-            if (onEdit)
-                onEdit(text.ToString(), userData);
+            onEdit(text.ToString());
         }
         return;
     case '\b':
@@ -163,21 +144,13 @@ String GUIEditA::GetText(){
     return text.ToString();
 }
 
-void GUIEditA::SetBackgroundColor(Vector3 color){ bkColor = color; }
-void GUIEditA::SetFontColor(Vector3 color){ fontColor = color; }
-void GUIEditA::SetSelectionColor(Vector3 color){ selColor = color; }
-void GUIEditA::SetCornerRadius(float radius){ this->radius = radius; }
-Vector3 GUIEditA::GetBackgroundColor(){ return bkColor; }
-Vector3 GUIEditA::GetFontColor(){ return fontColor; }
-Vector3 GUIEditA::GetSelectionColor(){ return selColor; }
-float GUIEditA::GetCornerRadius(){ return radius; }
+void GUIEditA::SetText(String s){
+    text.Clear();
+    text += s;
+}
 
 GUIEditW::GUIEditW(Vector2 pos, float width) :
     AGUIObject(L"GUIEditW", ViewObjectType::OBJECT_GUI_EDIT_W), position(pos), size(Vector2(width, 0.0f)) {}
-GUIEditW::GUIEditW(Vector2 pos, float width, void(*onEdit)(WString, void*)) :
-    AGUIObject(L"GUIEditW", ViewObjectType::OBJECT_GUI_EDIT_W), position(pos), size(Vector2(width, 0.0f)), onEdit(onEdit) {}
-GUIEditW::GUIEditW(Vector2 pos, float width, void(*onEdit)(WString, void*), void* userData) :
-    AGUIObject(L"GUIEditW", ViewObjectType::OBJECT_GUI_EDIT_W), position(pos), size(Vector2(width, 0.0f)), onEdit(onEdit), userData(userData) {}
 
 GUIEditW::~GUIEditW(){}
 
@@ -208,8 +181,7 @@ void GUIEditW::OnUnichar(wchar_t c){
     case '\n':
         if (editing){
             editing = false;
-            if (onEdit)
-                onEdit(text.ToString(), userData);
+            onEdit(text.ToString());
         }
         return;
     case L'\b':
@@ -248,13 +220,83 @@ void GUIEditW::OnRender(){
     }
 }
 
-WString GUIEditW::GetText(){ return text.ToString(); }
+WString GUIEditW::GetText(){
+    return text.ToString();
+}
 
-void GUIEditW::SetBackgroundColor(Vector3 color){ bkColor = color; }
-void GUIEditW::SetFontColor(Vector3 color){ fontColor = color; }
-void GUIEditW::SetSelectionColor(Vector3 color){ selColor = color; }
-void GUIEditW::SetCornerRadius(float radius){ this->radius = radius; }
-Vector3 GUIEditW::GetBackgroundColor(){ return bkColor; }
-Vector3 GUIEditW::GetFontColor(){ return fontColor; }
-Vector3 GUIEditW::GetSelectionColor(){ return selColor; }
-float GUIEditW::GetCornerRadius(){ return radius; }
+void GUIEditW::SetText(WString s){
+    text.Clear();
+    text += s;
+}
+
+HorizontalProgressBar::HorizontalProgressBar(){}
+HorizontalProgressBar::~HorizontalProgressBar(){}
+
+bool HorizontalProgressBar::OnHit2D(Point2 pos){
+    float btnPos = Lerp(lowBound, highBound, this->pos);
+    hover = (pos.x >= btnPos - btnX &&
+            pos.x <= btnPos + btnX &&
+            pos.y >= posY - btnY &&
+            pos.y <= posY + btnY);
+    return hover;
+}
+
+void HorizontalProgressBar::OnLeftDown2D(Point2 pos){
+    origin = this->pos;
+}
+
+void HorizontalProgressBar::OnLeftDrag2D(Vector2 dir){
+    pos = Clamp(origin + (dir.x / (highBound - lowBound)), 0.0f, 1.0f);
+    onPosChange(pos);
+}
+
+void HorizontalProgressBar::OnRender(){
+    glLineWidth(lineWidth);
+    glColorv3(lineColor);
+    glBegin(GL_LINES);
+    glVertex2f(lowBound, posY);
+    glVertex2f(highBound, posY);
+    glEnd();
+    glLineWidth(1.0f);
+
+    float btnPos = Lerp(lowBound, highBound, this->pos);
+    glColorv3(hover ? hoverBtnColor : defaultBtnColor);
+    GLUtils::DrawRect(btnPos - btnX, posY - btnY,
+                        btnPos + btnX, posY + btnY);
+}
+
+VerticalProgressBar::VerticalProgressBar(){}
+VerticalProgressBar::~VerticalProgressBar(){}
+
+bool VerticalProgressBar::OnHit2D(Point2 pos){
+    float btnPos = Lerp(lowBound, highBound, this->pos);
+    hover = (pos.x >= posX - btnX &&
+            pos.x <= posX + btnX &&
+            pos.y >= btnPos - btnY &&
+            pos.y <= btnPos + btnY);
+    return hover;
+}
+
+void VerticalProgressBar::OnLeftDown2D(Point2 pos){
+    origin = this->pos;
+}
+
+void VerticalProgressBar::OnLeftDrag2D(Vector2 dir){
+    pos = Clamp(origin + (dir.y / (highBound - lowBound)), 0.0f, 1.0f);
+    onPosChange(pos);
+}
+
+void VerticalProgressBar::OnRender(){
+    glLineWidth(lineWidth);
+    glColorv3(lineColor);
+    glBegin(GL_LINES);
+    glVertex2f(posX, lowBound);
+    glVertex2f(posX, highBound);
+    glEnd();
+    glLineWidth(1.0f);
+
+    float btnPos = Lerp(lowBound, highBound, this->pos);
+    glColorv3(hover ? hoverBtnColor : defaultBtnColor);
+    GLUtils::DrawRect(pos - btnX, btnPos - btnY,
+                        pos + btnX, btnPos + btnY);
+}

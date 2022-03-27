@@ -6,8 +6,6 @@
 #include <utils/List.h>
 #include <utils/math3d/LinearAlgebra.h>
 
-#define MENUITEM_LAMBDA_TRANS(t) (void(*)(void*))(void(*)(t*))
-
 interface IMenuItem : public Object {
 public:
     enum class ItemType {
@@ -25,6 +23,8 @@ public:
 
     virtual void OnClick();
 };
+
+#define MENUITEM_LAMBDA_TRANS(t) (void(*)(void*))(void(*)(t*))
 
 class MenuItem final : public IMenuItem {
 public:

@@ -6,23 +6,27 @@
 #include <utils/List.h>
 #include <utils/String.h>
 #include <utils/StringBuilder.h>
+#include <utils/Delegate.h>
 #include <utils/math3d/LinearAlgebra.h>
 #include <editor/object/GUIObject.h>
 
+// 看来GUI组件的属性过多，而且大都不为指针，所以大部分属性不要过度封装，直接公开即可
 class IconButton final : public AGUIObject {
 private:
-    Vector2 position;
     Vector2 startPos;
-    Vector2 size;
-    float radius;
     bool hover = false;
 
     GLTexture2D* texture = NULL;
-    bool moveable = false;
-    void(*onClick)(void*) = NULL;
-    void* userData = NULL;
 
 public:
+    Vector2 position;
+    Vector2 size;
+    float radius;
+    bool moveable = false;
+
+    DelegateWithData<void, void*> onClick;
+
+    IconButton();
     IconButton(Vector2 position, Vector2 size);
     IconButton(Vector2 position, Vector2 size, float radius);
     virtual ~IconButton() override;
@@ -32,17 +36,17 @@ public:
     virtual void OnLeftDrag2D(Vector2 dir) override;
     virtual void OnRender() override;
 
-    void OnClick(void(*func)(void*));
-    void SetUserData(void* data);
     void SetIcon(const char* texPath);
     void SetIcon(int iconRes);
     void SetIcon(GLTexture2D* tex);
-    bool IsMoveable();
-    void SetMoveable(bool moveable);
 };
 
 class GUIEditA final : public AGUIObject {
 private:
+    StringBuilderA text;
+    bool editing = false;
+
+public:
     // 左上角位置
     Vector2 position;
     Vector2 size;
@@ -52,16 +56,10 @@ private:
     Vector3 fontColor = Vector3::one;
     Vector3 selColor = Vector3(0.0f, 0.0f, 1.0f);
 
-    StringBuilderA text;
-    bool editing = false;
+    DelegateWithData<void, void*, String> onEdit;
 
-    void(*onEdit)(String, void*) = NULL;
-    void* userData = NULL;
-
-public:
+    GUIEditA();
     GUIEditA(Vector2 pos, float width);
-    GUIEditA(Vector2 pos, float width, void(*onEdit)(String, void*));
-    GUIEditA(Vector2 pos, float width, void(*onEdit)(String, void*), void* userData);
     virtual ~GUIEditA();
 
     virtual bool OnHit2D(Point2 pos) override;
@@ -72,19 +70,15 @@ public:
     virtual void OnRender() override;
 
     String GetText();
-
-    void SetBackgroundColor(Vector3 color);
-    void SetFontColor(Vector3 color);
-    void SetSelectionColor(Vector3 color);
-    void SetCornerRadius(float radius);
-    Vector3 GetBackgroundColor();
-    Vector3 GetFontColor();
-    Vector3 GetSelectionColor();
-    float GetCornerRadius();
+    void SetText(String s);
 };
 
 class GUIEditW final : public AGUIObject {
 private:
+    StringBuilderW text;
+    bool editing = false;
+
+public:
     // 左上角位置
     Vector2 position;
     Vector2 size;
@@ -94,16 +88,10 @@ private:
     Vector3 fontColor = Vector3::one;
     Vector3 selColor = Vector3(0.0f, 0.0f, 1.0f);
 
-    StringBuilderW text;
-    bool editing = false;
+    DelegateWithData<void, void*, WString> onEdit;
 
-    void(*onEdit)(WString, void*) = NULL;
-    void* userData = NULL;
-
-public:
+    GUIEditW();
     GUIEditW(Vector2 pos, float width);
-    GUIEditW(Vector2 pos, float width, void(*onEdit)(WString, void*));
-    GUIEditW(Vector2 pos, float width, void(*onEdit)(WString, void*), void* userData);
     virtual ~GUIEditW();
 
     virtual bool OnHit2D(Point2 pos) override;
@@ -114,15 +102,63 @@ public:
     virtual void OnRender() override;
 
     WString GetText();
+    void SetText(WString s);
+};
 
-    void SetBackgroundColor(Vector3 color);
-    void SetFontColor(Vector3 color);
-    void SetSelectionColor(Vector3 color);
-    void SetCornerRadius(float radius);
-    Vector3 GetBackgroundColor();
-    Vector3 GetFontColor();
-    Vector3 GetSelectionColor();
-    float GetCornerRadius();
+class HorizontalProgressBar : public AGUIObject {
+private:
+    bool hover = false;
+    float origin;
+
+public:
+    float pos = 0.0f;
+    float lowBound;
+    float highBound;
+    float posY;
+    float btnX;
+    float btnY;
+    float lineWidth = 10.0f;
+    Vector3 lineColor = Vector3(0.6f, 0.6f, 0.6f);
+    Vector3 defaultBtnColor = Vector3(0.0f, 0.0f, 0.5f);
+    Vector3 hoverBtnColor = Vector3(0.0f, 0.0f, 0.3f);
+
+    DelegateWithData<void, void*, float> onPosChange;
+
+    HorizontalProgressBar();
+    virtual ~HorizontalProgressBar() override;
+
+    virtual bool OnHit2D(Point2 pos) override;
+    virtual void OnLeftDown2D(Point2 pos) override;
+    virtual void OnLeftDrag2D(Vector2 dir) override;
+    virtual void OnRender() override;
+};
+
+class VerticalProgressBar : public AGUIObject {
+private:
+    bool hover = false;
+    float origin;
+
+public:
+    float pos = 0.0f;
+    float lowBound;
+    float highBound;
+    float posX;
+    float btnX;
+    float btnY;
+    float lineWidth = 10.0f;
+    Vector3 lineColor = Vector3(0.6f, 0.6f, 0.6f);
+    Vector3 defaultBtnColor = Vector3(0.0f, 0.0f, 0.5f);
+    Vector3 hoverBtnColor = Vector3(0.0f, 0.0f, 0.3f);
+
+    DelegateWithData<void, void*, float> onPosChange;
+
+    VerticalProgressBar();
+    virtual ~VerticalProgressBar() override;
+
+    virtual bool OnHit2D(Point2 pos) override;
+    virtual void OnLeftDown2D(Point2 pos) override;
+    virtual void OnLeftDrag2D(Vector2 dir) override;
+    virtual void OnRender() override;
 };
 
 #endif

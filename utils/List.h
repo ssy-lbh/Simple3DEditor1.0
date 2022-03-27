@@ -98,8 +98,22 @@ public:
         return Add(val);
     }
 
+    List<T>& operator+=(List<T>& list){
+        Check(list.size + 5);
+        for (size_t i = 0; i < list.size; i++)
+            data[ptr++] = list.data[i];
+        return *this;
+    }
+
     List<T>& operator-=(T val){
         Remove(val);
+        return *this;
+    }
+    
+    // 性能极低!
+    List<T>& operator-=(List<T>& list){
+        for (size_t i = 0; i < list.size; i++)
+            Remove(list.data[i]);
         return *this;
     }
 
