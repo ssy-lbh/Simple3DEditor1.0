@@ -376,8 +376,8 @@ void UDContainer::OnResize(int x, int y){
 void UDContainer::OnMouseMove(int x, int y){
     AWindow::OnMouseMove(x, y);
     if (adjustPos){
-        Main::SetCursor(IDC_SIZEWE);
-        dis = x;
+        Main::SetCursor(IDC_SIZENS);
+        dis = y;
         if (uWindow) uWindow->OnResize(cliSize.x, cliSize.y - dis);
         if (dWindow) dWindow->OnResize(cliSize.x, dis);
         return;
@@ -388,9 +388,9 @@ void UDContainer::OnMouseMove(int x, int y){
 
 void UDContainer::OnLeftDown(int x, int y){
     AWindow::OnLeftDown(x, y);
-    if (dragEnable && Abs(x - dis) < 4.0f){
+    if (dragEnable && Abs(y - dis) < 4.0f){
         adjustPos = true;
-        Main::SetCursor(IDC_SIZEWE);
+        Main::SetCursor(IDC_SIZENS);
         return;
     }
     UpdateFocus();
