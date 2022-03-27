@@ -4,6 +4,7 @@
 
 #include <utils/os/Log.h>
 #include <utils/os/System.h>
+#include <utils/os/Font.h>
 
 String::String(){
     str = new char[1];
@@ -33,17 +34,11 @@ String::String(const char* s, size_t size){
 }
 
 String::String(const wchar_t* s){
-    len = WideCharToMultiByte(CP_ACP, 0, s, -1, NULL, 0, NULL, NULL);
-    str = new char[len + 1];
-    WideCharToMultiByte(CP_ACP, 0, s, -1, str, len, NULL, NULL);
-    str[len] = '\0';
+    WideCharToBytes(s, wcslen(s), str, len);
 }
 
 String::String(const wchar_t* s, size_t size){
-    len = WideCharToMultiByte(CP_ACP, 0, s, size, NULL, 0, NULL, NULL);
-    str = new char[len + 1];
-    WideCharToMultiByte(CP_ACP, 0, s, -1, str, len, NULL, NULL);
-    str[len] = '\0';
+    WideCharToBytes(s, len, str, len);
 }
 
 String::String(String &&s){
@@ -54,10 +49,7 @@ String::String(String &&s){
 }
 
 String::String(WString &&s){
-    len = WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), NULL, 0, NULL, NULL);
-    str = new char[len + 1];
-    WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), str, len, NULL, NULL);
-    str[len] = '\0';
+    WideCharToBytes(s.GetString(), s.GetLength(), str, len);
 }
 
 String::String(const String &s){
@@ -68,10 +60,7 @@ String::String(const String &s){
 }
 
 String::String(const WString &s){
-    len = WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), NULL, 0, NULL, NULL);
-    str = new char[len + 1];
-    WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), str, len, NULL, NULL);
-    str[len] = '\0';
+    WideCharToBytes(s.GetString(), s.GetLength(), str, len);
 }
 
 String &String::operator=(const char* s){
@@ -85,10 +74,7 @@ String &String::operator=(const char* s){
 
 String &String::operator=(const wchar_t* s){
     delete[] str;
-    len = WideCharToMultiByte(CP_ACP, 0, s, -1, NULL, 0, NULL, NULL);
-    str = new char[len + 1];
-    WideCharToMultiByte(CP_ACP, 0, s, -1, str, len, NULL, NULL);
-    str[len] = '\0';
+    WideCharToBytes(s, wcslen(s), str, len);
     return *this;
 }
 
@@ -103,10 +89,7 @@ String &String::operator=(String &&s){
 
 String &String::operator=(WString &&s){
     delete[] str;
-    len = WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), NULL, 0, NULL, NULL);
-    str = new char[len + 1];
-    WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), str, len, NULL, NULL);
-    str[len] = '\0';
+    WideCharToBytes(s.GetString(), s.GetLength(), str, len);
     return *this;
 }
 
@@ -121,10 +104,7 @@ String &String::operator=(const String &s){
 
 String &String::operator=(const WString &s){
     delete[] str;
-    len = WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), NULL, 0, NULL, NULL);
-    str = new char[len + 1];
-    WideCharToMultiByte(CP_ACP, 0, s.GetString(), s.GetLength(), str, len, NULL, NULL);
-    str[len] = '\0';
+    WideCharToBytes(s.GetString(), s.GetLength(), str, len);
     return *this;
 }
 
@@ -257,6 +237,26 @@ size_t String::FindChar(char c) const{
 size_t String::FindChar(char c, size_t beg) const{
     char* pos = strchr(str + beg, c);
     return pos ? pos - str : -1;
+}
+
+bool String::HasChar(char c) const{
+    return strchr(str, c);
+}
+
+bool String::HasChars(const char* s) const{
+    for (; *s; s++){
+        if (strchr(str, *s))
+            return true;
+    }
+    return false;
+}
+
+bool String::HasAllChars(const char* s) const{
+    for (; *s; s++){
+        if (!strchr(str, *s))
+            return false;
+    }
+    return true;
 }
 
 size_t String::FindRevChar(char c) const{
@@ -442,17 +442,11 @@ WString::WString(wchar_t c){
 }
 
 WString::WString(const char* s){
-    len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s, -1, NULL, 0);
-    str = new wchar_t[len + 1];
-    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s, -1, str, len);
-    str[len] = L'\0';
+    BytesToWideChar(s, strlen(s), str, len);
 }
 
 WString::WString(const char* s, size_t size){
-    len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s, size, NULL, 0);
-    str = new wchar_t[len + 1];
-    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s, -1, str, len);
-    str[len] = L'\0';
+    BytesToWideChar(s, size, str, len);
 }
 
 WString::WString(const wchar_t* s){
@@ -470,10 +464,7 @@ WString::WString(const wchar_t* s, size_t size){
 }
 
 WString::WString(String &&s){
-    len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), NULL, 0);
-    str = new wchar_t[len + 1];
-    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), str, len);
-    str[len] = L'\0';
+    BytesToWideChar(s.GetString(), s.GetLength(), str, len);
 }
 
 WString::WString(WString &&s){
@@ -484,10 +475,7 @@ WString::WString(WString &&s){
 }
 
 WString::WString(const String &s){
-    len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), NULL, 0);
-    str = new wchar_t[len + 1];
-    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), str, len);
-    str[len] = L'\0';
+    BytesToWideChar(s.GetString(), s.GetLength(), str, len);
 }
 
 WString::WString(const WString &s){
@@ -499,10 +487,7 @@ WString::WString(const WString &s){
 
 WString &WString::operator=(const char* s){
     delete[] str;
-    len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s, -1, NULL, 0);
-    str = new wchar_t[len + 1];
-    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s, -1, str, len);
-    str[len] = L'\0';
+    BytesToWideChar(s, strlen(s), str, len);
     return *this;
 }
 
@@ -517,10 +502,7 @@ WString &WString::operator=(const wchar_t* s){
 
 WString &WString::operator=(String &&s){
     delete[] str;
-    len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), NULL, 0);
-    str = new wchar_t[len + 1];
-    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), str, len);
-    str[len] = L'\0';
+    BytesToWideChar(s.GetString(), s.GetLength(), str, len);
     return *this;
 }
 
@@ -535,10 +517,7 @@ WString &WString::operator=(WString &&s){
 
 WString &WString::operator=(const String &s){
     delete[] str;
-    len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), NULL, 0);
-    str = new wchar_t[len + 1];
-    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s.GetString(), s.GetLength(), str, len);
-    str[len] = L'\0';
+    BytesToWideChar(s.GetString(), s.GetLength(), str, len);
     return *this;
 }
 
@@ -680,6 +659,26 @@ size_t WString::FindChar(wchar_t c) const{
 size_t WString::FindChar(wchar_t c, size_t beg) const{
     wchar_t* pos = wcschr(str + beg, c);
     return pos ? pos - str : -1;
+}
+
+bool WString::HasChar(wchar_t c) const{
+    return wcschr(str, c);
+}
+
+bool WString::HasChars(const wchar_t* s) const{
+    for (; *s; s++){
+        if (wcschr(str, *s))
+            return true;
+    }
+    return false;
+}
+
+bool WString::HasAllChars(const wchar_t* s) const{
+    for (; *s; s++){
+        if (!wcschr(str, *s))
+            return false;
+    }
+    return true;
 }
 
 size_t WString::FindRevChar(wchar_t c) const{

@@ -17,6 +17,10 @@ float glGetCNStringHeight(const wchar_t* text);
 Vector2 glGetStringSize(const char* text);
 Vector2 glGetCNStringSize(const wchar_t* text);
 
+// outText 指针由new[]得到，需要delete[]回收内存，返回字符串由'\0'结尾
+bool WideCharToBytes(const wchar_t* text, size_t len, char*& outText, size_t& outLen);
+bool BytesToWideChar(const char* text, size_t len, wchar_t*& outText, size_t& outLen);
+
 typedef struct FT_LibraryRec_* FT_Library;
 typedef struct FT_FaceRec_* FT_Face;
 

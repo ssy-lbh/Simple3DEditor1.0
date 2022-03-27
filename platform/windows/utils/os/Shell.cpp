@@ -5,6 +5,7 @@
 #include <utils/os/AppFrame.h>
 #include <utils/os/Log.h>
 #include <utils/String.h>
+#include <utils/StringBuilder.h>
 
 String ShellFileSelectWindow(const String filter, int flags, bool save){
     OPENFILENAMEA ofn;
@@ -160,16 +161,10 @@ bool ShellCommandLine(const WString s){
     }
 }
 
-bool ShellFFmpeg(const String src, const String dst){
-    String cmd = String(".\\lib\\ffmpeg\\ffmpeg -i \"") + src + "\" -y " + dst;
-
-    if (!ShellCommandLine(cmd)){
-        return false;
-    }
-
-    for (int i = 0; i < 100; i++){
+bool ShellCheckFileExistence(const String file, size_t times, size_t interval){
+    for (size_t i = 0; i < times; i++){
         HANDLE hFile = CreateFileA(
-            dst.GetString(),
+            file.GetString(),
             GENERIC_READ,
             FILE_SHARE_READ,
             NULL,
@@ -181,21 +176,15 @@ bool ShellFFmpeg(const String src, const String dst){
             CloseHandle(hFile);
             return true;
         }
-        Sleep(100);
+        Sleep(interval);
     }
     return false;
 }
 
-bool ShellFFmpeg(const WString src, const WString dst){
-    WString cmd = WString(L".\\lib\\ffmpeg\\ffmpeg -i \"") + src + L"\" -y " + dst;
-
-    if (!ShellCommandLine(cmd)){
-        return false;
-    }
-
-    for (int i = 0; i < 100; i++){
+bool ShellCheckFileExistence(const WString file, size_t times, size_t interval){
+    for (size_t i = 0; i < times; i++){
         HANDLE hFile = CreateFileW(
-            dst.GetString(),
+            file.GetString(),
             GENERIC_READ,
             FILE_SHARE_READ,
             NULL,
@@ -207,8 +196,56 @@ bool ShellFFmpeg(const WString src, const WString dst){
             CloseHandle(hFile);
             return true;
         }
-        Sleep(100);
+        Sleep(interval);
     }
+    return false;
+}
+
+bool ShellFFmpeg(const String src, const String dst){
+    StringBuilderA cmd;
+
+    cmd += ".\\bin\\ffmpeg.exe -i \"";
+    cmd += src;
+    cmd += "\" -y ";
+    cmd += dst;
+
+    if (!ShellCommandLine(cmd.ToString())){
+        return false;
+    }
+    return ShellCheckFileExistence(dst, 100, 100);
+}
+
+bool ShellFFmpeg(const WString src, const WString dst){
+    StringBuilderW cmd;
+
+    cmd += L".\\bin\\ffmpeg.exe -i \"";
+    cmd += src;
+    cmd += L"\" -y ";
+    cmd += dst;
+
+    if (!ShellCommandLine(cmd.ToString())){
+        return false;
+    }
+    return ShellCheckFileExistence(dst, 100, 100);
+}
+
+bool ShellShaderToBinary(const String src, const String dst, ShaderType type){
+    DebugError("ShellShaderToBinary [Unimplemented]");
+    return false;
+}
+
+bool ShellShaderToBinary(const WString src, const WString dst, ShaderType type){
+    DebugError("ShellShaderToBinary [Unimplemented]");
+    return false;
+}
+
+bool ShellBinaryToShader(const String src, const String dst, ShaderType type){
+    DebugError("ShellBinaryToShader [Unimplemented]");
+    return false;
+}
+
+bool ShellBinaryToShader(const WString src, const WString dst, ShaderType type){
+    DebugError("ShellBinaryToShader [Unimplemented]");
     return false;
 }
 

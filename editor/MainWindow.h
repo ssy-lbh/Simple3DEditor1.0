@@ -29,7 +29,7 @@ private:
     Menu* insertMenu;
 
     UIManager* uiMgr;
-    GUIMeshObject* guiMgr;
+    //GUIMeshObject* guiMgr;
 
     IOperation* curOp = NULL;
 

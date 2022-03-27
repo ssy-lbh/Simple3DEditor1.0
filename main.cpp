@@ -314,9 +314,9 @@ void Main::RenderAnimation(String dir, size_t start, size_t end, Rect rect){
         frame->Render();
         frame->SwapBuffer();
         
-        builder.Append(dir);
-        builder.Append(i);
-        builder.Append(".png");
+        builder += dir;
+        builder += i;
+        builder += ".png";
         SaveImage(builder.ToString(), rect);
         builder.Clear();
     }

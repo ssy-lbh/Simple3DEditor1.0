@@ -135,7 +135,7 @@ void MainWindow::MoveOperation::OnMove(){
     delta = main->camRight * mov.x * main->aspect + main->camUp * mov.y;
     delta = Vector3(x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
 
-    DebugLog("MoveOperation OnMove %f %f %f", delta.x, delta.y, delta.z);
+    //DebugLog("MoveOperation OnMove %f %f %f", delta.x, delta.y, delta.z);
 
     switch (Main::data->selType){
     case SelectionType::SELECT_OBJECT:
@@ -252,7 +252,7 @@ void MainWindow::ExcludeOperation::OnMove(){
     moveInfo.Foreach<Vector3*>([](MoveInfo info, Vector3* offset){
         info.vert->SetWorldPos(info.pos + *offset);
     }, &delta);
-    DebugLog("ExcludeOperation OnMove %f %f %f", delta.x, delta.y, delta.z);
+    //DebugLog("ExcludeOperation OnMove %f %f %f", delta.x, delta.y, delta.z);
 }
 
 void MainWindow::ExcludeOperation::OnConfirm(){
@@ -341,7 +341,7 @@ void MainWindow::RotateOperation::OnMove(){
     
     delta = ((main->cursorPos - screenCenter).Magnitude() - dis) * 360.0f;
 
-    DebugLog("RotateOperation Rotate %f Degree", delta);
+    //DebugLog("RotateOperation Rotate %f Degree", delta);
 
     switch (Main::data->selType){
     case SelectionType::SELECT_OBJECT:{
@@ -474,7 +474,7 @@ void MainWindow::SizeOperation::OnMove(){
     
     scale = (main->cursorPos - screenCenter).Magnitude() / startSize;
 
-    DebugLog("SizeOperation Scale %f", scale);
+    //DebugLog("SizeOperation Scale %f", scale);
     
     switch (Main::data->selType){
     case SelectionType::SELECT_OBJECT:
@@ -748,7 +748,7 @@ MainWindow::~MainWindow(){
     if (basicMenu) delete basicMenu;
     if (insertMenu) delete insertMenu;
     if (uiMgr) delete uiMgr;
-    if (guiMgr) delete guiMgr;
+    //if (guiMgr) delete guiMgr;
     if (curOp) delete curOp;
     if (skyBox) delete skyBox;
 }
@@ -763,17 +763,17 @@ void MainWindow::OnCreate(){
     skyBox->Set(GLSkyBox::DOWN, new GLTexture2D(IDT_SKYBOX_DOWN));
 
     // GUI测试代码
-    guiMgr = new GUIMeshObject();
-    guiMgr->transform.rotationXYZ.x.Set(90.0f);
-    guiMgr->transform.scale.Set(Vector3(5.0f, 5.0f, 1.0f));
-    IconButton* iconBtn = new IconButton(Vector2::zero, Vector2::one, 0.1f);
-    iconBtn->SetIcon(IDT_NODEMAP_BACKGROUND);
-    iconBtn->OnClick([](void* p){
-        DebugLog("click");
-    });
-    iconBtn->SetMoveable(true);
-    guiMgr->AddChild(iconBtn);
-    Main::AddObject(guiMgr);
+    // guiMgr = new GUIMeshObject();
+    // guiMgr->transform.rotationXYZ.x.Set(90.0f);
+    // guiMgr->transform.scale.Set(Vector3(5.0f, 5.0f, 1.0f));
+    // IconButton* iconBtn = new IconButton(Vector2::zero, Vector2::one, 0.1f);
+    // iconBtn->SetIcon(IDT_NODEMAP_BACKGROUND);
+    // iconBtn->OnClick([](void* p){
+    //     DebugLog("click");
+    // });
+    // iconBtn->SetMoveable(true);
+    // guiMgr->AddChild(iconBtn);
+    // Main::AddObject(guiMgr);
 }
 
 void MainWindow::OnClose(){}

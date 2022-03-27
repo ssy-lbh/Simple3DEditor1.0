@@ -1,0 +1,182 @@
+; SPIR-V
+; Version: 1.0
+; Generator: Google spiregg; 0
+; Bound: 127
+; Schema: 0
+               OpCapability Shader
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint Vertex %vert_main "vert_main" %in_var_POSITION %in_var_NORMAL %in_var_BLENDWEIGHT %out_var_POSITION %out_var_COLOR
+               OpSource HLSL 600
+               OpName %type__Globals "type.$Globals"
+               OpMemberName %type__Globals 0 "vClr"
+               OpMemberName %type__Globals 1 "mWld1"
+               OpMemberName %type__Globals 2 "mWld2"
+               OpMemberName %type__Globals 3 "mWld3"
+               OpMemberName %type__Globals 4 "mWld4"
+               OpMemberName %type__Globals 5 "Len"
+               OpMemberName %type__Globals 6 "vLight"
+               OpMemberName %type__Globals 7 "mTot"
+               OpName %_Globals "$Globals"
+               OpName %in_var_POSITION "in.var.POSITION"
+               OpName %in_var_NORMAL "in.var.NORMAL"
+               OpName %in_var_BLENDWEIGHT "in.var.BLENDWEIGHT"
+               OpName %out_var_POSITION "out.var.POSITION"
+               OpName %out_var_COLOR "out.var.COLOR"
+               OpName %vert_main "vert_main"
+               OpDecorate %in_var_POSITION Location 0
+               OpDecorate %in_var_NORMAL Location 1
+               OpDecorate %in_var_BLENDWEIGHT Location 2
+               OpDecorate %out_var_POSITION Location 0
+               OpDecorate %out_var_COLOR Location 1
+               OpDecorate %_Globals DescriptorSet 0
+               OpDecorate %_Globals Binding 0
+               OpMemberDecorate %type__Globals 0 Offset 0
+               OpMemberDecorate %type__Globals 1 Offset 16
+               OpMemberDecorate %type__Globals 1 MatrixStride 16
+               OpMemberDecorate %type__Globals 1 RowMajor
+               OpMemberDecorate %type__Globals 2 Offset 80
+               OpMemberDecorate %type__Globals 2 MatrixStride 16
+               OpMemberDecorate %type__Globals 2 RowMajor
+               OpMemberDecorate %type__Globals 3 Offset 144
+               OpMemberDecorate %type__Globals 3 MatrixStride 16
+               OpMemberDecorate %type__Globals 3 RowMajor
+               OpMemberDecorate %type__Globals 4 Offset 208
+               OpMemberDecorate %type__Globals 4 MatrixStride 16
+               OpMemberDecorate %type__Globals 4 RowMajor
+               OpMemberDecorate %type__Globals 5 Offset 272
+               OpMemberDecorate %type__Globals 6 Offset 288
+               OpMemberDecorate %type__Globals 7 Offset 304
+               OpMemberDecorate %type__Globals 7 MatrixStride 16
+               OpMemberDecorate %type__Globals 7 RowMajor
+               OpDecorate %type__Globals Block
+        %int = OpTypeInt 32 1
+      %int_1 = OpConstant %int 1
+      %int_2 = OpConstant %int 2
+      %int_3 = OpConstant %int 3
+      %int_4 = OpConstant %int 4
+      %int_5 = OpConstant %int 5
+      %float = OpTypeFloat 32
+    %float_1 = OpConstant %float 1
+      %int_7 = OpConstant %int 7
+      %int_6 = OpConstant %int 6
+    %v4float = OpTypeVector %float 4
+%mat4v4float = OpTypeMatrix %v4float 4
+%type__Globals = OpTypeStruct %v4float %mat4v4float %mat4v4float %mat4v4float %mat4v4float %float %v4float %mat4v4float
+%_ptr_Uniform_type__Globals = OpTypePointer Uniform %type__Globals
+%_ptr_Input_v4float = OpTypePointer Input %v4float
+    %v3float = OpTypeVector %float 3
+%_ptr_Input_v3float = OpTypePointer Input %v3float
+%_ptr_Output_v4float = OpTypePointer Output %v4float
+       %void = OpTypeVoid
+         %27 = OpTypeFunction %void
+%_ptr_Uniform_mat4v4float = OpTypePointer Uniform %mat4v4float
+%mat4v3float = OpTypeMatrix %v3float 4
+%mat3v3float = OpTypeMatrix %v3float 3
+%_ptr_Uniform_float = OpTypePointer Uniform %float
+%_ptr_Uniform_v4float = OpTypePointer Uniform %v4float
+   %_Globals = OpVariable %_ptr_Uniform_type__Globals Uniform
+%in_var_POSITION = OpVariable %_ptr_Input_v4float Input
+%in_var_NORMAL = OpVariable %_ptr_Input_v3float Input
+%in_var_BLENDWEIGHT = OpVariable %_ptr_Input_v4float Input
+%out_var_POSITION = OpVariable %_ptr_Output_v4float Output
+%out_var_COLOR = OpVariable %_ptr_Output_v4float Output
+  %vert_main = OpFunction %void None %27
+         %33 = OpLabel
+         %34 = OpLoad %v4float %in_var_POSITION
+         %35 = OpLoad %v3float %in_var_NORMAL
+         %36 = OpLoad %v4float %in_var_BLENDWEIGHT
+         %37 = OpAccessChain %_ptr_Uniform_mat4v4float %_Globals %int_1
+         %38 = OpLoad %mat4v4float %37
+         %39 = OpCompositeExtract %v4float %38 0
+         %40 = OpVectorShuffle %v3float %39 %39 0 1 2
+         %41 = OpCompositeExtract %v4float %38 1
+         %42 = OpVectorShuffle %v3float %41 %41 0 1 2
+         %43 = OpCompositeExtract %v4float %38 2
+         %44 = OpVectorShuffle %v3float %43 %43 0 1 2
+         %45 = OpCompositeExtract %v4float %38 3
+         %46 = OpVectorShuffle %v3float %45 %45 0 1 2
+         %47 = OpCompositeConstruct %mat4v3float %40 %42 %44 %46
+         %48 = OpMatrixTimesVector %v3float %47 %34
+         %49 = OpCompositeExtract %float %36 0
+         %50 = OpVectorTimesScalar %v3float %48 %49
+         %51 = OpAccessChain %_ptr_Uniform_mat4v4float %_Globals %int_2
+         %52 = OpLoad %mat4v4float %51
+         %53 = OpCompositeExtract %v4float %52 0
+         %54 = OpVectorShuffle %v3float %53 %53 0 1 2
+         %55 = OpCompositeExtract %v4float %52 1
+         %56 = OpVectorShuffle %v3float %55 %55 0 1 2
+         %57 = OpCompositeExtract %v4float %52 2
+         %58 = OpVectorShuffle %v3float %57 %57 0 1 2
+         %59 = OpCompositeExtract %v4float %52 3
+         %60 = OpVectorShuffle %v3float %59 %59 0 1 2
+         %61 = OpCompositeConstruct %mat4v3float %54 %56 %58 %60
+         %62 = OpMatrixTimesVector %v3float %61 %34
+         %63 = OpCompositeExtract %float %36 1
+         %64 = OpVectorTimesScalar %v3float %62 %63
+         %65 = OpFAdd %v3float %50 %64
+         %66 = OpAccessChain %_ptr_Uniform_mat4v4float %_Globals %int_3
+         %67 = OpLoad %mat4v4float %66
+         %68 = OpCompositeExtract %v4float %67 0
+         %69 = OpVectorShuffle %v3float %68 %68 0 1 2
+         %70 = OpCompositeExtract %v4float %67 1
+         %71 = OpVectorShuffle %v3float %70 %70 0 1 2
+         %72 = OpCompositeExtract %v4float %67 2
+         %73 = OpVectorShuffle %v3float %72 %72 0 1 2
+         %74 = OpCompositeExtract %v4float %67 3
+         %75 = OpVectorShuffle %v3float %74 %74 0 1 2
+         %76 = OpCompositeConstruct %mat4v3float %69 %71 %73 %75
+         %77 = OpMatrixTimesVector %v3float %76 %34
+         %78 = OpCompositeExtract %float %36 2
+         %79 = OpVectorTimesScalar %v3float %77 %78
+         %80 = OpFAdd %v3float %65 %79
+         %81 = OpAccessChain %_ptr_Uniform_mat4v4float %_Globals %int_4
+         %82 = OpLoad %mat4v4float %81
+         %83 = OpCompositeExtract %v4float %82 0
+         %84 = OpVectorShuffle %v3float %83 %83 0 1 2
+         %85 = OpCompositeExtract %v4float %82 1
+         %86 = OpVectorShuffle %v3float %85 %85 0 1 2
+         %87 = OpCompositeExtract %v4float %82 2
+         %88 = OpVectorShuffle %v3float %87 %87 0 1 2
+         %89 = OpCompositeExtract %v4float %82 3
+         %90 = OpVectorShuffle %v3float %89 %89 0 1 2
+         %91 = OpCompositeConstruct %mat4v3float %84 %86 %88 %90
+         %92 = OpMatrixTimesVector %v3float %91 %34
+         %93 = OpCompositeExtract %float %36 3
+         %94 = OpVectorTimesScalar %v3float %92 %93
+         %95 = OpFAdd %v3float %80 %94
+         %96 = OpCompositeConstruct %mat3v3float %40 %42 %44
+         %97 = OpMatrixTimesVector %v3float %96 %35
+         %98 = OpVectorTimesScalar %v3float %97 %49
+         %99 = OpCompositeConstruct %mat3v3float %54 %56 %58
+        %100 = OpMatrixTimesVector %v3float %99 %35
+        %101 = OpVectorTimesScalar %v3float %100 %63
+        %102 = OpFAdd %v3float %98 %101
+        %103 = OpCompositeConstruct %mat3v3float %69 %71 %73
+        %104 = OpMatrixTimesVector %v3float %103 %35
+        %105 = OpVectorTimesScalar %v3float %104 %78
+        %106 = OpFAdd %v3float %102 %105
+        %107 = OpCompositeConstruct %mat3v3float %84 %86 %88
+        %108 = OpMatrixTimesVector %v3float %107 %35
+        %109 = OpVectorTimesScalar %v3float %108 %93
+        %110 = OpFAdd %v3float %106 %109
+        %111 = OpAccessChain %_ptr_Uniform_float %_Globals %int_5
+        %112 = OpLoad %float %111
+        %113 = OpVectorTimesScalar %v3float %110 %112
+        %114 = OpFAdd %v3float %95 %113
+        %115 = OpCompositeExtract %float %114 0
+        %116 = OpCompositeExtract %float %114 1
+        %117 = OpCompositeExtract %float %114 2
+        %118 = OpCompositeConstruct %v4float %115 %116 %117 %float_1
+        %119 = OpAccessChain %_ptr_Uniform_mat4v4float %_Globals %int_7
+        %120 = OpLoad %mat4v4float %119
+        %121 = OpMatrixTimesVector %v4float %120 %118
+        %122 = OpAccessChain %_ptr_Uniform_v4float %_Globals %int_6
+        %123 = OpLoad %v4float %122
+        %124 = OpVectorShuffle %v3float %123 %123 0 1 2
+        %125 = OpDot %float %124 %110
+        %126 = OpCompositeConstruct %v4float %125 %125 %125 %125
+               OpStore %out_var_POSITION %121
+               OpStore %out_var_COLOR %126
+               OpReturn
+               OpFunctionEnd
+

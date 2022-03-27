@@ -38,6 +38,19 @@ bool GLShader::Compile(){
     return state == GL_FALSE;
 }
 
+bool GLShader::CompileSPIRV(DataBuffer src, const char* entry){
+    GLint state;
+
+    glShaderBinary(1, &shader, GL_SHADER_BINARY_FORMAT_SPIR_V, src.Buffer(), src.Size());
+    glSpecializeShader(shader, entry, 0, NULL, NULL);
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &state);
+    return state == GL_FALSE;
+}
+
+bool GLShader::CompileSPIRV(DataBuffer src, String entry){
+    return CompileSPIRV(PackDataBuffer(src), entry.GetString());
+}
+
 void GLShader::PrintLog(){
     if (shaderLog == -1)
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &shaderLog);

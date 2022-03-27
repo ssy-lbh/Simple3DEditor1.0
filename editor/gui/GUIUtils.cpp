@@ -129,7 +129,7 @@ void GUIEditA::OnChar(char c){
         text.SetLength(text.GetLength() - 1);
         return;
     }
-    text.Append(c);
+    text += c;
     return;
 }
 
@@ -218,7 +218,7 @@ void GUIEditW::OnUnichar(wchar_t c){
         text.SetLength(text.GetLength() - 1);
         return;
     }
-    text.Append(c);
+    text += c;
     return;
 }
 

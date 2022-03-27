@@ -66,6 +66,9 @@ public:
     // 未找到返回-1
     size_t FindChar(char c) const;
     size_t FindChar(char c, size_t beg) const;
+    bool HasChar(char c) const;
+    bool HasChars(const char* s) const;
+    bool HasAllChars(const char* s) const;
     size_t FindRevChar(char c) const;
     size_t FindRevChar(char c, size_t beg) const;
     size_t FindString(const char* s) const;
@@ -152,6 +155,9 @@ public:
     // 未找到返回-1
     size_t FindChar(wchar_t c) const;
     size_t FindChar(wchar_t c, size_t beg) const;
+    bool HasChar(wchar_t c) const;
+    bool HasChars(const wchar_t* s) const;
+    bool HasAllChars(const wchar_t* s) const;
     size_t FindRevChar(wchar_t c) const;
     size_t FindRevChar(wchar_t c, size_t beg) const;
     size_t FindString(const wchar_t* s) const;

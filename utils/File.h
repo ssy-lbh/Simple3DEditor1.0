@@ -44,19 +44,23 @@ public:
     void SetPointer(size_t ptr);
     size_t GetSize();
     String GetPath() const;
+
+    // 检测注入使用
+    static bool IsSpecial(String s);
+    static bool IsSpecial(WString s);
 };
 
-class ISerializable : public Object {
+class ISerializable {
 public:
     void Serialize(File& f);
 };
 
-class IDeserializable : public Object {
+class IDeserializable {
 public:
     void Deserialize(File& f);
 };
 
-// Object中的方法应该以ISerializable为首，多继承中几个基类是连同各自的不同基类存入该子类的
+// 多继承中只含有接口，期望数据不会有不确定性
 class IMemorable : public ISerializable, public IDeserializable {};
 
 #endif

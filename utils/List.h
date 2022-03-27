@@ -29,20 +29,20 @@ private:
     }
 
 public:
-    List(){
+    List<T>(){
         //DebugLog("List()");
         size = 8;
         data = new T[size];
         ptr = 0;
     }
 
-    List(size_t size){
+    List<T>(size_t size){
         this->size = size;
         data = new T[size];
         ptr = 0;
     }
 
-    List(List&& list){
+    List<T>(List<T>&& list){
         //DebugLog("List(List&& list)");
         size = list.size;
         data = new T[size];
@@ -52,7 +52,7 @@ public:
         }
     }
 
-    List(const List& list){
+    List<T>(const List<T>& list){
         //DebugLog("List(const List& list)");
         size = list.size;
         data = new T[size];
@@ -62,7 +62,7 @@ public:
         }
     }
 
-    List& operator=(List&& list){
+    List<T>& operator=(List<T>&& list){
         //DebugLog("List& operator=(List&& list)");
         delete[] data;
         size = list.size;
@@ -74,7 +74,7 @@ public:
         return *this;
     }
 
-    List& operator=(const List& list){
+    List<T>& operator=(const List<T>& list){
         //DebugLog("List& operator=(const List& list)");
         delete[] data;
         size = list.size;
@@ -86,12 +86,25 @@ public:
         return *this;
     }
 
-    ~List(){
+    ~List<T>(){
         //DebugLog("~List()");
         if (data == NULL){
             DebugError("Critical: List<T>::~List Data Pointer Is NULL");
         }
         delete[] data;
+    }
+
+    List<T>& operator+=(T val){
+        return Add(val);
+    }
+
+    List<T>& operator-=(T val){
+        Remove(val);
+        return *this;
+    }
+
+    bool operator!(){
+        return Empty();
     }
 
     List<T>& Add(T val){

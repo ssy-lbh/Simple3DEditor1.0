@@ -136,6 +136,22 @@ Vector2 glGetCNStringSize(const wchar_t* text){
     return Vector2(size.cx, size.cy);
 }
 
+bool WideCharToBytes(const wchar_t* text, size_t len, char*& outText, size_t& outLen){
+    outLen = WideCharToMultiByte(CP_ACP, 0, text, len, NULL, 0, NULL, NULL);
+    outText = new char[outLen + 1];
+    WideCharToMultiByte(CP_ACP, 0, text, len, outText, outLen, NULL, NULL);
+    outText[outLen] = '\0';
+    return true;
+}
+
+bool BytesToWideChar(const char* text, size_t len, wchar_t*& outText, size_t& outLen){
+    outLen = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, text, len, NULL, 0);
+    outText = new wchar_t[outLen + 1];
+    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, text, len, outText, outLen);
+    outText[outLen] = L'\0';
+    return true;
+}
+
 FT_Library Font::ftLib = NULL;
 
 void Font::Init(){

@@ -1,6 +1,6 @@
 ; SPIR-V
 ; Version: 1.0
-; Generator: Khronos Glslang Reference Front End; 10
+; Generator: Google Shaderc over Glslang; 10
 ; Bound: 65
 ; Schema: 0
                OpCapability Shader
@@ -9,6 +9,8 @@
                OpEntryPoint GLCompute %main "main" %gl_GlobalInvocationID
                OpExecutionMode %main LocalSize 8 8 1
                OpSource GLSL 430
+               OpSourceExtension "GL_GOOGLE_cpp_style_line_directive"
+               OpSourceExtension "GL_GOOGLE_include_directive"
                OpName %main "main"
                OpName %curPos "curPos"
                OpName %gl_GlobalInvocationID "gl_GlobalInvocationID"

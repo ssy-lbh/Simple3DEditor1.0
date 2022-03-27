@@ -28,6 +28,7 @@ GIT  		= git
 
 BUILD_PATH	= build
 TEST_PATH	= test
+PLUGIN_PATH = plugins
 PROGOBJ		= main\
 				lib\soundtouch\SoundTouch lib\soundtouch\TDStretch lib\soundtouch\RateTransposer\
 				lib\soundtouch\AAFilter lib\soundtouch\FIRFilter lib\soundtouch\FIFOSampleBuffer\
@@ -49,10 +50,12 @@ PROGOBJ		= main\
 				editor\object\MeshObject editor\object\PointLightObject editor\object\WindowObject\
 				editor\object\GUIManagerObject editor\object\GUIObject editor\object\GUIMeshObject\
 				editor\main\Window editor\main\Tool editor\main\Operation\
-				editor\main\Transform
+				editor\main\Transform\
+				manager\WindowManager
 PLATOBJ		=  utils\File utils\os\Shell utils\os\Log utils\os\Thread utils\os\System\
 				utils\os\Time utils\os\Font utils\os\Appframe utils\os\Resource\
-				editor\dialog\ColorBoard editor\dialog\Tips
+				editor\dialog\ColorBoard editor\dialog\Tips\
+				manager\PluginManager
 EXTRAOBJ	= lib\soundtouch\mmx_optimized lib\soundtouch\sse_optimized lib\soundtouch\cpu_detect_x86
 RESOBJ		= res string
 OUTPUT 		= main.exe
@@ -161,8 +164,14 @@ sign: $(OUTPUT)
 clean:
 	-$(RM) $(OUTPUT) $(OUTPUTDLIB) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
 
+# glslc <file> --target-spv=spv1.0 [-x glsl/hlsl] -o <out> 编译GLSL/HLSL为SPIR-V
+# dxc -T {stage}[[ps/vs/gs/hs/ds/cs/lib/ms]_6_[0-7]] <file> -E <entry> -I <include> [-spirv]
+# spirv-as <file> -o <out> --target-env [spv1.[0-5]|vulkan1.[0-2]|opencl[1.2/2.[0-2]][embedded]|opengl4.[0,1,2,3,5]|vulkan1.1spv1.4]
+# spirv-dis <file> -o <out> 反汇编SPIR-V
+# spirv-cross SPIR-V <file> [--es/--hlsl/--msl/--vulkan-semantics(-V)/--reflect/--cpp] --output <out> 交叉编译SPIR-V为GLSL/ESSL/HLSL/MSL/JSON反射/C++
+
 # 测试
-.PHONY: dllboot
+.PHONY: dllboot plugin
 
 # 后面的测试如果只链接一个类的.o文件，include对应的.h，加上启动测试代码，不就是单元测试了么
 
@@ -171,3 +180,10 @@ dllboot: $(OUTPUTDLIB)
 	$(GCC) $(TEST_PATH)\$@\boot.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)\$@\boot.exe
 	$(TEST_PATH)\$@\boot.exe
 	del $(TEST_PATH)\$@\boot.exe
+
+plugin: $(OUTPUTDLIB)
+	$(GCC) $(TEST_PATH)\$@\main.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)\$@\main.exe
+	$(GCC) $(TEST_PATH)\$@\plugin.cpp $(OUTPUTDLIB) -I"." -shared -o $(PLUGIN_PATH)\plugin.dll
+	$(TEST_PATH)\$@\main.exe
+	del $(TEST_PATH)\$@\main.exe
+	del $(PLUGIN_PATH)\plugin.dll

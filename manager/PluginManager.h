@@ -3,7 +3,12 @@
 
 #include <define.h>
 
+#ifdef PLATFORM_WINDOWS
+#include <handleapi.h>
+#endif
+
 #include <utils/List.h>
+#include <utils/String.h>
 
 // 先就试做一下这个功能吧
 // 看来有必要将一部分代码做成库，交给插件共享，共通加载同一个动态库
@@ -11,13 +16,17 @@
 //TODO 待设计
 class Plugin : public Object {
 private:
-    handle hModule;
+#ifdef PLATFORM_WINDOWS
+    HMODULE hModule;
+#endif
 
-    WString name;
+    String name;
 
 public:
-    Plugin(WString name);
+    Plugin(String name);
     ~Plugin();
+
+    String GetName();
 };
 
 //TODO 待设计
@@ -29,10 +38,10 @@ public:
     PluginManager();
     ~PluginManager();
 
-    void LoadPlugin(WString name);
-    void UnloadPlugin(WString name);
+    void LoadPlugin(String name);
+    bool UnloadPlugin(String name);
     // 计划这里内部的实现以后改为HashMap加速
-    Plugin* GetPlugin(WString name);
+    Plugin* GetPlugin(String name);
     List<Plugin*>& GetPlugins();
 };
 

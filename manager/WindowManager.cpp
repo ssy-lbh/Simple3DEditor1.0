@@ -3,7 +3,10 @@
 #include <utils/String.h>
 
 WindowManager::WindowManager(){}
-WindowManager::~WindowManager(){}
+
+WindowManager::~WindowManager(){
+    Free(windows);
+}
 
 void WindowManager::RegisterWindow(WindowRegistry* window){
     windows.Add(window);
@@ -11,6 +14,12 @@ void WindowManager::RegisterWindow(WindowRegistry* window){
 
 void WindowManager::UnregisterWindow(WindowRegistry* window){
     windows.Remove(window);
+}
+
+WindowRegistry* WindowManager::UnregisterWindow(WString name){
+    WindowRegistry* window = GetWindow(name);
+    UnregisterWindow(window);
+    return window;
 }
 
 WindowRegistry* WindowManager::GetWindow(WString name){
@@ -29,6 +38,6 @@ IWindow* WindowManager::NewWindow(WString name){
     return NULL;
 }
 
-List<IWindowRegistry*>& WindowManager::GetWindows(){
+List<WindowRegistry*>& WindowManager::GetWindows(){
     return windows;
 }

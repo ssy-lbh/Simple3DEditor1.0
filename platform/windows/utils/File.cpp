@@ -223,3 +223,23 @@ size_t File::GetSize(){
 String File::GetPath() const{
     return path;
 }
+
+bool File::IsSpecial(String s){
+    if (s.HasChars("\\/:*?\"<>|."))
+        return true;
+    if (s.StartsWith("\\\\"))
+        return true;
+    if (s.IgnoreCaseEqual("CON") || s.IgnoreCaseEqual("NUL"))
+        return true;
+    return false;
+}
+
+bool File::IsSpecial(WString s){
+    if (s.HasChars(L"\\/:*?\"<>|."))
+        return true;
+    if (s.StartsWith(L"\\\\"))
+        return true;
+    if (s.IgnoreCaseEqual(L"CON") || s.IgnoreCaseEqual(L"NUL"))
+        return true;
+    return false;
+}

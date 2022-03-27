@@ -1,0 +1,103 @@
+{
+    "entryPoints" : [
+        {
+            "name" : "vert_main",
+            "mode" : "vert"
+        }
+    ],
+    "types" : {
+        "_7" : {
+            "name" : "type.$Globals",
+            "members" : [
+                {
+                    "name" : "vClr",
+                    "type" : "vec4",
+                    "offset" : 0
+                },
+                {
+                    "name" : "mWld1",
+                    "type" : "mat4",
+                    "offset" : 16,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "mWld2",
+                    "type" : "mat4",
+                    "offset" : 80,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "mWld3",
+                    "type" : "mat4",
+                    "offset" : 144,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "mWld4",
+                    "type" : "mat4",
+                    "offset" : 208,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                },
+                {
+                    "name" : "Len",
+                    "type" : "float",
+                    "offset" : 272
+                },
+                {
+                    "name" : "vLight",
+                    "type" : "vec4",
+                    "offset" : 288
+                },
+                {
+                    "name" : "mTot",
+                    "type" : "mat4",
+                    "offset" : 304,
+                    "matrix_stride" : 16,
+                    "row_major" : true
+                }
+            ]
+        }
+    },
+    "inputs" : [
+        {
+            "type" : "vec4",
+            "name" : "in.var.POSITION",
+            "location" : 0
+        },
+        {
+            "type" : "vec3",
+            "name" : "in.var.NORMAL",
+            "location" : 1
+        },
+        {
+            "type" : "vec4",
+            "name" : "in.var.BLENDWEIGHT",
+            "location" : 2
+        }
+    ],
+    "outputs" : [
+        {
+            "type" : "vec4",
+            "name" : "out.var.POSITION",
+            "location" : 0
+        },
+        {
+            "type" : "vec4",
+            "name" : "out.var.COLOR",
+            "location" : 1
+        }
+    ],
+    "ubos" : [
+        {
+            "type" : "_7",
+            "name" : "type.$Globals",
+            "block_size" : 368,
+            "set" : 0,
+            "binding" : 0
+        }
+    ]
+}

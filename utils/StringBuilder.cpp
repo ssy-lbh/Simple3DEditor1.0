@@ -94,16 +94,16 @@ StringBuilderA& StringBuilderA::Append(double d){
     return *this;
 
 }
-StringBuilderA& StringBuilderA::Append(String& s){
+StringBuilderA& StringBuilderA::Append(const String& s){
     Check(s.GetLength() + 2);
     ptr += __builtin_snprintf(data + ptr, s.GetLength() + 1, "%s", s.GetString());
     return *this;
 }
 
-StringBuilderA& StringBuilderA::Append(WString& s){
+StringBuilderA& StringBuilderA::Append(const WString& s){
     size_t len = s.GetLength() << 2;
     Check(len + 2);
-    ptr += __builtin_snprintf(data + ptr, len + 1, "%s", s.GetString());
+    ptr += __builtin_snprintf(data + ptr, len + 1, "%S", s.GetString());
     return *this;
 }
 
@@ -120,6 +120,18 @@ StringBuilderA& StringBuilderA::Append(const wchar_t* s){
     ptr += __builtin_snprintf(data + ptr, len + 1, "%S", s);
     return *this;
 }
+
+StringBuilderA& StringBuilderA::operator+=(char c){ return Append(c); }
+StringBuilderA& StringBuilderA::operator+=(wchar_t c){ return Append(c); }
+StringBuilderA& StringBuilderA::operator+=(int i){ return Append(i); }
+StringBuilderA& StringBuilderA::operator+=(size_t s){ return Append(s); }
+StringBuilderA& StringBuilderA::operator+=(bool b){ return Append(b); }
+StringBuilderA& StringBuilderA::operator+=(float f){ return Append(f); }
+StringBuilderA& StringBuilderA::operator+=(double d){ return Append(d); }
+StringBuilderA& StringBuilderA::operator+=(const String& s){ return Append(s); }
+StringBuilderA& StringBuilderA::operator+=(const WString& s){ return Append(s); }
+StringBuilderA& StringBuilderA::operator+=(const char* s){ return Append(s); }
+StringBuilderA& StringBuilderA::operator+=(const wchar_t* s){ return Append(s); }
 
 StringBuilderW::StringBuilderW(){
     data = new wchar_t[32];
@@ -209,16 +221,16 @@ StringBuilderW& StringBuilderW::Append(double d){
     return *this;
 
 }
-StringBuilderW& StringBuilderW::Append(String& s){
+StringBuilderW& StringBuilderW::Append(const String& s){
     Check(s.GetLength() + 2);
     ptr += __mingw_snwprintf(data + ptr, s.GetLength() + 1, L"%s", s.GetString());
     return *this;
 }
 
-StringBuilderW& StringBuilderW::Append(WString& s){
+StringBuilderW& StringBuilderW::Append(const WString& s){
     size_t len = s.GetLength();
     Check(len + 2);
-    ptr += __mingw_snwprintf(data + ptr, len + 1, L"%s", s.GetString());
+    ptr += __mingw_snwprintf(data + ptr, len + 1, L"%S", s.GetString());
     return *this;
 }
 
@@ -235,3 +247,15 @@ StringBuilderW& StringBuilderW::Append(const wchar_t* s){
     ptr += __mingw_snwprintf(data + ptr, len + 1, L"%S", s);
     return *this;
 }
+
+StringBuilderW& StringBuilderW::operator+=(char c){ return Append(c); }
+StringBuilderW& StringBuilderW::operator+=(wchar_t c){ return Append(c); }
+StringBuilderW& StringBuilderW::operator+=(int i){ return Append(i); }
+StringBuilderW& StringBuilderW::operator+=(size_t s){ return Append(s); }
+StringBuilderW& StringBuilderW::operator+=(bool b){ return Append(b); }
+StringBuilderW& StringBuilderW::operator+=(float f){ return Append(f); }
+StringBuilderW& StringBuilderW::operator+=(double d){ return Append(d); }
+StringBuilderW& StringBuilderW::operator+=(const String& s){ return Append(s); }
+StringBuilderW& StringBuilderW::operator+=(const WString& s){ return Append(s); }
+StringBuilderW& StringBuilderW::operator+=(const char* s){ return Append(s); }
+StringBuilderW& StringBuilderW::operator+=(const wchar_t* s){ return Append(s); }

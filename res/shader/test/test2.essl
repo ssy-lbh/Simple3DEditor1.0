@@ -1,0 +1,29 @@
+#version 450 es
+
+layout(binding = 0, std140) uniform type_Globals
+{
+    vec4 vClr;
+    layout(row_major) mat4 mWld1;
+    layout(row_major) mat4 mWld2;
+    layout(row_major) mat4 mWld3;
+    layout(row_major) mat4 mWld4;
+    float Len;
+    vec4 vLight;
+    layout(row_major) mat4 mTot;
+} _Globals;
+
+layout(location = 0) in vec4 in_var_POSITION;
+layout(location = 1) in vec3 in_var_NORMAL;
+layout(location = 2) in vec4 in_var_BLENDWEIGHT;
+layout(location = 0) out vec4 out_var_POSITION;
+layout(location = 1) out vec4 out_var_COLOR;
+
+mat4 spvWorkaroundRowMajor(mat4 wrap) { return wrap; }
+
+void main()
+{
+    vec3 _110 = ((((mat3(spvWorkaroundRowMajor(_Globals.mWld1)[0].xyz, spvWorkaroundRowMajor(_Globals.mWld1)[1].xyz, spvWorkaroundRowMajor(_Globals.mWld1)[2].xyz) * in_var_NORMAL) * in_var_BLENDWEIGHT.x) + ((mat3(spvWorkaroundRowMajor(_Globals.mWld2)[0].xyz, spvWorkaroundRowMajor(_Globals.mWld2)[1].xyz, spvWorkaroundRowMajor(_Globals.mWld2)[2].xyz) * in_var_NORMAL) * in_var_BLENDWEIGHT.y)) + ((mat3(spvWorkaroundRowMajor(_Globals.mWld3)[0].xyz, spvWorkaroundRowMajor(_Globals.mWld3)[1].xyz, spvWorkaroundRowMajor(_Globals.mWld3)[2].xyz) * in_var_NORMAL) * in_var_BLENDWEIGHT.z)) + ((mat3(spvWorkaroundRowMajor(_Globals.mWld4)[0].xyz, spvWorkaroundRowMajor(_Globals.mWld4)[1].xyz, spvWorkaroundRowMajor(_Globals.mWld4)[2].xyz) * in_var_NORMAL) * in_var_BLENDWEIGHT.w);
+    out_var_POSITION = spvWorkaroundRowMajor(_Globals.mTot) * vec4((((((mat4x3(spvWorkaroundRowMajor(_Globals.mWld1)[0].xyz, spvWorkaroundRowMajor(_Globals.mWld1)[1].xyz, spvWorkaroundRowMajor(_Globals.mWld1)[2].xyz, spvWorkaroundRowMajor(_Globals.mWld1)[3].xyz) * in_var_POSITION) * in_var_BLENDWEIGHT.x) + ((mat4x3(spvWorkaroundRowMajor(_Globals.mWld2)[0].xyz, spvWorkaroundRowMajor(_Globals.mWld2)[1].xyz, spvWorkaroundRowMajor(_Globals.mWld2)[2].xyz, spvWorkaroundRowMajor(_Globals.mWld2)[3].xyz) * in_var_POSITION) * in_var_BLENDWEIGHT.y)) + ((mat4x3(spvWorkaroundRowMajor(_Globals.mWld3)[0].xyz, spvWorkaroundRowMajor(_Globals.mWld3)[1].xyz, spvWorkaroundRowMajor(_Globals.mWld3)[2].xyz, spvWorkaroundRowMajor(_Globals.mWld3)[3].xyz) * in_var_POSITION) * in_var_BLENDWEIGHT.z)) + ((mat4x3(spvWorkaroundRowMajor(_Globals.mWld4)[0].xyz, spvWorkaroundRowMajor(_Globals.mWld4)[1].xyz, spvWorkaroundRowMajor(_Globals.mWld4)[2].xyz, spvWorkaroundRowMajor(_Globals.mWld4)[3].xyz) * in_var_POSITION) * in_var_BLENDWEIGHT.w)) + (_110 * _Globals.Len), 1.0);
+    out_var_COLOR = vec4(dot(_Globals.vLight.xyz, _110));
+}
+

@@ -26,6 +26,13 @@ typedef unsigned long uhash;
 
 #ifdef PLATFORM_WINDOWS
 typedef void* handle;
+#define EXECUTABLE_FFMPEG ".\\bin\\ffmpeg.exe"
+#define EXECUTABLE_FFPLAY ".\\bin\\ffplay.exe"
+#define EXECUTABLE_FFPROBE ".\\bin\\ffprobe.exe"
+#define EXECUTABLE_GLSLC ".\\bin\\glslc.exe"
+#define EXECUTABLE_DXC ".\\bin\\dxc.exe"
+#define EXECUTABLE_GLSLANG_VALIDATOR ".\\bin\\glslangValidator.exe"
+#define EXECUTABLE_SPIRV_CROSS ".\\bin\\spirv-cross.exe"
 #endif
 
 // utils
@@ -97,6 +104,9 @@ class SelectionWindow;
 
 // appframe
 class AppFrame;
+
+// shell
+enum class ShaderType;
 
 // colorboard
 class ColorBoard;
@@ -180,5 +190,11 @@ class PropertyQuaternion;
 namespace soundtouch {
     class SoundTouch;
 };
+
+// manager
+class WindowManager;
+class WindowRegistry;
+class PluginManager;
+class Plugin;
 
 #endif
