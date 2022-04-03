@@ -375,6 +375,8 @@ Mesh* Main::GetMesh(AViewObject* o){
     return NULL;
 }
 
+#include <utils/Task.h>
+
 int Main::MainEntry(int argc, char** argv){
     Init();
     AudioUtils::InitOpenAL();

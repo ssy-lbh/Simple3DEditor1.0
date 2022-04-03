@@ -54,4 +54,8 @@ public:
     static void* Get(int idx);
 };
 
+class ThreadPool final : public Object {
+    
+};
+
 #endif
