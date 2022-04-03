@@ -4,6 +4,7 @@
 
 #include <main.h>
 #include <utils/os/Log.h>
+#include <utils/math3d/Math.h>
 
 double Time::GetTime(){
     LARGE_INTEGER time;
@@ -17,6 +18,12 @@ double Time::GetTime(){
 
 float Time::GetDeltaTime(){
     return LocalData::GetLocalInst()->deltaTime;
+}
+
+void Time::Sleep(float time){
+    if (time < 0.0005f)
+        return;
+    ::Sleep((uint)Round(time * 1000.0f));
 }
 
 void TimerManager::CreateTimer(int id, int elapseMillis){

@@ -414,7 +414,7 @@ int Main::MainEntry(int argc, char** argv){
     localData->recTime = Time::GetTime();
     localData->deltaTime = 0.0167f; // 一个60FPS大概的估测值，作为启动时间即可
 
-    while (appFrame->HandleEvents()){
+    while (appFrame->WaitHandleEvent()){
         appFrame->Render();
         appFrame->SwapBuffer();
 
@@ -425,7 +425,7 @@ int Main::MainEntry(int argc, char** argv){
         if (localData->reqRender){
             localData->reqRender = false;
         }else{
-            Sleep(16 - localData->deltaTime);
+            Time::Sleep(0.016f - localData->deltaTime);
         }
     }
 

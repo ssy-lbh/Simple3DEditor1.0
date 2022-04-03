@@ -241,7 +241,7 @@ int AppFrame::MainLoop(){
     mainFrame->OnCreate();
 
     Show();
-    while (HandleEvents()){
+    while (WaitHandleEvent()){
         Render();
         SwapBuffer();
 
@@ -249,7 +249,7 @@ int AppFrame::MainLoop(){
         data->deltaTime = time - data->recTime;
         data->recTime = time;
         // 不知道为什么，我的电脑开不了垂直同步，只能出此下策了
-        Sleep(16 - data->deltaTime);
+        Time::Sleep(0.016f - data->deltaTime);
     }
 
     DisableOpenGL();

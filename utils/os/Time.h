@@ -9,6 +9,8 @@ public:
     static double GetTime();
     // 两帧之间的间隔时间(可视作两次OnRender调用的时间间隔)
     static float GetDeltaTime();
+    // 非主要控制程序代码禁止调用
+    static void Sleep(float time);
 };
 
 class TimerManager {
