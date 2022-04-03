@@ -7,6 +7,7 @@
 #include <main.h>
 #include <res.h>
 #include <utils/os/Font.h>
+#include <utils/os/Time.h>
 #include <utils/os/Thread.h>
 #include <utils/os/System.h>
 #include <utils/gl/GLEW.h>
@@ -25,7 +26,7 @@ AppFrame::AppFrame(String name, AWindow* mainFrame, size_t height, size_t width,
 
     if (async){
         hThread = CreateThread(NULL, 0, [] CALLBACK (LPVOID data) -> DWORD {
-            AppFrame* frame = (AppFrame*)data;
+            AppFrame* frame = static_cast<AppFrame*>(data);
             DWORD ret;
 
             frame->InitWindow();
@@ -48,6 +49,7 @@ AppFrame::~AppFrame(){
     if (data) delete data;
     if (viewMgr) delete viewMgr;
     if (font) delete font;
+    if (fontCache) delete[] fontCache;
     DestroyWindow(hWnd);
 }
 
@@ -239,20 +241,15 @@ int AppFrame::MainLoop(){
     mainFrame->OnCreate();
 
     Show();
-    while (GetMessageA(&Msg, NULL, 0, 0)){
-        if (!TranslateAcceleratorA(Msg.hwnd, hAccel, &Msg)){
-            if (Msg.message == WM_QUIT){
-                break;
-            } else {
-                TranslateMessage(&Msg);
-                DispatchMessageA(&Msg);
-                if (reqRender || Msg.message != WM_TIMER){
-                    reqRender = false;
-                    Render();
-                    SwapBuffer();
-                }
-            }
-        }
+    while (HandleEvents()){
+        Render();
+        SwapBuffer();
+
+        float time = Time::GetTime();
+        data->deltaTime = time - data->recTime;
+        data->recTime = time;
+        // 不知道为什么，我的电脑开不了垂直同步，只能出此下策了
+        Sleep(16 - data->deltaTime);
     }
 
     DisableOpenGL();
@@ -339,7 +336,8 @@ LRESULT CALLBACK AppFrame::LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         break;
     }
 
-    //将事件发送至对应整个窗口的组件容器
+    // 将事件发送至对应整个窗口的组件容器
+    // 可能以后需要异步提高性能了
     FireEvent(mainFrame, hWnd, uMsg, wParam, lParam);
 
     switch (uMsg){

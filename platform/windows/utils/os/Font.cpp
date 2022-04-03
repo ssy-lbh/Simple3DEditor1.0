@@ -57,14 +57,28 @@ void glDrawCNString(const wchar_t* text){
     HDC hDC;
     GLuint font;
 
+    if (!frame->fontCache){
+        frame->fontCache = new uint[MAX_CACHE_CHARS];
+        memset(frame->fontCache, 0, MAX_CACHE_CHARS * sizeof(uint));
+    }
+
     hDC = wglGetCurrentDC();
-    font = glGenLists(1);
 
     for (; *text != L'\0'; text++){
         if ((uint)*text < MAX_ASCII_CHARS){
             glCallList(frame->fontASCII + (uint)*text);
             continue;
         }
+        if ((uint)*text < MAX_CACHE_CHARS){
+            uint& list = frame->fontCache[(uint)*text];
+            if (!list){
+                list = glGenLists(1);
+                wglUseFontBitmapsW(hDC, *text, 1, list);
+            }
+            glCallList(list);
+            continue;
+        }
+        font = glGenLists(1);
         wglUseFontBitmapsW(hDC, *text, 1, font);
         glCallList(font);
     }

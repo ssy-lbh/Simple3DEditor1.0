@@ -15,7 +15,7 @@
 #include <utils/gl/GLProgram.h>
 #include <editor/main/ViewObject.h>
 
-RenderWindow::RenderWindow(){
+RenderWindow::RenderWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Vector3::up, 5.0f) {
     DebugLog("RenderWindow Launched");
     uiMgr = new UIManager();
 
@@ -37,22 +37,10 @@ RenderWindow::~RenderWindow(){
     DebugLog("RenderWindow Destroyed");
     if (basicMenu) delete basicMenu;
     if (uiMgr) delete uiMgr;
-    if (glProg) delete glProg;
 }
 
 void RenderWindow::InitCamera(){
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(90.0, ViewManager::GetLocalInst()->GetAspect(), camDis * 0.02, camDis * 20.0);
-
-    Vector3 camPos = camLookat - camDir * Vector3::forward * camDis;
-    Vector3 camUp = camDir * Vector3::up;
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(camPos.x, camPos.y, camPos.z,
-            camLookat.x, camLookat.y, camLookat.z,
-            camUp.x, camUp.y, camUp.z);
+    CCamera::InitCamera(aspect);
 }
 
 void RenderWindow::OnRender(){
@@ -64,6 +52,13 @@ void RenderWindow::OnRender(){
     glClearDepth(1.0);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
+    options->editor = false;
+    options->vertex = false;
+    options->edge = false;
+    options->face = true;
+    options->light = lightEnabled;
     
     //TODO 后续自制渲染管线
     glEnable(GL_DEPTH_TEST);
@@ -86,13 +81,6 @@ void RenderWindow::OnRender(){
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-    RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
-    options->editor = false;
-    options->vertex = false;
-    options->edge = false;
-    options->face = true;
-    options->light = lightEnabled;
-
     Main::RenderScene();
 
     glEnable(GL_BLEND);
@@ -102,6 +90,8 @@ void RenderWindow::OnRender(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     GLUtils::ResetProjection();
     GLUtils::ResetModelView();
+
+    Main::RenderScreen();
 
     uiMgr->Render();
 }
@@ -171,11 +161,21 @@ void RenderWindow::OnInsSave(){
 }
 
 void RenderWindow::UpdateWindowSize(int x, int y){
-    cliSize.x = x;
-    cliSize.y = y;
+    AWindow::UpdateWindowSize(x, y);
 }
 
 void RenderWindow::UpdateCursor(int x, int y){
-    cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
-    cursorPos.y = 2.0f * y / cliSize.y - 1.0f;
+    AWindow::UpdateCursor(x, y);
+}
+
+void RenderWindow::SetLookAt(Point3 at){
+    CCamera::SetLookAt(at);
+}
+
+void RenderWindow::SetRotation(Quaternion rot){
+    CCamera::SetRotation(rot);
+}
+
+void RenderWindow::SetDistance(float dis){
+    CCamera::SetDistance(dis);
 }

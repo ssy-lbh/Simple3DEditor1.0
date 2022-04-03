@@ -47,6 +47,10 @@ Vector2 Vector2::operator*(float w) const{
     return Vector2(x * w, y * w);
 }
 
+Vector3 Vector2::operator*(Vector2 v) const{
+    return Vector2(x * v.x, y * v.y);
+}
+
 Vector2 &Vector2::operator*=(float w){
     x *= w; y *= w;
     return *this;
@@ -77,6 +81,10 @@ Vector2 &Vector2::operator-=(Vector2 v){
 Vector2 Vector2::operator/(float w) const{
     w = 1.0F / w;
     return Vector2(x * w, y * w);
+}
+
+Vector3 Vector2::operator/(Vector2 v) const{
+    return Vector2(x / v.x, y / v.y);
 }
 
 Vector2 &Vector2::operator/=(float w){
@@ -212,6 +220,10 @@ Vector3 Vector3::operator*(float w) const{
     return Vector3(x * w, y * w, z * w);
 }
 
+Vector3 Vector3::operator*(Vector3 v) const{
+    return Vector3(x * v.x, y * v.y, z * v.z);
+}
+
 Vector3 &Vector3::operator*=(float w){
     x *= w; y *= w; z *= w;
     return *this;
@@ -242,6 +254,10 @@ Vector3 &Vector3::operator-=(Vector3 v){
 Vector3 Vector3::operator/(float w) const{
     w = 1.0F / w;
     return Vector3(x * w, y * w, z * w);
+}
+
+Vector3 Vector3::operator/(Vector3 v) const{
+    return Vector3(x / v.x, y / v.y, z / v.z);
 }
 
 Vector3 &Vector3::operator/=(float w){
@@ -776,10 +792,11 @@ Quaternion::~Quaternion(){}
 const Quaternion Quaternion::one     = { 0.0F, 0.0F, 0.0F, 1.0F};
 
 Quaternion Quaternion::operator*(Quaternion q) const{
-    return Quaternion(  w * q.x + x * q.w + y * q.z - z * q.y,
-                        w * q.y - x * q.z + y * q.w + z * q.x,
-                        w * q.z + x * q.y - y * q.x + z * q.w,
-                        w * q.w - x * q.x - y * q.y - z * q.z);//(w,z,-y,-x)*(-x,-y,-z,w)=(x2+w2-z2-y2,xy+wz-yw+yx,xz-wy+zx-yw,0)
+    return Quaternion(w * q.x + x * q.w + y * q.z - z * q.y,
+                      w * q.y - x * q.z + y * q.w + z * q.x,
+                      w * q.z + x * q.y - y * q.x + z * q.w,
+                      w * q.w - x * q.x - y * q.y - z * q.z);
+    //(w,z,-y,-x) * (-x,-y,-z,w) = (x2+w2-z2-y2,xy+wz-yw+yx,xz-wy+zx-yw,0)
 }
 
 Quaternion Quaternion::operator*(float s) const{
@@ -834,22 +851,28 @@ Quaternion Quaternion::Reflection(Vector3 axis, Vector3 v){
     return (Quaternion(axis, 0.0F) / Quaternion(v, 0.0F)).Normal();
 }
 
+Quaternion Quaternion::RotateX(float angle){
+    float vsin, vcos;
+    SinCos(ToRadianHalf(angle), &vsin, &vcos);
+    return Quaternion(vsin, 0.0f, 0.0f, vcos);
+}
+
+Quaternion Quaternion::RotateY(float angle){
+    float vsin, vcos;
+    SinCos(ToRadianHalf(angle), &vsin, &vcos);
+    return Quaternion(0.0f, vsin, 0.0f, vcos);
+}
+
+Quaternion Quaternion::RotateZ(float angle){
+    float vsin, vcos;
+    SinCos(ToRadianHalf(angle), &vsin, &vcos);
+    return Quaternion(0.0f, 0.0f, vsin, vcos);
+}
+
 Quaternion Quaternion::AxisAngle(Vector3 axis, float angle){
     float vsin, vcos;
-    SinCos(angle * 0.00872664625997164788F, &vsin, &vcos);
+    SinCos(ToRadianHalf(angle), &vsin, &vcos);
     return Quaternion(axis.Normal() * vsin, vcos);
-}
-
-Quaternion Quaternion::EulerZXY(Vector3 angle){
-    return  Quaternion::AxisAngle(Vector3::up, angle.y) *
-            Quaternion::AxisAngle(Vector3::right, angle.x) *
-            Quaternion::AxisAngle(Vector3::forward, angle.z);
-}
-
-Quaternion Quaternion::EulerZXY(float x, float y, float z){
-    return  Quaternion::AxisAngle(Vector3::up, y) *
-            Quaternion::AxisAngle(Vector3::right, x) *
-            Quaternion::AxisAngle(Vector3::forward, z);
 }
 
 Quaternion Quaternion::LookAt(Vector3 dir, Vector3 up){
@@ -889,6 +912,233 @@ float Quaternion::SqrMagnitude() const{
 
 Vector3 Quaternion::GetAxis() const{
     return Vector3(x, y, z);
+}
+
+// 欧拉角 => [w, x, y, z]
+// x => [cos(a/2), sin(a/2), 0, 0]
+// y => [cos(a/2), 0, sin(a/2), 0]
+// z => [cos(a/2), 0, 0, sin(a/2)]
+
+Quaternion Quaternion::EulerXYZ(Vector3 angle){
+    float sx, cx, sy, cy, sz, cz;
+
+    SinCos(ToRadianHalf(angle.x), &sx, &cx);
+    SinCos(ToRadianHalf(angle.y), &sy, &cy);
+    SinCos(ToRadianHalf(angle.z), &sz, &cz);
+    
+    // XYZ CCW
+    return Quaternion(
+        cz * sx * cy - sz * cx * sy,
+        cz * cx * sy + sz * sx * cy,
+        sz * cx * cy - cz * sx * sy,
+        cz * cx * cy + sz * sx * sy
+    );
+}
+
+Quaternion Quaternion::EulerXZY(Vector3 angle){
+    float sx, cx, sy, cy, sz, cz;
+
+    SinCos(ToRadianHalf(angle.x), &sx, &cx);
+    SinCos(ToRadianHalf(angle.y), &sy, &cy);
+    SinCos(ToRadianHalf(angle.z), &sz, &cz);
+    
+    // XZY CW
+    return Quaternion(
+        cz * sx * cy + sz * cx * sy,
+        cz * cx * sy + sz * sx * cy,
+        sz * cx * cy - cz * sx * sy,
+        cz * cx * cy - sz * sx * sy
+    );
+}
+
+Quaternion Quaternion::EulerYZX(Vector3 angle){
+    float sx, cx, sy, cy, sz, cz;
+
+    SinCos(ToRadianHalf(angle.x), &sx, &cx);
+    SinCos(ToRadianHalf(angle.y), &sy, &cy);
+    SinCos(ToRadianHalf(angle.z), &sz, &cz);
+    
+    // YZX CCW
+    return Quaternion(
+        cz * sx * cy - sz * cx * sy,
+        cz * cx * sy - sz * sx * cy,
+        sz * cx * cy + cz * sx * sy,
+        cz * cx * cy + sz * sx * sy
+    );
+}
+
+Quaternion Quaternion::EulerYXZ(Vector3 angle){
+    float sx, cx, sy, cy, sz, cz;
+
+    SinCos(ToRadianHalf(angle.x), &sx, &cx);
+    SinCos(ToRadianHalf(angle.y), &sy, &cy);
+    SinCos(ToRadianHalf(angle.z), &sz, &cz);
+    
+    // YXZ CW
+    return Quaternion(
+        cz * sx * cy - sz * cx * sy,
+        cz * cx * sy + sz * sx * cy,
+        sz * cx * cy + cz * sx * sy,
+        cz * cx * cy - sz * sx * sy
+    );
+}
+
+Quaternion Quaternion::EulerZXY(Vector3 angle){
+    float sx, cx, sy, cy, sz, cz;
+
+    SinCos(ToRadianHalf(angle.x), &sx, &cx);
+    SinCos(ToRadianHalf(angle.y), &sy, &cy);
+    SinCos(ToRadianHalf(angle.z), &sz, &cz);
+    
+    // ZXY CCW
+    return Quaternion(
+        cz * sx * cy + sz * cx * sy,
+        cz * cx * sy - sz * sx * cy,
+        sz * cx * cy - cz * sx * sy,
+        cz * cx * cy + sz * sx * sy
+    );
+}
+
+Quaternion Quaternion::EulerZYX(Vector3 angle){
+    float sx, cx, sy, cy, sz, cz;
+
+    SinCos(ToRadianHalf(angle.x), &sx, &cx);
+    SinCos(ToRadianHalf(angle.y), &sy, &cy);
+    SinCos(ToRadianHalf(angle.z), &sz, &cz);
+    
+    // ZYX CW
+    return Quaternion(
+        cz * sx * cy + sz * cx * sy,
+        cz * cx * sy - sz * sx * cy,
+        sz * cx * cy + cz * sx * sy,
+        cz * cx * cy - sz * sx * sy
+    );
+}
+
+Vector3 Quaternion::ToEulerXYZ() const{
+    // 1:X 2:Y 3:Z
+    // CCW
+    Vector3 xyz;
+
+    float y2 = y * y;
+ 
+    float y2z = w * x + y * z;// 0.5倍矩阵2=>3系数
+    float z2z = 0.5f - (x * x + y2);// 0.5倍矩阵3=>3系数
+    xyz.x = ToRadian(Atan2(z2z, y2z));
+ 
+    float z2x = 2.0f * (x * z - w * y);// 矩阵3=>1系数
+    xyz.y = ToRadian(Abs(z2x) >= 1.0f ? Copysign(PI * 0.5f, z2x) : Asin(z2x));
+ 
+    float x2y = w * z + x * y;// 0.5倍矩阵1=>2系数
+    float x2x = 0.5f - (y2 + z * z);// 0.5倍矩阵1=>1系数
+    xyz.z = ToRadian(Atan2(x2x, x2y));
+
+    return xyz;
+}
+
+Vector3 Quaternion::ToEulerXZY() const{
+    // 1:X 2:Z 3:Y
+    // CW 需要将后两个角度取相反数
+    Vector3 xzy;
+
+    float y2 = y * y;
+ 
+    float y2z = w * x + y * z;// 0.5倍矩阵2=>3系数
+    float z2z = 0.5f - (x * x + y2);// 0.5倍矩阵3=>3系数
+    xzy.x = ToRadian(Atan2(z2z, y2z));
+ 
+    float x2y = 2.0f * (w * z + x * y);// 矩阵3=>1系数
+    xzy.z = -ToRadian(Abs(x2y) >= 1.0f ? Copysign(PI * 0.5f, x2y) : Asin(x2y));
+ 
+    float x2z = w * y + z * x;// 0.5倍矩阵1=>2系数
+    float x2x = 0.5f - (y2 + z * z);// 0.5倍矩阵1=>1系数
+    xzy.y = -ToRadian(Atan2(x2x, x2z));
+
+    return xzy;
+}
+
+Vector3 Quaternion::ToEulerYZX() const{
+    // 1:Y 2:Z 3:X
+    // CCW
+    Vector3 yzx;
+
+    float z2 = z * z;
+ 
+    float z2x = z * x - w * y;// 0.5倍矩阵2=>3系数
+    float x2x = 0.5f - (y * y + z2);// 0.5倍矩阵3=>3系数
+    yzx.y = ToRadian(Atan2(x2x, z2x));
+ 
+    float x2y = 2.0f * (w * z + x * y);// 矩阵3=>1系数
+    yzx.z = ToRadian(Abs(x2y) >= 1.0f ? Copysign(PI * 0.5f, x2y) : Asin(x2y));
+ 
+    float y2z = w * x + y * z;// 0.5倍矩阵1=>2系数
+    float y2y = 0.5f - (z2 + x * x);// 0.5倍矩阵1=>1系数
+    yzx.x = ToRadian(Atan2(y2y, y2z));
+
+    return yzx;
+}
+
+Vector3 Quaternion::ToEulerYXZ() const{
+    // 1:Y 2:X 3:Z
+    // CW 需要将后两个角度取相反数
+    Vector3 yxz;
+
+    float x2 = x * x;
+ 
+    float x2z = w * y + z * x;// 0.5倍矩阵2=>3系数
+    float z2z = 0.5f - (x2 + y * y);// 0.5倍矩阵3=>3系数
+    yxz.y = ToRadian(Atan2(z2z, x2z));
+ 
+    float z2y = 2.0f * (y * z - w * x);// 矩阵3=>1系数
+    yxz.x = -ToRadian(Abs(z2y) >= 1.0f ? Copysign(PI * 0.5f, z2y) : Asin(z2y));
+ 
+    float y2x = x * y - w * z;// 0.5倍矩阵1=>2系数
+    float y2y = 0.5f - (z * z + x2);// 0.5倍矩阵1=>1系数
+    yxz.z = -ToRadian(Atan2(y2y, y2x));
+
+    return yxz;
+}
+
+Vector3 Quaternion::ToEulerZXY() const{
+    // 1:Z 2:X 3:Y
+    // CCW
+    Vector3 zxy;
+
+    float x2 = x * x;
+ 
+    float x2y = w * z + x * y;// 0.5倍矩阵2=>3系数
+    float y2y = 0.5f - (z * z + x2);// 0.5倍矩阵3=>3系数
+    zxy.z = ToRadian(Atan2(y2y, x2y));
+ 
+    float y2z = 2.0f * (w * x + y * z);// 矩阵3=>1系数
+    zxy.x = ToRadian(Abs(y2z) >= 1.0f ? Copysign(PI * 0.5f, y2z) : Asin(y2z));
+ 
+    float z2x = z * x - w * y;// 0.5倍矩阵1=>2系数
+    float z2z = 0.5f - (x2 + y * y);// 0.5倍矩阵1=>1系数
+    zxy.y = ToRadian(Atan2(z2z, z2x));
+
+    return zxy;
+}
+
+Vector3 Quaternion::ToEulerZYX() const{
+    // 1:Z 2:Y 3:X
+    // CW 需要将后两个角度取相反数
+    Vector3 zyx;
+
+    float x2 = x * x;
+ 
+    float y2x = x * y - w * z;// 0.5倍矩阵2=>3系数
+    float x2x = 0.5f - (y * y + z * z);// 0.5倍矩阵3=>3系数
+    zyx.z = ToRadian(Atan2(x2x, y2x));
+ 
+    float x2z = 2.0f * (w * y + z * x);// 矩阵3=>1系数
+    zyx.y = -ToRadian(Abs(x2z) >= 1.0f ? Copysign(PI * 0.5f, x2z) : Asin(x2z));
+ 
+    float z2y = y * z - w * x;// 0.5倍矩阵1=>2系数
+    float z2z = 0.5f - (x * x + y * y);// 0.5倍矩阵1=>1系数
+    zyx.x = -ToRadian(Atan2(z2z, z2y));
+
+    return zyx;
 }
 
 Matrix4x4::Matrix4x4(){}
@@ -1120,9 +1370,9 @@ Quaternion Matrix4x4::GetRotation() const{
 
 Vector3 Matrix4x4::GetScale() const{
     return Vector3(
-        Sqrt(_11 * _11 + _21 * _21 + _31 * _31),
-        Sqrt(_12 * _12 + _22 * _22 + _32 * _32),
-        Sqrt(_13 * _13 + _23 * _23 + _33 * _33)
+        Sqrt(_11 * _11 + _12 * _12 + _13 * _13),
+        Sqrt(_21 * _21 + _22 * _22 + _23 * _23),
+        Sqrt(_31 * _31 + _32 * _32 + _33 * _33)
     );
 }
 
@@ -1350,9 +1600,9 @@ Quaternion Matrix3x4::GetRotation() const{
 
 Vector3 Matrix3x4::GetScale() const{
     return Vector3(
-        Sqrt(_11 * _11 + _21 * _21 + _31 * _31),
-        Sqrt(_12 * _12 + _22 * _22 + _32 * _32),
-        Sqrt(_13 * _13 + _23 * _23 + _33 * _33)
+        Sqrt(_11 * _11 + _12 * _12 + _13 * _13),
+        Sqrt(_21 * _21 + _22 * _22 + _23 * _23),
+        Sqrt(_31 * _31 + _32 * _32 + _33 * _33)
     );
 }
 
@@ -1492,8 +1742,8 @@ Complex Matrix2x3::GetRotation() const{
 
 Vector2 Matrix2x3::GetScale() const{
     return Vector2(
-        Sqrt(_11 * _11 + _21 * _21),
-        Sqrt(_12 * _12 + _22 * _22)
+        Sqrt(_11 * _11 + _12 * _12),
+        Sqrt(_21 * _21 + _22 * _22)
     );
 }
 

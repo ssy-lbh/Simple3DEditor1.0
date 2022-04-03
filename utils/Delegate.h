@@ -139,7 +139,8 @@ public:
     template <typename D>
     DelegateWithData<T, void*, U...>& operator+=(T(*f)(D*, U...)){ return Add(f); }
     DelegateWithData<T, void*, U...>& operator+=(DelegateWithData<T, void*, U...>& d){ funcs += d.funcs; return *this; }
-    DelegateWithData<T, void*, U...>& operator-=(func_t f){ Remove(f); return *this; }
+    template <typename D>
+    DelegateWithData<T, void*, U...>& operator-=(T(*f)(D*, U...)){ Remove(f); return *this; }
     DelegateWithData<T, void*, U...>& operator-=(DelegateWithData<T, void*, U...>& d){ funcs -= d.funcs; return *this; }
     DelegateWithData<T, void*, U...>& operator!(){ return !funcs; }
 
@@ -160,10 +161,11 @@ public:
         return *this;
     }
 
-    bool Remove(func_t f){
+    template <typename D>
+    bool Remove(T(*f)(D*, U...)){
         size_t size = funcs.Size();
         for (size_t i = 0; i < size; i++){
-            if (funcs[i].func == f){
+            if (funcs[i].func == (func_t)f){
                 funcs.RemoveAt(i);
                 return true;
             }

@@ -39,6 +39,13 @@ public:
     AudioListenerObject* audioListener = NULL;
     CameraObject* camera = NULL;
 
+    // 外部程序不应修改
+    float recTime;
+    float deltaTime;
+
+    // 无延迟渲染
+    bool reqRender = false;
+
     LocalData();
     ~LocalData();
 
@@ -97,6 +104,8 @@ public:
     void SelectObject(AViewObject* o);
     void SelectType(SelectionType type);
 
+    void OnCreate();
+    void OnClose();
     void OnTimer(int id);
 
     void OnAnimationFrame(float frame);
@@ -106,7 +115,6 @@ class Main final : public Object {
 public:
     static GlobalData* data;
 
-    static void RequestRender();
     static void SetCursor(int id);
     static void SetCursor(const char* res);
     static void SetMenu(Menu* m);
@@ -118,6 +126,8 @@ public:
     static void OnAnimationFrame(float frame);
     static void SaveImage(String file, Rect rect);
     static void RenderAnimation(String dir, size_t start, size_t end, Rect rect);
+    // 请求无延迟渲染
+    static void RequestRender();
 
     static void OnMouseMove(Point3 ori, Vector3 dir);
     static void OnLeftDown(Point3 ori, Vector3 dir);
@@ -129,6 +139,7 @@ public:
     static void RenderScreen();
 
     static Mesh* GetMesh();
+    static Mesh* GetMesh(AViewObject* o);
 
     static int MainEntry(int argc, char** argv);
     static void Init();

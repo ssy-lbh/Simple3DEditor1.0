@@ -46,8 +46,7 @@ AudioSourceObject::AudioSourceObject(uenum format, char* data, int size, int fre
     alAudioFreq = freq;
     alAudioOffset = 0;
 
-    recPos = Vector3::zero;
-    recTime = TimeUtils::GetTime();
+    recPos = Point3::zero;
 }
 
 AudioSourceObject::~AudioSourceObject(){
@@ -57,15 +56,6 @@ AudioSourceObject::~AudioSourceObject(){
     alDeleteBuffers(1, &alBuf);
 
     if (window) window->LoadObject(NULL);
-}
-
-void AudioSourceObject::OnTimer(int id){
-    Point3 pos = transform.chainMat * Point3::zero;
-    if (dopplerEffect){
-        SetPosAutoVelv3(pos);
-    }else{
-        SetPosv3(pos);
-    }
 }
 
 void AudioSourceObject::OnRender(){
@@ -79,6 +69,13 @@ void AudioSourceObject::OnRender(){
     glVertex3f(0.0f, 0.0f, 0.0f);
     glEnd();
     glDisable(GL_POINT_SMOOTH);
+
+    Point3 pos = transform.GetWorldTranslation();
+    if (dopplerEffect){
+        SetPosAutoVelv3(pos);
+    }else{
+        SetPosv3(pos);
+    }
 }
 
 char* AudioSourceObject::GetData(){
@@ -171,12 +168,10 @@ void AudioSourceObject::SetVelocityv3(Vector3 value){
     alSource3f(alSrc, AL_VELOCITY, value.x, value.y, value.z);
 }
 
+// 如果是渲染过程中调用则可用Time::GetDeltaTime()
 void AudioSourceObject::SetPosAutoVelv3(Point3 value){
-    float curTime = TimeUtils::GetTime();
-    Vector3 vel = (value - recPos) / (curTime - recTime);
-
+    Vector3 vel = (value - recPos) / Time::GetDeltaTime();
     recPos = value;
-    recTime = curTime;
 
     alSource3f(alSrc, AL_POSITION, value.x, value.y, value.z);
     alSource3f(alSrc, AL_VELOCITY, vel.x, vel.y, vel.z);
@@ -187,8 +182,7 @@ void AudioSourceObject::SetDopplerEffect(bool on){
         return;
     dopplerEffect = on;
     if (on){
-        recPos = transform.chainMat * Point3::zero;
-        recTime = TimeUtils::GetTime();
+        recPos = transform.GetWorldTranslation();
     }else{
         SetVelocityv3(Vector3::zero);
     }

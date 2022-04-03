@@ -6,6 +6,10 @@
 Transform::Transform() : position(Vector3::zero), rotation(Quaternion::one), rotationXYZ(Vector3::zero), scale(Vector3::one) {}
 Transform::~Transform(){}
 
+Vector3 Transform::GetWorldTranslation(){
+    return chainMat.GetTranslation();
+}
+
 Quaternion Transform::GetRotation(){
     if (rotationMode == ROT_QUATERNION)
         return rotation.Get().Normal();
@@ -28,6 +32,10 @@ Quaternion Transform::GetRotation(){
     return Quaternion::one;
 }
 
+Vector3 Transform::GetRotationXYZ(){
+    return rotationXYZ.Get();
+}
+
 Matrix4x4 Transform::GetMatrix(){
     Matrix4x4 mat = Matrix4x4::identity;
 
@@ -38,9 +46,9 @@ Matrix4x4 Transform::GetMatrix(){
     if (rotationMode == ROT_QUATERNION){
         mat *= rotation.Get().Normal();
     }else{
-        Quaternion rotX = Quaternion::AxisAngle(Vector3::right, rotationXYZ.x.Get());
-        Quaternion rotY = Quaternion::AxisAngle(Vector3::forward, rotationXYZ.y.Get());
-        Quaternion rotZ = Quaternion::AxisAngle(Vector3::up, rotationXYZ.z.Get());
+        Quaternion rotX = Quaternion::RotateX(rotationXYZ.x.Get());
+        Quaternion rotY = Quaternion::RotateY(rotationXYZ.y.Get());
+        Quaternion rotZ = Quaternion::RotateZ(rotationXYZ.z.Get());
 
         switch (rotationMode){
         case ROT_EULER_XYZ:
@@ -67,13 +75,6 @@ Matrix4x4 Transform::GetMatrix(){
     mat._14 = position.x.Get();
     mat._24 = position.y.Get();
     mat._34 = position.z.Get();
-
-    // 调试输出矩阵
-    // DebugLog("%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f",
-    //          mat._11, mat._12, mat._13, mat._14,
-    //          mat._21, mat._22, mat._23, mat._24,
-    //          mat._31, mat._32, mat._33, mat._34,
-    //          mat._41, mat._42, mat._43, mat._44);
 
     return mat;
 }
@@ -121,6 +122,42 @@ Matrix4x4 Transform::GetInvMatrix(){
     tmp = 1.0f / scale.z.Get(); mat._31 *= tmp; mat._32 *= tmp; mat._33 *= tmp;
 
     return mat;
+}
+
+void Transform::SetRotationMode(RotationMode mode){
+    rotationMode = mode;
+    switch (rotationMode){
+    case ROT_EULER_XYZ: rotationXYZ.Set(rotation.Get().ToEulerXYZ()); break;
+    case ROT_EULER_XZY: rotationXYZ.Set(rotation.Get().ToEulerXZY()); break;
+    case ROT_EULER_YXZ: rotationXYZ.Set(rotation.Get().ToEulerYXZ()); break;
+    case ROT_EULER_YZX: rotationXYZ.Set(rotation.Get().ToEulerYZX()); break;
+    case ROT_EULER_ZXY: rotationXYZ.Set(rotation.Get().ToEulerZXY()); break;
+    case ROT_EULER_ZYX: rotationXYZ.Set(rotation.Get().ToEulerZYX()); break;
+    }
+}
+
+void Transform::SetRotation(Quaternion rot){
+    rotation.Set(rot);
+    switch (rotationMode){
+    case ROT_EULER_XYZ: rotationXYZ.Set(rotation.Get().ToEulerXYZ()); break;
+    case ROT_EULER_XZY: rotationXYZ.Set(rotation.Get().ToEulerXZY()); break;
+    case ROT_EULER_YXZ: rotationXYZ.Set(rotation.Get().ToEulerYXZ()); break;
+    case ROT_EULER_YZX: rotationXYZ.Set(rotation.Get().ToEulerYZX()); break;
+    case ROT_EULER_ZXY: rotationXYZ.Set(rotation.Get().ToEulerZXY()); break;
+    case ROT_EULER_ZYX: rotationXYZ.Set(rotation.Get().ToEulerZYX()); break;
+    }
+}
+
+void Transform::SetRotationXYZ(Vector3 xyz){
+    rotationXYZ.Set(xyz);
+    switch (rotationMode){
+    case ROT_EULER_XYZ: rotation.Set(Quaternion::EulerXYZ(xyz)); break;
+    case ROT_EULER_XZY: rotation.Set(Quaternion::EulerXZY(xyz)); break;
+    case ROT_EULER_YXZ: rotation.Set(Quaternion::EulerYXZ(xyz)); break;
+    case ROT_EULER_YZX: rotation.Set(Quaternion::EulerYZX(xyz)); break;
+    case ROT_EULER_ZXY: rotation.Set(Quaternion::EulerZXY(xyz)); break;
+    case ROT_EULER_ZYX: rotation.Set(Quaternion::EulerZYX(xyz)); break;
+    }
 }
 
 void Transform::PushMatrix(){

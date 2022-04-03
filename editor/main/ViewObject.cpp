@@ -33,6 +33,7 @@ AViewObject::AViewObject(WString name, ViewObjectType type) : name(name), type(t
 
 AViewObject::~AViewObject(){
     Free(children);
+    onDestroy(this);
     if (parent)
         parent->DeleteChild(this);
 }
@@ -88,11 +89,19 @@ Matrix4x4 AViewObject::GetParentChainInvMat(){
 }
 
 Point3 AViewObject::GetWorldPos(){
-    return transform.chainMat * Point3::zero;
+    return transform.chainMat.GetTranslation();
 }
 
 void AViewObject::SetWorldPos(Point3 pos){
     transform.position.Set(parent == NULL ? pos : parent->transform.chainInvMat * pos);
+}
+
+Quaternion AViewObject::GetWorldRot(){
+    return parent == NULL ? transform.GetRotation() : transform.GetRotation() * parent->GetWorldRot();
+}
+
+void AViewObject::SetWorldRot(Quaternion rot){
+    transform.SetRotation(parent == NULL ? rot : rot / parent->GetWorldRot());
 }
 
 AViewObject* AViewObject::QueryObject(WString path){
@@ -133,7 +142,8 @@ void AViewObject::OnChainRender(){
 }
 
 void AViewObject::OnRender(){
-    if (Main::data->selType == SelectionType::SELECT_OBJECT && Main::data->curObject == this){
+    const RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
+    if (options->editor && Main::data->selType == SelectionType::SELECT_OBJECT && Main::data->curObject == this){
         glDisable(GL_LIGHTING);
         glEnable(GL_POINT_SMOOTH);
         glPointSize(10.0f);
@@ -144,12 +154,20 @@ void AViewObject::OnRender(){
         glDisable(GL_POINT_SMOOTH);
 
         // 默认MOVE
-        glColor3f(1.0f, 0.0f, 0.0f);
-        GLUtils::Draw3DArrow(Point3::zero, Vector3::right, 0.3f, 0.3f, 5.0f);
-        glColor3f(0.0f, 1.0f, 0.0f);
-        GLUtils::Draw3DArrow(Point3::zero, Vector3::forward, 0.3f, 0.3f, 5.0f);
-        glColor3f(0.0f, 0.0f, 1.0f);
-        GLUtils::Draw3DArrow(Point3::zero, Vector3::up, 0.3f, 0.3f, 5.0f);
+        switch (options->objOp){
+        case ObjectOperation::MOVE:
+            glColor3f(1.0f, 0.0f, 0.0f);
+            GLUtils::Draw3DArrow(Point3::zero, Vector3::right, 0.3f, 0.3f, 5.0f);
+            glColor3f(0.0f, 1.0f, 0.0f);
+            GLUtils::Draw3DArrow(Point3::zero, Vector3::forward, 0.3f, 0.3f, 5.0f);
+            glColor3f(0.0f, 0.0f, 1.0f);
+            GLUtils::Draw3DArrow(Point3::zero, Vector3::up, 0.3f, 0.3f, 5.0f);
+            break;
+        case ObjectOperation::ROTATE:
+            break;
+        case ObjectOperation::SCALE:
+            break;
+        }
     }
 }
 

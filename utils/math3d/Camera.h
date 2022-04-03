@@ -5,7 +5,7 @@
 
 #include <utils/math3d/LinearAlgebra.h>
 
-class Camera {
+class CCamera {
 protected:
     void SetLookAt(Point3 at);
     void SetRotation(Quaternion rot);
@@ -18,6 +18,11 @@ protected:
     void InitCamera(float aspect);
     void InitCamera(float aspect, float near, float far);
 
+    CCamera();
+    CCamera(Point3 pos, Point3 lookAt, Vector3 up);
+    CCamera(Point3 pos, Point3 lookAt, Vector3 up, float dis);
+    ~CCamera();
+
 public:
     Point3 camLookat;
     Quaternion camDir = Quaternion::one;
@@ -26,11 +31,6 @@ public:
     Vector3 camRight = Vector3::right;
     Vector3 camUp = Vector3::up;
     Vector3 camForward = Vector3::forward;
-
-    Camera();
-    Camera(Point3 pos, Point3 lookAt, Vector3 up);
-    Camera(Point3 pos, Point3 lookAt, Vector3 up, float dis);
-    ~Camera();
 };
 
 #endif

@@ -12,6 +12,7 @@
 #include <utils/StringBuilder.h>
 #include <utils/os/Log.h>
 #include <utils/os/Font.h>
+#include <utils/os/Time.h>
 #include <utils/os/Thread.h>
 #include <utils/os/Shell.h>
 #include <utils/os/Resource.h>
@@ -213,6 +214,16 @@ void GlobalData::SelectType(SelectionType type){
     selType = type;
 }
 
+void GlobalData::OnCreate(){
+    scene->OnCreate();
+    screen->OnCreate();
+}
+
+void GlobalData::OnClose(){
+    scene->OnClose();
+    screen->OnClose();
+}
+
 void GlobalData::OnTimer(int id){
     scene->OnTimer(id);
     screen->OnTimer(id);
@@ -222,12 +233,6 @@ void GlobalData::OnAnimationFrame(float frame){
     animFrame = frame;
     scene->OnAnimationFrame(frame);
     screen->OnAnimationFrame(frame);
-}
-
-void Main::RequestRender(){
-    AppFrame* frame = AppFrame::GetLocalInst();
-    if (frame)
-        frame->reqRender = true;
 }
 
 #ifdef PLATFORM_WINDOWS
@@ -286,7 +291,6 @@ void Main::DeleteObject(AViewObject* o){
 
 void Main::OnAnimationFrame(float frame){
     data->OnAnimationFrame(frame);
-    RequestRender();
 }
 
 void Main::SaveImage(String file, Rect rect){
@@ -323,6 +327,10 @@ void Main::RenderAnimation(String dir, size_t start, size_t end, Rect rect){
     }
 }
 
+void Main::RequestRender(){
+    LocalData::GetLocalInst()->reqRender = true;
+}
+
 void Main::OnMouseMove(Point3 ori, Vector3 dir){
     data->curObject->OnMouseMove(ori, dir);
 }
@@ -348,17 +356,21 @@ void Main::RenderScene(){
 }
 
 void Main::RenderScreen(){
-    data->scene->OnChainRender();
+    data->screen->OnChainRender();
 }
 
 Mesh* Main::GetMesh(){
-    if (!data->curObject)
+    return GetMesh(data->curObject);
+}
+
+Mesh* Main::GetMesh(AViewObject* o){
+    if (!o)
         return NULL;
-    if (data->curObject->GetType() == ViewObjectType::OBJECT_MESH){
-        return (dynamic_cast<MeshObject*>(data->curObject))->GetMesh();
+    if (o->GetType() == ViewObjectType::OBJECT_MESH){
+        return (dynamic_cast<MeshObject*>(o))->GetMesh();
     }
-    if (data->curObject->GetType() == ViewObjectType::OBJECT_GUI_MESH){
-        return (dynamic_cast<GUIMeshObject*>(data->curObject))->GetMesh();
+    if (o->GetType() == ViewObjectType::OBJECT_GUI_MESH){
+        return (dynamic_cast<GUIMeshObject*>(o))->GetMesh();
     }
     return NULL;
 }
@@ -370,6 +382,8 @@ int Main::MainEntry(int argc, char** argv){
     AWindow* mainFrame = new SelectionWindow(new MainWindow());
 
     AppFrame* appFrame = new AppFrame("ModelView", mainFrame, 600, 600);
+
+    LocalData* localData = LocalData::GetLocalInst();
 
     DebugLog("Main Window Created");
 
@@ -391,15 +405,27 @@ int Main::MainEntry(int argc, char** argv){
 
     // 放在这里是为了让OpenGL初始化
     mainFrame->OnCreate();
+    data->OnCreate();
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 
     appFrame->Show();
-    while (appFrame->WaitHandleEvent()){
-        if (appFrame->reqRender || appFrame->GetLastMessageType() != AppFrame::MESSAGE_TIMER){
-            appFrame->reqRender = false;
-            appFrame->Render();
-            appFrame->SwapBuffer();
+
+    localData->recTime = Time::GetTime();
+    localData->deltaTime = 0.0167f; // 一个60FPS大概的估测值，作为启动时间即可
+
+    while (appFrame->HandleEvents()){
+        appFrame->Render();
+        appFrame->SwapBuffer();
+
+        float time = Time::GetTime();
+        localData->deltaTime = time - localData->recTime;
+        localData->recTime = time;
+        // 不知道为什么，我的电脑开不了垂直同步，只能出此下策了
+        if (localData->reqRender){
+            localData->reqRender = false;
+        }else{
+            Sleep(16 - localData->deltaTime);
         }
     }
 

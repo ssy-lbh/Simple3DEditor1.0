@@ -25,7 +25,6 @@ private:
     int alAudioOffset;
 
     Point3 recPos;
-    float recTime;
     bool dopplerEffect = true;
 
     AudioPlayerWindow* window = NULL;
@@ -34,8 +33,6 @@ public:
     // 输入的数据内部引用，自动回收，不能调用后释放data所在内存
     AudioSourceObject(uenum format, char* data, int size, int freq);
     virtual ~AudioSourceObject() override;
-
-    virtual void OnTimer(int id) override;
 
     // 使用渲染回调获取最新位置信息，并更新AudioListener
     virtual void OnRender() override;

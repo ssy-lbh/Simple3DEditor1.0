@@ -292,28 +292,18 @@ void AnimationWindow::OnRender(){
     uiMgr->RenderWithDepth();
 
     glDepthFunc(GL_LESS);
-}
 
-void AnimationWindow::OnTimer(int id){
-    switch (id){
-    // 标准10ms时钟
-    case 1:
-        if (play){
-            float curTime = TimeUtils::GetTime();
-
-            frame += (curTime - time) * fps;
-            time = curTime;
-            if (frame > endFrame){
-                // 结束直接暂停
-                //play = false;
-                //break;
-                // 循环
-                frame = startFrame;
-            }
-            frame = Clamp(frame, startFrame, endFrame);
-            Main::OnAnimationFrame(frame);
+    if (play){
+        frame += Time::GetDeltaTime() * fps;
+        if (frame > endFrame){
+            // 结束直接暂停
+            //play = false;
+            //return;
+            // 循环
+            frame = startFrame;
         }
-        break;
+        frame = Clamp(frame, startFrame, endFrame);
+        Main::OnAnimationFrame(frame);
     }
 }
 
@@ -396,7 +386,6 @@ void AnimationWindow::SetFrame(float frame){
 
 void AnimationWindow::Play(){
     play = true;
-    time = TimeUtils::GetTime();
 }
 
 void AnimationWindow::Stop(){

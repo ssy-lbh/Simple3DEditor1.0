@@ -3,38 +3,32 @@
 
 #include <define.h>
 
+#include <utils/math3d/Camera.h>
 #include <editor/gui/UIManager.h>
 #include <editor/gui/Menu.h>
 
-class RenderWindow final : public AWindow {
+class RenderWindow final : public AWindow, public CCamera {
 private:
     Rect rect;
 
     bool lightEnabled = false;
 
-    Vector3 camLookat = Vector3::up;
-    Quaternion camDir = Quaternion::one;
-    float camDis = 5.0f;
-    Vector3 camPos = Vector3::back * 5.0f + Vector3::up;
-    Vector3 camRight = Vector3::right;
-    Vector3 camUp = Vector3::up;
-    Vector3 camForward = Vector3::forward;
-
     Menu* basicMenu;
 
     UIManager* uiMgr;
-
-    GLProgram* glProg = NULL;
 
 protected:
     void UpdateWindowSize(int x, int y);
     void UpdateCursor(int x, int y);
 
+    void SetLookAt(Point3 at);
+    void SetRotation(Quaternion rot);
+    void SetDistance(float dis);
+    void InitCamera();
+
 public:
     RenderWindow();
     virtual ~RenderWindow() override;
-
-    void InitCamera();
     
     virtual void OnRender() override;
     virtual void OnCreate() override;

@@ -22,8 +22,6 @@ private:
     float frame = 0.0f;
     bool play = false;
 
-    float time;
-
     AnimationCurve* curve = NULL;
 
     class FrameIndicator : public IButton {
@@ -93,7 +91,6 @@ public:
     virtual ~AnimationWindow() override;
 
     virtual void OnRender() override;
-    virtual void OnTimer(int id) override;
     virtual void OnResize(int x, int y) override;
     virtual void OnMouseMove(int x, int y) override;
     virtual void OnLeftDown(int x, int y) override;

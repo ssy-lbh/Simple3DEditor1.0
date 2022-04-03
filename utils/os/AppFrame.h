@@ -55,10 +55,11 @@ public:
         MESSAGE_OTHERS
     };
 
-    bool reqRender = false;
     bool cursorSelected = false;
 
+    // 这些字体List由wglDeleteContext回收
     uint fontASCII = 0;
+    uint* fontCache = NULL;
 
     AppFrame(String name, AWindow* mainFrame, size_t height, size_t width, bool async = false);
     ~AppFrame();
@@ -83,6 +84,10 @@ public:
     bool HandleEvents();
     void Render();
     void SwapBuffer();
+    // 说到交换帧缓存，如果不垂直同步
+    // 性能问题很大不说，显示器跟不上来，渲染出来的画面人也看不到
+    // 而且画面撕裂，浪费CPU、GPU资源
+    // 我这电脑貌似没有开垂直同步，我还得自己找方法开启
 
     int MainLoop();
     bool WaitQuit();

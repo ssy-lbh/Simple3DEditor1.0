@@ -384,12 +384,6 @@ void AudioPlayerWindow::OnRender(){
 
 void AudioPlayerWindow::OnClose(){}
 
-void AudioPlayerWindow::OnTimer(int id){
-    if (IsLaunched()){
-        Main::RequestRender();
-    }
-}
-
 void AudioPlayerWindow::OnChar(char c){}
 
 void AudioPlayerWindow::OnUnichar(wchar_t c){}

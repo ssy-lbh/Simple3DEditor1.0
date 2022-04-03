@@ -41,6 +41,8 @@ PROGOBJ		= main\
 				utils\gl\GLLights utils\gl\GLProgram utils\gl\GLShader utils\gl\GLEW\
 				utils\gl\GLUtils utils\gl\GLVertexArray utils\gl\GLVertexBuffer\
 				utils\gl\GLTexture2D utils\gl\GLRenderTexture2D utils\gl\GLComputeProgram\
+				utils\physics\Rigidbody utils\physics\Collider utils\physics\CubeCollider\
+				utils\physics\SphereCollider utils\physics\MeshCollider\
 				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
 				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
 				editor\MainWindow editor\RenderWindow editor\gui\Container editor\gui\Menu\

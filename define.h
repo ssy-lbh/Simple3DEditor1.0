@@ -42,6 +42,9 @@ class PackString;
 class PackWString;
 class StringBuilder;
 class File;
+class ISerializable;
+class IDeserializable;
+class IMemorable;
 class DataBuffer;
 class PackDataBuffer;
 
@@ -60,7 +63,7 @@ class Mesh;
 
 // vecmath
 class Rect;
-class Camera;
+class CCamera;
 class Vector2;
 class Point2;
 class Vector3;
@@ -156,7 +159,7 @@ class PaintWindow;
 class RenderWindow;
 
 // timetools
-class TimeUtils;
+class Time;
 class TimerManager;
 
 // tree
@@ -174,10 +177,6 @@ class IOperation;
 class ITool;
 class IWindow;
 class AWindow;
-enum class HoverType {
-    LEFT,
-    RIGHT
-};
 
 // appframe
 class AppFrame;
@@ -200,5 +199,13 @@ class WindowManager;
 class WindowRegistry;
 class PluginManager;
 class Plugin;
+
+// physics
+class Rigidbody;
+enum class ColliderType;
+class ACollider;
+class CubeCollider;
+class SphereCollider;
+class MeshCollider;
 
 #endif

@@ -15,7 +15,7 @@ enum class ObjectOperation {
     SCALE
 };
 
-class MainWindow final : public AWindow, public Camera {
+class MainWindow final : public AWindow, public CCamera {
 private:
     Vector3 cursorDir;
 

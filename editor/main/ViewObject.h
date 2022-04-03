@@ -4,6 +4,7 @@
 #include <define.h>
 
 #include <utils/List.h>
+#include <utils/Delegate.h>
 #include <utils/math3d/Geometry.h>
 #include <utils/math3d/LinearAlgebra.h>
 #include <utils/String.h>
@@ -66,6 +67,9 @@ protected:
     AViewObject(WString name, ViewObjectType type);
 
 public:
+    // 被销毁时，子对象全部已销毁
+    DelegateWithData<void, void*, AViewObject*> onDestroy;
+
     AViewObject();
     AViewObject(const wchar_t* name);
     AViewObject(WString name);
@@ -87,6 +91,8 @@ public:
     Matrix4x4 GetParentChainInvMat();
     Point3 GetWorldPos();
     void SetWorldPos(Point3 pos);
+    Quaternion GetWorldRot();
+    void SetWorldRot(Quaternion rot);
     
     // 用字符'.'分隔各级对象名称
     // 计划这里内部的实现以后改为HashMap加速
@@ -109,6 +115,7 @@ public:
     virtual void OnRenderUVMap();
 
     // 要求调用时OpenGL或者其他渲染API上下文存在
+    //TODO 目前调用尚未实现
     virtual void OnCreate();
     virtual void OnClose();
     virtual void OnTimer(int id);

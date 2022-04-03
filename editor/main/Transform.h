@@ -34,9 +34,14 @@ public:
     Transform();
     ~Transform();
 
+    Vector3 GetWorldTranslation();
     Quaternion GetRotation();
+    Vector3 GetRotationXYZ();
     Matrix4x4 GetMatrix();
     Matrix4x4 GetInvMatrix();
+    void SetRotationMode(RotationMode mode);
+    void SetRotation(Quaternion rot);
+    void SetRotationXYZ(Vector3 xyz);
     void PushMatrix();
     void PushInvMatrix();
     void PopMatrix();

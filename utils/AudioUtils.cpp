@@ -129,7 +129,7 @@ void alListenerPosAutoVelv3(Vector3 value){
     static Vector3 pos = value;
     static float time = 0.0f;
 
-    float curTime = TimeUtils::GetTime();
+    float curTime = Time::GetTime();
     Vector3 vel = (value - pos) * VELOCITY_RATIO / (curTime - time);
     pos = value;
     time = curTime;

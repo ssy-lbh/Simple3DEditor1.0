@@ -34,6 +34,8 @@ public:
     Vector2 operator-(Vector2) const;
     Vector2 operator*(float) const;
     Vector2 operator/(float) const;
+    Vector3 operator*(Vector2) const;
+    Vector3 operator/(Vector2) const;
     Vector2 &operator+=(Vector2);
     Vector2 &operator-=(Vector2);
     Vector2 &operator*=(float);
@@ -110,6 +112,8 @@ public:
     Vector3 operator-(Vector3) const;
     Vector3 operator*(float) const;
     Vector3 operator/(float) const;
+    Vector3 operator*(Vector3) const;
+    Vector3 operator/(Vector3) const;
     Vector3 &operator+=(Vector3);
     Vector3 &operator-=(Vector3);
     Vector3 &operator*=(float);
@@ -344,9 +348,10 @@ public:
 
     static Quaternion FromTo(Vector3 from, Vector3 to);
     static Quaternion Reflection(Vector3 axis, Vector3 v);
+    static Quaternion RotateX(float);
+    static Quaternion RotateY(float);
+    static Quaternion RotateZ(float);
     static Quaternion AxisAngle(Vector3, float);
-    static Quaternion EulerZXY(float x, float y, float z);
-    static Quaternion EulerZXY(Vector3);
     static Quaternion LookAt(Vector3 dir, Vector3 up);
 
     Quaternion Conjugate() const;
@@ -357,6 +362,20 @@ public:
     float Magnitude() const;
     float SqrMagnitude() const;
     Vector3 GetAxis() const;
+
+    static Quaternion EulerXYZ(Vector3);
+    static Quaternion EulerXZY(Vector3);
+    static Quaternion EulerYZX(Vector3);
+    static Quaternion EulerYXZ(Vector3);
+    static Quaternion EulerZXY(Vector3);
+    static Quaternion EulerZYX(Vector3);
+
+    Vector3 ToEulerXYZ() const;
+    Vector3 ToEulerXZY() const;
+    Vector3 ToEulerYZX() const;
+    Vector3 ToEulerYXZ() const;
+    Vector3 ToEulerZXY() const;
+    Vector3 ToEulerZYX() const;
 };
 
 // 4x4矩阵主要用于三维空间的平移、旋转、大小、投影变换

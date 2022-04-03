@@ -9,7 +9,6 @@
 class AudioListenerObject final : public AViewObject {
 private:
     Point3 recPos;
-    float recTime;
     bool dopplerEffect = true;
 
 public:
@@ -22,6 +21,7 @@ public:
     void SetPosv3(Point3 value);
     void SetVelocityv3(Vector3 value);
     void SetPosAutoVelv3(Point3 value);
+    void SetDirv3(Vector3 dir, Vector3 up);
     
     void SetDopplerEffect(bool on);
     bool HasDopplerEffect();

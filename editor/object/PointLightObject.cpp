@@ -60,7 +60,7 @@ void PointLightObject::OnTimer(int id){
 }
 
 void PointLightObject::UpdateLight(){
-    Vector3 pos = transform.chainMat * Point3(v.pos);
+    Vector3 pos = transform.GetWorldTranslation();
 
     GLfloat position[] = {pos.x, pos.y, pos.z, 1.0};// 最后一个参数为1.0表示该光源是point light
 

@@ -2,9 +2,10 @@
 
 #include <windows.h>
 
+#include <main.h>
 #include <utils/os/Log.h>
 
-double TimeUtils::GetTime(){
+double Time::GetTime(){
     LARGE_INTEGER time;
     LARGE_INTEGER freq;
 
@@ -12,6 +13,10 @@ double TimeUtils::GetTime(){
     QueryPerformanceFrequency(&freq);
 
     return (double)time.QuadPart / freq.QuadPart;
+}
+
+float Time::GetDeltaTime(){
+    return LocalData::GetLocalInst()->deltaTime;
 }
 
 void TimerManager::CreateTimer(int id, int elapseMillis){

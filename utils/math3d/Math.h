@@ -3,7 +3,7 @@
 
 #include <define.h>
 
-#define PI 3.1415926535897932384626433832795
+#define PI 3.1415926535897932384626433832795f
 
 constexpr float Sqrt(float x){ return __builtin_sqrtf(x); }
 constexpr double Sqrt(double x){ return __builtin_sqrt(x); }
@@ -63,6 +63,10 @@ constexpr long double Acos(long double x){ return __builtin_acosl(x); }
 constexpr float Atan(float x){ return __builtin_atanf(x); }
 constexpr double Atan(double x){ return __builtin_atan(x); }
 constexpr long double Atan(long double x){ return __builtin_atanl(x); }
+// (1, 0)=>0 (0, 1)=>+90 (-1, 0)=>+180 (0, -1)=>-90 范围(-180, +180]
+constexpr float Atan2(float x, float y){ return __builtin_atan2f(x, y); }
+constexpr double Atan2(double x, double y){ return __builtin_atan2(x, y); }
+constexpr long double Atan2(long double x, long double y){ return __builtin_atan2l(x, y); }
 constexpr float Sinh(float x){ return __builtin_sinhf(x); }
 constexpr double Sinh(double x){ return __builtin_sinh(x); }
 constexpr long double Sinh(long double x){ return __builtin_sinhl(x); }
@@ -81,8 +85,12 @@ constexpr long double Acosh(long double x){ return __builtin_acoshl(x); }
 constexpr float Atanh(float x){ return __builtin_atanhf(x); }
 constexpr double Atanh(double x){ return __builtin_atanh(x); }
 constexpr long double Atanh(long double x){ return __builtin_atanhl(x); }
+constexpr float Copysign(float x, float sign){ return __builtin_copysignf(x, sign); }
+constexpr double Copysign(double x, double sign){ return __builtin_copysign(x, sign); }
+constexpr long double Copysign(long double x, long double sign){ return __builtin_copysignl(x, sign); }
 
 constexpr float ToRadian(float x){ return x * 0.017453292519f; }
+constexpr float ToRadianHalf(float x){ return x * 0.008726646259971f; }
 constexpr float ToAngle(float x){ return x * 57.29577951308f; }
 
 // 参数需要为定点数

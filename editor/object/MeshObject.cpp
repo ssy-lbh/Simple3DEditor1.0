@@ -1,5 +1,9 @@
 #include <editor/object/MeshObject.h>
 
+// GLUT依赖于C Runtime
+#include <crtdefs.h>
+#include <lib/glut/glut.h>
+
 #include <main.h>
 #include <utils/math3d/Mesh.h>
 #include <utils/gl/GLSimplified.h>

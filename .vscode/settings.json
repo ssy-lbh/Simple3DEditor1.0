@@ -19,6 +19,7 @@
     "C_Cpp.errorSquiggles": "Disabled",
     "files.associations": {
         "*.h": "cpp",
+        "*.hlsl": "hlsl",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -48,6 +49,23 @@
         "cstdio": "cpp",
         "cstring": "cpp",
         "cwchar": "cpp",
-        "cwctype": "cpp"
+        "cwctype": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+        "unordered_map": "cpp",
+        "exception": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "numeric": "cpp",
+        "iosfwd": "cpp",
+        "iostream": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "streambuf": "cpp",
+        "cinttypes": "cpp",
+        "typeinfo": "cpp"
     }
 }

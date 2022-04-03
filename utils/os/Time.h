@@ -3,10 +3,12 @@
 
 #include <define.h>
 
-class TimeUtils {
+class Time {
 public:
-    // time in seconds
+    // 以秒计的系统绝对时间
     static double GetTime();
+    // 两帧之间的间隔时间(可视作两次OnRender调用的时间间隔)
+    static float GetDeltaTime();
 };
 
 class TimerManager {

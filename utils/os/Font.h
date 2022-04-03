@@ -4,6 +4,7 @@
 #include <define.h>
 
 #define MAX_ASCII_CHARS 0x80
+#define MAX_CACHE_CHARS 0x10000
 
 void glFontSize(uint size);
 void glDrawString(const char* text);

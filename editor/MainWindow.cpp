@@ -354,7 +354,7 @@ void MainWindow::RotateOperation::OnMove(){
             case MODE_Z: rotVec = Vector3(0.0f, 0.0f, delta); break;
             }
             rotateInfo.Foreach<Vector3*>([](RotateInfo info, Vector3* rot){
-                info.obj->transform.rotationXYZ.Set(info.pos + *rot);
+                info.obj->transform.SetRotationXYZ(info.pos + *rot);
             }, &rotVec);
         }else{
             switch (mode){
@@ -364,7 +364,7 @@ void MainWindow::RotateOperation::OnMove(){
             case MODE_Z: rotate = Quaternion::AxisAngle(Vector3(0.0f, 0.0f, 1.0f), delta); break;
             }
             rotateInfo.Foreach<Quaternion*>([](RotateInfo info, Quaternion* rot){
-                info.obj->transform.rotation.Set(*rot * info.rot);
+                info.obj->transform.SetRotation(*rot * info.rot);
             }, &rotate);
         }
     }
@@ -372,9 +372,9 @@ void MainWindow::RotateOperation::OnMove(){
     case SelectionType::SELECT_VERTICES:
         switch (mode){
         case MODE_CAMERA: rotate = Quaternion::AxisAngle(main->camForward, delta); break;
-        case MODE_X: rotate = Quaternion::AxisAngle(Vector3(1.0f, 0.0f, 0.0f), delta); break;
-        case MODE_Y: rotate = Quaternion::AxisAngle(Vector3(0.0f, 1.0f, 0.0f), delta); break;
-        case MODE_Z: rotate = Quaternion::AxisAngle(Vector3(0.0f, 0.0f, 1.0f), delta); break;
+        case MODE_X: rotate = Quaternion::RotateX(delta); break;
+        case MODE_Y: rotate = Quaternion::RotateY(delta); break;
+        case MODE_Z: rotate = Quaternion::RotateZ(delta); break;
         }
         rotateInfo.Foreach<RotateOperation*>([](RotateInfo info, RotateOperation* op){
             info.vert->SetWorldPos(op->center + op->rotate * (info.pos - op->center));
@@ -398,7 +398,7 @@ void MainWindow::RotateOperation::OnUndo(){
     switch (Main::data->selType){
     case SelectionType::SELECT_OBJECT:
         rotateInfo.Foreach([](RotateInfo info){
-            info.obj->transform.rotationXYZ.Set(info.pos);
+            info.obj->transform.SetRotationXYZ(info.pos);
         });
         break;
     case SelectionType::SELECT_VERTICES:
@@ -588,7 +588,7 @@ void MainWindow::SelectTool::OnRender(){
     }
 }
 
-MainWindow::MainWindow() : Camera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Vector3::up, 5.0f) {
+MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Vector3::up, 5.0f) {
     DebugLog("MainWindow Launched");
 
     uiMgr = new UIManager();
@@ -842,7 +842,7 @@ void MainWindow::OnRightUp(int x, int y){
 }
 
 void MainWindow::InitCamera(){
-    Camera::InitCamera(aspect);
+    CCamera::InitCamera(aspect);
 }
 
 void MainWindow::RenderModelView(){
@@ -862,10 +862,9 @@ void MainWindow::RenderModelView(){
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     InitCamera();
-
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     glDisable(GL_DEPTH_TEST);
     skyBox->Render(camPos, camDis);
@@ -896,14 +895,6 @@ void MainWindow::RenderModelView(){
         glVertex3f(-i * camRange, -camRange, 0.0f); glVertex3f(-i * camRange, camRange, 0.0f);
     }
     glEnd();
-
-    RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
-    options->editor = true;
-    options->vertex = true;
-    options->edge = true;
-    options->face = true;
-    options->light = lightEnabled;
-    options->objOp = objOp;
 
     //TODO 后续光照设置法线
     Main::RenderScene();
@@ -944,16 +935,29 @@ void MainWindow::OnRender(){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
+    options->editor = true;
+    options->vertex = true;
+    options->edge = true;
+    options->face = true;
+    options->light = lightEnabled;
+    options->objOp = objOp;
+
     RenderModelView();
 
-    // 工具绘制
     glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glEnable(GL_ALPHA_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     GLUtils::ResetProjection();
     GLUtils::ResetModelView();
+    
+    // 屏幕绘制
+    Main::RenderScreen();
+
+    glDisable(GL_DEPTH_TEST);
+    // 工具绘制
     if (curTool)
         curTool->OnRender();
 
@@ -1000,18 +1004,18 @@ void MainWindow::UpdateCursor(int x, int y){
 }
 
 void MainWindow::SetLookAt(Point3 at){
-    Camera::SetLookAt(at);
+    CCamera::SetLookAt(at);
 }
 
 void MainWindow::SetRotation(Quaternion rot){
-    Camera::SetRotation(rot);
+    CCamera::SetRotation(rot);
     cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
     if (audioControl)
         alListenerDirv3(camForward, camUp);
 }
 
 void MainWindow::SetDistance(float dis){
-    Camera::SetDistance(dis);
+    CCamera::SetDistance(dis);
     DebugLog("Camera Distance %f", camDis);
     if (camRange < camDis * 8.0f){
         camRange *= 5.0f;
@@ -1501,9 +1505,9 @@ void MainWindow::OnDropFileW(const wchar_t* path){
 }
 
 Point3 MainWindow::GetLookPosition(Point3 pos){
-    return Camera::GetLookPosition(pos);
+    return CCamera::GetLookPosition(pos);
 }
 
 Point2 MainWindow::GetScreenPosition(Point3 pos){
-    return Camera::GetScreenPosition(pos, aspect);
+    return CCamera::GetScreenPosition(pos, aspect);
 }

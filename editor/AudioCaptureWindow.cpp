@@ -309,10 +309,6 @@ void AudioCaptureWindow::OnCreate(){
 
 void AudioCaptureWindow::OnClose(){}
 
-void AudioCaptureWindow::OnTimer(int id){
-    Main::RequestRender();
-}
-
 void AudioCaptureWindow::OnChar(char c){}
 
 void AudioCaptureWindow::OnUnichar(wchar_t c){}
