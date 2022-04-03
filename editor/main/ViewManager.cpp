@@ -9,7 +9,7 @@ ViewManager::ViewManager(AppFrame* frame) : frame(frame) {}
 ViewManager::~ViewManager(){}
 
 ViewManager* ViewManager::GetLocalInst(){
-    return (ViewManager*)ThreadLocal::Get(THREAD_LOCAL_VIEWMGR);
+    return static_cast<ViewManager*>(ThreadLocal::Get(THREAD_LOCAL_VIEWMGR));
 }
 
 void ViewManager::Reset(){

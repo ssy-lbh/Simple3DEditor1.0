@@ -3,8 +3,21 @@
 
 #include <define.h>
 
+#include <utils/List.h>
+
 class GLVertexFormat {
-    
+public:
+    struct VertexAttrib {
+        int length; // between 1 and 4
+        uenum type; // GL_FLOAT
+    };
+
+private:
+    List<VertexAttrib> attrs;
+
+public:
+    GLVertexFormat();
+    ~GLVertexFormat();
 };
 
 #endif

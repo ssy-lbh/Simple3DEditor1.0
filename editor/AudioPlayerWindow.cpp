@@ -486,12 +486,12 @@ void AudioPlayerWindow::PreloadFile(WString file){
             return;
         case MSGBOX_YES:
             DebugLog("AudioPlayerWindow::PreloadFile Preparing FFmpeg");
-            if (!ShellFFmpeg(file, L".\\temp.wav")){
+            if (!ShellFFmpeg(file, L"temp.wav")){
                 DebugError("AudioPlayerWindow::PreloadFile ShellFFmpegW Failed");
                 return;
             }
-            LoadFile(L".\\temp.wav");
-            File::Delete(L".\\temp.wav");
+            LoadFile(L"temp.wav");
+            File::Delete(L"temp.wav");
             return;
         case MSGBOX_CANCEL:
             break;

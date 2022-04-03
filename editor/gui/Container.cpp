@@ -407,7 +407,7 @@ void UDContainer::OnLeftUp(int x, int y){
 
 void UDContainer::OnRightDown(int x, int y){
     AWindow::OnRightDown(x, y);
-    if (selWindow && Abs(x - dis) < 4.0f){
+    if (selWindow && Abs(y - dis) < 4.0f){
         if (joinMenu){
             Main::SetMenu(joinMenu);
         }else{

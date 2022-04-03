@@ -105,6 +105,10 @@ class SelectionWindow;
 // appframe
 class AppFrame;
 
+// font
+class Font;
+class GLFont;
+
 // shell
 enum class ShaderType;
 

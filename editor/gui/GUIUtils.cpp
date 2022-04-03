@@ -229,7 +229,8 @@ void GUIEditW::SetText(WString s){
     text += s;
 }
 
-HorizontalProgressBar::HorizontalProgressBar(){}
+HorizontalProgressBar::HorizontalProgressBar() :
+    AGUIObject(L"HorizontalProgressBar", ViewObjectType::OBJECT_HORIZONTAL_PROGRESSBAR) {}
 HorizontalProgressBar::~HorizontalProgressBar(){}
 
 bool HorizontalProgressBar::OnHit2D(Point2 pos){
@@ -265,7 +266,8 @@ void HorizontalProgressBar::OnRender(){
                         btnPos + btnX, posY + btnY);
 }
 
-VerticalProgressBar::VerticalProgressBar(){}
+VerticalProgressBar::VerticalProgressBar() :
+    AGUIObject(L"VerticalProgressBar", ViewObjectType::OBJECT_VERTICAL_PROGRESSBAR) {}
 VerticalProgressBar::~VerticalProgressBar(){}
 
 bool VerticalProgressBar::OnHit2D(Point2 pos){

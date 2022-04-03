@@ -19,9 +19,9 @@ private:
     GLTexture2D* texture = NULL;
 
 public:
-    Vector2 position;
-    Vector2 size;
-    float radius;
+    Vector2 position = Vector2::zero;
+    Vector2 size = Vector2::one;
+    float radius = 0.0f;
     bool moveable = false;
 
     DelegateWithData<void, void*> onClick;
@@ -48,8 +48,8 @@ private:
 
 public:
     // 左上角位置
-    Vector2 position;
-    Vector2 size;
+    Vector2 position = Vector2::zero;
+    Vector2 size = Vector2::one;
     // 意为半径占高度的比例
     float radius = 0.0f;
     Vector3 bkColor = Vector3::zero;
@@ -80,8 +80,8 @@ private:
 
 public:
     // 左上角位置
-    Vector2 position;
-    Vector2 size;
+    Vector2 position = Vector2::zero;
+    Vector2 size = Vector2::one;
     // 意为半径占高度的比例
     float radius = 0.0f;
     Vector3 bkColor = Vector3::zero;
@@ -112,11 +112,11 @@ private:
 
 public:
     float pos = 0.0f;
-    float lowBound;
-    float highBound;
-    float posY;
-    float btnX;
-    float btnY;
+    float lowBound = -1.0f;
+    float highBound = 1.0f;
+    float posY = 0.0f;
+    float btnX = 0.1f;
+    float btnY = 0.1f;
     float lineWidth = 10.0f;
     Vector3 lineColor = Vector3(0.6f, 0.6f, 0.6f);
     Vector3 defaultBtnColor = Vector3(0.0f, 0.0f, 0.5f);
@@ -140,11 +140,11 @@ private:
 
 public:
     float pos = 0.0f;
-    float lowBound;
-    float highBound;
-    float posX;
-    float btnX;
-    float btnY;
+    float lowBound = -1.0f;
+    float highBound = 1.0f;
+    float posX = 0.0f;
+    float btnX = 0.1f;
+    float btnY = 0.1f;
     float lineWidth = 10.0f;
     Vector3 lineColor = Vector3(0.6f, 0.6f, 0.6f);
     Vector3 defaultBtnColor = Vector3(0.0f, 0.0f, 0.5f);

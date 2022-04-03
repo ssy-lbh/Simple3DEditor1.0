@@ -47,6 +47,7 @@ AppFrame::~AppFrame(){
     if (mainFrame) delete mainFrame;
     if (data) delete data;
     if (viewMgr) delete viewMgr;
+    if (font) delete font;
     DestroyWindow(hWnd);
 }
 
@@ -82,7 +83,7 @@ void AppFrame::Initialize(){
 }
 
 AppFrame* AppFrame::GetLocalInst(){
-    return (AppFrame*)ThreadLocal::Get(THREAD_LOCAL_APPFRAME);
+    return static_cast<AppFrame*>(ThreadLocal::Get(THREAD_LOCAL_APPFRAME));
 }
 
 String AppFrame::GetCaption(){
@@ -233,7 +234,6 @@ int AppFrame::MainLoop(){
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
     glFontSize(12);
-    glInitASCIIFont();
 
     // 放在这里是为了让OpenGL初始化
     mainFrame->OnCreate();

@@ -3,18 +3,18 @@
 #include <lib/glew/gl/glew.h>
 #include <lib/glew/gl/wglew.h>
 
-#include <lib/freetype/ft2build.h>
-#include FT_FREETYPE_H
-#include <lib/freetype/freetype/ftglyph.h>
+#include <lib/ftgl/FTGL/ftgl.h>
 
 #include <utils/String.h>
 #include <utils/os/Log.h>
 #include <utils/os/AppFrame.h>
+#include <utils/os/Thread.h>
 #include <utils/math3d/Math.h>
 #include <utils/math3d/LinearAlgebra.h>
 
 void glFontSize(uint size) {
     HFONT hFont;
+    AppFrame* frame = AppFrame::GetLocalInst();
     HDC hDC = wglGetCurrentDC();
 
     hFont = CreateFontA(size, 0, 0, 0, FW_MEDIUM, 0, 0, 0,
@@ -23,14 +23,10 @@ void glFontSize(uint size) {
 
     HFONT hOldFont = (HFONT)SelectObject(hDC, hFont);
     DeleteObject(hOldFont);
-}
 
-void glInitASCIIFont(){
-    AppFrame* frame = AppFrame::GetLocalInst();
-    HDC hDC;
-
+    if (frame->fontASCII)
+        glDeleteLists(frame->fontASCII, MAX_ASCII_CHARS);
     frame->fontASCII = glGenLists(MAX_ASCII_CHARS);
-    hDC = wglGetCurrentDC();
     wglUseFontBitmapsA(hDC, 0, MAX_ASCII_CHARS, frame->fontASCII);
 }
 
@@ -152,6 +148,22 @@ bool BytesToWideChar(const char* text, size_t len, wchar_t*& outText, size_t& ou
     return true;
 }
 
+bool WideCharToBytesUTF8(const wchar_t* text, size_t len, char*& outText, size_t& outLen){
+    outLen = WideCharToMultiByte(CP_UTF8, 0, text, len, NULL, 0, NULL, NULL);
+    outText = new char[outLen + 1];
+    WideCharToMultiByte(CP_UTF8, 0, text, len, outText, outLen, NULL, NULL);
+    outText[outLen] = '\0';
+    return true;
+}
+
+bool BytesToWideCharUTF8(const char* text, size_t len, wchar_t*& outText, size_t& outLen){
+    outLen = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, text, len, NULL, 0);
+    outText = new wchar_t[outLen + 1];
+    MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, text, len, outText, outLen);
+    outText[outLen] = L'\0';
+    return true;
+}
+
 FT_Library Font::ftLib = NULL;
 
 void Font::Init(){
@@ -166,12 +178,12 @@ void Font::Uninit(){
     }
 }
 
-Font::Font(String path){
+Font::Font(String& path){
     FT_New_Face(ftLib, path.GetString(), 0, &face);
     FT_Select_Charmap(face, FT_ENCODING_UNICODE);
 }
 
-Font::Font(String path, uint width, uint height){
+Font::Font(String& path, uint width, uint height){
     FT_New_Face(ftLib, path.GetString(), 0, &face);
     FT_Select_Charmap(face, FT_ENCODING_UNICODE);
     FT_Set_Pixel_Sizes(face, width, height);
@@ -327,4 +339,61 @@ void Font::DrawString(const WString& text, float x, float y, float h, float line
     }
 
     glDisable(GL_TEXTURE_2D);
+}
+
+GLFont::GLFont(String path, FontType type) : type(type) {
+    CreateFTGLFont(path);
+}
+
+GLFont::GLFont(String path, uint size, uint res) : type(FONT_PIXMAP) {
+    CreateFTGLFont(path);
+    FTGL::ftglSetFontFaceSize(font, size, res);
+}
+
+GLFont::GLFont(String path, uint size, FontType type, uint res) : type(type) {
+    CreateFTGLFont(path);
+    FTGL::ftglSetFontFaceSize(font, size, res);
+}
+
+GLFont::~GLFont(){
+    FTGL::ftglDestroyFont(font);
+}
+
+void GLFont::CreateFTGLFont(String& path){
+    switch (type){
+    case FONT_BITMAP: font = FTGL::ftglCreateBitmapFont(path.GetString()); break;
+    case FONT_BUFFER: font = FTGL::ftglCreateBufferFont(path.GetString()); break;
+    case FONT_EXTRUDE: font = FTGL::ftglCreateExtrudeFont(path.GetString()); break;
+    case FONT_OUTLINE: font = FTGL::ftglCreateOutlineFont(path.GetString()); break;
+    case FONT_PIXMAP: font = FTGL::ftglCreatePixmapFont(path.GetString()); break;
+    case FONT_POLYGON: font = FTGL::ftglCreatePolygonFont(path.GetString()); break;
+    case FONT_TEXTURE: font = FTGL::ftglCreateTextureFont(path.GetString()); break;
+    case FONT_CUSTOM:
+        DebugError("GLFont::CreateFTGLFont Custom Font Should Be Created By GLFont::GLFont(..., void* data, FTGLglyph*(*makeglyphCallback)(FT_GlyphSlot, void*))");
+        break;
+    default:
+        DebugError("GLFont::CreateFTGLFont Unrecognized Font Type %d", type);
+        break;
+    }
+}
+
+GLFont::FontType GLFont::GetType(){
+    return type;
+}
+
+void GLFont::SetSize(uint size, uint res){
+    FTGL::ftglSetFontFaceSize(font, size, res);
+}
+
+void GLFont::DrawString(const char* text){
+    FTGL::ftglRenderFont(font, text, FTGL::RENDER_ALL);
+}
+
+void GLFont::DrawString(const wchar_t* text){
+    String s(text);
+    DrawString(s);
+}
+
+void GLFont::DrawString(const String& text){
+    FTGL::ftglRenderFont(font, text.GetString(), FTGL::RENDER_ALL);
 }

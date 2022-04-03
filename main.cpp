@@ -1,6 +1,7 @@
 #include <main.h>
 
 #include <lib/opengl/gl/gl.h>
+#include <lib/glut/glut.h>
 
 #include <res.h>
 #include <editor/gui/Container.h>
@@ -364,7 +365,6 @@ Mesh* Main::GetMesh(){
 
 int Main::MainEntry(int argc, char** argv){
     Init();
-    Font::Init();
     AudioUtils::InitOpenAL();
 
     AWindow* mainFrame = new SelectionWindow(new MainWindow());
@@ -374,6 +374,7 @@ int Main::MainEntry(int argc, char** argv){
     DebugLog("Main Window Created");
 
     appFrame->EnableOpenGL();
+    glutInit(&argc, argv);
 
     DebugLog("OpenGL Enabled");
     DebugLog("OpenGL Version %s", glGetString(GL_VERSION));
@@ -385,15 +386,13 @@ int Main::MainEntry(int argc, char** argv){
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
+    // 不知道为什么，arial.ttf最大值字符为0x6FF
     glFontSize(12);
-    glInitASCIIFont();
 
     // 放在这里是为了让OpenGL初始化
     mainFrame->OnCreate();
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
-
-    //Font* font = new Font("res\\fonts\\arial.ttf", 0, 72);
 
     appFrame->Show();
     while (appFrame->WaitHandleEvent()){

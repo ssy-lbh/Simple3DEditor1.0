@@ -17,11 +17,12 @@ PLATFORM_U	= WINDOWS
 GCC			= g++.exe
 DLLTOOL		= dlltool.exe
 RM			= del
-CFLAGS 		= -I"." -I".\\lib\\freetype" -m64 -O3 -std=c++11
+CFLAGS 		= -I"." -I".\\lib\\freetype" -I".\\lib\\ftgl" -I"" -m64 -O3 -std=c++11 -finput-charset=UTF-8 -fexec-charset=UTF-8
 OFLAGS		= -m64 -s
 LFLAGS		= -m64 -shared
 LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32\
-				"lib\openal\OpenAL32.lib" "lib\glew\glew32.lib" "lib\freetype\freetype.lib"
+				"lib\openal\OpenAL32.lib" "lib\glew\glew32.lib" "lib\freetype\freetype.lib"\
+				"lib\glut\glut64.lib" "lib\ftgl\ftgl_D.lib"
 RES  		= windres.exe
 MKDIR   	= mkdir
 GIT  		= git
@@ -122,7 +123,7 @@ $(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
 # 当前分支
 BRANCH		= master-2.0
 # 提交信息
-COMMITMSG	= "update"
+COMMITMSG	= "bugfix"
 # 合并分支时的目标分支
 MERGE 		= master-2.0
 

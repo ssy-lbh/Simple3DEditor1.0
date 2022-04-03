@@ -4,6 +4,7 @@
 #include <define.h>
 
 #include <utils/String.h>
+#include <utils/os/Font.h>
 
 #ifdef PLATFORM_WINDOWS
 #include <windef.h>
@@ -40,6 +41,7 @@ private:
 
     LocalData* data;
     ViewManager* viewMgr;
+    GLFont* font;
 
     static void Initialize();
 
@@ -56,7 +58,7 @@ public:
     bool reqRender = false;
     bool cursorSelected = false;
 
-    uint fontASCII;
+    uint fontASCII = 0;
 
     AppFrame(String name, AWindow* mainFrame, size_t height, size_t width, bool async = false);
     ~AppFrame();

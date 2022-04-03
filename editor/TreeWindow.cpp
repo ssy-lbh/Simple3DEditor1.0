@@ -5,6 +5,7 @@
 #include <main.h>
 #include <res.h>
 #include <editor/gui/Menu.h>
+#include <editor/gui/GUIUtils.h>
 #include <editor/dialog/Tips.h>
 #include <utils/os/Font.h>
 #include <utils/gl/GLUtils.h>
@@ -29,6 +30,28 @@ TreeWindow::TreeWindow(){
     objectMenu->AddItem(new MenuItem(L"点光源", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
         window->AddObject(new PointLightObject());
     }, this));
+    objectMenu->AddItem(new MenuItem(L"GUI管理器", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::AddObject(new GUIManagerObject());
+    }, this));
+    objectMenu->AddItem(new MenuItem(L"GUI网格体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::AddObject(new GUIMeshObject());
+    }, this));
+
+    Menu* objGUIMenu = new Menu();
+    objGUIMenu->AddItem(new MenuItem(L"图标按钮", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::AddObject(new IconButton());
+    }, this));
+    objGUIMenu->AddItem(new MenuItem(L"编辑框", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::AddObject(new GUIEditA());
+    }, this));
+    objGUIMenu->AddItem(new MenuItem(L"横进度条", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::AddObject(new HorizontalProgressBar());
+    }, this));
+    objGUIMenu->AddItem(new MenuItem(L"竖进度条", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
+        Main::AddObject(new VerticalProgressBar());
+    }, this));
+    objectMenu->AddItem(new MenuItem(L"GUI", objGUIMenu));
+
     objectMenu->AddItem(new MenuItem(L"音频收听者", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
         LocalData::GetLocalInst()->CreateAudioListener();
     }, this));
