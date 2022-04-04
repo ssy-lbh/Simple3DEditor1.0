@@ -15,7 +15,7 @@ private:
 
     Menu* basicMenu;
 
-    UIManager* uiMgr;
+    GUIManagerObject* guiMgr;
 
 protected:
     void UpdateWindowSize(int x, int y);

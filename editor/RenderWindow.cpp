@@ -4,7 +4,6 @@
 
 #include <main.h>
 #include <res.h>
-#include <editor/gui/ViewManager.h>
 #include <utils/String.h>
 #include <utils/File.h>
 #include <utils/DataBuffer.h>
@@ -13,11 +12,13 @@
 #include <utils/gl/GLUtils.h>
 #include <utils/gl/GLShader.h>
 #include <utils/gl/GLProgram.h>
+#include <editor/gui/ViewManager.h>
 #include <editor/main/ViewObject.h>
+#include <editor/object/GUIManagerObject.h>
 
 RenderWindow::RenderWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Vector3::up, 5.0f) {
     DebugLog("RenderWindow Launched");
-    uiMgr = new UIManager();
+    guiMgr = new GUIManagerObject();
 
     basicMenu = new Menu();
     basicMenu->AddItem(new MenuItem(L"保存", [=]{ this->OnMenuAccel(IDM_SAVE, false); }));
@@ -35,7 +36,7 @@ RenderWindow::RenderWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0
 RenderWindow::~RenderWindow(){
     DebugLog("RenderWindow Destroyed");
     if (basicMenu) delete basicMenu;
-    if (uiMgr) delete uiMgr;
+    if (guiMgr) delete guiMgr;
 }
 
 void RenderWindow::InitCamera(){
@@ -91,7 +92,7 @@ void RenderWindow::OnRender(){
 
     Main::RenderScreen();
 
-    uiMgr->Render();
+    guiMgr->OnChainRender();
 }
 
 void RenderWindow::OnCreate(){}
