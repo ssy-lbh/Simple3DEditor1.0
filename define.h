@@ -144,9 +144,9 @@ class GLIndexBuffer;
 class GLSkyBox;
 
 // menu
-class IMenuItem;
 class Menu;
 class MenuItem;
+enum class MenuItemType;
 
 // nodemap
 class NodeMapWindow;

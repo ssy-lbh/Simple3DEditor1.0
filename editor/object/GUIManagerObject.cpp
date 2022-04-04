@@ -59,8 +59,8 @@ void GUIManagerObject::OnRender(){
     AViewObject::OnRender();
     
     // 测试代码
-    glColor4f(1.0f, 1.0f, 1.0f, 0.4f);
-    GLUtils::DrawRect(Rect(-1.0f, 1.0f, -1.0f, 1.0f));
+    // glColor4f(1.0f, 1.0f, 1.0f, 0.4f);
+    // GLUtils::DrawRect(Rect(-1.0f, 1.0f, -1.0f, 1.0f));
 }
 
 void GUIManagerObject::OnMouseMove(Point3 ori, Vector3 dir){

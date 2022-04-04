@@ -48,7 +48,6 @@ AppFrame::~AppFrame(){
     if (mainFrame) delete mainFrame;
     if (data) delete data;
     if (viewMgr) delete viewMgr;
-    if (font) delete font;
     if (fontCache) delete[] fontCache;
     DestroyWindow(hWnd);
 }
@@ -249,7 +248,7 @@ int AppFrame::MainLoop(){
         data->deltaTime = time - data->recTime;
         data->recTime = time;
         // 不知道为什么，我的电脑开不了垂直同步，只能出此下策了
-        Time::Sleep(0.016f - data->deltaTime);
+        Time::Sleep(0.0167f - data->deltaTime);
     }
 
     DisableOpenGL();

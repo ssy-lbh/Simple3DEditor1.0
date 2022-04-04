@@ -9,8 +9,8 @@ class AWindow : public Object {
 protected:
     bool focus = false;
 
-    Vector2 cursorCoord;
-    Vector2 cursorPos = Vector2::zero;
+    Point2 cursorCoord;
+    Point2 cursorPos = Point2::zero;
     Vector2 cliSize;
     Vector2 cliInvSize;
     float aspect;
@@ -43,6 +43,24 @@ public:
     virtual void OnMenuAccel(int id, bool accel);
     virtual void OnDropFileA(const char* path);
     virtual void OnDropFileW(const wchar_t* path);
+};
+
+class AGUIWindow : public AWindow {
+protected:
+    GUIManagerObject* guiMgr;
+
+public:
+    AGUIWindow();
+    virtual ~AGUIWindow() override;
+
+    virtual void OnRender() override;
+    virtual void OnChar(char c) override;
+    virtual void OnUnichar(wchar_t c) override;
+    virtual void OnMouseMove(int x, int y) override;
+    virtual void OnLeftDown(int x, int y) override;
+    virtual void OnLeftUp(int x, int y) override;
+    virtual void OnRightDown(int x, int y) override;
+    virtual void OnRightUp(int x, int y) override;
 };
 
 #endif

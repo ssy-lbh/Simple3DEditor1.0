@@ -275,6 +275,15 @@ void Main::AddObjectToScreen(AViewObject* o){
     data->screen->AddChild(o);
 }
 
+bool Main::AddObjectChild(AViewObject* parent, AViewObject* child){
+    if (parent->HasAncestor(child))
+        return false;
+    if (child == data->scene || child == data->screen)
+        return false;
+    parent->AddChild(child);
+    return true;
+}
+
 void Main::DeleteObject(AViewObject* o){
     if (o == data->scene){
         DebugError("Main::DeleteObject Trying To Delete Scene Object");
@@ -375,7 +384,7 @@ Mesh* Main::GetMesh(AViewObject* o){
     return NULL;
 }
 
-#include <utils/Task.h>
+#include <utils/Value.h>
 
 int Main::MainEntry(int argc, char** argv){
     Init();
@@ -427,7 +436,7 @@ int Main::MainEntry(int argc, char** argv){
         if (localData->reqRender){
             localData->reqRender = false;
         }else{
-            Time::Sleep(0.016f - localData->deltaTime);
+            Time::Sleep(0.0167f - localData->deltaTime);
         }
     }
 

@@ -19,6 +19,7 @@ public:
     AGUIObject(WString name);
     virtual ~AGUIObject() override;
 
+    // 获取管理自身的GUIManagerObject
     GUIManagerObject* GetGUIManager();
     void SetGUIManager(GUIManagerObject* guiMgr);
 };

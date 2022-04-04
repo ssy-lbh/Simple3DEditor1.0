@@ -12,6 +12,58 @@
 #include <utils/os/Font.h>
 #include <editor/gui/ViewManager.h>
 
+RoundButton::RoundButton() : AGUIObject(L"RoundButton", ViewObjectType::OBJECT_GUI_ROUND_BUTTON) {}
+RoundButton::RoundButton(Point2 center, float radius)
+    : AGUIObject(L"RoundButton", ViewObjectType::OBJECT_GUI_ROUND_BUTTON), center(center), radius(radius) {}
+
+RoundButton::~RoundButton(){
+    if (texture) delete texture;
+}
+
+bool RoundButton::OnHit2D(Point2 pos){
+    hover = ((pos - center).SqrMagnitude() <= Square(radius));
+    return hover;
+}
+
+void RoundButton::OnLeftDown2D(Point2 pos){
+    onClick();
+    startPos = center;
+}
+
+void RoundButton::OnLeftDrag2D(Vector2 dir){
+    if (moveable)
+        center = startPos + dir;
+    onDrag(dir);
+}
+
+void RoundButton::OnRender(){
+    glColorv3(hover ? hoverColor : defaultColor);
+    if (texture && texture->Enable()){
+        GLUtils::DrawCornerWithUV(center, 0.0f, 360.0f, radius);
+        GLTexture2D::Disable();
+    }else{
+        GLUtils::DrawCorner(center, 0.0f, 360.0f, radius);
+    }
+}
+
+void RoundButton::SetIcon(const char* texPath){
+    if (texture)
+        delete texture;
+    texture = new GLTexture2D(texPath);
+}
+
+void RoundButton::SetIcon(int iconRes){
+    if (texture)
+        delete texture;
+    texture = new GLTexture2D(iconRes);
+}
+
+void RoundButton::SetIcon(GLTexture2D* tex){
+    if (texture)
+        delete texture;
+    texture = tex;
+}
+
 IconButton::IconButton() : AGUIObject(L"IconButton", ViewObjectType::OBJECT_GUI_ICON_BUTTON) {}
 IconButton::IconButton(Vector2 position, Vector2 size) : AGUIObject(L"IconButton", ViewObjectType::OBJECT_GUI_ICON_BUTTON), position(position), size(size) {}
 IconButton::IconButton(Vector2 position, Vector2 size, float radius) : AGUIObject(L"IconButton", ViewObjectType::OBJECT_GUI_ICON_BUTTON), position(position), size(size), radius(radius) {}
@@ -21,8 +73,8 @@ IconButton::~IconButton(){
 }
 
 bool IconButton::OnHit2D(Point2 pos){
-    hover = pos.x >= position.x && pos.x <= position.x + size.x &&
-            pos.y >= position.y && pos.y <= position.y + size.y;
+    hover = (pos.x >= position.x && (pos.x <= position.x + size.x) &&
+             pos.y >= position.y && (pos.y <= position.y + size.y));
     return hover;
 }
 
@@ -34,17 +86,23 @@ void IconButton::OnLeftDown2D(Point2 pos){
 void IconButton::OnLeftDrag2D(Vector2 dir){
     if (moveable)
         position = startPos + dir;
+    onDrag(dir);
 }
 
 void IconButton::OnRender(){
-    if (texture)
-        texture->Enable();
-    glColorv3(hover ? Vector3(1.0f, 1.0f, 1.0f) : Vector3(0.8f, 0.8f, 0.8f));
-    GLUtils::DrawRoundRectWithUV(
-        Rect(position, position + size),
-        radius, 0.05f
-    );
-    GLTexture2D::Disable();
+    glColorv3(hover ? hoverColor : defaultColor);
+    if (texture && texture->Enable()){
+        GLUtils::DrawRoundRectWithUV(
+            Rect(position, position + size),
+            radius, 0.05f
+        );
+        GLTexture2D::Disable();
+    }else{
+        GLUtils::DrawRoundRect(
+            Rect(position, position + size),
+            radius, 0.05f
+        );
+    }
 }
 
 void IconButton::SetIcon(const char* texPath){
@@ -126,7 +184,7 @@ void GUIEditA::OnRender(){
     if (radius == 0.0f){
         GLUtils::DrawRect(position, position + size);
     }else{
-        GLUtils::DrawRoundRect(Rect(position, position + size), radius * size.y, 0.05f);
+        GLUtils::DrawRoundRect(Rect(position, position + size), radius, 0.05f);
     }
 
     glColor3f(fontColor.x, fontColor.y, fontColor.z);
@@ -206,7 +264,7 @@ void GUIEditW::OnRender(){
     if (radius == 0.0f){
         GLUtils::DrawRect(position, position + size);
     }else{
-        GLUtils::DrawRoundRect(Rect(position, position + size), radius * size.y, 0.05f);
+        GLUtils::DrawRoundRect(Rect(position, position + size), radius, 0.05f);
     }
 
     glColor3f(fontColor.x, fontColor.y, fontColor.z);
@@ -299,6 +357,6 @@ void VerticalProgressBar::OnRender(){
 
     float btnPos = Lerp(lowBound, highBound, this->pos);
     glColorv3(hover ? hoverBtnColor : defaultBtnColor);
-    GLUtils::DrawRect(pos - btnX, btnPos - btnY,
-                        pos + btnX, btnPos + btnY);
+    GLUtils::DrawRect(posX - btnX, btnPos - btnY,
+                        posX + btnX, btnPos + btnY);
 }

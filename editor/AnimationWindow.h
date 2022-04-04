@@ -67,21 +67,6 @@ private:
         virtual void Render() override;
     };
 
-    class RotationMenu : public IMenuItem {
-    private:
-        AnimationWindow* window;
-        Menu* xyzMenu;
-        Menu* quatMenu;
-
-    public:
-        RotationMenu(AnimationWindow* window);
-        virtual ~RotationMenu() override;
-
-        virtual IMenuItem::ItemType GetType() override;
-        virtual const wchar_t* GetName() override;
-        virtual Menu* GetMenu() override;
-    };
-
 protected:
     void UpdateCursor(int x, int y);
     void UpdateWindowSize(int x, int y);

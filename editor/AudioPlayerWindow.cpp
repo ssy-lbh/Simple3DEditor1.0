@@ -17,257 +17,55 @@
 #include <utils/String.h>
 #include <utils/StringBuilder.h>
 #include <editor/main/ViewObject.h>
+#include <editor/gui/GUIUtils.h>
 #include <editor/object/AudioSourceObject.h>
-
-const float AudioPlayerWindow::PlayButton::BOUND_LEFT = -0.5f;
-const float AudioPlayerWindow::PlayButton::BOUND_RIGHT = 0.5f;
-const float AudioPlayerWindow::PlayButton::BOUND_TOP = -0.3f;
-const float AudioPlayerWindow::PlayButton::BOUND_BOTTOM = -0.9f;
-const float AudioPlayerWindow::PlayButton::RADIUS = 0.2f;
-const Vector3 AudioPlayerWindow::PlayButton::HOVER_COLOR = Vector3(1.0f, 0.5f, 0.0f);
-const Vector3 AudioPlayerWindow::PlayButton::LEAVE_COLOR = Vector3(0.0f, 0.4f, 1.0f);
-
-AudioPlayerWindow::PlayButton::PlayButton(AudioPlayerWindow* window) : window(window) {}
-AudioPlayerWindow::PlayButton::~PlayButton(){}
-
-bool AudioPlayerWindow::PlayButton::Trigger(Vector2 pos){
-    return pos.x >= BOUND_LEFT && pos.x <= BOUND_RIGHT && pos.y >= BOUND_BOTTOM && pos.y <= BOUND_TOP;
-}
-
-void AudioPlayerWindow::PlayButton::Hover(Vector2 pos){
-    hover = true;
-}
-
-void AudioPlayerWindow::PlayButton::Click(Vector2 pos){
-    if (window->IsLaunched()){
-        window->Stop();
-    }else{
-        window->Launch();
-    }
-}
-
-void AudioPlayerWindow::PlayButton::Leave(Vector2 pos){
-    hover = false;
-}
-
-void AudioPlayerWindow::PlayButton::Render(){
-    if (hover){
-        glColorv3(HOVER_COLOR);
-    }else{
-        glColorv3(LEAVE_COLOR);
-    }
-    GLUtils::DrawRoundRect(-0.5f, -0.9f, 1.0f, 0.6f, 0.2f, 0.05f);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBegin(GL_TRIANGLES);
-    glVertex2f(-0.15f, -0.8f);
-    glVertex2f(-0.15f, -0.4f);
-    glVertex2f(0.25f, -0.6f);
-    glEnd();
-}
-
-const float AudioPlayerWindow::ProgressBar::LOW_BOUND = -0.6f;
-const float AudioPlayerWindow::ProgressBar::HIGH_BOUND = 0.6f;
-const float AudioPlayerWindow::ProgressBar::POSITION_Y = -0.1f;
-const float AudioPlayerWindow::ProgressBar::BUTTON_WIDTH_X = 0.05f;
-const float AudioPlayerWindow::ProgressBar::BUTTON_WIDTH_Y = 0.1f;
-
-AudioPlayerWindow::ProgressBar::ProgressBar(AudioPlayerWindow* window) : window(window) {}
-AudioPlayerWindow::ProgressBar::~ProgressBar(){}
-
-bool AudioPlayerWindow::ProgressBar::Trigger(Vector2 pos){
-    return pos.x >= this->pos - BUTTON_WIDTH_X &&
-            pos.x <= this->pos + BUTTON_WIDTH_X &&
-            pos.y >= POSITION_Y - BUTTON_WIDTH_Y &&
-            pos.y <= POSITION_Y + BUTTON_WIDTH_Y;
-}
-
-void AudioPlayerWindow::ProgressBar::Click(Vector2 pos){
-    origin = this->pos;
-}
-
-void AudioPlayerWindow::ProgressBar::Drag(Vector2 dir){
-    ALint size;
-
-    pos = Clamp(origin + dir.x, LOW_BOUND, HIGH_BOUND);
-
-    if (!window->source)
-        return;
-    
-    size = window->source->GetSize();
-    window->source->SetOffset(Clamp((int)(GetRate(pos, LOW_BOUND, HIGH_BOUND) * size), 0, size));
-}
-
-void AudioPlayerWindow::ProgressBar::Hover(Vector2 pos){
-    hover = true;
-}
-
-void AudioPlayerWindow::ProgressBar::Leave(Vector2 pos){
-    hover = false;
-}
-
-void AudioPlayerWindow::ProgressBar::Render(){
-    // 因为Render调用之前source不能为NULL，所以应不需检查
-    ALint offset = window->source->GetOffset();
-    ALint size = window->source->GetSize();
-
-    glLineWidth(10.0f);
-    glColor3f(0.6f, 0.6f, 0.6f);
-    glBegin(GL_LINES);
-    glVertex2f(LOW_BOUND, POSITION_Y);
-    glVertex2f(HIGH_BOUND, POSITION_Y);
-    glEnd();
-    glLineWidth(1.0f);
-
-    pos = Lerp(LOW_BOUND, HIGH_BOUND, (float)offset / size);
-    if (hover){
-        glColor3f(0.0f, 0.0f, 0.3f);
-    }else{
-        glColor3f(0.0f, 0.0f, 0.5f);
-    }
-    GLUtils::DrawRect(pos - BUTTON_WIDTH_X, POSITION_Y - BUTTON_WIDTH_Y,
-                        pos + BUTTON_WIDTH_X, POSITION_Y + BUTTON_WIDTH_Y);
-}
-
-const float AudioPlayerWindow::GainBar::LOW_BOUND = -0.8f;
-const float AudioPlayerWindow::GainBar::HIGH_BOUND = -0.2f;
-const float AudioPlayerWindow::GainBar::POSITION_X = -0.85f;
-const float AudioPlayerWindow::GainBar::BUTTON_WIDTH_X = 0.05f;
-const float AudioPlayerWindow::GainBar::BUTTON_WIDTH_Y = 0.02f;
-
-AudioPlayerWindow::GainBar::GainBar(AudioPlayerWindow* window) : window(window) {}
-AudioPlayerWindow::GainBar::~GainBar(){}
-
-bool AudioPlayerWindow::GainBar::Trigger(Vector2 pos){
-    return pos.x >= (POSITION_X - BUTTON_WIDTH_X) &&
-            pos.x <= (POSITION_X + BUTTON_WIDTH_X) &&
-            pos.y >= this->pos - BUTTON_WIDTH_Y && pos.y <= this->pos + BUTTON_WIDTH_Y;
-}
-
-void AudioPlayerWindow::GainBar::Click(Vector2 pos){
-    origin = this->pos;
-}
-
-void AudioPlayerWindow::GainBar::Drag(Vector2 dir){
-    pos = Clamp(origin + dir.y, LOW_BOUND, HIGH_BOUND);
-    if (window->source)
-        window->source->SetGain(GetRate(Exp(-5.0f * GetRate(pos, HIGH_BOUND, LOW_BOUND)), 0.0067379469f /* e^-5 */, 1.0f));
-}
-
-void AudioPlayerWindow::GainBar::Hover(Vector2 pos){
-    hover = true;
-}
-
-void AudioPlayerWindow::GainBar::Leave(Vector2 pos){
-    hover = false;
-}
-
-void AudioPlayerWindow::GainBar::Render(){
-    glLineWidth(5.0f);
-    glColor3f(0.6f, 0.6f, 0.6f);
-    glBegin(GL_LINES);
-    glVertex2f(POSITION_X, LOW_BOUND);
-    glVertex2f(POSITION_X, HIGH_BOUND);
-    glEnd();
-    glLineWidth(1.0f);
-
-    if (hover){
-        glColor3f(0.0f, 0.0f, 0.3f);
-    }else{
-        glColor3f(0.0f, 0.0f, 0.5f);
-    }
-    GLUtils::DrawRect(POSITION_X - BUTTON_WIDTH_X, pos - BUTTON_WIDTH_Y,
-                        POSITION_X + BUTTON_WIDTH_X, pos + BUTTON_WIDTH_Y);
-}
-
-AudioPlayerWindow::LoopOption::LoopOption(AudioPlayerWindow* window) : window(window) {}
-AudioPlayerWindow::LoopOption::~LoopOption(){}
-
-bool AudioPlayerWindow::LoopOption::Trigger(Vector2 pos){
-    return pos.x >= 0.7f && pos.x <= 0.9f && pos.y >= -0.2f && pos.y <= 0.0f;
-}
-
-void AudioPlayerWindow::LoopOption::Click(Vector2 pos){
-    loop = window->IsLoop();
-    loop = !loop;
-    window->SetLoop(loop);
-    DebugLog("AudioPlayerWindow::LoopOption State %s", loop ? "Looping" : "Default");
-}
-
-void AudioPlayerWindow::LoopOption::Render(){
-    loop = window->IsLoop();
-    if (loop){
-        glColor3f(0.0f, 0.0f, 1.0f);
-    }else{
-        glColor3f(0.0f, 0.0f, 0.0f);
-    }
-    GLUtils::DrawRect(0.7f, -0.2f, 0.9f, 0.0f);
-}
-
-AudioPlayerWindow::LoopItem::LoopItem(AudioPlayerWindow* window) : window(window) {}
-AudioPlayerWindow::LoopItem::~LoopItem(){}
-
-const wchar_t* AudioPlayerWindow::LoopItem::GetName(){
-    return window->IsLoop() ? L"循环:开" : L"循环:关";
-}
-
-void AudioPlayerWindow::LoopItem::OnClick(){
-    bool loop = window->IsLoop();
-    loop = !loop;
-    window->SetLoop(loop);
-    DebugLog("AudioPlayerWindow::LoopItem State %s", loop ? "Looping" : "Default");
-}
-
-AudioPlayerWindow::DopplerEffectItem::DopplerEffectItem(AudioPlayerWindow* window) : window(window) {}
-AudioPlayerWindow::DopplerEffectItem::~DopplerEffectItem(){}
-
-const wchar_t* AudioPlayerWindow::DopplerEffectItem::GetName(){
-    return window->HasDopplerEffect() ? L"多普勒效应:开" : L"多普勒效应:关";
-}
-
-void AudioPlayerWindow::DopplerEffectItem::OnClick(){
-    bool state = window->HasDopplerEffect();
-    state = !state;
-    window->SetDopplerEffect(state);
-    DebugLog("AudioPlayerWindow::DopplerEffectItem State %s", state ? "On" : "Off");
-}
+#include <editor/object/GUIManagerObject.h>
 
 AudioPlayerWindow::AudioPlayerWindow(){
     DebugLog("AudioPlayerWindow Launched");
 
-    uiMgr = new UIManager();
-
-    uiMgr->AddButton(new PlayButton(this));
-    uiMgr->AddButton(new ProgressBar(this));
-    uiMgr->AddButton(new GainBar(this));
-    uiMgr->AddButton(new LoopOption(this));
+    guiMgr = new GUIManagerObject();
 
     basicMenu = new Menu();
-    basicMenu->AddItem(new MenuItem(L"加载", MENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](AudioPlayerWindow* window){
-        window->OnMenuAccel(IDM_LOAD, false);
-    }, this));
-    basicMenu->AddItem(new MenuItem(L"加载当前对象", MENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](AudioPlayerWindow* window){
+    basicMenu->AddItem(new MenuItem(L"加载", [=]{ this->OnMenuAccel(IDM_LOAD, false); }));
+    basicMenu->AddItem(new MenuItem(L"加载当前对象", [=]{
         if (Main::data->curObject && Main::data->curObject->GetType() != ViewObjectType::OBJECT_AUDIO_SOURCE){
             DebugError("AudioPlayerWindow::LoadObject Object Type Error");
             return;
         }
-        window->LoadObject((AudioSourceObject*)Main::data->curObject);
-    }, this));
-    basicMenu->AddItem(new LoopItem(this));
-    basicMenu->AddItem(new SwitchMenuItem(L"显示模式:波形", L"显示模式:频谱", SWITCHMENUITEM_LAMBDA_TRANS(AudioPlayerWindow)[](bool state, AudioPlayerWindow* window){
-        window->displayWave = state;
-        DebugLog("AudioPlayerWindow::DisplayModeItem State %s", window->displayWave ? "Wave" : "Frequency");
-    }, this, displayWave));
-    basicMenu->AddItem(new DopplerEffectItem(this));
+        this->LoadObject((AudioSourceObject*)Main::data->curObject);
+    }));
+    basicMenu->AddItem(new MenuItem(
+        Value<const wchar_t*>([=]{ return this->IsLoop() ? L"循环:开" : L"循环:关"; }),
+        [=]{
+            bool loop = this->IsLoop();
+            loop = !loop;
+            this->SetLoop(loop);
+            DebugLog("AudioPlayerWindow::LoopItem State %s", loop ? "Looping" : "Default");
+        }
+    ));
+    basicMenu->AddItem(new MenuItem(
+        Value<const wchar_t*>([=]{ return this->displayWave ? L"显示模式:波形" : L"显示模式:频谱"; }),
+        [=]{
+            this->displayWave = !this->displayWave;
+            DebugLog("AudioPlayerWindow::DisplayModeItem State %s", this->displayWave ? "Wave" : "Frequency");
+        }
+    ));
+    basicMenu->AddItem(new MenuItem(
+        Value<const wchar_t*>([=]{ return this->HasDopplerEffect() ? L"多普勒效应:开" : L"多普勒效应:关"; }),
+        [=]{
+            bool state = this->HasDopplerEffect();
+            state = !state;
+            this->SetDopplerEffect(state);
+            DebugLog("AudioPlayerWindow::DopplerEffectItem State %s", state ? "On" : "Off");
+        }
+    ));
 }
 
 AudioPlayerWindow::~AudioPlayerWindow(){
     DebugLog("AudioPlayerWindow Destroyed");
     LoadObject(NULL);
-    if (uiMgr) delete uiMgr;
-}
-
-bool AudioPlayerWindow::IsFocus(){
-    return focus;
+    if (guiMgr) delete guiMgr;
 }
 
 void AudioPlayerWindow::DrawLineGraph(float* height, size_t size){
@@ -369,9 +167,9 @@ void AudioPlayerWindow::OnRender(){
 
     if (!source){
         glColor3f(1.0f, 0.5f, 0.0f);
-        glRasterPos2f(-1.0f, 1.0f - 30.0f / size.y);
+        glRasterPos2f(-1.0f, 1.0f - 30.0f * cliInvSize.y);
         glDrawCNString(L"尚未存在音源");
-        glRasterPos2f(-1.0f, 1.0f - 60.0f / size.y);
+        glRasterPos2f(-1.0f, 1.0f - 60.0f * cliInvSize.y);
         glDrawCNString(L"可以将文件拖拽至此处");
         return;
     }
@@ -379,62 +177,146 @@ void AudioPlayerWindow::OnRender(){
     RenderGraph();
     DrawTime();
 
-    uiMgr->Render();
+    guiMgr->OnChainRender();
+}
+
+void AudioPlayerWindow::OnCreate(){
+    class PlayButton final : public IconButton {
+    public:
+        PlayButton() : IconButton(Vector2(-0.5f, -0.9f), Vector2(1.0f, 0.6f), 0.2f) {
+            hoverColor = Vector3(1.0f, 0.5f, 0.0f);
+            defaultColor = Vector3(0.0f, 0.4f, 1.0f);
+        }
+
+        virtual void OnRender() override {
+            IconButton::OnRender();
+
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glBegin(GL_TRIANGLES);
+            glVertex2f(-0.15f, -0.8f);
+            glVertex2f(-0.15f, -0.4f);
+            glVertex2f(0.25f, -0.6f);
+            glEnd();
+        }
+    } *playBtn = new PlayButton();
+    playBtn->onClick += [=]{
+        if (this->IsLaunched()){
+            this->Stop();
+        }else{
+            this->Launch();
+        }
+    };
+    guiMgr->AddChild(playBtn);
+
+    class ProgressBar : public HorizontalProgressBar {
+    public:
+        AudioPlayerWindow* window;
+
+        ProgressBar(AudioPlayerWindow* window) : HorizontalProgressBar(), window(window) {
+            lowBound = -0.6f;
+            highBound = 0.6f;
+            posY = -0.1f;
+            btnX = 0.05f;
+            btnY = 0.1f;
+            lineWidth = 10.0f;
+        }
+
+        virtual void OnRender() override {
+            pos = window->GetOffsetRate();
+            HorizontalProgressBar::OnRender();
+        }
+    } *progBar = new ProgressBar(this);
+    progBar->onPosChange += [=](float pos){
+        this->SetOffsetRate(pos);
+    };
+    guiMgr->AddChild(progBar);
+
+    class GainBar : public VerticalProgressBar {
+    public:
+        GainBar() : VerticalProgressBar() {
+            lowBound = -0.8f;
+            highBound = -0.2f;
+            posX = -0.85f;
+            btnX = 0.05f;
+            btnY = 0.02f;
+            lineWidth = 5.0f;
+            pos = 1.0f;
+        }
+    } *gainBar = new GainBar();
+    gainBar->onPosChange += [=](float pos){
+        this->SetGain(pos);
+        // 这个是大致按照分贝数调节音量的
+        // this->SetGain(GetRate(Exp(-5.0f * pos), 0.0067379469f /* e^-5 */, 1.0f));
+    };
+    guiMgr->AddChild(gainBar);
+
+    class LoopButton : public IconButton {
+    public:
+        AudioPlayerWindow* window;
+        bool state = false;
+
+        LoopButton(AudioPlayerWindow* window) : IconButton(Vector2(0.7f, -0.2f), Vector2(0.2f, 0.2f), 0.04f), window(window) {
+            hoverColor = Vector3(0.0f, 0.0f, 0.2f);
+            defaultColor = Vector3(0.0f, 0.0f, 0.0f);
+            state = window->IsLoop();
+        }
+
+        virtual void OnRender() override {
+            if (state != window->IsLoop()){
+                state = window->IsLoop();
+                defaultColor = state ? Vector3(0.0f, 0.0f, 1.0f) : Vector3(0.0f, 0.0f, 0.0f);
+                hoverColor = state ? Vector3(0.0f, 0.0f, 0.8f) : Vector3(0.0f, 0.0f, 0.2f);
+            }
+            IconButton::OnRender();
+        }
+    } *loopBtn = new LoopButton(this);
+    loopBtn->onClick += [=]{
+        bool loop = this->IsLoop();
+        loop = !loop;
+        this->SetLoop(loop);
+        DebugLog("AudioPlayerWindow::LoopOption State %s", loop ? "Looping" : "Default");
+    };
+    guiMgr->AddChild(loopBtn);
 }
 
 void AudioPlayerWindow::OnClose(){}
 
-void AudioPlayerWindow::OnChar(char c){}
+void AudioPlayerWindow::OnChar(char c){
+    guiMgr->OnChar(c);
+}
 
-void AudioPlayerWindow::OnUnichar(wchar_t c){}
+void AudioPlayerWindow::OnUnichar(wchar_t c){
+    guiMgr->OnUnichar(c);
+}
 
 void AudioPlayerWindow::OnResize(int x, int y){
-    if (x == 0 || y == 0){
-        return;
-    }
-    size.x = x;
-    size.y = y;
+    UpdateWindowSize(x, y);
 }
 
 void AudioPlayerWindow::OnMouseMove(int x, int y){
-    cursorPos.x = 2.0f * x / size.x - 1.0f;
-    cursorPos.y = 2.0f * y / size.y - 1.0f;
-    uiMgr->CursorMove(cursorPos);
+    UpdateCursor(x, y);
+    guiMgr->OnMouseMove2D(cursorPos);
 }
 
 void AudioPlayerWindow::OnLeftDown(int x, int y){
-    cursorPos.x = 2.0f * x / size.x - 1.0f;
-    cursorPos.y = 2.0f * y / size.y - 1.0f;
-    uiMgr->CursorMove(cursorPos);
-    uiMgr->LeftDown();
+    UpdateCursor(x, y);
+    guiMgr->OnLeftDown2D(cursorPos);
 }
 
 void AudioPlayerWindow::OnLeftUp(int x, int y){
-    cursorPos.x = 2.0f * x / size.x - 1.0f;
-    cursorPos.y = 2.0f * y / size.y - 1.0f;
-    uiMgr->CursorMove(cursorPos);
-    uiMgr->LeftUp();
+    UpdateCursor(x, y);
+    guiMgr->OnLeftUp2D(cursorPos);
 }
 
 void AudioPlayerWindow::OnRightDown(int x, int y){
-    cursorPos.x = 2.0f * x / size.x - 1.0f;
-    cursorPos.y = 2.0f * y / size.y - 1.0f;
-    uiMgr->CursorMove(cursorPos);
+    UpdateCursor(x, y);
+    guiMgr->OnRightDown2D(cursorPos);
     Main::SetMenu(basicMenu);
 }
 
 void AudioPlayerWindow::OnRightUp(int x, int y){
-    cursorPos.x = 2.0f * x / size.x - 1.0f;
-    cursorPos.y = 2.0f * y / size.y - 1.0f;
-    uiMgr->CursorMove(cursorPos);
-}
-
-void AudioPlayerWindow::OnFocus(){
-    focus = true;
-}
-
-void AudioPlayerWindow::OnKillFocus(){
-    focus = false;
+    UpdateCursor(x, y);
+    guiMgr->OnRightUp2D(cursorPos);
 }
 
 void AudioPlayerWindow::OnMouseWheel(int delta){}
@@ -667,6 +549,27 @@ ALint AudioPlayerWindow::GetOffset(){
     if (!source)
         return 0;
     return source->GetOffset();
+}
+
+float AudioPlayerWindow::GetOffsetRate(){
+    if (!source)
+        return 0.0f;
+    return (float)source->GetOffset() / source->GetSize();
+}
+
+void AudioPlayerWindow::SetOffsetRate(float rate){
+    ALint size;
+
+    if (!source)
+        return;
+    size = source->GetSize();
+    source->SetOffset(Clamp((int)Round(rate * size), 0, size));
+}
+
+void AudioPlayerWindow::SetGain(float gain){
+    if (!source)
+        return;
+    source->SetGain(gain);
 }
 
 bool AudioPlayerWindow::HasDopplerEffect(){

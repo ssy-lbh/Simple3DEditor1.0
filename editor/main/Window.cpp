@@ -1,5 +1,7 @@
 #include <editor/main/Window.h>
 
+#include <editor/object/GUIManagerObject.h>
+
 AWindow::AWindow(){}
 AWindow::~AWindow(){}
 
@@ -68,3 +70,48 @@ void AWindow::OnMouseWheel(int delta){}
 void AWindow::OnMenuAccel(int id, bool accel){}
 void AWindow::OnDropFileA(const char* path){}
 void AWindow::OnDropFileW(const wchar_t* path){}
+
+AGUIWindow::AGUIWindow(){
+    guiMgr = new GUIManagerObject();
+}
+
+AGUIWindow::~AGUIWindow(){
+    delete guiMgr;
+}
+
+void AGUIWindow::OnRender(){
+    guiMgr->OnChainRender();   
+}
+
+void AGUIWindow::OnChar(char c){
+    guiMgr->OnChar(c);
+}
+
+void AGUIWindow::OnUnichar(wchar_t c){
+    guiMgr->OnUnichar(c);
+}
+
+void AGUIWindow::OnMouseMove(int x, int y){
+    UpdateCursor(x, y);
+    guiMgr->OnMouseMove2D(cursorPos);
+}
+
+void AGUIWindow::OnLeftDown(int x, int y){
+    UpdateCursor(x, y);
+    guiMgr->OnLeftDown2D(cursorPos);
+}
+
+void AGUIWindow::OnLeftUp(int x, int y){
+    UpdateCursor(x, y);
+    guiMgr->OnLeftUp2D(cursorPos);
+}
+
+void AGUIWindow::OnRightDown(int x, int y){
+    UpdateCursor(x, y);
+    guiMgr->OnRightDown2D(cursorPos);
+}
+
+void AGUIWindow::OnRightUp(int x, int y){
+    UpdateCursor(x, y);
+    guiMgr->OnRightUp2D(cursorPos);
+}

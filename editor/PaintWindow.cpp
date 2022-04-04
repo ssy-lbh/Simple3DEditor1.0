@@ -162,37 +162,19 @@ PaintWindow::PaintWindow(){
     basicMenu = new Menu();
 
     Menu* brushMenu = new Menu();
-    brushMenu->AddItem(new MenuItem(L"默认", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
-        window->OnMenuAccel(IDM_BRUSH_DEFAULT, false);
-    }, this));
-    brushMenu->AddItem(new MenuItem(L"加色", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
-        window->OnMenuAccel(IDM_BRUSH_RGB_ADD, false);
-    }, this));
-    brushMenu->AddItem(new MenuItem(L"减色", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
-        window->OnMenuAccel(IDM_BRUSH_CMK_ADD, false);
-    }, this));
-    brushMenu->AddItem(new MenuItem(L"水彩(未完成)", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
-        window->OnMenuAccel(IDM_BRUSH_WATERCOLOR, false);
-    }, this));
-    brushMenu->AddItem(new MenuItem(L"乘色", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
-        window->OnMenuAccel(IDM_BRUSH_RGB_MUL, false);
-    }, this));
-    brushMenu->AddItem(new MenuItem(L"平均色", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
-        window->OnMenuAccel(IDM_BRUSH_RGB_AVERAGE, false);
-    }, this));
+    brushMenu->AddItem(new MenuItem(L"默认", [=]{ this->OnMenuAccel(IDM_BRUSH_DEFAULT, false); }));
+    brushMenu->AddItem(new MenuItem(L"加色", [=]{ this->OnMenuAccel(IDM_BRUSH_RGB_ADD, false); }));
+    brushMenu->AddItem(new MenuItem(L"减色", [=]{ this->OnMenuAccel(IDM_BRUSH_CMK_ADD, false); }));
+    brushMenu->AddItem(new MenuItem(L"水彩(未完成)", [=]{ this->OnMenuAccel(IDM_BRUSH_WATERCOLOR, false); }));
+    brushMenu->AddItem(new MenuItem(L"乘色", [=]{ this->OnMenuAccel(IDM_BRUSH_RGB_MUL, false); }));
+    brushMenu->AddItem(new MenuItem(L"平均色", [=]{ this->OnMenuAccel(IDM_BRUSH_RGB_AVERAGE, false); }));
     brushMenu->AddItem(new MenuItem());
-    brushMenu->AddItem(new MenuItem(L"清空", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
-        window->OnMenuAccel(IDM_BRUSH_CLEAR, false);
-    }, this));
+    brushMenu->AddItem(new MenuItem(L"清空", [=]{ this->OnMenuAccel(IDM_BRUSH_CLEAR, false); }));
     basicMenu->AddItem(new MenuItem(L"笔刷", brushMenu));
 
     basicMenu->AddItem(new MenuItem());
-    basicMenu->AddItem(new MenuItem(L"使用画布纹理", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
-        window->OnMenuAccel(IDM_TEXTURE_USE_PAINT, false);
-    }, this));
-    basicMenu->AddItem(new MenuItem(L"调色板", MENUITEM_LAMBDA_TRANS(PaintWindow)[](PaintWindow* window){
-        window->OnMenuAccel(IDM_SELECT_COLOR, false);
-    }, this));
+    basicMenu->AddItem(new MenuItem(L"使用画布纹理", [=]{ this->OnMenuAccel(IDM_TEXTURE_USE_PAINT, false); }));
+    basicMenu->AddItem(new MenuItem(L"调色板", [=]{ this->OnMenuAccel(IDM_SELECT_COLOR, false); }));
 }
 
 PaintWindow::~PaintWindow(){

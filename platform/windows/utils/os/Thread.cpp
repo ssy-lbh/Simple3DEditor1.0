@@ -12,35 +12,6 @@ void ThreadUtils::ExitProcess(int code){
     ::ExitProcess(code);
 }
 
-Thread::Thread(int(*func)(void*), void* user) : func(func), user(user) {}
-Thread::~Thread(){}
-
-bool Thread::Start(){
-    if (isStarted())
-        return false;
-    ThreadData* data = new ThreadData;
-    data->func = func;
-    data->user = user;
-    hThread = CreateThread(NULL, 0, Thread::RunThread, data, 0, NULL);
-    CloseHandle(hThread);
-    return isStarted();
-}
-
-bool Thread::isStarted() const{
-    return hThread != INVALID_HANDLE_VALUE;
-}
-
-bool Thread::Join(){
-    return WaitForSingleObject(hThread, INFINITE) == WAIT_OBJECT_0;
-}
-
-ulong __stdcall Thread::RunThread(void* data){
-    ThreadData* th = (ThreadData*)data;
-    ulong ret = th->func(th->user);
-    delete th;
-    return ret;
-}
-
 ulong ThreadLocal::tlsIndex[THREAD_LOCAL_SIZE] = {TLS_OUT_OF_INDEXES};
 
 bool ThreadLocal::Alloc(int idx){

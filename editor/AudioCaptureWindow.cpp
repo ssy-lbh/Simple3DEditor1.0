@@ -12,86 +12,11 @@
 #include <utils/os/Font.h>
 #include <utils/os/Shell.h>
 #include <utils/gl/GLUtils.h>
+#include <editor/gui/GUIUtils.h>
+#include <editor/object/GUIManagerObject.h>
 
 // 应在一切windows相关类型定义之后
 #include <lib/soundtouch/SoundTouch.h>
-
-AudioCaptureWindow::ProgressBar::ProgressBar(AudioCaptureWindow* window) : window(window) {}
-AudioCaptureWindow::ProgressBar::~ProgressBar(){}
-
-bool AudioCaptureWindow::ProgressBar::Trigger(Vector2 pos){
-    return pos.x >= 0.8f && pos.x <= 1.0f && pos.y >= this->pos - 0.05f && pos.y <= this->pos + 0.05f;
-}
-
-void AudioCaptureWindow::ProgressBar::Click(Vector2 pos){
-    origin = this->pos;
-}
-
-void AudioCaptureWindow::ProgressBar::Drag(Vector2 dir){
-    pos = Clamp(origin + dir.y, -0.8f, 0.8f);
-    window->soundTouch->setPitchSemiTones(pos * 1.25f * 12.0f);
-}
-
-void AudioCaptureWindow::ProgressBar::Hover(Vector2 pos){
-    hover = true;
-}
-
-void AudioCaptureWindow::ProgressBar::Leave(Vector2 pos){
-    hover = false;
-}
-
-void AudioCaptureWindow::ProgressBar::Render(){
-    glLineWidth(10.0f);
-    glColor3f(0.6f, 0.6f, 0.6f);
-    glBegin(GL_LINES);
-    glVertex2f(0.9f, -0.8f);
-    glVertex2f(0.9f, 0.8f);
-    glEnd();
-    glLineWidth(1.0f);
-
-    if (hover){
-        glColor3f(0.0f, 0.0f, 0.3f);
-    }else{
-        glColor3f(0.0f, 0.0f, 0.5f);
-    }
-    GLUtils::DrawRect(0.8f, pos - 0.05f, 1.0f, pos + 0.05f);
-}
-
-AudioCaptureWindow::CaptureItem::CaptureItem(AudioCaptureWindow* window) : window(window) {}
-AudioCaptureWindow::CaptureItem::~CaptureItem(){}
-
-const wchar_t* AudioCaptureWindow::CaptureItem::GetName(){
-    return window->capture ? L"录音:开" : L"录音:关";
-}
-
-void AudioCaptureWindow::CaptureItem::OnClick(){
-    window->capture ? window->Stop() : window->Launch();
-    DebugLog("AudioCaptureWindow::CaptureItem State %s", window->capture ? "Capturing" : "Stopped");
-}
-
-AudioCaptureWindow::DisplayModeItem::DisplayModeItem(AudioCaptureWindow* window) : window(window) {}
-AudioCaptureWindow::DisplayModeItem::~DisplayModeItem(){}
-
-const wchar_t* AudioCaptureWindow::DisplayModeItem::GetName(){
-    return window->displayWave ? L"显示模式:波形" : L"显示模式:频谱";
-}
-
-void AudioCaptureWindow::DisplayModeItem::OnClick(){
-    window->displayWave = !window->displayWave;
-    DebugLog("AudioCaptureWindow::DisplayModeItem State %s", window->displayWave ? "Wave" : "Frequency");
-}
-
-AudioCaptureWindow::AdjushWaveItem::AdjushWaveItem(AudioCaptureWindow* window) : window(window) {}
-AudioCaptureWindow::AdjushWaveItem::~AdjushWaveItem(){}
-
-const wchar_t* AudioCaptureWindow::AdjushWaveItem::GetName(){
-    return window->adjustWave ? L"调整波形:开" : L"调整波形:关";
-}
-
-void AudioCaptureWindow::AdjushWaveItem::OnClick(){
-    window->adjustWave = !window->adjustWave;
-    DebugLog("AudioCaptureWindow::AdjushWaveItem State %s", window->adjustWave ? "On" : "Off");
-}
 
 AudioCaptureWindow::AudioCaptureWindow(){
     DebugLog("AudioCaptureWindow Launched");
@@ -104,25 +29,41 @@ AudioCaptureWindow::AudioCaptureWindow(){
     soundTouch->setTempo(1.0f);
     soundTouch->clear();
 
-    uiMgr = new UIManager();
-
-    uiMgr->AddButton(new ProgressBar(this));
+    guiMgr = new GUIManagerObject();
 
     basicMenu = new Menu();
-    basicMenu->AddItem(new CaptureItem(this));
-    basicMenu->AddItem(new DisplayModeItem(this));
-    basicMenu->AddItem(new AdjushWaveItem(this));
-    basicMenu->AddItem(new MenuItem(L"刷新输入设备", MENUITEM_LAMBDA_TRANS(AudioCaptureWindow)[](AudioCaptureWindow* window){
-        if (window->capDev){
-            if (window->capture){
-                window->Stop();
-                window->CloseCaptureDevice();
-                window->Launch();
+    basicMenu->AddItem(new MenuItem(
+        Value<const wchar_t*>([=]{ return this->capture ? L"录音:开" : L"录音:关"; }),
+        [=]{
+            this->capture ? this->Stop() : this->Launch();
+            DebugLog("AudioCaptureWindow::CaptureItem State %s", this->capture ? "Capturing" : "Stopped");
+        }
+    ));
+    basicMenu->AddItem(new MenuItem(
+        Value<const wchar_t*>([=]{ return this->displayWave ? L"显示模式:波形" : L"显示模式:频谱"; }),
+        [=]{
+            this->displayWave = !this->displayWave;
+            DebugLog("AudioCaptureWindow::DisplayModeItem State %s", this->displayWave ? "Wave" : "Frequency");
+        }
+    ));
+    basicMenu->AddItem(new MenuItem(
+        Value<const wchar_t*>([=]{ return this->adjustWave ? L"调整波形:开" : L"调整波形:关"; }),
+        [=]{
+            this->adjustWave = !this->adjustWave;
+            DebugLog("AudioCaptureWindow::AdjushWaveItem State %s", this->adjustWave ? "On" : "Off");
+        }
+    ));
+    basicMenu->AddItem(new MenuItem(L"刷新输入设备", [=]{
+        if (this->capDev){
+            if (this->capture){
+                this->Stop();
+                this->CloseCaptureDevice();
+                this->Launch();
             }else{
-                window->CloseCaptureDevice();
+                this->CloseCaptureDevice();
             }
         }
-    }, this));
+    }));
 
     alGenSources(1, &alSrc);
     alGenBuffers(QUEUE_SIZE, alBuf);
@@ -139,7 +80,7 @@ AudioCaptureWindow::AudioCaptureWindow(){
 
 AudioCaptureWindow::~AudioCaptureWindow(){
     DebugLog("AudioCaptureWindow Destroyed");
-    if (uiMgr) delete uiMgr;
+    if (guiMgr) delete guiMgr;
     if (capBuf) delete[] (short*)capBuf;
     if (recBuf) delete[] (short*)recBuf;
     if (freqBuf) delete[] freqBuf;
@@ -300,18 +241,39 @@ void AudioCaptureWindow::OnRender(){
         ProcessOutput();
     }
 
-    uiMgr->Render();
+    guiMgr->OnChainRender();
 }
 
 void AudioCaptureWindow::OnCreate(){
+    class FrequencyBar : public VerticalProgressBar {
+    public:
+        FrequencyBar() : VerticalProgressBar() {
+            lowBound = -0.8f;
+            highBound = 0.8f;
+            posX = 0.9f;
+            btnX = 0.1f;
+            btnY = 0.05f;
+            lineWidth = 10.0f;
+            pos = 0.5f;
+        }
+    } *freqBar = new FrequencyBar();
+    freqBar->onPosChange += [=](float pos){
+        soundTouch->setPitchSemiTones(Lerp(-12.0f, 12.0f, pos));
+    };
+    guiMgr->AddChild(freqBar);
+
     Launch();
 }
 
 void AudioCaptureWindow::OnClose(){}
 
-void AudioCaptureWindow::OnChar(char c){}
+void AudioCaptureWindow::OnChar(char c){
+    guiMgr->OnChar(c);
+}
 
-void AudioCaptureWindow::OnUnichar(wchar_t c){}
+void AudioCaptureWindow::OnUnichar(wchar_t c){
+    guiMgr->OnUnichar(c);
+}
 
 void AudioCaptureWindow::OnResize(int x, int y){
     UpdateWindowSize(x, y);
@@ -319,30 +281,28 @@ void AudioCaptureWindow::OnResize(int x, int y){
 
 void AudioCaptureWindow::OnMouseMove(int x, int y){
     UpdateCursor(x, y);
-    uiMgr->CursorMove(cursorPos);
+    guiMgr->OnMouseMove2D(cursorPos);
 }
 
 void AudioCaptureWindow::OnLeftDown(int x, int y){
     UpdateCursor(x, y);
-    uiMgr->CursorMove(cursorPos);
-    uiMgr->LeftDown();
+    guiMgr->OnLeftDown2D(cursorPos);
 }
 
 void AudioCaptureWindow::OnLeftUp(int x, int y){
     UpdateCursor(x, y);
-    uiMgr->CursorMove(cursorPos);
-    uiMgr->LeftUp();
+    guiMgr->OnLeftUp2D(cursorPos);
 }
 
 void AudioCaptureWindow::OnRightDown(int x, int y){
     UpdateCursor(x, y);
-    uiMgr->CursorMove(cursorPos);
+    guiMgr->OnRightDown2D(cursorPos);
     Main::SetMenu(basicMenu);
 }
 
 void AudioCaptureWindow::OnRightUp(int x, int y){
     UpdateCursor(x, y);
-    uiMgr->CursorMove(cursorPos);
+    guiMgr->OnRightUp2D(cursorPos);
 }
 
 void AudioCaptureWindow::OnMouseWheel(int delta){}

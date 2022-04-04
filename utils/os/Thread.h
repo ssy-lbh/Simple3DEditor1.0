@@ -15,31 +15,6 @@ public:
     static void ExitProcess(int code);
 };
 
-class Thread final : public Object {
-private:
-#ifdef PLATFORM_WINDOWS
-    handle hThread = (handle)(-1);
-
-    struct ThreadData {
-        int(*func)(void*);
-        void* user;
-    };
-
-    static ulong __stdcall RunThread(void* data);
-#endif
-
-    int(*func)(void*);
-    void* user;
-
-public:
-    Thread(int(*func)(void*), void* user);
-    ~Thread();
-
-    bool Start();
-    bool isStarted() const;
-    bool Join();
-};
-
 class ThreadLocal final {
 private:
 #ifdef PLATFORM_WINDOWS
@@ -52,10 +27,6 @@ public:
     static bool Free(int idx);
     static void Set(int idx, void* val);
     static void* Get(int idx);
-};
-
-class ThreadPool final : public Object {
-    
 };
 
 #endif

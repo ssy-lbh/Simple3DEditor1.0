@@ -45,8 +45,9 @@ PROGOBJ		= main\
 				utils\physics\SphereCollider utils\physics\MeshCollider\
 				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
 				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
-				editor\MainWindow editor\RenderWindow editor\gui\Container editor\gui\Menu\
-				editor\gui\UIManager editor\gui\GUIUtils editor\gui\AnimationCurve editor\gui\ViewManager\
+				editor\MainWindow editor\RenderWindow editor\AttributeWindow\
+				editor\gui\Container editor\gui\Menu editor\gui\UIManager editor\gui\GUIUtils\
+				editor\gui\AnimationCurve editor\gui\ViewManager\
 				editor\main\ViewObject\
 				editor\object\AudioListenerObject editor\object\AudioSourceObject\
 				editor\object\CameraObject editor\object\CubicBezierObject\

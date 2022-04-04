@@ -11,6 +11,7 @@
 #include <editor/TreeWindow.h>
 #include <editor/UVEditWindow.h>
 #include <editor/RenderWindow.h>
+#include <editor/AttributeWindow.h>
 #include <editor/gui/Menu.h>
 #include <editor/main/ViewManager.h>
 #include <utils/math3d/Math.h>
@@ -38,28 +39,28 @@ LRContainer::~LRContainer(){
 void LRContainer::InitMenu(){
     joinMenu = new Menu();
 
-    joinMenu->AddItem(new MenuItem(L"归并为左窗口", MENUITEM_LAMBDA_TRANS(LRContainer)[](LRContainer* window){
-        if (window->selWindow){
-            delete window->rWindow;
-            window->rWindow = NULL;
-            AWindow* curWindow = ((SelectionWindow*)window->lWindow)->GetWindow();
-            ((SelectionWindow*)window->lWindow)->SetWindow(NULL, false);
-            delete window->lWindow;
-            window->lWindow = NULL;
-            window->selWindow->SetWindow(curWindow, true);
+    joinMenu->AddItem(new MenuItem(L"归并为左窗口", [=]{
+        if (this->selWindow){
+            delete this->rWindow;
+            this->rWindow = NULL;
+            AWindow* curWindow = ((SelectionWindow*)this->lWindow)->GetWindow();
+            ((SelectionWindow*)this->lWindow)->SetWindow(NULL, false);
+            delete this->lWindow;
+            this->lWindow = NULL;
+            this->selWindow->SetWindow(curWindow, true);
         }
-    }, this));
-    joinMenu->AddItem(new MenuItem(L"归并为右窗口", MENUITEM_LAMBDA_TRANS(LRContainer)[](LRContainer* window){
-        if (window->selWindow){
-            delete window->lWindow;
-            window->lWindow = NULL;
-            AWindow* curWindow = ((SelectionWindow*)window->rWindow)->GetWindow();
-            ((SelectionWindow*)window->rWindow)->SetWindow(NULL, false);
-            delete window->rWindow;
-            window->rWindow = NULL;
-            window->selWindow->SetWindow(curWindow, true);
+    }));
+    joinMenu->AddItem(new MenuItem(L"归并为右窗口", [=]{
+        if (this->selWindow){
+            delete this->lWindow;
+            this->lWindow = NULL;
+            AWindow* curWindow = ((SelectionWindow*)this->rWindow)->GetWindow();
+            ((SelectionWindow*)this->rWindow)->SetWindow(NULL, false);
+            delete this->rWindow;
+            this->rWindow = NULL;
+            this->selWindow->SetWindow(curWindow, true);
         }
-    }, this));
+    }));
 }
 
 bool LRContainer::IsFocus(){
@@ -288,28 +289,28 @@ UDContainer::~UDContainer(){
 void UDContainer::InitMenu(){
     joinMenu = new Menu();
 
-    joinMenu->AddItem(new MenuItem(L"归并为上窗口", MENUITEM_LAMBDA_TRANS(UDContainer)[](UDContainer* window){
-        if (window->selWindow){
-            delete window->dWindow;
-            window->dWindow = NULL;
-            AWindow* curWindow = ((SelectionWindow*)window->uWindow)->GetWindow();
-            ((SelectionWindow*)window->uWindow)->SetWindow(NULL, false);
-            delete window->uWindow;
-            window->uWindow = NULL;
-            window->selWindow->SetWindow(curWindow, true);
+    joinMenu->AddItem(new MenuItem(L"归并为上窗口", [=]{
+        if (this->selWindow){
+            delete this->dWindow;
+            this->dWindow = NULL;
+            AWindow* curWindow = ((SelectionWindow*)this->uWindow)->GetWindow();
+            ((SelectionWindow*)this->uWindow)->SetWindow(NULL, false);
+            delete this->uWindow;
+            this->uWindow = NULL;
+            this->selWindow->SetWindow(curWindow, true);
         }
-    }, this));
-    joinMenu->AddItem(new MenuItem(L"归并为下窗口", MENUITEM_LAMBDA_TRANS(UDContainer)[](UDContainer* window){
-        if (window->selWindow){
-            delete window->uWindow;
-            window->uWindow = NULL;
-            AWindow* curWindow = ((SelectionWindow*)window->dWindow)->GetWindow();
-            ((SelectionWindow*)window->dWindow)->SetWindow(NULL, false);
-            delete window->dWindow;
-            window->dWindow = NULL;
-            window->selWindow->SetWindow(curWindow, true);
+    }));
+    joinMenu->AddItem(new MenuItem(L"归并为下窗口", [=]{
+        if (this->selWindow){
+            delete this->uWindow;
+            this->uWindow = NULL;
+            AWindow* curWindow = ((SelectionWindow*)this->dWindow)->GetWindow();
+            ((SelectionWindow*)this->dWindow)->SetWindow(NULL, false);
+            delete this->dWindow;
+            this->dWindow = NULL;
+            this->selWindow->SetWindow(curWindow, true);
         }
-    }, this));
+    }));
 }
 
 bool UDContainer::IsFocus(){
@@ -537,51 +538,24 @@ SelectionWindow::~SelectionWindow(){
 void SelectionWindow::InitMenu(){
     selMenu = new Menu();
 
-    selMenu->AddItem(new MenuItem(L"主窗口", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new MainWindow());
-    }, this));
-    selMenu->AddItem(new MenuItem(L"UV编辑器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new UVEditWindow());
-    }, this));
-    selMenu->AddItem(new MenuItem(L"绘画窗口", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new PaintWindow());
-    }, this));
-    selMenu->AddItem(new MenuItem(L"音频播放器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new AudioPlayerWindow());
-    }, this));
-    selMenu->AddItem(new MenuItem(L"变声器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new AudioCaptureWindow());
-    }, this));
-    selMenu->AddItem(new MenuItem(L"树形图", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new TreeWindow());
-    }, this));
-    selMenu->AddItem(new MenuItem(L"节点编辑器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new NodeMapWindow());
-    }, this));
-    selMenu->AddItem(new MenuItem(L"动画控制器", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new AnimationWindow());
-    }, this));
-    selMenu->AddItem(new MenuItem(L"渲染窗口", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new RenderWindow());
-    }, this));
+    selMenu->AddItem(new MenuItem(L"主窗口", [=]{ this->SetWindow(new MainWindow()); }));
+    selMenu->AddItem(new MenuItem(L"UV编辑器", [=]{ this->SetWindow(new UVEditWindow()); }));
+    selMenu->AddItem(new MenuItem(L"绘画窗口", [=]{ this->SetWindow(new PaintWindow()); }));
+    selMenu->AddItem(new MenuItem(L"音频播放器", [=]{ this->SetWindow(new AudioPlayerWindow()); }));
+    selMenu->AddItem(new MenuItem(L"变声器", [=]{ this->SetWindow(new AudioCaptureWindow()); }));
+    selMenu->AddItem(new MenuItem(L"树形图", [=]{ this->SetWindow(new TreeWindow()); }));
+    selMenu->AddItem(new MenuItem(L"节点编辑器", [=]{ this->SetWindow(new NodeMapWindow()); }));
+    selMenu->AddItem(new MenuItem(L"动画控制器", [=]{ this->SetWindow(new AnimationWindow()); }));
+    selMenu->AddItem(new MenuItem(L"渲染窗口", [=]{ this->SetWindow(new RenderWindow()); }));
+    selMenu->AddItem(new MenuItem(L"属性窗口(未完成)", [=]{ this->SetWindow(new AttributeWindow()); }));
     selMenu->AddItem(new MenuItem());
-    selMenu->AddItem(new MenuItem(L"左右分割至左侧", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new LRContainer(window->curWindow, NULL, window), false);
-    }, this));
-    selMenu->AddItem(new MenuItem(L"左右分割至右侧", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new LRContainer(NULL, window->curWindow, window), false);
-    }, this));
-    selMenu->AddItem(new MenuItem(L"上下分割至上侧", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new UDContainer(window->curWindow, NULL, window), false);
-    }, this));
-    selMenu->AddItem(new MenuItem(L"上下分割至下侧", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        window->SetWindow(new UDContainer(NULL, window->curWindow, window), false);
-    }, this));
+    selMenu->AddItem(new MenuItem(L"左右分割至左侧", [=]{ this->SetWindow(new LRContainer(this->curWindow, NULL, this), false); }));
+    selMenu->AddItem(new MenuItem(L"左右分割至右侧", [=]{ this->SetWindow(new LRContainer(NULL, this->curWindow, this), false); }));
+    selMenu->AddItem(new MenuItem(L"上下分割至上侧", [=]{ this->SetWindow(new UDContainer(this->curWindow, NULL, this), false); }));
+    selMenu->AddItem(new MenuItem(L"上下分割至下侧", [=]{ this->SetWindow(new UDContainer(NULL, this->curWindow, this), false); }));
 #ifdef PLATFORM_WINDOWS
     selMenu->AddItem(new MenuItem());
-    selMenu->AddItem(new MenuItem(L"新窗口", MENUITEM_LAMBDA_TRANS(SelectionWindow)[](SelectionWindow* window){
-        new AppFrame("ModelView New", new SelectionWindow(), 400, 400, true);
-    }, this));
+    selMenu->AddItem(new MenuItem(L"新窗口", [=]{ new AppFrame("ModelView New", new SelectionWindow(), 400, 400, true); }));
 #endif
 }
 

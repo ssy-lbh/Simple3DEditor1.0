@@ -36,6 +36,7 @@ enum class ViewObjectType {
     OBJECT_GUI_MESH,
     OBJECT_GUI,
     OBJECT_GUI_MANAGER,
+    OBJECT_GUI_ROUND_BUTTON,
     OBJECT_GUI_ICON_BUTTON,
     OBJECT_GUI_EDIT_A,
     OBJECT_GUI_EDIT_W,
@@ -68,7 +69,7 @@ protected:
 
 public:
     // 被销毁时，子对象全部已销毁
-    DelegateWithData<void, void*, AViewObject*> onDestroy;
+    Delegate<AViewObject*> onDestroy;
 
     AViewObject();
     AViewObject(const wchar_t* name);

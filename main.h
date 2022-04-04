@@ -122,6 +122,7 @@ public:
     static void SelectType(SelectionType type);
     static void AddObject(AViewObject* o);
     static void AddObjectToScreen(AViewObject* o);
+    static bool AddObjectChild(AViewObject* parent, AViewObject* child);
     static void DeleteObject(AViewObject* o);
     static void OnAnimationFrame(float frame);
     static void SaveImage(String file, Rect rect);

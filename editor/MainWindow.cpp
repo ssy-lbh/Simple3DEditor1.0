@@ -22,74 +22,6 @@
 #include <utils/gl/GLSkyBox.h>
 #include <utils/gl/GLSimplified.h>
 
-MainWindow::MoveButton::MoveButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
-
-MainWindow::MoveButton::~MoveButton(){
-    if (texture) delete texture;
-}
-
-bool MainWindow::MoveButton::Trigger(Vector2 pos){
-    return (pos - center).SqrMagnitude() <= radius * radius;
-}
-
-void MainWindow::MoveButton::Render(){
-    glColor3f(1.0f, 1.0f, 1.0f);
-    if (!texture)
-        texture = new GLTexture2D(IDT_BUTTON_MOVE);
-    texture->Enable();
-    GLUtils::DrawCornerWithUV(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
-    GLTexture2D::Disable();
-}
-
-void MainWindow::MoveButton::Click(Vector2 pos){
-    DebugLog("MoveButton Click");
-    start = main->camLookat;
-}
-
-void MainWindow::MoveButton::Drag(Vector2 dir){
-    main->SetLookAt(start - (main->camRight * dir.x + main->camUp * dir.y) * main->camDis);
-}
-
-MainWindow::RotateButton::RotateButton(Vector2 center, float radius, MainWindow* main) : center(center), radius(radius), main(main) {}
-MainWindow::RotateButton::~RotateButton(){}
-
-bool MainWindow::RotateButton::Trigger(Vector2 pos){
-    return (pos - center).SqrMagnitude() <= radius * radius;
-}
-
-void MainWindow::RotateButton::Render(){
-    Quaternion q = -main->camDir;
-    Vector2 right = (q * Vector3::right).XZ() * radius;
-    Vector2 forward = (q * Vector3::forward).XZ() * radius;
-    Vector2 up = (q * Vector3::up).XZ() * radius;
-
-    glColor3f(0.1f, 0.1f, 0.1f);
-    GLUtils::DrawCornerWithUV(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
-
-    glEnable(GL_LINE_SMOOTH);
-    glBegin(GL_LINES);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertexv2(center - right); glVertexv2(center + right);
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glVertexv2(center - forward); glVertexv2(center + forward);
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glVertexv2(center - up); glVertexv2(center + up);
-    glEnd();
-    glDisable(GL_LINE_SMOOTH);
-}
-
-void MainWindow::RotateButton::Click(Vector2 pos){
-    DebugLog("RotateButton Click");
-    start = main->camDir;
-    up = main->camUp;
-    right = main->camRight;
-}
-
-void MainWindow::RotateButton::Drag(Vector2 dir){
-    main->SetRotation(Quaternion::AxisAngle(up, -dir.x * 100.0f) *
-                            Quaternion::AxisAngle(right, dir.y * 100.0f) * start);
-}
-
 MainWindow::MoveOperation::MoveOperation(MainWindow* main) : main(main) {}
 MainWindow::MoveOperation::~MoveOperation(){}
 
@@ -591,172 +523,111 @@ void MainWindow::SelectTool::OnRender(){
 MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Vector3::up, 5.0f) {
     DebugLog("MainWindow Launched");
 
-    uiMgr = new UIManager();
-    uiMgr->AddButton(new RotateButton(Vector2(0.85f, 0.85f), 0.12f, this));
-    uiMgr->AddButton(new MoveButton(Vector2(0.55f, 0.85f), 0.12f, this));
+    guiMgr = new GUIManagerObject();
 
     SetTool(new EmptyTool(this));
 
     basicMenu = new Menu();
-    basicMenu->AddItem(new MenuItem(L"添加顶点", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->AddPoint();
-    }, this));
-    basicMenu->AddItem(new MenuItem(L"删除顶点", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->DeletePoint();
-    }, this));
+    basicMenu->AddItem(new MenuItem(L"添加顶点", [=]{ this->AddPoint(); }));
+    basicMenu->AddItem(new MenuItem(L"删除顶点", [=]{ this->DeletePoint(); }));
     basicMenu->AddItem(new MenuItem());
-    basicMenu->AddItem(new MenuItem(L"保存", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnInsSave();
-    }, this));
-    basicMenu->AddItem(new MenuItem(L"加载", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnInsLoad();
-    }, this));
+    basicMenu->AddItem(new MenuItem(L"保存", [=]{ this->OnInsSave(); }));
+    basicMenu->AddItem(new MenuItem(L"加载", [=]{ this->OnInsLoad(); }));
     basicMenu->AddItem(new MenuItem());
-    basicMenu->AddItem(new MenuItem(L"关于", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        DialogVersionInfo();
-    }, this));
+    basicMenu->AddItem(new MenuItem(L"关于", [=]{ DialogVersionInfo(); }));
     basicMenu->AddItem(new MenuItem());
 
     Menu* subMenu = new Menu();
-    subMenu->AddItem(new MenuItem(L"方块", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnMenuAccel(IDM_MESH_BASIC_BLOCK, false);
-    }, this));
-    subMenu->AddItem(new MenuItem(L"平面", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnMenuAccel(IDM_MESH_BASIC_PLANE, false);
-    }, this));
-    subMenu->AddItem(new MenuItem(L"圆柱体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnMenuAccel(IDM_MESH_BASIC_CYLINDER, false);
-    }, this));
-    subMenu->AddItem(new MenuItem(L"球体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnMenuAccel(IDM_MESH_BASIC_SPHERE, false);
-    }, this));
-    subMenu->AddItem(new MenuItem(L"胶囊体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnMenuAccel(IDM_MESH_BASIC_CAPSULE, false);
-    }, this));
+    subMenu->AddItem(new MenuItem(L"方块", [=]{ this->OnMenuAccel(IDM_MESH_BASIC_BLOCK, false); }));
+    subMenu->AddItem(new MenuItem(L"平面", [=]{ this->OnMenuAccel(IDM_MESH_BASIC_PLANE, false); }));
+    subMenu->AddItem(new MenuItem(L"圆柱体", [=]{ this->OnMenuAccel(IDM_MESH_BASIC_CYLINDER, false); }));
+    subMenu->AddItem(new MenuItem(L"球体", [=]{ this->OnMenuAccel(IDM_MESH_BASIC_SPHERE, false); }));
+    subMenu->AddItem(new MenuItem(L"胶囊体", [=]{ this->OnMenuAccel(IDM_MESH_BASIC_CAPSULE, false); }));
     basicMenu->AddItem(new MenuItem(L"添加", subMenu));
 
     Menu* toolMenu = new Menu();
-    toolMenu->AddItem(new MenuItem(L"点选", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnMenuAccel(IDM_TOOL_EMPTY, false);
-    }, this));
-    toolMenu->AddItem(new MenuItem(L"框选", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnMenuAccel(IDM_TOOL_SELECTBOX, false);
-    }, this));
+    toolMenu->AddItem(new MenuItem(L"点选", [=]{ this->OnMenuAccel(IDM_TOOL_EMPTY, false); }));
+    toolMenu->AddItem(new MenuItem(L"框选", [=]{ this->OnMenuAccel(IDM_TOOL_SELECTBOX, false); }));
     basicMenu->AddItem(new MenuItem(L"工具", toolMenu));
 
     Menu* selTypeMenu = new Menu();
-    selTypeMenu->AddItem(new MenuItem(L"对象(部分实现)", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::SelectType(SelectionType::SELECT_OBJECT);
-    }, this));
-    selTypeMenu->AddItem(new MenuItem(L"顶点", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::SelectType(SelectionType::SELECT_VERTICES);
-    }, this));
-    selTypeMenu->AddItem(new MenuItem(L"边(部分实现)", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::SelectType(SelectionType::SELECT_EDGES);
-    }, this));
-    selTypeMenu->AddItem(new MenuItem(L"面(未实现)", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::SelectType(SelectionType::SELECT_FACES);
-    }, this));
+    selTypeMenu->AddItem(new MenuItem(L"对象(部分实现)", [=]{ Main::SelectType(SelectionType::SELECT_OBJECT); }));
+    selTypeMenu->AddItem(new MenuItem(L"顶点", [=]{ Main::SelectType(SelectionType::SELECT_VERTICES); }));
+    selTypeMenu->AddItem(new MenuItem(L"边(部分实现)", [=]{ Main::SelectType(SelectionType::SELECT_EDGES); }));
+    selTypeMenu->AddItem(new MenuItem(L"面(未实现)", [=]{ Main::SelectType(SelectionType::SELECT_FACES); }));
     basicMenu->AddItem(new MenuItem(L"选择类型", selTypeMenu));
 
     Menu* texMenu = new Menu();
-    texMenu->AddItem(new MenuItem(L"启用", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnMenuAccel(IDM_TEXTURE_ENABLE, false);
-    }, this));
-    texMenu->AddItem(new MenuItem(L"停用", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnMenuAccel(IDM_TEXTURE_DISABLE, false);
-    }, this));
-    texMenu->AddItem(new MenuItem(L"加载", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        window->OnMenuAccel(IDM_TEXTURE_LOAD, false);
-    }, this));
+    texMenu->AddItem(new MenuItem(L"启用", [=]{ this->OnMenuAccel(IDM_TEXTURE_ENABLE, false); }));
+    texMenu->AddItem(new MenuItem(L"停用", [=]{ this->OnMenuAccel(IDM_TEXTURE_DISABLE, false); }));
+    texMenu->AddItem(new MenuItem(L"加载", [=]{ this->OnMenuAccel(IDM_TEXTURE_LOAD, false); }));
     basicMenu->AddItem(new MenuItem(L"纹理", texMenu));
 
     Menu* objectMenu = new Menu();
-    objectMenu->AddItem(new MenuItem(L"空对象", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new AViewObject());
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"网格体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new MeshObject());
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"三次贝塞尔曲线", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new CubicBezierObject());
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"点光源", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new PointLightObject());
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"GUI管理器", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new GUIManagerObject());
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"GUI网格体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new GUIMeshObject());
-    }, this));
+    objectMenu->AddItem(new MenuItem(L"空对象", [=]{ Main::AddObject(new AViewObject()); }));
+    objectMenu->AddItem(new MenuItem(L"网格体", [=]{ Main::AddObject(new MeshObject()); }));
+    objectMenu->AddItem(new MenuItem(L"三次贝塞尔曲线", [=]{ Main::AddObject(new CubicBezierObject()); }));
+    objectMenu->AddItem(new MenuItem(L"点光源", [=]{ Main::AddObject(new PointLightObject()); }));
+    objectMenu->AddItem(new MenuItem(L"GUI管理器", [=]{ Main::AddObject(new GUIManagerObject()); }));
+    objectMenu->AddItem(new MenuItem(L"GUI网格体", [=]{ Main::AddObject(new GUIMeshObject()); }));
 
     Menu* objGUIMenu = new Menu();
-    objGUIMenu->AddItem(new MenuItem(L"图标按钮", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new IconButton());
-    }, this));
-    objGUIMenu->AddItem(new MenuItem(L"编辑框", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new GUIEditA());
-    }, this));
-    objGUIMenu->AddItem(new MenuItem(L"横进度条", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new HorizontalProgressBar());
-    }, this));
-    objGUIMenu->AddItem(new MenuItem(L"竖进度条", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new VerticalProgressBar());
-    }, this));
+    objGUIMenu->AddItem(new MenuItem(L"图标按钮", [=]{ Main::AddObject(new IconButton()); }));
+    objGUIMenu->AddItem(new MenuItem(L"编辑框", [=]{ Main::AddObject(new GUIEditA()); }));
+    objGUIMenu->AddItem(new MenuItem(L"横进度条", [=]{ Main::AddObject(new HorizontalProgressBar()); }));
+    objGUIMenu->AddItem(new MenuItem(L"竖进度条", [=]{ Main::AddObject(new VerticalProgressBar()); }));
     objectMenu->AddItem(new MenuItem(L"GUI", objGUIMenu));
 
-    objectMenu->AddItem(new MenuItem(L"音频收听者", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        LocalData::GetLocalInst()->CreateAudioListener();
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"摄像机", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        LocalData::GetLocalInst()->CreateCamera();
-    }, this));
+    objectMenu->AddItem(new MenuItem(L"音频收听者", [=]{ LocalData::GetLocalInst()->CreateAudioListener(); }));
+    objectMenu->AddItem(new MenuItem(L"摄像机", [=]{ LocalData::GetLocalInst()->CreateCamera(); }));
     basicMenu->AddItem(new MenuItem(L"添加对象", objectMenu));
 
     basicMenu->AddItem(new MenuItem());
-    basicMenu->AddItem(new SwitchMenuItem(L"光照:开", L"光照:关", SWITCHMENUITEM_LAMBDA_TRANS(MainWindow)[](bool state, MainWindow* window){
-        window->lightEnabled = state;
-        DebugLog("MainWindow Light State %s", window->lightEnabled ? "On" : "Off");
-    }, this, lightEnabled));
+    basicMenu->AddItem(new MenuItem(
+        Value<const wchar_t*>([=]{ return this->lightEnabled ? L"光照:开" : L"光照:关"; }),
+        [=]{
+            this->lightEnabled = !this->lightEnabled;
+            DebugLog("MainWindow Light State %s", this->lightEnabled ? "On" : "Off");
+        }
+    ));
 
     basicMenu->AddItem(new MenuItem());
-    basicMenu->AddItem(new SwitchMenuItem(L"音频控制:开", L"音频控制:关", SWITCHMENUITEM_LAMBDA_TRANS(MainWindow)[](bool state, MainWindow* window){
-        window->audioControl = state;
-        DebugLog("MainWindow Audio Control %s", window->audioControl ? "On" : "Off");
-        if (state){
-            // 重置速度并记录当前位置
-            alListenerPosAutoVelv3(window->camPos);
-            alListenerVelocityv3(Vector3::zero);
-            alListenerDirv3(window->camForward, window->camUp);
-        }else{
-            alListenerPosv3(Vector3::zero);
-            alListenerVelocityv3(Vector3::zero);
-            alListenerDirv3(Vector3::forward, Vector3::up);
+    basicMenu->AddItem(new MenuItem(
+        Value<const wchar_t*>([=]{ return this->audioControl ? L"音频控制:开" : L"音频控制:关"; }),
+        [=]{
+            this->audioControl = !this->audioControl;
+            DebugLog("MainWindow Audio Control %s", this->audioControl ? "On" : "Off");
+            if (this->audioControl){
+                // 重置速度并记录当前位置
+                alListenerPosAutoVelv3(this->camPos);
+                alListenerVelocityv3(Vector3::zero);
+                alListenerDirv3(this->camForward, this->camUp);
+            }else{
+                alListenerPosv3(Vector3::zero);
+                alListenerVelocityv3(Vector3::zero);
+                alListenerDirv3(Vector3::forward, Vector3::up);
+            }
         }
-    }, this, audioControl));
-    basicMenu->AddItem(new SwitchMenuItem(L"多普勒效应:开", L"多普勒效应:关", SWITCHMENUITEM_LAMBDA_TRANS(MainWindow)[](bool state, MainWindow* window){
-        window->dopplerEffect = state;
-        DebugLog("MainWindow Doppler Effect %s", window->dopplerEffect ? "On" : "Off");
-        if (state){
-            // 重置速度并记录当前位置
-            alListenerPosAutoVelv3(window->camPos);
-            alListenerVelocityv3(Vector3::zero);
-        }else{
-            alListenerVelocityv3(Vector3::zero);
+    ));
+    basicMenu->AddItem(new MenuItem(
+        Value<const wchar_t*>([=]{ return this->dopplerEffect ? L"多普勒效应:开" : L"多普勒效应:关"; }),
+        [=]{
+            this->dopplerEffect = !this->dopplerEffect;
+            DebugLog("MainWindow Doppler Effect %s", this->dopplerEffect ? "On" : "Off");
+            if (this->dopplerEffect){
+                // 重置速度并记录当前位置
+                alListenerPosAutoVelv3(this->camPos);
+                alListenerVelocityv3(Vector3::zero);
+            }else{
+                alListenerVelocityv3(Vector3::zero);
+            }
         }
-    }, this, dopplerEffect));
+    ));
 
     insertMenu = new Menu();
-    insertMenu->AddItem(new MenuItem(L"位置", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::data->curObject->transform.InsertPos(Main::data->animFrame);
-    }, this));
-    insertMenu->AddItem(new MenuItem(L"旋转", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::data->curObject->transform.InsertRot(Main::data->animFrame);
-    }, this));
-    insertMenu->AddItem(new MenuItem(L"大小", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::data->curObject->transform.InsertScale(Main::data->animFrame);
-    }, this));
+    insertMenu->AddItem(new MenuItem(L"位置", [=]{ Main::data->curObject->transform.InsertPos(Main::data->animFrame); }));
+    insertMenu->AddItem(new MenuItem(L"旋转", [=]{ Main::data->curObject->transform.InsertRot(Main::data->animFrame); }));
+    insertMenu->AddItem(new MenuItem(L"大小", [=]{ Main::data->curObject->transform.InsertScale(Main::data->animFrame); }));
 
     if (audioControl){
         alListenerDirv3(camForward, camUp);
@@ -767,10 +638,9 @@ MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f,
 
 MainWindow::~MainWindow(){
     DebugLog("MainWindow Destroyed");
+    if (guiMgr) delete guiMgr;
     if (basicMenu) delete basicMenu;
     if (insertMenu) delete insertMenu;
-    if (uiMgr) delete uiMgr;
-    //if (guiMgr) delete guiMgr;
     if (curOp) delete curOp;
     if (skyBox) delete skyBox;
 }
@@ -784,31 +654,71 @@ void MainWindow::OnCreate(){
     skyBox->Set(GLSkyBox::TOP, new GLTexture2D(IDT_SKYBOX_TOP));
     skyBox->Set(GLSkyBox::DOWN, new GLTexture2D(IDT_SKYBOX_DOWN));
 
-    // GUI测试代码
-    // guiMgr = new GUIMeshObject();
-    // guiMgr->transform.rotationXYZ.x.Set(90.0f);
-    // guiMgr->transform.scale.Set(Vector3(5.0f, 5.0f, 1.0f));
-    // IconButton* iconBtn = new IconButton(Vector2::zero, Vector2::one, 0.1f);
-    // iconBtn->SetIcon(IDT_NODEMAP_BACKGROUND);
-    // iconBtn->OnClick([](void* p){
-    //     DebugLog("click");
-    // });
-    // iconBtn->SetMoveable(true);
-    // guiMgr->AddChild(iconBtn);
-    // Main::AddObject(guiMgr);
+    // 我其实也想问问有这么写C++的么？
+    // 不过也不如Java构造接口实现类时方便啊
+    // 而且类的内部函数是友元的，内部访问变量是通过this引用
+    class MoveButton final : public RoundButton {
+    public:
+        Point3 startPos;
+
+        MoveButton() : RoundButton(Vector2(0.55f, 0.85f), 0.12f) {}
+    } *moveBtn = new MoveButton();
+    moveBtn->SetIcon(IDT_BUTTON_MOVE);
+    moveBtn->onClick += [=]{
+        moveBtn->startPos = this->camLookat;
+    };
+    moveBtn->onDrag += [=](Vector2 dir){
+        this->SetLookAt(moveBtn->startPos - (this->camRight * dir.x + this->camUp * dir.y) * this->camDis);
+    };
+    guiMgr->AddChild(moveBtn);
+
+    class RotateButton final : public RoundButton {
+    public:
+        Quaternion start;
+        Vector3 up;
+        Vector3 right;
+        MainWindow* window;
+
+        RotateButton(MainWindow* window) : RoundButton(Vector2(0.85f, 0.85f), 0.12f), window(window) {}
+
+        virtual void OnRender() override {
+            Quaternion q = -window->camDir;
+            Vector2 right = (q * Vector3::right).XZ() * radius;
+            Vector2 forward = (q * Vector3::forward).XZ() * radius;
+            Vector2 up = (q * Vector3::up).XZ() * radius;
+            float light = (hover ? 1.0f : 0.8f);
+
+            glColor3f(0.1f, 0.1f, 0.1f);
+            GLUtils::DrawCornerWithUV(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
+
+            glEnable(GL_LINE_SMOOTH);
+            glBegin(GL_LINES);
+            glColor3f(light, 0.0f, 0.0f);
+            glVertexv2(center - right); glVertexv2(center + right);
+            glColor3f(0.0f, light, 0.0f);
+            glVertexv2(center - forward); glVertexv2(center + forward);
+            glColor3f(0.0f, 0.0f, light);
+            glVertexv2(center - up); glVertexv2(center + up);
+            glEnd();
+            glDisable(GL_LINE_SMOOTH);
+        }
+    } *rotBtn = new RotateButton(this);
+    rotBtn->SetIcon(IDT_BUTTON_ROTATE);
+    rotBtn->onClick += [=]{
+        rotBtn->start = this->camDir;
+        rotBtn->up = this->camUp;
+        rotBtn->right = this->camRight;
+    };
+    rotBtn->onDrag += [=](Vector2 dir){
+        this->SetRotation(Quaternion::AxisAngle(rotBtn->up, -dir.x * 100.0f) *
+                            Quaternion::AxisAngle(rotBtn->right, dir.y * 100.0f) * rotBtn->start);
+    };
+    guiMgr->AddChild(rotBtn);
 }
 
 void MainWindow::OnClose(){}
 
-void MainWindow::OnTimer(int id){
-    if (audioControl){
-        if (dopplerEffect){
-            alListenerPosAutoVelv3(camPos);
-        }else{
-            alListenerPosv3(camPos);
-        }
-    }
-}
+void MainWindow::OnTimer(int id){}
 
 void MainWindow::OnResize(int x, int y){
     UpdateWindowSize(x, y);
@@ -816,10 +726,15 @@ void MainWindow::OnResize(int x, int y){
 
 void MainWindow::OnMouseMove(int x, int y){
     UpdateCursor(x, y);
+    guiMgr->OnMouseMove2D(cursorPos);
 }
 
 void MainWindow::OnRightDown(int x, int y){
-    AWindow::OnRightDown(x, y);
+    UpdateCursor(x, y);
+    // UI交互
+    guiMgr->OnRightDown2D(cursorPos);
+    if (guiMgr->GetCurrent())
+        return;
     // 操作
     if (curOp){
         curOp->OnUndo();
@@ -828,17 +743,20 @@ void MainWindow::OnRightDown(int x, int y){
         return;
     }
     // 工具
-    if (curTool){
+    if (curTool)
         curTool->OnRightDown();
-    }
     Main::SetMenu(basicMenu);
 }
 
 void MainWindow::OnRightUp(int x, int y){
-    AWindow::OnRightUp(x, y);
-    if (curTool){
+    UpdateCursor(x, y);
+    // UI交互
+    guiMgr->OnRightUp2D(cursorPos);
+    if (guiMgr->GetCurrent())
+        return;
+    // 工具
+    if (curTool)
         curTool->OnRightUp();
-    }
 }
 
 void MainWindow::InitCamera(){
@@ -963,7 +881,15 @@ void MainWindow::OnRender(){
 
     // UI绘制
     // 在之前进行3D渲染使用投影变换后，需要参数aspect
-    uiMgr->Render();
+    guiMgr->OnChainRender();
+
+    if (audioControl){
+        if (dopplerEffect){
+            alListenerPosAutoVelv3(camPos);
+        }else{
+            alListenerPosv3(camPos);
+        }
+    }
 }
 
 void MainWindow::SetOperation(IOperation* op){
@@ -985,14 +911,9 @@ void MainWindow::SetTool(ITool* tool){
     tool->OnSelect();
 }
 
-void MainWindow::UpdateWindowSize(int x, int y){
-    AWindow::UpdateWindowSize(x, y);
-}
-
 void MainWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);
     cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
-    uiMgr->CursorMove(cursorPos);
     if (curOp){
         curOp->OnMove();
     }
@@ -1001,10 +922,6 @@ void MainWindow::UpdateCursor(int x, int y){
     }
     // GUI测试代码
     Main::OnMouseMove(camPos, cursorDir);
-}
-
-void MainWindow::SetLookAt(Point3 at){
-    CCamera::SetLookAt(at);
 }
 
 void MainWindow::SetRotation(Quaternion rot){
@@ -1184,11 +1101,11 @@ void MainWindow::OnInsSelectColor(){
 }
 
 void MainWindow::OnLeftDown(int x, int y){
+    UpdateCursor(x, y);
     // UI交互
-    if (uiMgr->LeftDown()){
-        UpdateCursor(x, y);
+    guiMgr->OnLeftDown2D(cursorPos);
+    if (guiMgr->GetCurrent())
         return;
-    }
     // 操作
     if (curOp){
         curOp->OnConfirm();
@@ -1206,7 +1123,11 @@ void MainWindow::OnLeftDown(int x, int y){
 
 void MainWindow::OnLeftUp(int x, int y){
     UpdateCursor(x, y);
-    uiMgr->LeftUp();
+    // UI交互
+    guiMgr->OnLeftUp2D(cursorPos);
+    if (guiMgr->GetCurrent())
+        return;
+    // 工具
     if (curTool){
         curTool->OnLeftUp();
     }
@@ -1215,11 +1136,13 @@ void MainWindow::OnLeftUp(int x, int y){
 }
 
 void MainWindow::OnChar(char c){
-    uiMgr->Char(c);
+    AWindow::OnChar(c);
+    guiMgr->OnChar(c);
 }
 
 void MainWindow::OnUnichar(wchar_t c){
-    uiMgr->Unichar(c);
+    AWindow::OnUnichar(c);
+    guiMgr->OnUnichar(c);
 }
 
 void MainWindow::OnMouseWheel(int delta){
@@ -1502,10 +1425,6 @@ void MainWindow::OnDropFileW(const wchar_t* path){
         }
     }
     LoadMesh(Main::data->curObject, path);
-}
-
-Point3 MainWindow::GetLookPosition(Point3 pos){
-    return CCamera::GetLookPosition(pos);
 }
 
 Point2 MainWindow::GetScreenPosition(Point3 pos){

@@ -11,8 +11,40 @@
 #include <editor/object/GUIObject.h>
 
 // 看来GUI组件的属性过多，而且大都不为指针，所以大部分属性不要过度封装，直接公开即可
-class IconButton final : public AGUIObject {
-private:
+
+class RoundButton : public AGUIObject {
+protected:
+    Point2 startPos;
+    bool hover = false;
+
+    GLTexture2D* texture = NULL;
+
+public:
+    Point2 center = Point2::zero;
+    float radius = 0.0f;
+    bool moveable = false;
+    Vector3 hoverColor = Vector3(1.0f, 1.0f, 1.0f);
+    Vector3 defaultColor = Vector3(0.8f, 0.8f, 0.8f);
+
+    Delegate<> onClick;
+    Delegate<Vector2> onDrag;
+
+    RoundButton();
+    RoundButton(Point2 center, float radius);
+    virtual ~RoundButton() override;
+
+    virtual bool OnHit2D(Point2 pos) override;
+    virtual void OnLeftDown2D(Point2 pos) override;
+    virtual void OnLeftDrag2D(Vector2 dir) override;
+    virtual void OnRender() override;
+
+    void SetIcon(const char* texPath);
+    void SetIcon(int iconRes);
+    void SetIcon(GLTexture2D* tex);
+};
+
+class IconButton : public AGUIObject {
+protected:
     Vector2 startPos;
     bool hover = false;
 
@@ -23,8 +55,11 @@ public:
     Vector2 size = Vector2::one;
     float radius = 0.0f;
     bool moveable = false;
+    Vector3 hoverColor = Vector3(1.0f, 1.0f, 1.0f);
+    Vector3 defaultColor = Vector3(0.8f, 0.8f, 0.8f);
 
-    DelegateWithData<void, void*> onClick;
+    Delegate<> onClick;
+    Delegate<Vector2> onDrag;
 
     IconButton();
     IconButton(Vector2 position, Vector2 size);
@@ -41,22 +76,21 @@ public:
     void SetIcon(GLTexture2D* tex);
 };
 
-class GUIEditA final : public AGUIObject {
-private:
+class GUIEditA : public AGUIObject {
+protected:
     StringBuilderA text;
     bool editing = false;
 
 public:
-    // 左上角位置
+    // 左下角位置
     Vector2 position = Vector2::zero;
     Vector2 size = Vector2::one;
-    // 意为半径占高度的比例
     float radius = 0.0f;
     Vector3 bkColor = Vector3::zero;
     Vector3 fontColor = Vector3::one;
     Vector3 selColor = Vector3(0.0f, 0.0f, 1.0f);
 
-    DelegateWithData<void, void*, String> onEdit;
+    Delegate<const String&> onEdit;
 
     GUIEditA();
     GUIEditA(Vector2 pos, float width);
@@ -73,22 +107,21 @@ public:
     void SetText(String s);
 };
 
-class GUIEditW final : public AGUIObject {
-private:
+class GUIEditW : public AGUIObject {
+protected:
     StringBuilderW text;
     bool editing = false;
 
 public:
-    // 左上角位置
+    // 左下角位置
     Vector2 position = Vector2::zero;
     Vector2 size = Vector2::one;
-    // 意为半径占高度的比例
     float radius = 0.0f;
     Vector3 bkColor = Vector3::zero;
     Vector3 fontColor = Vector3::one;
     Vector3 selColor = Vector3(0.0f, 0.0f, 1.0f);
 
-    DelegateWithData<void, void*, WString> onEdit;
+    Delegate<const WString&> onEdit;
 
     GUIEditW();
     GUIEditW(Vector2 pos, float width);
@@ -106,7 +139,7 @@ public:
 };
 
 class HorizontalProgressBar : public AGUIObject {
-private:
+protected:
     bool hover = false;
     float origin;
 
@@ -122,7 +155,7 @@ public:
     Vector3 defaultBtnColor = Vector3(0.0f, 0.0f, 0.5f);
     Vector3 hoverBtnColor = Vector3(0.0f, 0.0f, 0.3f);
 
-    DelegateWithData<void, void*, float> onPosChange;
+    Delegate<float> onPosChange;
 
     HorizontalProgressBar();
     virtual ~HorizontalProgressBar() override;
@@ -134,7 +167,7 @@ public:
 };
 
 class VerticalProgressBar : public AGUIObject {
-private:
+protected:
     bool hover = false;
     float origin;
 
@@ -150,7 +183,7 @@ public:
     Vector3 defaultBtnColor = Vector3(0.0f, 0.0f, 0.5f);
     Vector3 hoverBtnColor = Vector3(0.0f, 0.0f, 0.3f);
 
-    DelegateWithData<void, void*, float> onPosChange;
+    Delegate<float> onPosChange;
 
     VerticalProgressBar();
     virtual ~VerticalProgressBar() override;

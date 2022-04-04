@@ -6,7 +6,8 @@
 #include <utils/math3d/LinearAlgebra.h>
 #include <utils/math3d/Camera.h>
 #include <editor/main/Window.h>
-#include <editor/gui/UIManager.h>
+#include <editor/main/Tool.h>
+#include <editor/main/Operation.h>
 #include <editor/gui/Menu.h>
 
 enum class ObjectOperation {
@@ -25,11 +26,10 @@ private:
 
     float camRange = 100.0f;
 
+    GUIManagerObject* guiMgr;
+
     Menu* basicMenu;
     Menu* insertMenu;
-
-    UIManager* uiMgr;
-    //GUIMeshObject* guiMgr;
 
     IOperation* curOp = NULL;
 
@@ -38,43 +38,6 @@ private:
     GLSkyBox* skyBox = NULL;
 
     ObjectOperation objOp = ObjectOperation::MOVE;
-
-    class MoveButton final : public IButton {
-    private:
-        Point2 center;
-        float radius;
-        Point3 start;
-        MainWindow* main;
-        GLTexture2D* texture = NULL;
-
-    public:
-        MoveButton(Vector2 center, float radius, MainWindow* main);
-        virtual ~MoveButton() override;
-
-        virtual bool Trigger(Vector2 pos) override;
-        virtual void Render() override;
-        virtual void Click(Vector2 pos) override;
-        virtual void Drag(Vector2 dir) override;
-    };
-
-    class RotateButton final : public IButton {
-    private:
-        Point2 center;
-        float radius;
-        Quaternion start;
-        Vector3 up;
-        Vector3 right;
-        MainWindow* main;
-
-    public:
-        RotateButton(Vector2 center, float radius, MainWindow* main);
-        virtual ~RotateButton() override;
-
-        virtual bool Trigger(Vector2 pos) override;
-        virtual void Render() override;
-        virtual void Click(Vector2 pos) override;
-        virtual void Drag(Vector2 dir) override;
-    };
 
     class MoveOperation final : public IOperation {
     private:
@@ -229,13 +192,10 @@ private:
 
 protected:
     // 覆盖了父类函数
-    void UpdateWindowSize(int x, int y);
     void UpdateCursor(int x, int y);
 
-    void SetLookAt(Point3 at);
     void SetRotation(Quaternion rot);
     void SetDistance(float dis);
-    Point3 GetLookPosition(Point3 pos);
     Point2 GetScreenPosition(Point3 pos);
     void InitCamera();
 

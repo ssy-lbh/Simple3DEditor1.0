@@ -166,40 +166,38 @@ NodeMapWindow::NodeMapWindow(){
     n1->Connect(n2);
 
     basicMenu = new Menu();
-    basicMenu->AddItem(new MenuItem(L"添加节点", MENUITEM_LAMBDA_TRANS(NodeMapWindow)[](NodeMapWindow* window){
-        window->AddNode();
-    }, this));
-    basicMenu->AddItem(new MenuItem(L"删除节点", MENUITEM_LAMBDA_TRANS(NodeMapWindow)[](NodeMapWindow* window){
-        if (window->selectedNodes.Size() == 1){
-            Node* node = window->selectedNodes.GetItem(0);
-            window->nodeMgr->DeleteButton(node);
-            window->nodeMgr->Foreach([](IButton* btn, void* node){
+    basicMenu->AddItem(new MenuItem(L"添加节点", [=]{ this->AddNode(); }));
+    basicMenu->AddItem(new MenuItem(L"删除节点", [=]{
+        if (this->selectedNodes.Size() == 1){
+            Node* node = this->selectedNodes.GetItem(0);
+            this->nodeMgr->DeleteButton(node);
+            this->nodeMgr->Foreach([](IButton* btn, void* node){
                 if (btn){
                     ((Node*)btn)->Disconnect((Node*)node);
                 }else{
                     DebugError("NodeMapWindow::nodeMgr has NULL button");
                 }
             }, node);
-            window->selectedNodes.Clear();
+            this->selectedNodes.Clear();
             //DebugLog("delete %p", node);
             delete node;
         }
-    }, this));
-    basicMenu->AddItem(new MenuItem(L"链接节点", MENUITEM_LAMBDA_TRANS(NodeMapWindow)[](NodeMapWindow* window){
-        if (window->selectedNodes.Size() == 2){
-            Node* n1 = window->selectedNodes.GetItem(0);
-            Node* n2 = window->selectedNodes.GetItem(1);
+    }));
+    basicMenu->AddItem(new MenuItem(L"链接节点", [=]{
+        if (this->selectedNodes.Size() == 2){
+            Node* n1 = this->selectedNodes[0];
+            Node* n2 = this->selectedNodes[1];
             n1->Connect(n2);
-            window->selectedNodes.Clear();
+            this->selectedNodes.Clear();
         }
-    }, this));
-    basicMenu->AddItem(new MenuItem(L"断开节点", MENUITEM_LAMBDA_TRANS(NodeMapWindow)[](NodeMapWindow* window){
-        if (window->selectedNodes.Size() == 1){
-            Node* node = window->selectedNodes.GetItem(0);
+    }));
+    basicMenu->AddItem(new MenuItem(L"断开节点", [=]{
+        if (this->selectedNodes.Size() == 1){
+            Node* node = this->selectedNodes[0];
             node->Disconnect();
-            window->selectedNodes.Clear();
+            this->selectedNodes.Clear();
         }
-    }, this));
+    }));
 }
 
 NodeMapWindow::~NodeMapWindow(){

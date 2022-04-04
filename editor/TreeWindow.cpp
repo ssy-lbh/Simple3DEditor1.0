@@ -18,59 +18,35 @@ TreeWindow::TreeWindow(){
     basicMenu = new Menu();
 
     Menu* objectMenu = new Menu();
-    objectMenu->AddItem(new MenuItem(L"空对象", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
-        window->AddObject(new AViewObject());
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"网格体", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
-        window->AddObject(new MeshObject());
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"三次贝塞尔曲线", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
-        window->AddObject(new CubicBezierObject());
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"点光源", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
-        window->AddObject(new PointLightObject());
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"GUI管理器", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new GUIManagerObject());
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"GUI网格体", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new GUIMeshObject());
-    }, this));
+    objectMenu->AddItem(new MenuItem(L"空对象", [=]{ this->AddObject(new AViewObject()); }));
+    objectMenu->AddItem(new MenuItem(L"网格体", [=]{ this->AddObject(new MeshObject()); }));
+    objectMenu->AddItem(new MenuItem(L"三次贝塞尔曲线", [=]{ this->AddObject(new CubicBezierObject()); }));
+    objectMenu->AddItem(new MenuItem(L"点光源", [=]{ this->AddObject(new PointLightObject()); }));
+    objectMenu->AddItem(new MenuItem(L"GUI管理器", [=]{ Main::AddObject(new GUIManagerObject()); }));
+    objectMenu->AddItem(new MenuItem(L"GUI网格体", [=]{ Main::AddObject(new GUIMeshObject()); }));
 
     Menu* objGUIMenu = new Menu();
-    objGUIMenu->AddItem(new MenuItem(L"图标按钮", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new IconButton());
-    }, this));
-    objGUIMenu->AddItem(new MenuItem(L"编辑框", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new GUIEditA());
-    }, this));
-    objGUIMenu->AddItem(new MenuItem(L"横进度条", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new HorizontalProgressBar());
-    }, this));
-    objGUIMenu->AddItem(new MenuItem(L"竖进度条", MENUITEM_LAMBDA_TRANS(MainWindow)[](MainWindow* window){
-        Main::AddObject(new VerticalProgressBar());
-    }, this));
+    objGUIMenu->AddItem(new MenuItem(L"图标按钮", [=]{ Main::AddObject(new IconButton()); }));
+    objGUIMenu->AddItem(new MenuItem(L"编辑框", [=]{ Main::AddObject(new GUIEditA()); }));
+    objGUIMenu->AddItem(new MenuItem(L"横进度条", [=]{ Main::AddObject(new HorizontalProgressBar()); }));
+    objGUIMenu->AddItem(new MenuItem(L"竖进度条", [=]{ Main::AddObject(new VerticalProgressBar()); }));
     objectMenu->AddItem(new MenuItem(L"GUI", objGUIMenu));
 
-    objectMenu->AddItem(new MenuItem(L"音频收听者", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
-        LocalData::GetLocalInst()->CreateAudioListener();
-    }, this));
-    objectMenu->AddItem(new MenuItem(L"摄像机", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
-        LocalData::GetLocalInst()->CreateCamera();
-    }, this));
+    objectMenu->AddItem(new MenuItem(L"音频收听者", [=]{ LocalData::GetLocalInst()->CreateAudioListener(); }));
+    objectMenu->AddItem(new MenuItem(L"摄像机", [=]{ LocalData::GetLocalInst()->CreateCamera(); }));
     basicMenu->AddItem(new MenuItem(L"添加对象", objectMenu));
 
-    basicMenu->AddItem(new MenuItem(L"删除对象", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
-        if (!window->selObject){
+    basicMenu->AddItem(new MenuItem(L"删除对象", [=]{
+        if (!this->selObject){
             DebugError("No Object Selected");
             return;
         }
-        Main::DeleteObject(window->selObject);
-    }, this));
-    basicMenu->AddItem(new MenuItem(L"重命名", MENUITEM_LAMBDA_TRANS(TreeWindow)[](TreeWindow* window){
+        Main::DeleteObject(this->selObject);
+    }));
+    basicMenu->AddItem(new MenuItem(L"重命名", [=]{
         wchar_t name[DEFAULT_STRING_LENGTH];
 
-        if (!window->selObject){
+        if (!this->selObject){
             DebugError("No Object Selected");
             return;
         }
@@ -79,8 +55,8 @@ TreeWindow::TreeWindow(){
             DebugLog("Rename Operation Cancelled");
             return;
         }
-        window->selObject->name = name;
-    }, this));
+        this->selObject->name = name;
+    }));
 }
 
 TreeWindow::~TreeWindow(){
@@ -111,10 +87,8 @@ void TreeWindow::OnRender(){
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    GLUtils::ResetProjection();
+    GLUtils::ResetModelView();
 
     objectList.Clear();
 
@@ -216,11 +190,10 @@ void TreeWindow::OnLeftUp(int x, int y){
             o->unfold = !o->unfold;
             DebugLog("TreeWindow %s Object %S", o->unfold ? "Unfold" : "Fold", o->name.GetString());
         }else{
-            if (!o || o->HasAncestor(dragObject)){
+            if (!o || !Main::AddObjectChild(o, dragObject)){
                 dragObject = NULL;
                 return;
             }
-            o->AddChild(dragObject);
             DebugLog("TreeWindow Set %S As Child Of %S", dragObject->name.GetString(), o->name.GetString());
         }
     }

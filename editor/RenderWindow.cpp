@@ -20,17 +20,16 @@ RenderWindow::RenderWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0
     uiMgr = new UIManager();
 
     basicMenu = new Menu();
-    basicMenu->AddItem(new MenuItem(L"保存", MENUITEM_LAMBDA_TRANS(RenderWindow)[](RenderWindow* window){
-        window->OnMenuAccel(IDM_SAVE, false);
-    }, this));
-    basicMenu->AddItem(new MenuItem(L"打印", MENUITEM_LAMBDA_TRANS(RenderWindow)[](RenderWindow* window){
-        window->OnMenuAccel(IDM_PRINT, false);
-    }, this));
+    basicMenu->AddItem(new MenuItem(L"保存", [=]{ this->OnMenuAccel(IDM_SAVE, false); }));
+    basicMenu->AddItem(new MenuItem(L"打印", [=]{ this->OnMenuAccel(IDM_PRINT, false); }));
     basicMenu->AddItem(new MenuItem());
-    basicMenu->AddItem(new SwitchMenuItem(L"光照:开", L"光照:关", SWITCHMENUITEM_LAMBDA_TRANS(RenderWindow)[](bool state, RenderWindow* window){
-        window->lightEnabled = state;
-        DebugLog("RenderWindow Light State %s", window->lightEnabled ? "On" : "Off");
-    }, this, lightEnabled));
+    basicMenu->AddItem(new MenuItem(
+        Value<const wchar_t*>([=]{ return this->lightEnabled ? L"光照:开" : L"光照:关"; }),
+        [=]{
+            this->lightEnabled = !this->lightEnabled;
+            DebugLog("RenderWindow Light State %s", this->lightEnabled ? "On" : "Off");
+        }
+    ));
 }
 
 RenderWindow::~RenderWindow(){
@@ -76,10 +75,9 @@ void RenderWindow::OnRender(){
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     InitCamera();
-
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     Main::RenderScene();
 

@@ -104,52 +104,6 @@ void AnimationWindow::PlayButton::Render(){
     }
 }
 
-AnimationWindow::RotationMenu::RotationMenu(AnimationWindow* window) : window(window) {
-    quatMenu = new Menu();
-    quatMenu->AddItem(new MenuItem(L"X", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.rotation.x);
-    }, window));
-    quatMenu->AddItem(new MenuItem(L"Y", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.rotation.y);
-    }, window));
-    quatMenu->AddItem(new MenuItem(L"Z", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.rotation.z);
-    }, window));
-    quatMenu->AddItem(new MenuItem(L"W", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.rotation.z);
-    }, window));
-
-    xyzMenu = new Menu();
-    xyzMenu->AddItem(new MenuItem(L"X", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.rotationXYZ.x);
-    }, window));
-    xyzMenu->AddItem(new MenuItem(L"Y", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.rotationXYZ.y);
-    }, window));
-    xyzMenu->AddItem(new MenuItem(L"Z", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.rotationXYZ.z);
-    }, window));
-}
-
-AnimationWindow::RotationMenu::~RotationMenu(){
-    delete quatMenu;
-    delete xyzMenu;
-}
-
-IMenuItem::ItemType AnimationWindow::RotationMenu::GetType(){
-    return ItemType::GROUP;
-}
-
-const wchar_t* AnimationWindow::RotationMenu::GetName(){
-    return L"旋转";
-}
-
-Menu* AnimationWindow::RotationMenu::GetMenu(){
-    if (Main::data->curObject->transform.rotationMode == Transform::ROT_QUATERNION)
-        return quatMenu;
-    return xyzMenu;
-}
-
 const float AnimationWindow::DEFAULT_START_FRAME = 0.0f;
 const float AnimationWindow::DEFAULT_END_FRAME = 250.0f;
 
@@ -165,108 +119,69 @@ AnimationWindow::AnimationWindow(){
     basicMenu = new Menu();
 
     Menu* posMenu = new Menu();
-    posMenu->AddItem(new MenuItem(L"X", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.position.x);
-    }, this));
-    posMenu->AddItem(new MenuItem(L"Y", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.position.y);
-    }, this));
-    posMenu->AddItem(new MenuItem(L"Z", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.position.z);
-    }, this));
+    posMenu->AddItem(new MenuItem(L"X", [=]{ this->SetProperty(&Main::data->curObject->transform.position.x); }));
+    posMenu->AddItem(new MenuItem(L"Y", [=]{ this->SetProperty(&Main::data->curObject->transform.position.y);}));
+    posMenu->AddItem(new MenuItem(L"Z", [=]{ this->SetProperty(&Main::data->curObject->transform.position.z); }));
     basicMenu->AddItem(new MenuItem(L"位置", posMenu));
 
-    basicMenu->AddItem(new RotationMenu(this));
+    Menu* quatMenu = new Menu();
+    quatMenu->AddItem(new MenuItem(L"X", [=]{ this->SetProperty(&Main::data->curObject->transform.rotation.x); }));
+    quatMenu->AddItem(new MenuItem(L"Y", [=]{ this->SetProperty(&Main::data->curObject->transform.rotation.y); }));
+    quatMenu->AddItem(new MenuItem(L"Z", [=]{ this->SetProperty(&Main::data->curObject->transform.rotation.z); }));
+    quatMenu->AddItem(new MenuItem(L"W", [=]{ this->SetProperty(&Main::data->curObject->transform.rotation.z); }));
+
+    Menu* xyzMenu = new Menu();
+    xyzMenu->AddItem(new MenuItem(L"X", [=]{ this->SetProperty(&Main::data->curObject->transform.rotationXYZ.x); }));
+    xyzMenu->AddItem(new MenuItem(L"Y", [=]{ this->SetProperty(&Main::data->curObject->transform.rotationXYZ.y); }));
+    xyzMenu->AddItem(new MenuItem(L"Z", [=]{ this->SetProperty(&Main::data->curObject->transform.rotationXYZ.z); }));
+
+    MenuItem* rotMenu = new MenuItem();
+    rotMenu->type = MenuItemType::GROUP;
+    rotMenu->name = L"旋转";
+    rotMenu->menu = [=]{
+        if (Main::data->curObject->transform.rotationMode == Transform::ROT_QUATERNION)
+            return quatMenu;
+        return xyzMenu;
+    };
+    basicMenu->AddItem(rotMenu);
 
     Menu* scaleMenu = new Menu();
-    scaleMenu->AddItem(new MenuItem(L"X", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.scale.x);
-    }, this));
-    scaleMenu->AddItem(new MenuItem(L"Y", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.scale.y);
-    }, this));
-    scaleMenu->AddItem(new MenuItem(L"Z", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->SetProperty(&Main::data->curObject->transform.scale.z);
-    }, this));
+    scaleMenu->AddItem(new MenuItem(L"X", [=]{ this->SetProperty(&Main::data->curObject->transform.scale.x); }));
+    scaleMenu->AddItem(new MenuItem(L"Y", [=]{ this->SetProperty(&Main::data->curObject->transform.scale.y); }));
+    scaleMenu->AddItem(new MenuItem(L"Z", [=]{ this->SetProperty(&Main::data->curObject->transform.scale.z); }));
     basicMenu->AddItem(new MenuItem(L"尺寸", scaleMenu));
 
     Menu* rotModeMenu = new Menu();
-    rotModeMenu->AddItem(new MenuItem(L"四元数", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        Main::data->curObject->transform.rotationMode = Transform::ROT_QUATERNION;
-    }, this));
-    rotModeMenu->AddItem(new MenuItem(L"XYZ旋转", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_XYZ;
-    }, this));
-    rotModeMenu->AddItem(new MenuItem(L"XZY旋转", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_XZY;
-    }, this));
-    rotModeMenu->AddItem(new MenuItem(L"YZX旋转", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_YZX;
-    }, this));
-    rotModeMenu->AddItem(new MenuItem(L"YXZ旋转", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_YXZ;
-    }, this));
-    rotModeMenu->AddItem(new MenuItem(L"ZXY旋转", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_ZXY;
-    }, this));
-    rotModeMenu->AddItem(new MenuItem(L"ZYX旋转", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_ZYX;
-    }, this));
+    rotModeMenu->AddItem(new MenuItem(L"四元数", [=]{ Main::data->curObject->transform.rotationMode = Transform::ROT_QUATERNION; }));
+    rotModeMenu->AddItem(new MenuItem(L"XYZ旋转", [=]{ Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_XYZ; }));
+    rotModeMenu->AddItem(new MenuItem(L"XZY旋转", [=]{ Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_XZY; }));
+    rotModeMenu->AddItem(new MenuItem(L"YZX旋转", [=]{ Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_YZX; }));
+    rotModeMenu->AddItem(new MenuItem(L"YXZ旋转", [=]{ Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_YXZ; }));
+    rotModeMenu->AddItem(new MenuItem(L"ZXY旋转", [=]{ Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_ZXY; }));
+    rotModeMenu->AddItem(new MenuItem(L"ZYX旋转", [=]{ Main::data->curObject->transform.rotationMode = Transform::ROT_EULER_ZYX; }));
     basicMenu->AddItem(new MenuItem(L"旋转模式", rotModeMenu));
     basicMenu->AddItem(new MenuItem());
 
     Menu* fpsMenu = new Menu();
-    fpsMenu->AddItem(new MenuItem(L"10", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 10.0f;
-    }, this));
-    fpsMenu->AddItem(new MenuItem(L"15", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 15.0f;
-    }, this));
-    fpsMenu->AddItem(new MenuItem(L"20", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 20.0f;
-    }, this));
-    fpsMenu->AddItem(new MenuItem(L"25", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 25.0f;
-    }, this));
-    fpsMenu->AddItem(new MenuItem(L"30", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 30.0f;
-    }, this));
-    fpsMenu->AddItem(new MenuItem(L"40", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 40.0f;
-    }, this));
-    fpsMenu->AddItem(new MenuItem(L"50", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 50.0f;
-    }, this));
-    fpsMenu->AddItem(new MenuItem(L"60", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 60.0f;
-    }, this));
-    fpsMenu->AddItem(new MenuItem(L"75", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 75.0f;
-    }, this));
-    fpsMenu->AddItem(new MenuItem(L"100", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 100.0f;
-    }, this));
+    fpsMenu->AddItem(new MenuItem(L"10", [=]{ this->fps = 10.0f; }));
+    fpsMenu->AddItem(new MenuItem(L"15", [=]{ this->fps = 15.0f; }));
+    fpsMenu->AddItem(new MenuItem(L"20", [=]{ this->fps = 20.0f; }));
+    fpsMenu->AddItem(new MenuItem(L"25", [=]{ this->fps = 25.0f; }));
+    fpsMenu->AddItem(new MenuItem(L"30", [=]{ this->fps = 30.0f; }));
+    fpsMenu->AddItem(new MenuItem(L"40", [=]{ this->fps = 40.0f; }));
+    fpsMenu->AddItem(new MenuItem(L"50", [=]{ this->fps = 50.0f; }));
+    fpsMenu->AddItem(new MenuItem(L"60", [=]{ this->fps = 60.0f; }));
+    fpsMenu->AddItem(new MenuItem(L"75", [=]{ this->fps = 75.0f; }));
+    fpsMenu->AddItem(new MenuItem(L"100", [=]{ this->fps = 100.0f; }));
     basicMenu->AddItem(new MenuItem(L"帧率", fpsMenu));
 
     Menu* highFpsMenu = new Menu();
-    highFpsMenu->AddItem(new MenuItem(L"200", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 200.0f;
-    }, this));
-    highFpsMenu->AddItem(new MenuItem(L"300", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 300.0f;
-    }, this));
-    highFpsMenu->AddItem(new MenuItem(L"400", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 400.0f;
-    }, this));
-    highFpsMenu->AddItem(new MenuItem(L"500", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 500.0f;
-    }, this));
-    highFpsMenu->AddItem(new MenuItem(L"750", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 750.0f;
-    }, this));
-    highFpsMenu->AddItem(new MenuItem(L"1000", MENUITEM_LAMBDA_TRANS(AnimationWindow)[](AnimationWindow* window){
-        window->fps = 1000.0f;
-    }, this));
+    highFpsMenu->AddItem(new MenuItem(L"200", [=]{ this->fps = 200.0f; }));
+    highFpsMenu->AddItem(new MenuItem(L"300", [=]{ this->fps = 300.0f; }));
+    highFpsMenu->AddItem(new MenuItem(L"400", [=]{ this->fps = 400.0f; }));
+    highFpsMenu->AddItem(new MenuItem(L"500", [=]{ this->fps = 500.0f; }));
+    highFpsMenu->AddItem(new MenuItem(L"750", [=]{ this->fps = 750.0f; }));
+    highFpsMenu->AddItem(new MenuItem(L"1000", [=]{ this->fps = 1000.0f; }));
     basicMenu->AddItem(new MenuItem(L"高帧率(仅供快放)", highFpsMenu));
 }
 

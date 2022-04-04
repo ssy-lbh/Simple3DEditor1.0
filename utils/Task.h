@@ -1,24 +1,26 @@
-#ifndef __UTILS_OS_THREAD__
-#define __UTILS_OS_THREAD__
+#ifndef __UTILS_TASK__
+#define __UTILS_TASK__
 
 #include <define.h>
 
-template <typename T, typename... U>
+#include <functional>
+
+template <typename T>
 class Task final : public Object {
+private:
+    std::function<T()> task;
+
 public:
-    struct ArgList {
-        U... args;
-    };
+    Task<T>(std::function<T()>&& f) : task(f) {}
+    ~Task<T>(){}
 
-    T(*func)(U...);
-    ArgList list;
-
-    Task(T(*func)(U...), U... args) : func(func), list{args...} {}
-    ~Task();
-
-    T Invoke(){
-        return func(list.args...);
-    }
+    T operator()(){ return task(); }
+    T Invoke(){ return task(); }
 };
+
+template <typename F, typename... U>
+auto GetTask(F&& f, U&&... args) -> Task<decltype(f(args...))> {
+    return Task<decltype(f(args...))>([=](){ return f(args...); });
+}
 
 #endif

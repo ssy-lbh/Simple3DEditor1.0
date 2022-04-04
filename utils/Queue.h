@@ -14,6 +14,7 @@ private:
     size_t head;
     size_t tail;
     size_t dataSize;
+    volatile bool lock = false;
 
     void Check(size_t reserve){
         size_t len = dataSize + reserve;
@@ -150,6 +151,15 @@ public:
         return *this;
     }
 
+    Queue<T>& AddFrontSync(T val){
+        while (__atomic_test_and_set(&lock, true));
+        Check(5);
+        data[(--head) & size] = val;
+        dataSize++;
+        lock = false;
+        return *this;
+    }
+
     T RemoveFront(){
         if (dataSize == 0){
             DebugError("Critical: Queue<T>::RemoveFront When Size Is 0");
@@ -159,6 +169,18 @@ public:
         return data[(head++) & size];
     }
 
+    T RemoveFrontSync(){
+        if (dataSize == 0){
+            DebugError("Critical: Queue<T>::RemoveFront When Size Is 0");
+            return data[head];
+        }
+        while (__atomic_test_and_set(&lock, true));
+        dataSize--;
+        T res = data[(head++) & size];
+        lock = false;
+        return res;
+    }
+
     T RemoveBack(){
         if (dataSize == 0){
             DebugError("Critical: Queue<T>::RemoveBack When Size Is 0");
@@ -166,6 +188,18 @@ public:
         }
         dataSize--;
         return data[(--tail) & size];
+    }
+
+    T RemoveBackSync(){
+        if (dataSize == 0){
+            DebugError("Critical: Queue<T>::RemoveBack When Size Is 0");
+            return data[head];
+        }
+        while (__atomic_test_and_set(&lock, true));
+        dataSize--;
+        T res = data[(--tail) & size];
+        lock = false;
+        return res;
     }
 
     T& GetFront(){

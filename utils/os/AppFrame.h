@@ -41,7 +41,6 @@ private:
 
     LocalData* data;
     ViewManager* viewMgr;
-    GLFont* font;
 
     static void Initialize();
 

@@ -20,7 +20,7 @@ private:
     static const int QUEUE_MASK = (QUEUE_SIZE - 1);
     static const int FREQUENCY = 44100;
 
-    UIManager* uiMgr;
+    GUIManagerObject* guiMgr;
 
     Menu* basicMenu;
 
@@ -42,64 +42,6 @@ private:
     bool displayWave = false;
     bool adjustWave = false;
     int ratio = 1;
-
-    class ProgressBar final : public IButton {
-    private:
-        AudioCaptureWindow* window;
-        bool hover = false;
-        float pos = 0.0f;
-        float origin;
-    
-    public:
-        ProgressBar(AudioCaptureWindow* window);
-        virtual ~ProgressBar() override;
-
-        virtual bool Trigger(Vector2 pos) override;
-        virtual void Click(Vector2 pos) override;
-        virtual void Drag(Vector2 dir) override;
-        virtual void Hover(Vector2 pos) override;
-        virtual void Leave(Vector2 pos) override;
-        virtual void Render() override;
-    };
-
-    class CaptureItem final : public IMenuItem {
-    private:
-        AudioCaptureWindow* window;
-
-    public:
-        CaptureItem(AudioCaptureWindow* window);
-        virtual ~CaptureItem() override;
-
-        virtual const wchar_t* GetName() override;
-
-        virtual void OnClick() override;
-    };
-
-    class DisplayModeItem final : public IMenuItem {
-    private:
-        AudioCaptureWindow* window;
-
-    public:
-        DisplayModeItem(AudioCaptureWindow* window);
-        virtual ~DisplayModeItem() override;
-
-        virtual const wchar_t* GetName() override;
-
-        virtual void OnClick() override;
-    };
-
-    class AdjushWaveItem final : public IMenuItem {
-    private:
-        AudioCaptureWindow* window;
-
-    public:
-        AdjushWaveItem(AudioCaptureWindow* window);
-        virtual ~AdjushWaveItem() override;
-
-        virtual const wchar_t* GetName() override;
-
-        virtual void OnClick() override;
-    };
 
 protected:
     void UpdateCursor(int x, int y);

@@ -45,55 +45,32 @@ AnimationCurve::AnimationCurve(float startFrame, float endFrame) : startFrame(st
     functions.Add(new IAnimationFunction());
 
     basicMenu = new Menu();
-    basicMenu->AddItem(new MenuItem(L"添加点", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->AddPoint(curve->selIndex, Vector2(Lerp(curve->startFrame, curve->endFrame, (curve->cursorPos.x + 1.0f) * 0.5f), curve->cursorPos.y / curve->ratio));
-        curve->selTarget = NONE;
-    }, this));
-    basicMenu->AddItem(new MenuItem(L"删除点", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        if (curve->selIndex > 0){
-            curve->RemovePoint(curve->selIndex);
-        }
-        curve->selTarget = NONE;
-    }, this));
+    basicMenu->AddItem(new MenuItem(L"添加点", [=]{
+        this->AddPoint(this->selIndex, Vector2(Lerp(this->startFrame, this->endFrame, (this->cursorPos.x + 1.0f) * 0.5f), this->cursorPos.y / this->ratio));
+        this->selTarget = NONE;
+    }));
+    basicMenu->AddItem(new MenuItem(L"删除点", [=]{
+        if (this->selIndex > 0)
+            this->RemovePoint(this->selIndex);
+        this->selTarget = NONE;
+    }));
     basicMenu->AddItem(new MenuItem());
 
     Menu* rangeMenu = new Menu();
-    rangeMenu->AddItem(new MenuItem(L"刷新范围", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->FlushRange();
-    }, this));
-    rangeMenu->AddItem(new MenuItem(L"范围2倍", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->ratio *= 0.5f;
-    }, this));
-    rangeMenu->AddItem(new MenuItem(L"范围10倍", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->ratio *= 0.1f;
-    }, this));
-    rangeMenu->AddItem(new MenuItem(L"范围100倍", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->ratio *= 0.01f;
-    }, this));
-    rangeMenu->AddItem(new MenuItem(L"范围0.5倍", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->ratio *= 2.0f;
-    }, this));
-    rangeMenu->AddItem(new MenuItem(L"范围0.1倍", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->ratio *= 10.0f;
-    }, this));
-    rangeMenu->AddItem(new MenuItem(L"范围0.01倍", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->ratio *= 100.0f;
-    }, this));
+    rangeMenu->AddItem(new MenuItem(L"刷新范围", [=]{ this->FlushRange(); }));
+    rangeMenu->AddItem(new MenuItem(L"范围2倍", [=]{ this->ratio *= 0.5f; }));
+    rangeMenu->AddItem(new MenuItem(L"范围10倍", [=]{ this->ratio *= 0.1f; }));
+    rangeMenu->AddItem(new MenuItem(L"范围100倍", [=]{ this->ratio *= 0.01f; }));
+    rangeMenu->AddItem(new MenuItem(L"范围0.5倍", [=]{ this->ratio *= 2.0f; }));
+    rangeMenu->AddItem(new MenuItem(L"范围0.1倍", [=]{ this->ratio *= 10.0f; }));
+    rangeMenu->AddItem(new MenuItem(L"范围0.01倍", [=]{ this->ratio *= 100.0f; }));
     basicMenu->AddItem(new MenuItem(L"范围", rangeMenu));
 
     Menu* funcMenu = new Menu();
-    funcMenu->AddItem(new MenuItem(L"常量", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->SetFunc(curve->selIndex, new IAnimationFunction());
-    }, this));
-    funcMenu->AddItem(new MenuItem(L"右方常量", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->SetFunc(curve->selIndex, new RightValueFunc());
-    }, this));
-    funcMenu->AddItem(new MenuItem(L"线性", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->SetFunc(curve->selIndex, new LinearFunc());
-    }, this));
-    funcMenu->AddItem(new MenuItem(L"平方", MENUITEM_LAMBDA_TRANS(AnimationCurve)[](AnimationCurve* curve){
-        curve->SetFunc(curve->selIndex, new SquareFunc());
-    }, this));
+    funcMenu->AddItem(new MenuItem(L"常量", [=]{ this->SetFunc(this->selIndex, new IAnimationFunction()); }));
+    funcMenu->AddItem(new MenuItem(L"右方常量", [=]{ this->SetFunc(this->selIndex, new RightValueFunc()); }));
+    funcMenu->AddItem(new MenuItem(L"线性", [=]{ this->SetFunc(this->selIndex, new LinearFunc()); }));
+    funcMenu->AddItem(new MenuItem(L"平方", [=]{ this->SetFunc(this->selIndex, new SquareFunc()); }));
     basicMenu->AddItem(new MenuItem(L"函数", funcMenu));
 }
 

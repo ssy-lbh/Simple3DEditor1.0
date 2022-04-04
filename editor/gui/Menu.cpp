@@ -6,92 +6,23 @@
 #include <utils/os/Log.h>
 #include <utils/gl/GLUtils.h>
 
-IMenuItem::IMenuItem(){}
-IMenuItem::~IMenuItem(){}
+MenuItem::MenuItem() : type(MenuItemType::SEPERATOR) {}
+MenuItem::MenuItem(Value<const wchar_t*>&& name) : type(MenuItemType::DEFAULT), name(name) {}
 
-IMenuItem::ItemType IMenuItem::GetType(){ return ItemType::DEFAULT; }
-const wchar_t* IMenuItem::GetName(){ return L""; }
-Menu* IMenuItem::GetMenu(){ return NULL; }
+MenuItem::MenuItem(Value<const wchar_t*>&& name, std::function<void()>&& click) :
+    type(MenuItemType::DEFAULT), name(name) {
+    onClick += click;
+}
 
-void IMenuItem::OnClick(){}
-
-MenuItem::MenuItem() : type(ItemType::SEPERATOR) {}
-MenuItem::MenuItem(const wchar_t* name) : type(ItemType::DEFAULT), name(name) {}
-MenuItem::MenuItem(const wchar_t* name, void(*click)(void*)) : type(ItemType::DEFAULT), name(name), click(click) {}
-MenuItem::MenuItem(const wchar_t* name, void(*click)(void*), void* userData)
-    : type(ItemType::DEFAULT), name(name), click(click), userData(userData) {}
-MenuItem::MenuItem(const wchar_t* name, Menu* menu) : type(ItemType::GROUP), name(name), menu(menu) {}
+MenuItem::MenuItem(Value<const wchar_t*>&& name, Menu* menu) : type(MenuItemType::GROUP), name(name), menu(menu) {
+    onDestory += [](MenuItem* item){
+        if (item->menu())
+            delete item->menu();
+    };
+}
 
 MenuItem::~MenuItem(){
-    if (menu) delete menu;
-}
-
-IMenuItem::ItemType MenuItem::GetType(){
-    return type;
-}
-
-const wchar_t* MenuItem::GetName(){
-    return name;
-}
-
-Menu* MenuItem::GetMenu(){
-    return menu;
-}
-
-void MenuItem::OnClick(){
-    if (click)
-        click(userData);
-}
-
-SwitchMenuItem::SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff)
-    : nameOn(nameOn), nameOff(nameOff) {}
-SwitchMenuItem::SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, bool state)
-    : nameOn(nameOn), nameOff(nameOff), state(state) {}
-SwitchMenuItem::SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, void(*click)(bool, void*))
-    : nameOn(nameOn), nameOff(nameOff), click(click) {}
-SwitchMenuItem::SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, void(*click)(bool, void*), bool state)
-    : nameOn(nameOn), nameOff(nameOff), click(click), state(state) {}
-SwitchMenuItem::SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, void(*click)(bool, void*), void* userData)
-    : nameOn(nameOn), nameOff(nameOff), click(click), userData(userData) {}
-SwitchMenuItem::SwitchMenuItem(const wchar_t* nameOn, const wchar_t* nameOff, void(*click)(bool, void*), void* userData, bool state)
-    : nameOn(nameOn), nameOff(nameOff), click(click), userData(userData), state(state) {}
-SwitchMenuItem::~SwitchMenuItem(){}
-
-IMenuItem::ItemType SwitchMenuItem::GetType(){
-    return ItemType::DEFAULT;
-}
-
-const wchar_t* SwitchMenuItem::GetName(){
-    return state ? nameOn : nameOff;
-}
-
-void SwitchMenuItem::OnClick(){
-    state = !state;
-    if (click)
-        click(state, userData);
-}
-
-ConditionalMenuItem::ConditionalMenuItem(const wchar_t* nameTrue, const wchar_t* nameFalse, bool(*judge)(void*))
-    : nameTrue(nameTrue), nameFalse(nameFalse), judge(judge) {}
-ConditionalMenuItem::ConditionalMenuItem(const wchar_t* nameTrue, const wchar_t* nameFalse, bool(*judge)(void*), void(*click)(bool, void*))
-    : nameTrue(nameTrue), nameFalse(nameFalse), judge(judge), click(click) {}
-ConditionalMenuItem::ConditionalMenuItem(const wchar_t* nameTrue, const wchar_t* nameFalse, bool(*judge)(void*), void(*click)(bool, void*), void* data)
-    : nameTrue(nameTrue), nameFalse(nameFalse), judge(judge), click(click), judgeData(data), userData(data) {}
-ConditionalMenuItem::ConditionalMenuItem(const wchar_t* nameTrue, const wchar_t* nameFalse, bool(*judge)(void*), void* judgeData, void(*click)(bool, void*), void* userData)
-    : nameTrue(nameTrue), nameFalse(nameFalse), judge(judge), click(click), judgeData(judgeData), userData(userData) {}
-ConditionalMenuItem::~ConditionalMenuItem(){}
-
-IMenuItem::ItemType ConditionalMenuItem::GetType(){
-    return ItemType::DEFAULT;
-}
-
-const wchar_t* ConditionalMenuItem::GetName(){
-    return judge(judgeData) ? nameTrue : nameFalse;
-}
-
-void ConditionalMenuItem::OnClick(){
-    if (click)
-        click(judge(judgeData), userData);
+    onDestory(this);
 }
 
 const float Menu::WIDTH_PIXELS = 250.0f;
@@ -104,7 +35,7 @@ Menu::~Menu(){
     Free(items);
 }
 
-void Menu::AddItem(IMenuItem* item){
+void Menu::AddItem(MenuItem* item){
     items.Add(item);
 }
 
@@ -112,9 +43,8 @@ void Menu::SetClientSize(Vector2 size){
     cliSize = size;
     cliInvSize.x = 1.0f / cliSize.x;
     cliInvSize.y = 1.0f / cliSize.y;
-    if (curMenu){
+    if (curMenu)
         curMenu->SetClientSize(size);
-    }
 }
 
 bool Menu::InMenu(Vector2 relaPos){
@@ -148,15 +78,15 @@ void Menu::Click(){
         curMenu->Click();
     }
     if (selected >= 0 && selected < items.Size()){
-        IMenuItem* item = items.GetItem(selected);
-        item->OnClick();
+        MenuItem* item = items[selected];
+        item->onClick();
     }
 }
 
-void Menu::RenderItem(IMenuItem* item){
+void Menu::RenderItem(MenuItem* item){
     minPos.y -= LINE_PIXELS * cliInvSize.y;
-    switch (item->GetType()){
-    case IMenuItem::ItemType::DEFAULT:{
+    switch (item->type()){
+    case MenuItemType::DEFAULT:{
         if (drawCounter == selected){
             SetMenu(NULL, -1);
             float height = LINE_PIXELS * cliInvSize.y, width = WIDTH_PIXELS * cliInvSize.x;
@@ -168,10 +98,10 @@ void Menu::RenderItem(IMenuItem* item){
         }
         glColor3f(1.0f, 0.5f, 0.0f);
         glRasterPos2f(minPos.x + (0.5f * CORNER_PIXELS) * cliInvSize.x, minPos.y + (0.2f * LINE_PIXELS) * cliInvSize.y);
-        glDrawCNString(item->GetName());
+        glDrawCNString(item->name());
     }
         break;
-    case IMenuItem::ItemType::SEPERATOR:
+    case MenuItemType::SEPERATOR:
         if (drawCounter == selected){
             SetMenu(NULL, -1);
         }
@@ -183,7 +113,7 @@ void Menu::RenderItem(IMenuItem* item){
         glEnd();
         glLineWidth(1.0f);
         break;
-    case IMenuItem::ItemType::GROUP:{
+    case MenuItemType::GROUP:{
         float height = LINE_PIXELS * cliInvSize.y, width = WIDTH_PIXELS * cliInvSize.x;
         if (drawCounter == selected){
             glColor3f(0.1f, 0.4f, 1.0f);
@@ -191,7 +121,7 @@ void Menu::RenderItem(IMenuItem* item){
             glVertex2f(minPos.x, minPos.y); glVertex2f(minPos.x + width, minPos.y); glVertex2f(minPos.x + width, minPos.y + height);
             glVertex2f(minPos.x, minPos.y); glVertex2f(minPos.x, minPos.y + height); glVertex2f(minPos.x + width, minPos.y + height);
             glEnd();
-            Menu* itemMenu = item->GetMenu();
+            Menu* itemMenu = item->menu();
             if (itemMenu == NULL){
                 DebugError("Menu::RenderItem %llu:%p NullPointerException", drawCounter, item);
             }else{
@@ -203,7 +133,7 @@ void Menu::RenderItem(IMenuItem* item){
         }
         glColor3f(1.0f, 0.5f, 0.0f);
         glRasterPos2f(minPos.x + (0.5f * CORNER_PIXELS) * cliInvSize.x, minPos.y + (0.2f * LINE_PIXELS) * cliInvSize.y);
-        glDrawCNString(item->GetName());
+        glDrawCNString(item->name());
         glColor3f(1.0f, 1.0f, 1.0f);
         glBegin(GL_TRIANGLES);
         glVertex2f(minPos.x + width * 0.9f, minPos.y + height * 0.2f);
@@ -248,7 +178,7 @@ void Menu::Render(Vector2 pos){
     minPos = Vector2(xmin, ymax);
     drawCounter = 0;
 
-    items.Foreach<Menu*>([](IMenuItem* item, Menu* menu){
+    items.Foreach<Menu*>([](MenuItem* item, Menu* menu){
         menu->RenderItem(item);
     }, this);
 
@@ -321,13 +251,13 @@ void Menu::PressRight(){
     }
     openMenu = true;
     if (selected < items.Size()){
-        IMenuItem* item = items[selected];
-        if (item->GetType() == IMenuItem::ItemType::GROUP){
-            if (!item->GetMenu()){
+        MenuItem* item = items[selected];
+        if (item->type() == MenuItemType::GROUP){
+            if (!item->menu()){
                 DebugError("Menu::PressRight %llu:%p NullPointerException", selected, item);
                 return;
             }
-            SetMenu(item->GetMenu(), selected);
+            SetMenu(item->menu(), selected);
             curMenu->selected = 0;
         }
     }
