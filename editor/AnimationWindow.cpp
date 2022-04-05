@@ -143,6 +143,10 @@ AnimationWindow::AnimationWindow(){
             return quatMenu;
         return xyzMenu;
     };
+    rotMenu->onDestory += [=](MenuItem* item){
+        delete quatMenu;
+        delete xyzMenu;
+    };
     basicMenu->AddItem(rotMenu);
 
     Menu* scaleMenu = new Menu();

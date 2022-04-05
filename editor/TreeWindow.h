@@ -3,7 +3,8 @@
 
 #include <define.h>
 
-#include <editor/gui/UIManager.h>
+#include <utils/List.h>
+#include <editor/main/Window.h>
 
 class TreeWindow final : public AWindow {
 private:

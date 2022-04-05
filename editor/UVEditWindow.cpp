@@ -19,9 +19,9 @@ void UVEditWindow::MoveOperation::OnEnter(){
     x = y = true;
     start = main->cursorPos;
     if (Main::data->selPoints.Size() > 0){
-        Main::data->selPoints.Foreach<MoveOperation*>([](Vertex* v, MoveOperation* op){
-            op->moveInfo.Add({v, v->uv});
-        }, this);
+        Main::data->selPoints.Foreach([=](Vertex* v){
+            this->moveInfo.Add({v, v->uv});
+        });
     }
 }
 
@@ -30,9 +30,9 @@ void UVEditWindow::MoveOperation::OnMove(){
     if (moveInfo.Size() > 0){
         mov = (main->cursorPos - start) * 0.5f;
         mov = Vector2(x ? mov.x : 0.0f, y ? mov.y : 0.0f);
-        moveInfo.Foreach<Vector2*>([](MoveInfo info, Vector2* offset){
-            info.vert->uv = info.uv + *offset;
-        }, &mov);
+        moveInfo.Foreach([=](MoveInfo info){
+            info.vert->uv = info.uv + mov;
+        });
         DebugLog("MoveOperation OnMove %f %f", x ? mov.x : 0.0f, y ? mov.y : 0.0f);
     }
 }

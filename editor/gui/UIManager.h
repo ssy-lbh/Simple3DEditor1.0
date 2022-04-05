@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+#include <functional>
+
 #include <utils/List.h>
 #include <utils/String.h>
 #include <utils/math3d/LinearAlgebra.h>
@@ -39,8 +41,7 @@ public:
     bool Wheel(int delta);
     bool Char(char c);
     bool Unichar(wchar_t c);
-    void Foreach(void(*func)(IButton*));
-    void Foreach(void(*func)(IButton*, void*), void* user);
+    void Foreach(std::function<void(IButton*)> func);
 
     IButton* GetCurrent();
     IButton* FindCurrent();

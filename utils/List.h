@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+#include <functional>
+
 #include <utils/os/Log.h>
 
 template <typename T>
@@ -234,20 +236,9 @@ public:
         return false;
     }
 
-    List<T>& Foreach(void(*func)(T)){
-        //DebugLog("Foreach");
-        for (size_t i = 0; i < ptr; i++){
-            func(data[i]);
-        }
-        return *this;
-    }
-
-    template <typename Tp>
-    List<T>& Foreach(void(*func)(T, Tp), Tp user){
-        //DebugLog("Foreach");
-        for (size_t i = 0; i < ptr; i++){
-            func(data[i], user);
-        }
+    List<T>& Foreach(std::function<void(T)> f){
+        for (size_t i = 0; i < ptr; i++)
+            f(data[i]);
         return *this;
     }
 

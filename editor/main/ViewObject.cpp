@@ -52,12 +52,8 @@ bool AViewObject::DeleteChild(AViewObject* o){
     return children.Remove(o);
 }
 
-void AViewObject::EnumChildren(void(*func)(AViewObject*)){
+void AViewObject::EnumChildren(std::function<void(AViewObject*)> func){
     children.Foreach(func);
-}
-
-void AViewObject::EnumChildren(void(*func)(AViewObject*, void*), void* user){
-    children.Foreach<void*>(func, user);
 }
 
 ViewObjectType AViewObject::GetType(){

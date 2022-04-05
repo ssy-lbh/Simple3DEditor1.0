@@ -3,68 +3,70 @@
 
 #include <define.h>
 
-#include <editor/gui/UIManager.h>
-#include <editor/gui/Menu.h>
-#include <utils/gl/GLUtils.h>
+#include <utils/math3d/LinearAlgebra.h>
+#include <editor/main/Window.h>
+#include <editor/object/GUIObject.h>
 
 class NodeMapWindow final : public AWindow {
 private:
     Vector2 viewPos;
 
-    UIManager* uiMgr;
-    UIManager* nodeMgr;
+    GUIManagerObject* guiMgr;
+    GUIManagerObject* nodeMgr;
 
     Menu* basicMenu;
 
     GLTexture2D* bktex = NULL;
 
-    class MoveButton final : public IButton {
+    class MoveButton final : public AGUIObject {
     private:
-        Vector2 center;
+        Point2 center;
         float radius;
-        Vector2 start;
+        Point2 start;
         NodeMapWindow* window;
 
     public:
-        MoveButton(Vector2 center, float radius, NodeMapWindow* window);
+        MoveButton(Point2 center, float radius, NodeMapWindow* window);
         virtual ~MoveButton() override;
-        virtual bool Trigger(Vector2 pos) override;
-        virtual void Render() override;
-        virtual void Click(Vector2 pos) override;
-        virtual void Drag(Vector2 dir) override;
+
+        virtual bool OnHit2D(Point2 pos) override;
+        virtual void OnRender() override;
+        virtual void OnLeftDown2D(Point2 pos) override;
+        virtual void OnLeftDrag2D(Vector2 dir) override;
     };
 
-    class Node final : public IButton {
+    class Node final : public AGUIObject {
     private:
         NodeMapWindow* window;
-        Vector2 relaPos;
-        Vector2 start;
-        Vector2 rightStart;
-        Vector2 rightEnd;
-        Vector2 position;
+        Point2 relaPos;
+        Point2 start;
+        Point2 rightStart;
+        Point2 rightEnd;
+        Point2 position;
         Node* connNode = NULL;
         Vector2 offset;
         bool focus = false;
         bool rightDown = false;
 
-        UIManager* uiMgr = NULL;
+        GUIManagerObject* guiMgr = NULL;
 
     public:
         Node(NodeMapWindow* window);
-        Node(Vector2 pos, NodeMapWindow* window);
+        Node(Point2 pos, NodeMapWindow* window);
         virtual ~Node() override;
-        virtual bool Trigger(Vector2 pos) override;
-        virtual void Render() override;
-        virtual void Hover(Vector2 pos) override;
-        virtual void Click(Vector2 pos) override;
-        virtual void Drag(Vector2 dir) override;
-        virtual void ClickEnd(Vector2 pos, IButton* end) override;
-        virtual void OnFocus(Vector2 pos);
-        virtual void OnKillFocus(Vector2 pos, IButton* focus);
-        virtual void RightClick(Vector2 pos);
-        virtual void RightDrag(Vector2 dir);
-        virtual void RightClickEnd(Vector2 pos, IButton* end);
-        virtual bool Char(char c);
+
+        virtual bool OnHit2D(Point2 pos) override;
+        virtual void OnRender() override;
+        virtual void OnMouseMove2D(Point2 pos) override;
+        virtual void OnLeftDown2D(Point2 pos) override;
+        virtual void OnLeftDrag2D(Vector2 dir) override;
+        virtual void OnLeftUp2D(Point2 pos) override;
+        virtual void OnFocus() override;
+        virtual void OnKillFocus() override;
+        virtual void OnRightDown2D(Point2 pos) override;
+        virtual void OnRightDrag2D(Vector2 dir) override;
+        virtual void OnRightUp2D(Point2 pos) override;
+        virtual void OnChar(char c) override;
 
         void Connect(Node* node);
         void Connect(Node* node, Vector2 offset);

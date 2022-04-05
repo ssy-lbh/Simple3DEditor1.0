@@ -8,30 +8,14 @@
 #include <utils/os/Font.h>
 #include <utils/math3d/Math.h>
 
-IAnimationFunction::IAnimationFunction(){}
-IAnimationFunction::~IAnimationFunction(){}
+static AnimationFunction leftVal = [](Vector2 p1, Vector2 p2, float val){ return p1.y; };
+static AnimationFunction rightVal = [](Vector2 p1, Vector2 p2, float val){ return p2.y; };
+static AnimationFunction linearVal = [](Vector2 p1, Vector2 p2, float val){ return Lerp(p1.y, p2.y, GetRate(val, p1.x, p2.x)); };
 
-float IAnimationFunction::GetValue(Vector2 p1, Vector2 p2, float val){ return p1.y; }
-
-RightValueFunc::RightValueFunc(){}
-RightValueFunc::~RightValueFunc(){}
-
-float RightValueFunc::GetValue(Vector2 p1, Vector2 p2, float val){ return p2.y; }
-
-LinearFunc::LinearFunc(){}
-LinearFunc::~LinearFunc(){}
-
-float LinearFunc::GetValue(Vector2 p1, Vector2 p2, float val){
-    return Lerp(p1.y, p2.y, GetRate(val, p1.x, p2.x));
-}
-
-SquareFunc::SquareFunc(){}
-SquareFunc::~SquareFunc(){}
-
-float SquareFunc::GetValue(Vector2 p1, Vector2 p2, float val){
+static AnimationFunction squareVal = [](Vector2 p1, Vector2 p2, float val){
     float rate = GetRate(val, p1.x, p2.x);
     return Lerp(p1.y, p2.y, rate <= 0.5f ? 2.0f * rate * rate : rate * (-2.0f * rate + 4.0f) - 1.0f);
-}
+};
 
 const float AnimationCurve::BOUND_TOP = 0.8f;
 const float AnimationCurve::BOUND_BOTTOM = -0.8f;
@@ -42,7 +26,7 @@ AnimationCurve::AnimationCurve(float startFrame, float endFrame) : startFrame(st
     points.Add(Vector2(startFrame, 0.0f));
     points.Add(Vector2(endFrame, 0.0f));
 
-    functions.Add(new IAnimationFunction());
+    functions.Add(leftVal);
 
     basicMenu = new Menu();
     basicMenu->AddItem(new MenuItem(L"添加点", [=]{
@@ -67,15 +51,14 @@ AnimationCurve::AnimationCurve(float startFrame, float endFrame) : startFrame(st
     basicMenu->AddItem(new MenuItem(L"范围", rangeMenu));
 
     Menu* funcMenu = new Menu();
-    funcMenu->AddItem(new MenuItem(L"常量", [=]{ this->SetFunc(this->selIndex, new IAnimationFunction()); }));
-    funcMenu->AddItem(new MenuItem(L"右方常量", [=]{ this->SetFunc(this->selIndex, new RightValueFunc()); }));
-    funcMenu->AddItem(new MenuItem(L"线性", [=]{ this->SetFunc(this->selIndex, new LinearFunc()); }));
-    funcMenu->AddItem(new MenuItem(L"平方", [=]{ this->SetFunc(this->selIndex, new SquareFunc()); }));
+    funcMenu->AddItem(new MenuItem(L"常量", [=]{ this->SetFunc(this->selIndex, leftVal); }));
+    funcMenu->AddItem(new MenuItem(L"右方常量", [=]{ this->SetFunc(this->selIndex, rightVal); }));
+    funcMenu->AddItem(new MenuItem(L"线性", [=]{ this->SetFunc(this->selIndex, linearVal); }));
+    funcMenu->AddItem(new MenuItem(L"平方", [=]{ this->SetFunc(this->selIndex, squareVal); }));
     basicMenu->AddItem(new MenuItem(L"函数", funcMenu));
 }
 
 AnimationCurve::~AnimationCurve(){
-    Free(functions);
     if (basicMenu) delete basicMenu;
 }
 
@@ -178,9 +161,9 @@ void AnimationCurve::Render(){
     glEnable(GL_POINT_SMOOTH);
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_POINTS);
-    points.Foreach<AnimationCurve*>([](Vector2 p, AnimationCurve* curve){
-        glVertex3f(GetRate(p.x, curve->startFrame, curve->endFrame) * 2.0f - 1.0f, p.y, DEPTH);
-    }, this);
+    points.Foreach([=](Vector2 p){
+        glVertex3f(GetRate(p.x, this->startFrame, this->endFrame) * 2.0f - 1.0f, p.y, DEPTH);
+    });
     glEnd();
 
     glColor3f(1.0f, 1.0f, 0.0f);
@@ -209,12 +192,18 @@ void AnimationCurve::Render(){
 }
 
 size_t AnimationCurve::GetSegment(float pos){
-    size_t size = points.Size();
+    size_t l = 0, r = points.Size() - 1, mid;
 
-    for (size_t i = 0; i < size - 1; i++){
-        if (pos >= points[i].x && pos <= points[i + 1].x){
-            return i;
+    while (l < r){
+        mid = (l + r) >> 1;
+        if (pos < points[mid].x){
+            r = mid;
+            continue;
+        }else if (pos > points[mid + 1].x){
+            l = mid + 1;
+            continue;
         }
+        return mid;
     }
 
     return -1;
@@ -223,11 +212,9 @@ size_t AnimationCurve::GetSegment(float pos){
 float AnimationCurve::GetValue(float pos){
     size_t seg = GetSegment(pos);
 
-    if (seg == -1){
+    if (seg == -1)
         return 0.0f;
-    }
-
-    return functions[seg]->GetValue(points[seg], points[seg + 1], pos);
+    return functions[seg](points[seg], points[seg + 1], pos);
 }
 
 void AnimationCurve::OnChangeRange(float start, float end){
@@ -235,9 +222,7 @@ void AnimationCurve::OnChangeRange(float start, float end){
     points[points.Size() - 1].x = end;
 }
 
-void AnimationCurve::SetFunc(size_t seg, IAnimationFunction* func){
-    if (functions[seg])
-        delete functions[seg];
+void AnimationCurve::SetFunc(size_t seg, AnimationFunction func){
     functions[seg] = func;
 }
 
@@ -246,15 +231,12 @@ void AnimationCurve::AddPoint(Vector2 point){
 }
 
 void AnimationCurve::AddPoint(size_t index, Vector2 point){
-    functions.Insert(index + 1, new IAnimationFunction());
+    functions.Insert(index + 1, leftVal);
     points.Insert(index + 1, point);
 }
 
 void AnimationCurve::RemovePoint(size_t index){
     points.RemoveAt(index);
-    if (functions[index]){
-        delete functions[index];
-    }
     functions.RemoveAt(index);
 }
 

@@ -129,9 +129,9 @@ void TreeWindow::RenderItem(AViewObject* o){
 
     if (o->unfold){
         depth++;
-        o->GetChildren().Foreach<TreeWindow*>([](AViewObject* o, TreeWindow* window){
-            window->RenderItem(o);
-        }, this);
+        o->GetChildren().Foreach([=](AViewObject* o){
+            this->RenderItem(o);
+        });
         depth--;
     }
 }

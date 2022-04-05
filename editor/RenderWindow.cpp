@@ -12,6 +12,7 @@
 #include <utils/gl/GLUtils.h>
 #include <utils/gl/GLShader.h>
 #include <utils/gl/GLProgram.h>
+#include <editor/gui/Menu.h>
 #include <editor/gui/ViewManager.h>
 #include <editor/main/ViewObject.h>
 #include <editor/object/GUIManagerObject.h>
@@ -109,23 +110,28 @@ void RenderWindow::OnResize(int x, int y){
 
 void RenderWindow::OnMouseMove(int x, int y){
     UpdateCursor(x, y);
+    guiMgr->OnMouseMove2D(cursorPos);
 }
 
 void RenderWindow::OnLeftDown(int x, int y){
     UpdateCursor(x, y);
+    guiMgr->OnLeftDown2D(cursorPos);
 }
 
 void RenderWindow::OnLeftUp(int x, int y){
     UpdateCursor(x, y);
+    guiMgr->OnLeftUp2D(cursorPos);
 }
 
 void RenderWindow::OnRightDown(int x, int y){
     UpdateCursor(x, y);
+    guiMgr->OnRightDown2D(cursorPos);
     Main::SetMenu(basicMenu);
 }
 
 void RenderWindow::OnRightUp(int x, int y){
     UpdateCursor(x, y);
+    guiMgr->OnRightUp2D(cursorPos);
 }
 
 void RenderWindow::OnMouseWheel(int delta){}

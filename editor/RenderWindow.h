@@ -4,8 +4,7 @@
 #include <define.h>
 
 #include <utils/math3d/Camera.h>
-#include <editor/gui/UIManager.h>
-#include <editor/gui/Menu.h>
+#include <editor/main/Window.h>
 
 class RenderWindow final : public AWindow, public CCamera {
 private:

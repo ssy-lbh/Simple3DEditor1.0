@@ -29,9 +29,9 @@ void Vertex::SetWorldPos(Point3 pos){
 
 void Vertex::UpdateNormal(){
     Vector3 dir = Vector3::zero;
-    faces.Foreach<Vector3*>([](Face* f, Vector3* n){
-        *n += f->normal;
-    }, &dir);
+    faces.Foreach([&](Face* f){
+        dir += f->normal;
+    });
     if (dir.SqrMagnitude() == 0.0f){
         normal = Vector3::forward;
         return;
@@ -66,18 +66,14 @@ bool Vertex::DeleteFace(Face* f){
 }
 
 Edge* Vertex::EdgeRelateTo(Vertex* v){
-    struct {
-        Vertex* v;
-        Edge* res;
-    } pack;
-    pack.v = v;
-    pack.res = NULL;
-    edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* p){
-        if (e->v1 == p->v || e->v2 == p->v){
-            p->res = e;
+    Edge* res = NULL;
+
+    edges.Foreach([=, &res](Edge* e){
+        if (e->v1 == v || e->v2 == v){
+            res = e;
         }
-    }, &pack);
-    return pack.res;
+    });
+    return res;
 }
 
 bool Vertex::Hit(Vector3 pos, Vector3 camPos, Quaternion camDir, Vector2 zBound, Rect rect){
@@ -124,17 +120,17 @@ bool Edge::DeleteFace(Face* f){
 void Edge::DeleteSelfReference(){
     if(v1) v1->DeleteEdge(this);
     if(v2) v2->DeleteEdge(this);
-    faces.Foreach<Edge*>([](Face* f, Edge* e){
-        f->DeleteEdge(e);
-    }, this);
+    faces.Foreach([=](Face* f){
+        f->DeleteEdge(this);
+    });
 }
 
 void Edge::DeleteSelfReferenceExcept(Vertex* v){
     if(v1 && v1 != v) v1->DeleteEdge(this);
     if(v2 && v2 != v) v2->DeleteEdge(this);
-    faces.Foreach<Edge*>([](Face* f, Edge* e){
-        f->DeleteEdge(e);
-    }, this);
+    faces.Foreach([=](Face* f){
+        f->DeleteEdge(this);
+    });
 }
 
 bool Edge::Hit(Vector3 ori, Vector3 dir){
@@ -151,18 +147,13 @@ Face::Face(){}
 Face::~Face(){}
 
 Face* Edge::FaceRelateTo(Vertex* v){
-    struct {
-        Vertex* v;
-        Face* res;
-    } pack;
-    pack.v = v;
-    pack.res = __null;
-    faces.Foreach<decltype(pack)*>([](Face* f, decltype(pack)* p){
-        if (f->FindVertex(p->v)){
-            p->res = f;
-        }
-    }, &pack);
-    return pack.res;
+    Face* res = NULL;
+
+    faces.Foreach([=, &res](Face* f){
+        if (f->FindVertex(v))
+            res = f;
+    });
+    return res;
 }
 
 void Face::AddVertex(Vertex* v){
@@ -190,42 +181,30 @@ bool Face::DeleteEdge(Edge* e){
 }
 
 void Face::DeleteSelfReference(){
-    vertices.Foreach<Face*>([](Vertex* v, Face* f){
-        v->DeleteFace(f);
-    }, this);
-    edges.Foreach<Face*>([](Edge* e, Face* f){
-        e->DeleteFace(f);
-    }, this);
+    vertices.Foreach([=](Vertex* v){
+        v->DeleteFace(this);
+    });
+    edges.Foreach([=](Edge* e){
+        e->DeleteFace(this);
+    });
 }
 
 void Face::DeleteSelfReferenceExcept(Vertex* v){
-    struct {
-        Vertex* v;
-        Face* f;
-    } pack;
-    pack.f = this;
-    pack.v = v;
-    vertices.Foreach<decltype(pack)*>([](Vertex* v, decltype(pack)* p){
-        if(v != p->v) v->DeleteFace(p->f);
-    }, &pack);
-    edges.Foreach<Face*>([](Edge* e, Face* f){
-        e->DeleteFace(f);
-    }, this);
+    vertices.Foreach([=](Vertex* vert){
+        if(vert != v) vert->DeleteFace(this);
+    });
+    edges.Foreach([=](Edge* e){
+        e->DeleteFace(this);
+    });
 }
 
 void Face::DeleteSelfReferenceExcept(Edge* e){
-    struct {
-        Edge* e;
-        Face* f;
-    } pack;
-    pack.f = this;
-    pack.e = e;
-    vertices.Foreach<Face*>([](Vertex* v, Face* f){
-        v->DeleteFace(f);
-    }, this);
-    edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* p){
-        if (e != p->e) e->DeleteFace(p->f);
-    }, &pack);
+    vertices.Foreach([=](Vertex* v){
+        v->DeleteFace(this);
+    });
+    edges.Foreach([=](Edge* edge){
+        if (edge != e) edge->DeleteFace(this);
+    });
 }
 
 bool Face::Hit(Point3 ori, Vector3 dir){

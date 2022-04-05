@@ -25,117 +25,72 @@ Mesh::~Mesh(){
 }
 
 Vertex* Mesh::Find(Vector3 ori, Vector3 dir){
-    struct {
-        float selectDis;
-        Vector3 start;
-        Vector3 forward;
-        Vertex* res;
-    }pack;
-    pack.selectDis = -1.0f;
-    pack.start = ori;
-    pack.forward = dir;
-    vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
-        if (Vector3::Cosine(m->forward, p->pos - m->start) > 0.9997f){
-            if (m->selectDis < 0.0f || (p->pos - m->start).SqrMagnitude() < m->selectDis * m->selectDis){
-                m->selectDis = (p->pos - m->start).Magnitude();
-                m->res = p;
+    float selectDis = -1.0f;
+    Vertex* res;
+
+    vertices.Foreach([&](Vertex* p){
+        if (Vector3::Cosine(dir, p->pos - ori) > 0.9997f){
+            if (selectDis < 0.0f || (p->pos - ori).SqrMagnitude() < selectDis * selectDis){
+                selectDis = (p->pos - ori).Magnitude();
+                res = p;
             }
         }
-    }, &pack);
-    if (pack.selectDis < 0.0f){
-        return NULL;
-    }else{
-        return pack.res;
-    }
+    });
+    return selectDis < 0.0f ? NULL : res;
 }
 
 size_t Mesh::FindScreenRect(const SelectInfo* info, Matrix4x4 mat, List<Vertex*>& result){
-    struct {
-        size_t cnt;
-        const SelectInfo* info;
-        Matrix4x4 mat;
-        List<Vertex*>* list;
-    }pack;
-    pack.cnt = 0;
-    pack.info = info;
-    pack.mat = mat;
-    pack.list = &result;
-    vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
-        if (m->info->Inside(m->mat * Point3(p->pos))){
-            if (m->list->HasValue(p))
+    size_t cnt = 0;
+
+    vertices.Foreach([&](Vertex* p){
+        if (info->Inside(mat * Point3(p->pos))){
+            if (result.HasValue(p))
                 return;
-            m->cnt++;
-            m->list->Add(p);
+            cnt++;
+            result.Add(p);
         }
-    }, &pack);
-    return pack.cnt;
+    });
+    return cnt;
 }
 
 Edge* Mesh::FindEdge(Vector3 ori, Vector3 dir){
-    struct {
-        Vector3 start;
-        Vector3 forward;
-        Edge* res;
-    }pack;
-    pack.start = ori;
-    pack.forward = dir;
-    pack.res = NULL;
-    edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* m){
-        if (e->Hit(m->start, m->forward)){
-            m->res = e;
-        }
-    }, &pack);
-    return pack.res;
+    Edge* res = NULL;
+
+    edges.Foreach([&](Edge* e){
+        if (e->Hit(ori, dir))
+            res = e;
+    });
+    return res;
 }
 
 Vertex* Mesh::FindUV(Vector2 uv, float err){
-    struct {
-        float err;
-        Vector2 uv;
-        Vertex* res;
-    }pack;
-    pack.err = err * err;
-    pack.uv = uv;
-    pack.res = NULL;
-    vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
-        if (m->res)
+    err *= err;
+    Vertex* res = NULL;
+
+    vertices.Foreach([=, &res](Vertex* p){
+        if (res)
             return;
-        if ((p->uv - m->uv).SqrMagnitude() <= m->err){
-            m->res = p;
+        if ((p->uv - uv).SqrMagnitude() <= err){
+            res = p;
         }
-    }, &pack);
-    return pack.res;
+    });
+    return res;
 }
 
 size_t Mesh::FindUVRect(Vector2 uv1, Vector2 uv2, List<Vertex*>& result){
-    struct {
-        size_t cnt;
-        float x1, x2, y1, y2;
-        List<Vertex*>* list;
-    }pack;
-    pack.cnt = 0;
-    if (uv1.x < uv2.x){
-        pack.x1 = uv1.x;
-        pack.x2 = uv2.x;
-    }else{
-        pack.x1 = uv2.x;
-        pack.x2 = uv1.x;
-    }
-    if (uv1.y < uv2.y){
-        pack.y1 = uv1.y;
-        pack.y2 = uv2.y;
-    }else{
-        pack.y1 = uv2.y;
-        pack.y2 = uv1.y;
-    }
-    pack.list = &result;
-    vertices.Foreach<decltype(pack)*>([](Vertex* p, decltype(pack)* m){
-        if (p->uv.x >= m->x1 && p->uv.x <= m->x2 && p->uv.y >= m->y1 && p->uv.y <= m->y2){
-            m->cnt++;
-            m->list->Add(p);
+    size_t cnt = 0;
+    float x1 = uv1.x, x2 = uv2.x, y1 = uv1.y, y2 = uv2.y;
+    List<Vertex*>* list;
+
+    Sort(x1, x2); Sort(y1, y2);
+    
+    vertices.Foreach([&](Vertex* p){
+        if (p->uv.x >= x1 && p->uv.x <= x2 && p->uv.y >= y1 && p->uv.y <= y2){
+            cnt++;
+            result.Add(p);
         }
-    }, &pack);
-    return pack.cnt;
+    });
+    return cnt;
 }
 
 Face* Mesh::Intersect(Point3 ori, Vector3 dir, Vector3* bary){
@@ -194,27 +149,20 @@ Vertex* Mesh::AddVertex(Vertex* v){
 Edge* Mesh::AddEdge(Vertex* v1, Vertex* v2){
     //DebugLog("Mesh::AddEdge %p %p", v1, v2);
     // 边去重
-    struct {
-        bool has;
-        Vertex* v1;
-        Vertex* v2;
-        Edge* e;
-    } pack;
-    pack.has = false;
-    pack.v1 = v1;
-    pack.v2 = v2;
-    v1->edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* res){
-        if (e->v1 == res->v1 && e->v2 == res->v2){
-            res->has = true;
-            res->e = e;
-        }else if (e->v1 == res->v2 && e->v2 == res->v1){
-            res->has = true;
-            res->e = e;
+    bool has = false;
+    Edge* res;
+
+    v1->edges.Foreach([=, &has, &res](Edge* e){
+        if (e->v1 == v1 && e->v2 == v2){
+            has = true;
+            res = e;
+        }else if (e->v1 == v2 && e->v2 == v1){
+            has = true;
+            res = e;
         }
-    }, &pack);
-    if (pack.has){
-        return pack.e;
-    }
+    });
+    if (has)
+        return res;
     AddVertex(v1);
     AddVertex(v2);
     Edge* e = new Edge(v1, v2);
@@ -255,40 +203,28 @@ Face* Mesh::AddTriFace(Vertex* v1, Vertex* v2, Vertex* v3){
 
 void Mesh::DeleteVertex(Vertex* v){
     //DebugLog("Mesh::DeleteVertex %p", v);
-    struct {
-        Mesh* m;
-        Vertex* v;
-    } pack;
-    pack.m = this;
-    pack.v = v;
-    v->faces.Foreach<decltype(pack)*>([](Face* f, decltype(pack)* p){
+    v->faces.Foreach([=](Face* f){
         //DebugLog("Face::DeleteSelfReferenceExcept %p", f);
-        f->DeleteSelfReferenceExcept(p->v);
-        p->m->faces.Remove(f);
+        f->DeleteSelfReferenceExcept(v);
+        this->faces.Remove(f);
         delete f;
-    }, &pack);
-    v->edges.Foreach<decltype(pack)*>([](Edge* e, decltype(pack)* p){
+    });
+    v->edges.Foreach([=](Edge* e){
         //DebugLog("Edge::DeleteSelfReferenceExcept %p", e);
-        e->DeleteSelfReferenceExcept(p->v);
-        p->m->edges.Remove(e);
+        e->DeleteSelfReferenceExcept(v);
+        this->edges.Remove(e);
         delete e;
-    }, &pack);
+    });
     vertices.Remove(v);
     delete v;
 }
 
 void Mesh::DeleteEdge(Edge* e){
-    struct {
-        Mesh* m;
-        Edge* e;
-    } pack;
-    pack.m = this;
-    pack.e = e;
-    e->faces.Foreach<decltype(pack)*>([](Face* f, decltype(pack)* p){
-        f->DeleteSelfReferenceExcept(p->e);
-        p->m->faces.Remove(f);
+    e->faces.Foreach([=](Face* f){
+        f->DeleteSelfReferenceExcept(e);
+        this->faces.Remove(f);
         delete f;
-    }, &pack);
+    });
     e->faces.Clear();
     e->DeleteSelfReference();
     edges.Remove(e);
@@ -490,67 +426,67 @@ void Mesh::WriteToOBJ(File file, bool uv, bool normal){
     file.Write("# StereoVision 3D Editor\n", 25);
     file.Write("# Author: lin-boheng@gitee.com\n", 31);
     // 顶点索引
-    vertices.Foreach<size_t*>([](Vertex* v, size_t* i){
-        v->index = ++*i;
-    }, &index);
+    vertices.Foreach([&index](Vertex* v){
+        v->index = ++index;
+    });
     // 顶点
-    vertices.Foreach<File*>([](Vertex* v, File* file){
+    vertices.Foreach([&file](Vertex* v){
         char tmp[MAX_PATH + 1];
         DWORD len;
         len = __builtin_snprintf(tmp, MAX_PATH, "v %f %f %f\n", v->pos.x, v->pos.y, v->pos.z);
-        file->Write(tmp, len);
-    }, &file);
+        file.Write(tmp, len);
+    });
     // 纹理UV坐标
     if (uv){
-        vertices.Foreach<File*>([](Vertex* v, File* file){
+        vertices.Foreach([&file](Vertex* v){
             char tmp[MAX_PATH + 1];
             DWORD len;
             len = __builtin_snprintf(tmp, MAX_PATH, "vt %f %f\n", v->uv.x, v->uv.y);
-            file->Write(tmp, len);
-        }, &file);
+            file.Write(tmp, len);
+        });
     }
     // 顶点法线
     if (normal){
-        vertices.Foreach<File*>([](Vertex* v, File* file){
+        vertices.Foreach([&file](Vertex* v){
             char tmp[MAX_PATH + 1];
             DWORD len;
             len = __builtin_snprintf(tmp, MAX_PATH, "vn %f %f %f\n", v->normal.x, v->normal.y, v->normal.z);
-            file->Write(tmp, len);
-        }, &file);
+            file.Write(tmp, len);
+        });
     }
     // 片元
     if (!uv && !normal){
-        faces.Foreach<File*>([](Face* f, File* file){
+        faces.Foreach([&file](Face* f){
             char tmp[MAX_PATH + 1];
             DWORD len;
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d %d %d\n", idx1, idx2, idx3);
-            file->Write(tmp, len);
-        }, &file);
+            file.Write(tmp, len);
+        });
     }else if (uv && !normal){
-        faces.Foreach<File*>([](Face* f, File* file){
+        faces.Foreach([&file](Face* f){
             char tmp[MAX_PATH + 1];
             DWORD len;
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d/%d %d/%d %d/%d\n", idx1, idx1, idx2, idx2, idx3, idx3);
-            file->Write(tmp, len);
-        }, &file);
+            file.Write(tmp, len);
+        });
     }else if (!uv && normal){
-        faces.Foreach<File*>([](Face* f, File* file){
+        faces.Foreach([&file](Face* f){
             char tmp[MAX_PATH + 1];
             DWORD len;
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d//%d %d//%d %d//%d\n", idx1, idx1, idx2, idx2, idx3, idx3);
-            file->Write(tmp, len);
-        }, &file);
+            file.Write(tmp, len);
+        });
     }else{
-        faces.Foreach<File*>([](Face* f, File* file){
+        faces.Foreach([&file](Face* f){
             char tmp[MAX_PATH + 1];
             DWORD len;
             int idx1 = f->vertices[0]->index, idx2 = f->vertices[1]->index, idx3 = f->vertices[2]->index;
             len = __builtin_snprintf(tmp, MAX_PATH, "f %d/%d/%d %d/%d/%d %d/%d/%d\n", idx1, idx1, idx1, idx2, idx2, idx2, idx3, idx3, idx3);
-            file->Write(tmp, len);
-        }, &file);
+            file.Write(tmp, len);
+        });
     }
 }
 

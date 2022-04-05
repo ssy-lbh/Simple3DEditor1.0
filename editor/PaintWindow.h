@@ -3,8 +3,11 @@
 
 #include <define.h>
 
-#include <editor/gui/UIManager.h>
 #include <utils/math3d/LinearAlgebra.h>
+#include <editor/main/Tool.h>
+#include <editor/main/Operation.h>
+#include <editor/main/Window.h>
+
 
 class PaintWindow final : public AWindow {
 private:

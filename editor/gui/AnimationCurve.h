@@ -3,40 +3,13 @@
 
 #include <define.h>
 
-#include <editor/gui/UIManager.h>
+#include <functional>
+
 #include <utils/List.h>
+#include <utils/math3d/LinearAlgebra.h>
+#include <editor/gui/UIManager.h>
 
-interface IAnimationFunction {
-public:
-    IAnimationFunction();
-    virtual ~IAnimationFunction();
-
-    virtual float GetValue(Vector2 p1, Vector2 p2, float val);
-};
-
-class RightValueFunc final : public IAnimationFunction {
-public:
-    RightValueFunc();
-    virtual ~RightValueFunc() override;
-
-    virtual float GetValue(Vector2 p1, Vector2 p2, float val) override;
-};
-
-class LinearFunc final : public IAnimationFunction {
-public:
-    LinearFunc();
-    virtual ~LinearFunc() override;
-
-    virtual float GetValue(Vector2 p1, Vector2 p2, float val) override;
-};
-
-class SquareFunc final : public IAnimationFunction {
-public:
-    SquareFunc();
-    virtual ~SquareFunc() override;
-
-    virtual float GetValue(Vector2 p1, Vector2 p2, float val) override;
-};
+using AnimationFunction = std::function<float(Vector2, Vector2, float)>;
 
 class AnimationCurve : public IButton {
 private:
@@ -48,7 +21,7 @@ private:
 
     static const float BOUND_TOP;
     static const float BOUND_BOTTOM;
-    // size in pixels
+    // 以像素计的大小
     static const float ERROR_NUM;
     static const float DEPTH;
 
@@ -57,7 +30,7 @@ private:
 
     Vector2 cursorPos;
     
-    List<IAnimationFunction*> functions;
+    List<AnimationFunction> functions;
     List<Vector2> points;
 
     SelectTarget selTarget = NONE;
@@ -82,7 +55,7 @@ public:
     size_t GetSegment(float pos);
     float GetValue(float pos);
     void OnChangeRange(float start, float end);
-    void SetFunc(size_t seg, IAnimationFunction* func);
+    void SetFunc(size_t seg, AnimationFunction func);
     void AddPoint(Vector2 point);
     void AddPoint(size_t index, Vector2 point);
     void RemovePoint(size_t index);

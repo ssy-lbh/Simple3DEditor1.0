@@ -121,8 +121,9 @@ void GUIManagerObject::OnLeftDown2D(Point2 pos){
 void GUIManagerObject::OnLeftUp2D(Point2 pos){
     UpdateCursor(pos);
     if (cur){
-        cur->OnLeftUp2D(cursorPos);
+        AGUIObject* preObj = cur;
         FindCurrent();
+        preObj->OnLeftUp2D(cursorPos);
     }
     if (leftDown)
         leftDown = false;
@@ -148,8 +149,9 @@ void GUIManagerObject::OnRightDown2D(Point2 pos){
 void GUIManagerObject::OnRightUp2D(Point2 pos){
     UpdateCursor(pos);
     if (cur){
-        cur->OnRightUp2D(cursorPos);
+        AGUIObject* preObj = cur;
         FindCurrent();
+        preObj->OnRightUp2D(cursorPos);
     }
     if (rightDown)
         rightDown = false;
@@ -199,15 +201,15 @@ AGUIObject* GUIManagerObject::GetCurrent(){
 
 AGUIObject* GUIManagerObject::FindCurrent(){
     cur = NULL;
-    children.Foreach<GUIManagerObject*>([](AViewObject* o, GUIManagerObject* mgr){
-        if(o->OnHit2D(mgr->cursorPos)){
+    children.Foreach([=](AViewObject* o){
+        if(o->OnHit2D(this->cursorPos)){
             try {
-                mgr->cur = dynamic_cast<AGUIObject*>(o);
-                o->OnMouseMove2D(mgr->cursorPos);
+                this->cur = dynamic_cast<AGUIObject*>(o);
+                o->OnMouseMove2D(this->cursorPos);
             }catch(std::bad_cast e){
                 DebugError("GUIManagerObject::FindCurrent Current Object Is Not GUI Object");
             }
         }
-    }, this);
+    });
     return cur;
 }

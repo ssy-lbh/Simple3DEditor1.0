@@ -79,8 +79,7 @@ public:
     virtual void AddChild(AViewObject* o);
     // 此函数不会回收内存，回收在解构器中进行
     virtual bool DeleteChild(AViewObject* o);
-    void EnumChildren(void(*func)(AViewObject*));
-    void EnumChildren(void(*func)(AViewObject*, void*), void* user);
+    void EnumChildren(std::function<void(AViewObject*)> func);
     List<AViewObject*>& GetChildren();
 
     ViewObjectType GetType();

@@ -178,9 +178,9 @@ void Menu::Render(Vector2 pos){
     minPos = Vector2(xmin, ymax);
     drawCounter = 0;
 
-    items.Foreach<Menu*>([](MenuItem* item, Menu* menu){
-        menu->RenderItem(item);
-    }, this);
+    items.Foreach([=](MenuItem* item){
+        this->RenderItem(item);
+    });
 
     glLineWidth(1.0f);
 }

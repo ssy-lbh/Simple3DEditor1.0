@@ -42,12 +42,12 @@ void MainWindow::MoveOperation::OnEnter(){
     case SelectionType::SELECT_VERTICES:
         if (Main::data->selPoints.Empty())
             break;
-        Main::data->selPoints.Foreach<MoveOperation*>([](Vertex* v, MoveOperation* op){
+        Main::data->selPoints.Foreach([=](Vertex* v){
             MoveInfo info;
             info.vert = v;
             info.pos = v->GetWorldPos();
-            op->moveInfo.Add(info);
-        }, this);
+            this->moveInfo.Add(info);
+        });
         break;
     case SelectionType::SELECT_EDGES:
         break;
@@ -71,14 +71,14 @@ void MainWindow::MoveOperation::OnMove(){
 
     switch (Main::data->selType){
     case SelectionType::SELECT_OBJECT:
-        moveInfo.Foreach<Vector3*>([](MoveInfo info, Vector3* offset){
-            info.obj->SetWorldPos(info.pos + *offset);
-        }, &delta);
+        moveInfo.Foreach([=](MoveInfo info){
+            info.obj->SetWorldPos(info.pos + delta);
+        });
         break;
     case SelectionType::SELECT_VERTICES:
-        moveInfo.Foreach<Vector3*>([](MoveInfo info, Vector3* offset){
-            info.vert->SetWorldPos(info.pos + *offset);
-        }, &delta);
+        moveInfo.Foreach([=](MoveInfo info){
+            info.vert->SetWorldPos(info.pos + delta);
+        });
         break;
     case SelectionType::SELECT_EDGES:
         break;
@@ -164,9 +164,9 @@ void MainWindow::ExcludeOperation::OnEnter(){
         }
     }
     if (Main::data->selPoints.Size() > 0){
-        Main::data->selPoints.Foreach<ExcludeOperation*>([](Vertex* v, ExcludeOperation* op){
-            op->moveInfo.Add({v, v->GetWorldPos()});
-        }, this);
+        Main::data->selPoints.Foreach([=](Vertex* v){
+            this->moveInfo.Add({v, v->GetWorldPos()});
+        });
     }
 }
 
@@ -181,9 +181,9 @@ void MainWindow::ExcludeOperation::OnMove(){
     delta = main->camRight * mov.x * main->aspect + main->camUp * mov.y;
     delta = Vector3(x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
 
-    moveInfo.Foreach<Vector3*>([](MoveInfo info, Vector3* offset){
-        info.vert->SetWorldPos(info.pos + *offset);
-    }, &delta);
+    moveInfo.Foreach([=](MoveInfo info){
+        info.vert->SetWorldPos(info.pos + delta);
+    });
     //DebugLog("ExcludeOperation OnMove %f %f %f", delta.x, delta.y, delta.z);
 }
 
@@ -198,11 +198,10 @@ void MainWindow::ExcludeOperation::OnUndo(){
 
     if (!mesh)
         return;
-    
     Main::data->selPoints.Clear();
-    moveInfo.Foreach<Mesh*>([](MoveInfo info, Mesh* mesh){
+    moveInfo.Foreach([=](MoveInfo info){
         mesh->DeleteVertex(info.vert);
-    }, mesh);
+    });
     moveInfo.Clear();
 }
 
@@ -246,13 +245,13 @@ void MainWindow::RotateOperation::OnEnter(){
     case SelectionType::SELECT_VERTICES:
         if (Main::data->selPoints.Empty())
             break;
-        Main::data->selPoints.Foreach<RotateOperation*>([](Vertex* v, RotateOperation* op){
+        Main::data->selPoints.Foreach([=](Vertex* v){
             RotateInfo info;
             info.vert = v;
             info.pos = v->GetWorldPos();
-            op->rotateInfo.Add(info);
-            op->center += info.pos;
-        }, this);
+            this->rotateInfo.Add(info);
+            this->center += info.pos;
+        });
         center /= Main::data->selPoints.Size();
         screenCenter = main->GetScreenPosition(center);
         break;
@@ -285,9 +284,9 @@ void MainWindow::RotateOperation::OnMove(){
             case MODE_Y: rotVec = Vector3(0.0f, delta, 0.0f); break;
             case MODE_Z: rotVec = Vector3(0.0f, 0.0f, delta); break;
             }
-            rotateInfo.Foreach<Vector3*>([](RotateInfo info, Vector3* rot){
-                info.obj->transform.SetRotationXYZ(info.pos + *rot);
-            }, &rotVec);
+            rotateInfo.Foreach([=](RotateInfo info){
+                info.obj->transform.SetRotationXYZ(info.pos + rotVec);
+            });
         }else{
             switch (mode){
             case MODE_CAMERA: rotate = Quaternion::AxisAngle(main->camForward, delta); break;
@@ -295,9 +294,9 @@ void MainWindow::RotateOperation::OnMove(){
             case MODE_Y: rotate = Quaternion::AxisAngle(Vector3(0.0f, 1.0f, 0.0f), delta); break;
             case MODE_Z: rotate = Quaternion::AxisAngle(Vector3(0.0f, 0.0f, 1.0f), delta); break;
             }
-            rotateInfo.Foreach<Quaternion*>([](RotateInfo info, Quaternion* rot){
-                info.obj->transform.SetRotation(*rot * info.rot);
-            }, &rotate);
+            rotateInfo.Foreach([=](RotateInfo info){
+                info.obj->transform.SetRotation(rotate * info.rot);
+            });
         }
     }
         break;
@@ -308,9 +307,9 @@ void MainWindow::RotateOperation::OnMove(){
         case MODE_Y: rotate = Quaternion::RotateY(delta); break;
         case MODE_Z: rotate = Quaternion::RotateZ(delta); break;
         }
-        rotateInfo.Foreach<RotateOperation*>([](RotateInfo info, RotateOperation* op){
-            info.vert->SetWorldPos(op->center + op->rotate * (info.pos - op->center));
-        }, this);
+        rotateInfo.Foreach([=](RotateInfo info){
+            info.vert->SetWorldPos(this->center + this->rotate * (info.pos - this->center));
+        });
         break;
     case SelectionType::SELECT_EDGES:
         break;
@@ -381,13 +380,13 @@ void MainWindow::SizeOperation::OnEnter(){
     case SelectionType::SELECT_VERTICES:
         if (Main::data->selPoints.Empty())
             break;
-        Main::data->selPoints.Foreach<SizeOperation*>([](Vertex* v, SizeOperation* op){
+        Main::data->selPoints.Foreach([=](Vertex* v){
             SizeInfo info;
             info.vert = v;
             info.vec = v->GetWorldPos();
-            op->sizeInfo.Add(info);
-            op->center += info.vec;
-        }, this);
+            this->sizeInfo.Add(info);
+            this->center += info.vec;
+        });
         center /= Main::data->selPoints.Size();
         screenCenter = main->GetScreenPosition(center);
         break;
@@ -410,23 +409,23 @@ void MainWindow::SizeOperation::OnMove(){
     
     switch (Main::data->selType){
     case SelectionType::SELECT_OBJECT:
-        sizeInfo.Foreach<SizeOperation*>([](SizeInfo info, SizeOperation* op){
+        sizeInfo.Foreach([=](SizeInfo info){
             info.obj->transform.scale.Set(Vector3(
-                op->x ? info.vec.x * op->scale : info.vec.x,
-                op->y ? info.vec.y * op->scale : info.vec.y,
-                op->z ? info.vec.z * op->scale : info.vec.z
+                this->x ? info.vec.x * this->scale : info.vec.x,
+                this->y ? info.vec.y * this->scale : info.vec.y,
+                this->z ? info.vec.z * this->scale : info.vec.z
             ));
-        }, this);
+        });
         break;
     case SelectionType::SELECT_VERTICES:
-        sizeInfo.Foreach<SizeOperation*>([](SizeInfo info, SizeOperation* op){
-            Vector3 res = op->center + (info.vec - op->center) * op->scale;
+        sizeInfo.Foreach([=](SizeInfo info){
+            Vector3 res = this->center + (info.vec - this->center) * this->scale;
             info.vert->SetWorldPos(Vector3(
-                op->x ? res.x : info.vec.x,
-                op->y ? res.y : info.vec.y,
-                op->z ? res.z : info.vec.z
+                this->x ? res.x : info.vec.x,
+                this->y ? res.y : info.vec.y,
+                this->z ? res.z : info.vec.z
             ));
-        }, this);
+        });
         break;
     case SelectionType::SELECT_EDGES:
         break;
@@ -960,9 +959,9 @@ void MainWindow::DeletePoint(){
     Mesh* mesh = Main::GetMesh();
     if (!mesh)
         return;
-    Main::data->selPoints.Foreach<Mesh*>([](Vertex* v, Mesh* m){
-        m->DeleteVertex(v);
-    }, mesh);
+    Main::data->selPoints.Foreach([=](Vertex* v){
+        mesh->DeleteVertex(v);
+    });
     Main::data->selPoints.Clear();
 }
 
@@ -1095,9 +1094,9 @@ void MainWindow::OnInsTopology(){
 
 void MainWindow::OnInsSelectColor(){
     Vector3 color = ColorBoard::GetColor();
-    Main::data->selPoints.Foreach<Vector3*>([](Vertex* v, Vector3* c){
-        v->color = *c;
-    }, &color);
+    Main::data->selPoints.Foreach([=](Vertex* v){
+        v->color = color;
+    });
 }
 
 void MainWindow::OnLeftDown(int x, int y){

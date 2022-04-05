@@ -142,12 +142,8 @@ bool UIManager::Unichar(wchar_t c){
     return false;
 }
 
-void UIManager::Foreach(void(*func)(IButton*)){
+void UIManager::Foreach(std::function<void(IButton*)> func){
     buttons.Foreach(func);
-}
-
-void UIManager::Foreach(void(*func)(IButton*, void*), void* user){
-    buttons.Foreach(func, user);
 }
 
 IButton* UIManager::GetCurrent(){
@@ -156,15 +152,15 @@ IButton* UIManager::GetCurrent(){
 
 IButton* UIManager::FindCurrent(){
     cur = NULL;
-    buttons.Foreach<UIManager*>([](IButton* btn, UIManager* mgr){
-        if(btn->Trigger(mgr->cursorPos)){
-            mgr->cur = btn;
-            mgr->startPos = mgr->cursorPos;
-            btn->Hover(mgr->cursorPos);
+    buttons.Foreach([=](IButton* btn){
+        if(btn->Trigger(this->cursorPos)){
+            this->cur = btn;
+            this->startPos = this->cursorPos;
+            btn->Hover(this->cursorPos);
         }else{
-            btn->Leave(mgr->cursorPos);
+            btn->Leave(this->cursorPos);
         }
-    }, this);
+    });
     return cur;
 }
 

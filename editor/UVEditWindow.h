@@ -3,7 +3,10 @@
 
 #include <define.h>
 
-#include <editor/gui/UIManager.h>
+#include <utils/List.h>
+#include <editor/main/Window.h>
+#include <editor/main/Tool.h>
+#include <editor/main/Operation.h>
 
 class UVEditWindow final : public AWindow {
 private:
