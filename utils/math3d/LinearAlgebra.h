@@ -34,8 +34,8 @@ public:
     Vector2 operator-(Vector2) const;
     Vector2 operator*(float) const;
     Vector2 operator/(float) const;
-    Vector3 operator*(Vector2) const;
-    Vector3 operator/(Vector2) const;
+    Vector2 operator*(Vector2) const;
+    Vector2 operator/(Vector2) const;
     Vector2 &operator+=(Vector2);
     Vector2 &operator-=(Vector2);
     Vector2 &operator*=(float);

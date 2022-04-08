@@ -214,16 +214,6 @@ void GlobalData::SelectType(SelectionType type){
     selType = type;
 }
 
-void GlobalData::OnCreate(){
-    scene->OnCreate();
-    screen->OnCreate();
-}
-
-void GlobalData::OnClose(){
-    scene->OnClose();
-    screen->OnClose();
-}
-
 void GlobalData::OnTimer(int id){
     scene->OnTimer(id);
     screen->OnTimer(id);
@@ -360,6 +350,10 @@ void Main::OnRightUp(Point3 ori, Vector3 dir){
     data->curObject->OnRightUp(ori, dir);
 }
 
+void Main::OnMouseWheel(int delta){
+    data->curObject->OnMouseWheel(delta);
+}
+
 void Main::RenderScene(){
     data->scene->OnChainRender();
 }
@@ -384,13 +378,11 @@ Mesh* Main::GetMesh(AViewObject* o){
     return NULL;
 }
 
-#include <utils/Value.h>
-
 int Main::MainEntry(int argc, char** argv){
     Init();
     AudioUtils::InitOpenAL();
 
-    AWindow* mainFrame = new SelectionWindow(new MainWindow());
+    SelectionWindow* mainFrame = new SelectionWindow();
 
     AppFrame* appFrame = new AppFrame("ModelView", mainFrame, 600, 600);
 
@@ -414,9 +406,7 @@ int Main::MainEntry(int argc, char** argv){
     // 不知道为什么，arial.ttf最大值字符为0x6FF
     glFontSize(12);
 
-    // 放在这里是为了让OpenGL初始化
-    mainFrame->OnCreate();
-    data->OnCreate();
+    mainFrame->SetWindow(new MainWindow());
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 

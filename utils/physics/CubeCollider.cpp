@@ -104,11 +104,11 @@ void CubeCollider::OnCollideCube(const CubeCollider* collider) const{
     float len;
 
     if (rb) vel += rb->velocity;
-    if (rb2) vel -= rb->velocity;
-    vel /= -rot;
+    if (rb2) vel -= rb2->velocity;
+    vel /= rot;
 
     // 1.2F 是为了防止自旋等运动造成穿模
-    if (CastMinLength(pos, vel, collider->scale, scale, GetRotation() * rot, point, len)
+    if (CastMinLength(pos, vel, collider->scale, scale, GetRotation() / rot, point, len)
             && len <= vel.Magnitude() * Time::GetDeltaTime() * 1.2f){
         vel *= rot;
         // no 1 2 4 => point.mul(world.scale).mul(world.rotation); 针对rb1的受力点

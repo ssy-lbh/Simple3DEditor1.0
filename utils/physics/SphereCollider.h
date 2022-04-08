@@ -7,6 +7,8 @@
 
 class SphereCollider final : public ACollider {
 public:
+    float radius = 1.0f;
+
     SphereCollider(Rigidbody* rb);
     virtual ~SphereCollider();
 

@@ -92,16 +92,6 @@ void LRContainer::OnRender(){
     viewMgr->PopView();
 }
 
-void LRContainer::OnCreate(){
-    if (lWindow) lWindow->OnCreate();
-    if (rWindow) rWindow->OnCreate();
-}
-
-void LRContainer::OnClose(){
-    if (lWindow) lWindow->OnClose();
-    if (rWindow) rWindow->OnClose();
-}
-
 void LRContainer::OnTimer(int id){
     if (lWindow) lWindow->OnTimer(id);
     if (rWindow) rWindow->OnTimer(id);
@@ -342,16 +332,6 @@ void UDContainer::OnRender(){
     viewMgr->PopView();
 }
 
-void UDContainer::OnCreate(){
-    if (uWindow) uWindow->OnCreate();
-    if (dWindow) dWindow->OnCreate();
-}
-
-void UDContainer::OnClose(){
-    if (uWindow) uWindow->OnClose();
-    if (dWindow) dWindow->OnClose();
-}
-
 void UDContainer::OnTimer(int id){
     if (uWindow) uWindow->OnTimer(id);
     if (dWindow) dWindow->OnTimer(id);
@@ -573,16 +553,6 @@ void SelectionWindow::OnRender(){
     }
 }
 
-void SelectionWindow::OnCreate(){
-    if (curWindow)
-        curWindow->OnCreate();
-}
-
-void SelectionWindow::OnClose(){
-    if (curWindow)
-        curWindow->OnClose();
-}
-
 void SelectionWindow::OnTimer(int id){
     if (curWindow)
         curWindow->OnTimer(id);
@@ -679,13 +649,10 @@ AWindow* SelectionWindow::GetWindow(){
 
 void SelectionWindow::SetWindow(AWindow* window, bool del){
     if (del){
-        if (curWindow){
-            curWindow->OnClose();
+        if (curWindow)
             delete curWindow;
-        }
         curWindow = window;
         if (curWindow){
-            curWindow->OnCreate();
             curWindow->OnResize(cliSize.x, cliSize.y);
             curWindow->OnMouseMove(cursorCoord.x, cursorCoord.y);
         }

@@ -173,18 +173,6 @@ void AViewObject::OnRenderUVMap(){
         children[i]->OnRenderUVMap();
 }
 
-void AViewObject::OnCreate(){
-    size_t len = children.Size();
-    for (size_t i = 0; i < len; i++)
-        children[i]->OnCreate();
-}
-
-void AViewObject::OnClose(){
-    size_t len = children.Size();
-    for (size_t i = 0; i < len; i++)
-        children[i]->OnClose();
-}
-
 void AViewObject::OnTimer(int id){
     size_t len = children.Size();
     for (size_t i = 0; i < len; i++)
@@ -205,42 +193,36 @@ void AViewObject::OnUnichar(wchar_t c){
 
 void AViewObject::OnResize(Vector2 size){
     size_t len = children.Size();
-    cliSize = size;
     for (size_t i = 0; i < len; i++)
         children[i]->OnResize(size);
 }
 
 void AViewObject::OnMouseMove(Point3 ori, Vector3 dir){
     size_t len = children.Size();
-    cursorOri = ori; cursorDir = dir;
     for (size_t i = 0; i < len; i++)
         children[i]->OnMouseMove(ori, dir);
 }
 
 void AViewObject::OnLeftDown(Point3 ori, Vector3 dir){
     size_t len = children.Size();
-    cursorOri = ori; cursorDir = dir;
     for (size_t i = 0; i < len; i++)
         children[i]->OnLeftDown(ori, dir);
 }
 
 void AViewObject::OnLeftUp(Point3 ori, Vector3 dir){
     size_t len = children.Size();
-    cursorOri = ori; cursorDir = dir;
     for (size_t i = 0; i < len; i++)
         children[i]->OnLeftUp(ori, dir);
 }
 
 void AViewObject::OnRightDown(Point3 ori, Vector3 dir){
     size_t len = children.Size();
-    cursorOri = ori; cursorDir = dir;
     for (size_t i = 0; i < len; i++)
         children[i]->OnRightDown(ori, dir);
 }
 
 void AViewObject::OnRightUp(Point3 ori, Vector3 dir){
     size_t len = children.Size();
-    cursorOri = ori; cursorDir = dir;
     for (size_t i = 0; i < len; i++)
         children[i]->OnRightUp(ori, dir);
 }

@@ -12,6 +12,7 @@
 #include <utils/os/Font.h>
 #include <utils/os/Shell.h>
 #include <utils/gl/GLUtils.h>
+#include <editor/gui/Menu.h>
 #include <editor/gui/GUIUtils.h>
 #include <editor/object/GUIManagerObject.h>
 
@@ -76,6 +77,25 @@ AudioCaptureWindow::AudioCaptureWindow(){
     memset(recBuf, 0, (SAMPLE_SIZE << 1));
 
     freqBuf = new Complex[SAMPLE_SIZE];
+
+    class FrequencyBar : public VerticalProgressBar {
+    public:
+        FrequencyBar() : VerticalProgressBar() {
+            lowBound = -0.8f;
+            highBound = 0.8f;
+            posX = 0.9f;
+            btnX = 0.1f;
+            btnY = 0.05f;
+            lineWidth = 10.0f;
+            pos = 0.5f;
+        }
+    } *freqBar = new FrequencyBar();
+    freqBar->onPosChange += [=](float pos){
+        soundTouch->setPitchSemiTones(Lerp(-12.0f, 12.0f, pos));
+    };
+    guiMgr->AddChild(freqBar);
+
+    Launch();
 }
 
 AudioCaptureWindow::~AudioCaptureWindow(){
@@ -243,29 +263,6 @@ void AudioCaptureWindow::OnRender(){
 
     guiMgr->OnChainRender();
 }
-
-void AudioCaptureWindow::OnCreate(){
-    class FrequencyBar : public VerticalProgressBar {
-    public:
-        FrequencyBar() : VerticalProgressBar() {
-            lowBound = -0.8f;
-            highBound = 0.8f;
-            posX = 0.9f;
-            btnX = 0.1f;
-            btnY = 0.05f;
-            lineWidth = 10.0f;
-            pos = 0.5f;
-        }
-    } *freqBar = new FrequencyBar();
-    freqBar->onPosChange += [=](float pos){
-        soundTouch->setPitchSemiTones(Lerp(-12.0f, 12.0f, pos));
-    };
-    guiMgr->AddChild(freqBar);
-
-    Launch();
-}
-
-void AudioCaptureWindow::OnClose(){}
 
 void AudioCaptureWindow::OnChar(char c){
     guiMgr->OnChar(c);

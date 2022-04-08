@@ -54,10 +54,6 @@ public:
 protected:
     bool focus = false;
 
-    Vector2 cliSize;
-    Point3 cursorOri;
-    Vector3 cursorDir;
-
     AViewObject* parent = NULL;
     List<AViewObject*> children;
 
@@ -79,7 +75,7 @@ public:
     virtual void AddChild(AViewObject* o);
     // 此函数不会回收内存，回收在解构器中进行
     virtual bool DeleteChild(AViewObject* o);
-    void EnumChildren(std::function<void(AViewObject*)> func);
+    virtual void EnumChildren(std::function<void(AViewObject*)> func);
     List<AViewObject*>& GetChildren();
 
     ViewObjectType GetType();
@@ -114,13 +110,10 @@ public:
     virtual void OnRender();
     virtual void OnRenderUVMap();
 
-    // 要求调用时OpenGL或者其他渲染API上下文存在
-    //TODO 目前调用尚未实现
-    virtual void OnCreate();
-    virtual void OnClose();
     virtual void OnTimer(int id);
     virtual void OnChar(char c);
     virtual void OnUnichar(wchar_t c);
+    //TODO 改为每一次渲染之前调用，提前告知比率等信息
     virtual void OnResize(Vector2 size);
     // 链式传递鼠标位移请使用3D
     virtual void OnMouseMove(Point3 ori, Vector3 dir);

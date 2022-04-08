@@ -236,9 +236,6 @@ int AppFrame::MainLoop(){
 
     glFontSize(12);
 
-    // 放在这里是为了让OpenGL初始化
-    mainFrame->OnCreate();
-
     Show();
     while (WaitHandleEvent()){
         Render();
@@ -364,9 +361,6 @@ void AppFrame::FireEvent(AWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, L
     // 事件中鼠标坐标上下需反转
     int x = GET_X_LPARAM(lParam), y = cliRect.bottom - GET_Y_LPARAM(lParam);
     switch (uMsg){
-    case WM_CLOSE:
-        window->OnClose();
-        break;
     case WM_TIMER:
         window->OnTimer(wParam);
         break;

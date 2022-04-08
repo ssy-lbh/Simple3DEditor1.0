@@ -85,7 +85,6 @@ public:
     virtual ~NodeMapWindow() override;
 
     virtual void OnRender() override;
-    virtual void OnCreate() override;
     virtual void OnChar(char c) override;
     virtual void OnUnichar(wchar_t c) override;
     virtual void OnResize(int x, int y) override;

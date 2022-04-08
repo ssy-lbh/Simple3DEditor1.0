@@ -9,6 +9,10 @@
 AttributeWindow::AttributeWindow(){
     DebugLog("AttributeWindow Launched");
     guiMgr = new GUIManagerObject();
+
+    // 注意：字体，编辑框高度为30px
+    GUIEditA* edit = new GUIEditA(Vector2(0.0f, 0.0f), 0.5f);
+    guiMgr->AddChild(edit);
 }
 
 AttributeWindow::~AttributeWindow(){
@@ -38,12 +42,6 @@ void AttributeWindow::OnRender(){
     guiMgr->transform.scale.Set(Vector3(cliSize.x * 0.5f, -cliSize.y * 0.5f, 1.0f));
     guiMgr->transform.position.Set(Vector3(-cliSize.x * 0.5f, cliSize.y * 0.5f, 0.0f));
     guiMgr->OnChainRender();
-}
-
-void AttributeWindow::OnCreate(){
-    // 注意：字体，编辑框高度为30px
-    GUIEditA* edit = new GUIEditA(Vector2(0.0f, 0.0f), 0.5f);
-    guiMgr->AddChild(edit);
 }
 
 void AttributeWindow::OnResize(int x, int y){

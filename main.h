@@ -104,8 +104,6 @@ public:
     void SelectObject(AViewObject* o);
     void SelectType(SelectionType type);
 
-    void OnCreate();
-    void OnClose();
     void OnTimer(int id);
 
     void OnAnimationFrame(float frame);
@@ -135,6 +133,7 @@ public:
     static void OnLeftUp(Point3 ori, Vector3 dir);
     static void OnRightDown(Point3 ori, Vector3 dir);
     static void OnRightUp(Point3 ori, Vector3 dir);
+    static void OnMouseWheel(int delta);
 
     static void RenderScene();
     static void RenderScreen();

@@ -25,9 +25,6 @@ public:
     virtual bool IsFocus();
     // 基于OpenGL的渲染，如果渲染全过程已做好抽象可换用API
     virtual void OnRender();
-    // 要求调用时OpenGL或者其他渲染API上下文存在
-    virtual void OnCreate();
-    virtual void OnClose();
     virtual void OnTimer(int id);
     virtual void OnChar(char c);
     virtual void OnUnichar(wchar_t c);

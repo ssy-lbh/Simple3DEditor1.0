@@ -8,5 +8,5 @@ AGUIObject::AGUIObject(const wchar_t* name, ViewObjectType type) : AViewObject(n
 AGUIObject::AGUIObject(WString name, ViewObjectType type) : AViewObject(name, type) {}
 AGUIObject::~AGUIObject(){}
 
-GUIManagerObject* AGUIObject::GetGUIManager(){ return guiMgr; }
-void AGUIObject::SetGUIManager(GUIManagerObject* guiMgr){ this->guiMgr = guiMgr; }
+GUIManagerObject* AGUIObject::GetGUIManager(){ return parentGUIMgr; }
+void AGUIObject::SetGUIManager(GUIManagerObject* guiMgr){ this->parentGUIMgr = guiMgr; }

@@ -1,9 +1,9 @@
-#ifndef __EDITOR_AUDIOPLAYERWINDOW__
-#define __EDITOR_AUDIOPLAYERWINDOW__
+#ifndef __EDITOR_WINDOWS_AUDIOPLAYERWINDOWOBJECT__
+#define __EDITOR_WINDOWS_AUDIOPLAYERWINDOWOBJECT__
 
 #include <define.h>
 
-#include <editor/main/Window.h>
+#include <editor/object/WindowObject.h>
 #include <editor/object/AudioSourceObject.h>
 
 struct AudioWaveFormat {
@@ -15,7 +15,7 @@ struct AudioWaveFormat {
     short wBitsPerSample;
 };
 
-class AudioPlayerWindow final : public AWindow, public CAudioSourceLoader {
+class AudioPlayerWindowObject final : public AWindowObject, public CAudioSourceLoader {
 private:
     static const int SAMPLE_SIZE_BIT = 12;
     static const int SAMPLE_SIZE = (1 << SAMPLE_SIZE_BIT);
@@ -32,22 +32,24 @@ private:
     bool displayWave = false;
 
 public:
-    AudioPlayerWindow();
-    virtual ~AudioPlayerWindow() override;
+    AudioPlayerWindowObject();
+    virtual ~AudioPlayerWindowObject() override;
 
     void DrawLineGraph(float* height, size_t size);
     void DrawAmplitudeGraph(float* height, size_t size);
     void DrawTime();
     void RenderGraph();
 
+    virtual bool OnHit2D(Point2 pos) override;
     virtual void OnRender() override;
     virtual void OnChar(char c) override;
     virtual void OnUnichar(wchar_t c) override;
-    virtual void OnMouseMove(int x, int y) override;
-    virtual void OnLeftDown(int x, int y) override;
-    virtual void OnLeftUp(int x, int y) override;
-    virtual void OnRightDown(int x, int y) override;
-    virtual void OnRightUp(int x, int y) override;
+    virtual void OnResize(Vector2 size) override;
+    virtual void OnMouseMove2D(Point2 pos) override;
+    virtual void OnLeftDown2D(Point2 pos) override;
+    virtual void OnLeftUp2D(Point2 pos) override;
+    virtual void OnRightDown2D(Point2 pos) override;
+    virtual void OnRightUp2D(Point2 pos) override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileA(const char* path) override;
@@ -57,7 +59,6 @@ public:
 
     void PreloadFile(WString file);
     void LoadFile(WString file);
-    void LoadObject(AudioSourceObject* o);
     bool IsLoaded();
     void Launch();
     void Stop();

@@ -5,12 +5,6 @@
 
 #include <main.h>
 #include <res.h>
-#include <editor/gui/ViewManager.h>
-#include <editor/gui/GUIUtils.h>
-#include <editor/dialog/ColorBoard.h>
-#include <editor/dialog/Tips.h>
-#include <editor/main/ViewObject.h>
-#include <editor/object/AllObjects.h>
 #include <utils/File.h>
 #include <utils/AudioUtils.h>
 #include <utils/math3d/Math.h>
@@ -21,6 +15,13 @@
 #include <utils/gl/GLTexture2D.h>
 #include <utils/gl/GLSkyBox.h>
 #include <utils/gl/GLSimplified.h>
+#include <editor/gui/Menu.h>
+#include <editor/gui/ViewManager.h>
+#include <editor/gui/GUIUtils.h>
+#include <editor/dialog/ColorBoard.h>
+#include <editor/dialog/Tips.h>
+#include <editor/main/ViewObject.h>
+#include <editor/object/AllObjects.h>
 
 MainWindow::MoveOperation::MoveOperation(MainWindow* main) : main(main) {}
 MainWindow::MoveOperation::~MoveOperation(){}
@@ -633,18 +634,7 @@ MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f,
     }else{
         alListenerDirv3(Vector3::forward, Vector3::up);
     }
-}
 
-MainWindow::~MainWindow(){
-    DebugLog("MainWindow Destroyed");
-    if (guiMgr) delete guiMgr;
-    if (basicMenu) delete basicMenu;
-    if (insertMenu) delete insertMenu;
-    if (curOp) delete curOp;
-    if (skyBox) delete skyBox;
-}
-
-void MainWindow::OnCreate(){
     skyBox = new GLSkyBox();
     skyBox->Set(GLSkyBox::LEFT, new GLTexture2D(IDT_SKYBOX_LEFT));
     skyBox->Set(GLSkyBox::RIGHT, new GLTexture2D(IDT_SKYBOX_RIGHT));
@@ -715,12 +705,13 @@ void MainWindow::OnCreate(){
     guiMgr->AddChild(rotBtn);
 }
 
-void MainWindow::OnClose(){}
-
-void MainWindow::OnTimer(int id){}
-
-void MainWindow::OnResize(int x, int y){
-    UpdateWindowSize(x, y);
+MainWindow::~MainWindow(){
+    DebugLog("MainWindow Destroyed");
+    if (guiMgr) delete guiMgr;
+    if (basicMenu) delete basicMenu;
+    if (insertMenu) delete insertMenu;
+    if (curOp) delete curOp;
+    if (skyBox) delete skyBox;
 }
 
 void MainWindow::OnMouseMove(int x, int y){
@@ -745,6 +736,8 @@ void MainWindow::OnRightDown(int x, int y){
     if (curTool)
         curTool->OnRightDown();
     Main::SetMenu(basicMenu);
+    // GUI测试
+    Main::OnRightDown(camPos, cursorDir);
 }
 
 void MainWindow::OnRightUp(int x, int y){
@@ -756,6 +749,8 @@ void MainWindow::OnRightUp(int x, int y){
     // 工具
     if (curTool)
         curTool->OnRightUp();
+    // GUI测试
+    Main::OnRightUp(camPos, cursorDir);
 }
 
 void MainWindow::InitCamera(){
@@ -777,7 +772,7 @@ void MainWindow::RenderModelView(){
     glDisable(GL_LOGIC_OP);
 
     glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LESS);
+    glDepthFunc(GL_LEQUAL);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
@@ -815,6 +810,8 @@ void MainWindow::RenderModelView(){
 
     //TODO 后续光照设置法线
     Main::RenderScene();
+
+    glDepthFunc(GL_LESS);
 
     // 已选择点绘制
     glDisable(GL_LIGHTING);
@@ -913,12 +910,10 @@ void MainWindow::SetTool(ITool* tool){
 void MainWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);
     cursorDir = camForward + camRight * cursorPos.x * aspect + camUp * cursorPos.y;
-    if (curOp){
+    if (curOp)
         curOp->OnMove();
-    }
-    if (curTool){
+    if (curTool)
         curTool->OnMove();
-    }
     // GUI测试代码
     Main::OnMouseMove(camPos, cursorDir);
 }
@@ -1135,12 +1130,10 @@ void MainWindow::OnLeftUp(int x, int y){
 }
 
 void MainWindow::OnChar(char c){
-    AWindow::OnChar(c);
     guiMgr->OnChar(c);
 }
 
 void MainWindow::OnUnichar(wchar_t c){
-    AWindow::OnUnichar(c);
     guiMgr->OnUnichar(c);
 }
 

@@ -7,7 +7,7 @@
 
 class AGUIObject : public AViewObject {
 protected:
-    GUIManagerObject* guiMgr = NULL;
+    GUIManagerObject* parentGUIMgr = NULL;
 
     AGUIObject(ViewObjectType type);
     AGUIObject(const wchar_t* name, ViewObjectType type);

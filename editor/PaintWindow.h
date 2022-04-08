@@ -73,7 +73,6 @@ public:
     PaintWindow();
     virtual ~PaintWindow();
 
-    virtual void OnCreate() override;
     virtual void OnRender() override;
     virtual void OnResize(int x, int y) override;
     virtual void OnMouseMove(int x, int y) override;

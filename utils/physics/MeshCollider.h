@@ -7,7 +7,7 @@
 
 class MeshCollider final : public ACollider {
 public:
-    Mesh* mesh;
+    Mesh* mesh = NULL;
 
     MeshCollider(Rigidbody* rb);
     virtual ~MeshCollider();

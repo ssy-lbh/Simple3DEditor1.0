@@ -175,6 +175,9 @@ PaintWindow::PaintWindow(){
     basicMenu->AddItem(new MenuItem());
     basicMenu->AddItem(new MenuItem(L"使用画布纹理", [=]{ this->OnMenuAccel(IDM_TEXTURE_USE_PAINT, false); }));
     basicMenu->AddItem(new MenuItem(L"调色板", [=]{ this->OnMenuAccel(IDM_SELECT_COLOR, false); }));
+
+    CreateImage(500, 500);
+    SetBrush(new DefaultBrush(this, IDS_BRUSH_OVERLAY));
 }
 
 PaintWindow::~PaintWindow(){
@@ -182,33 +185,6 @@ PaintWindow::~PaintWindow(){
     if (basicMenu) delete basicMenu;
     if (brush) delete brush;
     if (paintTex) delete paintTex;
-}
-
-void PaintWindow::OnCreate(){
-    CreateImage(500, 500);
-    SetBrush(new DefaultBrush(this, IDS_BRUSH_OVERLAY));
-
-    // 测试代码
-
-    // 可能是因为该段渲染流程使用的内部其他类型的管线
-    // Vertex会进入内部VertexBuffer
-    // Color会写入uniforn变量中
-    // glEnd()以后执行DrawCall时，颜色只会以最后设置的颜色为准
-    // 所以目前顶点属性的插值尚未解决
-
-    // GLFrameBuffer* frame = new GLFrameBuffer();
-    // frame->BindTexture(paintTex);
-    // frame->Enable();
-    // glPushMatrix();
-    // glScalef(1.0f, -1.0f, 1.0f);
-    // glBegin(GL_TRIANGLES);
-    // glColor3f(1.0f, 0.0f, 0.0f); glVertex2f(0.0f, 1.0f);
-    // glColor3f(0.0f, 1.0f, 0.0f); glVertex2f(0.866f, -0.5f);
-    // glColor3f(0.0f, 0.0f, 1.0f); glVertex2f(-0.866f, -0.5f);
-    // glEnd();
-    // glPopMatrix();
-    // frame->Disable();
-    // delete frame;
 }
 
 void PaintWindow::OnRender(){

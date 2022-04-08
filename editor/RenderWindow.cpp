@@ -96,8 +96,6 @@ void RenderWindow::OnRender(){
     guiMgr->OnChainRender();
 }
 
-void RenderWindow::OnCreate(){}
-
 void RenderWindow::OnTimer(int id){}
 
 void RenderWindow::OnChar(char c){}

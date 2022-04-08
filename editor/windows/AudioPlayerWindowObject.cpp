@@ -1,4 +1,4 @@
-#include <editor/AudioPlayerWindow.h>
+#include <editor/windows/AudioPlayerWindowObject.h>
 
 #include <lib/openal/al.h>
 
@@ -19,12 +19,11 @@
 #include <editor/main/ViewObject.h>
 #include <editor/gui/Menu.h>
 #include <editor/gui/GUIUtils.h>
-#include <editor/gui/Menu.h>
 #include <editor/object/AudioSourceObject.h>
 #include <editor/object/GUIManagerObject.h>
 
-AudioPlayerWindow::AudioPlayerWindow() : CAudioSourceLoader(source) {
-    DebugLog("AudioPlayerWindow Launched");
+AudioPlayerWindowObject::AudioPlayerWindowObject() : AWindowObject(L"AudioPlayerWindow"), CAudioSourceLoader(source) {
+    DebugLog("AudioPlayerWindowObject Launched");
 
     guiMgr = new GUIManagerObject();
 
@@ -32,10 +31,10 @@ AudioPlayerWindow::AudioPlayerWindow() : CAudioSourceLoader(source) {
     basicMenu->AddItem(new MenuItem(L"加载", [=]{ this->OnMenuAccel(IDM_LOAD, false); }));
     basicMenu->AddItem(new MenuItem(L"加载当前对象", [=]{
         if (Main::data->curObject && Main::data->curObject->GetType() != ViewObjectType::OBJECT_AUDIO_SOURCE){
-            DebugError("AudioPlayerWindow::LoadObject Object Type Error");
+            DebugError("AudioPlayerWindowObject::LoadObject Object Type Error");
             return;
         }
-        this->AudioSourceLoad((AudioSourceObject*)Main::data->curObject);
+        this->AudioSourceLoad(dynamic_cast<AudioSourceObject*>(Main::data->curObject));
     }));
     basicMenu->AddItem(new MenuItem(
         Value<const wchar_t*>([=]{ return this->IsLoop() ? L"循环:开" : L"循环:关"; }),
@@ -43,14 +42,14 @@ AudioPlayerWindow::AudioPlayerWindow() : CAudioSourceLoader(source) {
             bool loop = this->IsLoop();
             loop = !loop;
             this->SetLoop(loop);
-            DebugLog("AudioPlayerWindow::LoopItem State %s", loop ? "Looping" : "Default");
+            DebugLog("AudioPlayerWindowObject::LoopItem State %s", loop ? "Looping" : "Default");
         }
     ));
     basicMenu->AddItem(new MenuItem(
         Value<const wchar_t*>([=]{ return this->displayWave ? L"显示模式:波形" : L"显示模式:频谱"; }),
         [=]{
             this->displayWave = !this->displayWave;
-            DebugLog("AudioPlayerWindow::DisplayModeItem State %s", this->displayWave ? "Wave" : "Frequency");
+            DebugLog("AudioPlayerWindowObject::DisplayModeItem State %s", this->displayWave ? "Wave" : "Frequency");
         }
     ));
     basicMenu->AddItem(new MenuItem(
@@ -59,7 +58,7 @@ AudioPlayerWindow::AudioPlayerWindow() : CAudioSourceLoader(source) {
             bool state = this->HasDopplerEffect();
             state = !state;
             this->SetDopplerEffect(state);
-            DebugLog("AudioPlayerWindow::DopplerEffectItem State %s", state ? "On" : "Off");
+            DebugLog("AudioPlayerWindowObject::DopplerEffectItem State %s", state ? "On" : "Off");
         }
     ));
 
@@ -92,9 +91,9 @@ AudioPlayerWindow::AudioPlayerWindow() : CAudioSourceLoader(source) {
 
     class ProgressBar : public HorizontalProgressBar {
     public:
-        AudioPlayerWindow* window;
+        AudioPlayerWindowObject* window;
 
-        ProgressBar(AudioPlayerWindow* window) : HorizontalProgressBar(), window(window) {
+        ProgressBar(AudioPlayerWindowObject* window) : HorizontalProgressBar(), window(window) {
             lowBound = -0.6f;
             highBound = 0.6f;
             posY = -0.1f;
@@ -134,10 +133,10 @@ AudioPlayerWindow::AudioPlayerWindow() : CAudioSourceLoader(source) {
 
     class LoopButton : public IconButton {
     public:
-        AudioPlayerWindow* window;
+        AudioPlayerWindowObject* window;
         bool state = false;
 
-        LoopButton(AudioPlayerWindow* window) : IconButton(Vector2(0.7f, -0.2f), Vector2(0.2f, 0.2f), 0.04f), window(window) {
+        LoopButton(AudioPlayerWindowObject* window) : IconButton(Vector2(0.7f, -0.2f), Vector2(0.2f, 0.2f), 0.04f), window(window) {
             hoverColor = Vector3(0.0f, 0.0f, 0.2f);
             defaultColor = Vector3(0.0f, 0.0f, 0.0f);
             state = window->IsLoop();
@@ -156,17 +155,17 @@ AudioPlayerWindow::AudioPlayerWindow() : CAudioSourceLoader(source) {
         bool loop = this->IsLoop();
         loop = !loop;
         this->SetLoop(loop);
-        DebugLog("AudioPlayerWindow::LoopOption State %s", loop ? "Looping" : "Default");
+        DebugLog("AudioPlayerWindowObject::LoopOption State %s", loop ? "Looping" : "Default");
     };
     guiMgr->AddChild(loopBtn);
 }
 
-AudioPlayerWindow::~AudioPlayerWindow(){
-    DebugLog("AudioPlayerWindow Destroyed");
+AudioPlayerWindowObject::~AudioPlayerWindowObject(){
+    DebugLog("AudioPlayerWindowObject Destroyed");
     if (guiMgr) delete guiMgr;
 }
 
-void AudioPlayerWindow::DrawLineGraph(float* height, size_t size){
+void AudioPlayerWindowObject::DrawLineGraph(float* height, size_t size){
     glDisable(GL_LINE_SMOOTH);
     glLineWidth(1.0f);
     glBegin(GL_LINE_STRIP);
@@ -178,7 +177,7 @@ void AudioPlayerWindow::DrawLineGraph(float* height, size_t size){
     glEnd();
 }
 
-void AudioPlayerWindow::DrawAmplitudeGraph(float* height, size_t size){
+void AudioPlayerWindowObject::DrawAmplitudeGraph(float* height, size_t size){
     glDisable(GL_LINE_SMOOTH);
     glLineWidth(1.0f);
     glBegin(GL_LINES);
@@ -193,7 +192,7 @@ void AudioPlayerWindow::DrawAmplitudeGraph(float* height, size_t size){
     glEnd();
 }
 
-void AudioPlayerWindow::RenderGraph(){
+void AudioPlayerWindowObject::RenderGraph(){
     ALint offset = source->GetOffset();
     ALint sampleSize = source->GetSampleSize();
     ALint channels = source->GetChannelCount();
@@ -238,7 +237,7 @@ void AudioPlayerWindow::RenderGraph(){
     }
 }
 
-void AudioPlayerWindow::DrawTime(){
+void AudioPlayerWindowObject::DrawTime(){
     int total = source->GetLength();
     int offset = source->GetOffset() / source->GetFrequency();
     char time[20];
@@ -250,18 +249,10 @@ void AudioPlayerWindow::DrawTime(){
     glDrawString(time);
 }
 
-void AudioPlayerWindow::OnRender(){
-    glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
-
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glEnable(GL_ALPHA_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    GLUtils::ResetProjection();
-    GLUtils::ResetModelView();
+void AudioPlayerWindowObject::OnRender(){
+    //TODO 3D窗口背景无效，仅半透明时渲染有效
+    glColor4f(0.3f, 0.3f, 0.3f, 0.5f);
+    GLUtils::DrawRect(-1.0f, -1.0f, 1.0f, 1.0f);
 
     if (!source){
         glColor3f(1.0f, 0.5f, 0.0f);
@@ -278,44 +269,53 @@ void AudioPlayerWindow::OnRender(){
     guiMgr->OnChainRender();
 }
 
-void AudioPlayerWindow::OnChar(char c){
+bool AudioPlayerWindowObject::OnHit2D(Point2 pos){
+    return pos.x >= -1.0f && pos.x <= 1.0f &&
+            pos.y >= -1.0f && pos.y <= 1.0f;
+}
+
+void AudioPlayerWindowObject::OnChar(char c){
     guiMgr->OnChar(c);
 }
 
-void AudioPlayerWindow::OnUnichar(wchar_t c){
+void AudioPlayerWindowObject::OnUnichar(wchar_t c){
     guiMgr->OnUnichar(c);
 }
 
-void AudioPlayerWindow::OnMouseMove(int x, int y){
-    UpdateCursor(x, y);
+void AudioPlayerWindowObject::OnResize(Vector2 size){
+    UpdateWindowSize(size);
+}
+
+void AudioPlayerWindowObject::OnMouseMove2D(Point2 pos){
+    UpdateCursor(pos);
     guiMgr->OnMouseMove2D(cursorPos);
 }
 
-void AudioPlayerWindow::OnLeftDown(int x, int y){
-    UpdateCursor(x, y);
+void AudioPlayerWindowObject::OnLeftDown2D(Point2 pos){
+    UpdateCursor(pos);
     guiMgr->OnLeftDown2D(cursorPos);
 }
 
-void AudioPlayerWindow::OnLeftUp(int x, int y){
-    UpdateCursor(x, y);
+void AudioPlayerWindowObject::OnLeftUp2D(Point2 pos){
+    UpdateCursor(pos);
     guiMgr->OnLeftUp2D(cursorPos);
 }
 
-void AudioPlayerWindow::OnRightDown(int x, int y){
-    UpdateCursor(x, y);
+void AudioPlayerWindowObject::OnRightDown2D(Point2 pos){
+    UpdateCursor(pos);
     guiMgr->OnRightDown2D(cursorPos);
     Main::SetMenu(basicMenu);
 }
 
-void AudioPlayerWindow::OnRightUp(int x, int y){
-    UpdateCursor(x, y);
+void AudioPlayerWindowObject::OnRightUp2D(Point2 pos){
+    UpdateCursor(pos);
     guiMgr->OnRightUp2D(cursorPos);
 }
 
-void AudioPlayerWindow::OnMouseWheel(int delta){}
+void AudioPlayerWindowObject::OnMouseWheel(int delta){}
 
-void AudioPlayerWindow::OnMenuAccel(int id, bool accel){
-    DebugLog("AudioPlayerWindow::OnMenuAccel %d %s", id, accel ? "true" : "false");
+void AudioPlayerWindowObject::OnMenuAccel(int id, bool accel){
+    DebugLog("AudioPlayerWindowObject::OnMenuAccel %d %s", id, accel ? "true" : "false");
     switch (id){
     case IDM_LOAD:
         OnInsLoad();
@@ -326,14 +326,14 @@ void AudioPlayerWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void AudioPlayerWindow::OnDropFileA(const char* path){}
+void AudioPlayerWindowObject::OnDropFileA(const char* path){}
 
-void AudioPlayerWindow::OnDropFileW(const wchar_t* path){
-    DebugLog("AudioPlayerWindow::OnDropFileW %S", path);
+void AudioPlayerWindowObject::OnDropFileW(const wchar_t* path){
+    DebugLog("AudioPlayerWindowObject::OnDropFileW %S", path);
     PreloadFile(WString(path));
 }
 
-void AudioPlayerWindow::OnInsLoad(){
+void AudioPlayerWindowObject::OnInsLoad(){
     // 暂不使用 L"PCM音频文件(*.wav)\0*.wav\0所有音频类型(.*)\0*.*\0"，此状态下发现Shell时可能的环境错误
     // 若要使用请拖入文件
     static const WString filter = Resource::GetWString(IDS_WAVFILE_FILTER);
@@ -345,18 +345,18 @@ void AudioPlayerWindow::OnInsLoad(){
     PreloadFile(file);
 }
 
-void AudioPlayerWindow::PreloadFile(WString file){
+void AudioPlayerWindowObject::PreloadFile(WString file){
     if (!file.EndsWith(L".wav")){
         static const WString message = Resource::GetWString(IDS_WAVFILE_FORM_WARNING);
         static const WString caption = Resource::GetWString(IDS_WAVFILE_FORM_WARNING_CAPTION);
         switch (ShellMsgBox(caption, message)){
         case MSGBOX_NO:
-            DebugLog("AudioPlayerWindow::PreloadFile Stop Load File");
+            DebugLog("AudioPlayerWindowObject::PreloadFile Stop Load File");
             return;
         case MSGBOX_YES:
-            DebugLog("AudioPlayerWindow::PreloadFile Preparing FFmpeg");
+            DebugLog("AudioPlayerWindowObject::PreloadFile Preparing FFmpeg");
             if (!ShellFFmpeg(file, L"temp.wav")){
-                DebugError("AudioPlayerWindow::PreloadFile ShellFFmpegW Failed");
+                DebugError("AudioPlayerWindowObject::PreloadFile ShellFFmpegW Failed");
                 return;
             }
             LoadFile(L"temp.wav");
@@ -369,16 +369,16 @@ void AudioPlayerWindow::PreloadFile(WString file){
     LoadFile(file);
 }
 
-void AudioPlayerWindow::LoadFile(WString file){
+void AudioPlayerWindowObject::LoadFile(WString file){
     if (file.GetLength() == 0){
         return;
     }
 
-    DebugLog("AudioPlayerWindow::LoadFile From %S", file.GetString());
+    DebugLog("AudioPlayerWindowObject::LoadFile From %S", file.GetString());
 
     File src(file);
     if (!src.Open()){
-        DebugError("AudioPlayerWindow::LoadFile File Open Failed");
+        DebugError("AudioPlayerWindowObject::LoadFile File Open Failed");
         return;
     }
 
@@ -392,20 +392,20 @@ void AudioPlayerWindow::LoadFile(WString file){
     src.Read(&specNum, 4);
     if (specNum != *(int*)"RIFF"){
         src.Close();
-        DebugError("AudioPlayerWindow::LoadFile File Magic Number 'RIFF' Not Found");
+        DebugError("AudioPlayerWindowObject::LoadFile File Magic Number 'RIFF' Not Found");
         return;
     }
     src.Read(&specNum, 4);
     src.Read(&specNum, 4);
     if (specNum != *(int*)"WAVE"){
         src.Close();
-        DebugError("AudioPlayerWindow::LoadFile File Magic Number 'WAVE' Not Found");
+        DebugError("AudioPlayerWindowObject::LoadFile File Magic Number 'WAVE' Not Found");
         return;
     }
     readLen = src.Read(&specNum, 4);
     while (true){
         if (readLen != 4){
-            DebugError("AudioPlayerWindow::LoadFile File Data Block Not Found");
+            DebugError("AudioPlayerWindowObject::LoadFile File Data Block Not Found");
             src.Close();
             return;
         }
@@ -413,7 +413,7 @@ void AudioPlayerWindow::LoadFile(WString file){
             readLen = src.Read(&specNum, 4);
             if (specNum != 0x10){
                 src.Close();
-                DebugError("AudioPlayerWindow::LoadFile File Format Length Is Not 0x10 [%d]", specNum);
+                DebugError("AudioPlayerWindowObject::LoadFile File Format Length Is Not 0x10 [%d]", specNum);
                 return;
             }
             src.Read(&wav, sizeof(wav));
@@ -431,13 +431,13 @@ void AudioPlayerWindow::LoadFile(WString file){
     }
     if (!fmtRead){
         src.Close();
-        DebugError("AudioPlayerWindow::LoadFile File Format Not Found");
+        DebugError("AudioPlayerWindowObject::LoadFile File Format Not Found");
         return;
     }
     ALint format = GetWaveFormat(&wav);
     if (format == -1){
         src.Close();
-        DebugError("AudioPlayerWindow::LoadFile File Format Unrecognized");
+        DebugError("AudioPlayerWindowObject::LoadFile File Format Unrecognized");
         return;
     }
 
@@ -479,61 +479,61 @@ void AudioPlayerWindow::LoadFile(WString file){
     
     src.Close();
 
-    DebugLog("AudioPlayerWindow::LoadFile Success");
+    DebugLog("AudioPlayerWindowObject::LoadFile Success");
 }
 
-bool AudioPlayerWindow::IsLoaded(){
+bool AudioPlayerWindowObject::IsLoaded(){
     return source;
 }
 
-void AudioPlayerWindow::Launch(){
+void AudioPlayerWindowObject::Launch(){
     if (!source){
-        DebugError("AudioPlayerWindow::Launch Is Not Loaded");
+        DebugError("AudioPlayerWindowObject::Launch Is Not Loaded");
         return;
     }
 
     source->Play();
 
-    DebugLog("AudioPlayerWindow::Launch Success");
+    DebugLog("AudioPlayerWindowObject::Launch Success");
 }
 
-void AudioPlayerWindow::Stop(){
+void AudioPlayerWindowObject::Stop(){
     if (!source)
         return;
     source->Stop();
 }
 
-bool AudioPlayerWindow::IsLaunched(){
+bool AudioPlayerWindowObject::IsLaunched(){
     if (!source)
         return false;
     return source->IsPlaying();
 }
 
-bool AudioPlayerWindow::IsLoop(){
+bool AudioPlayerWindowObject::IsLoop(){
     if (!source)
         return false;
     return source->IsLoop();
 }
 
-void AudioPlayerWindow::SetLoop(bool loop){
+void AudioPlayerWindowObject::SetLoop(bool loop){
     if (!source)
         return;
     return source->SetLoop(loop);
 }
 
-ALint AudioPlayerWindow::GetOffset(){
+ALint AudioPlayerWindowObject::GetOffset(){
     if (!source)
         return 0;
     return source->GetOffset();
 }
 
-float AudioPlayerWindow::GetOffsetRate(){
+float AudioPlayerWindowObject::GetOffsetRate(){
     if (!source)
         return 0.0f;
     return (float)source->GetOffset() / source->GetSize();
 }
 
-void AudioPlayerWindow::SetOffsetRate(float rate){
+void AudioPlayerWindowObject::SetOffsetRate(float rate){
     ALint size;
 
     if (!source)
@@ -542,25 +542,25 @@ void AudioPlayerWindow::SetOffsetRate(float rate){
     source->SetOffset(Clamp((int)Round(rate * size), 0, size));
 }
 
-void AudioPlayerWindow::SetGain(float gain){
+void AudioPlayerWindowObject::SetGain(float gain){
     if (!source)
         return;
     source->SetGain(gain);
 }
 
-bool AudioPlayerWindow::HasDopplerEffect(){
+bool AudioPlayerWindowObject::HasDopplerEffect(){
     if (!source)
         return false;
     return source->HasDopplerEffect();
 }
 
-void AudioPlayerWindow::SetDopplerEffect(bool on){
+void AudioPlayerWindowObject::SetDopplerEffect(bool on){
     if (!source)
         return;
     source->SetDopplerEffect(on);
 }
 
-ALint AudioPlayerWindow::GetWaveFormat(AudioWaveFormat* wav){
+ALint AudioPlayerWindowObject::GetWaveFormat(AudioWaveFormat* wav){
     ALenum format = AL_NONE;
     switch (wav->nChannels){
     case 1:

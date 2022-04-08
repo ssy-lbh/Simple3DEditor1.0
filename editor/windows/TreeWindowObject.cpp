@@ -1,6 +1,4 @@
-#include <editor/TreeWindow.h>
-
-#include <lib/opengl/gl/gl.h>
+#include <editor/windows/TreeWindowObject.h>
 
 #include <main.h>
 #include <res.h>
@@ -9,12 +7,13 @@
 #include <editor/dialog/Tips.h>
 #include <utils/os/Font.h>
 #include <utils/gl/GLUtils.h>
+#include <utils/gl/GLSimplified.h>
 #include <editor/main/ViewObject.h>
 #include <editor/object/AllObjects.h>
 #include <editor/windows/AllWindows.h>
 
-TreeWindow::TreeWindow(){
-    DebugLog("TreeWindow Launched");
+TreeWindowObject::TreeWindowObject() : AWindowObject(L"TreeWindow") {
+    DebugLog("TreeWindowObject Launched");
 
     basicMenu = new Menu();
 
@@ -65,36 +64,27 @@ TreeWindow::TreeWindow(){
     }));
 }
 
-TreeWindow::~TreeWindow(){
-    DebugLog("TreeWindow Destroyed");
+TreeWindowObject::~TreeWindowObject(){
+    DebugLog("TreeWindowObject Destroyed");
     if (basicMenu) delete basicMenu;
 }
 
-void TreeWindow::AddObject(AViewObject* o){
+void TreeWindowObject::AddObject(AViewObject* o){
     if (selObject){
         selObject->AddChild(o);
         return;
     }
-    this->AddObject(o);
+    Main::AddObject(o);
 }
 
-void TreeWindow::OnRender(){
-    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+bool TreeWindowObject::OnHit2D(Point2 pos){
+    return pos.x >= -1.0f && pos.x <= 1.0f &&
+            pos.y >= -1.0f && pos.y <= 1.0f;
+}
 
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_AUTO_NORMAL);
-    glEnable(GL_BLEND);
-    glDisable(GL_STENCIL_TEST);
-    glEnable(GL_ALPHA_TEST);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_CULL_FACE);
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    GLUtils::ResetProjection();
-    GLUtils::ResetModelView();
+void TreeWindowObject::OnRender(){
+    glColor4f(0.2f, 0.2f, 0.2f, 0.5f);
+    GLUtils::DrawRect(-1.0f, -1.0f, 1.0f, 1.0f);
 
     objectList.Clear();
 
@@ -103,7 +93,7 @@ void TreeWindow::OnRender(){
     RenderItem(Main::data->screen);
 }
 
-void TreeWindow::RenderItem(AViewObject* o){
+void TreeWindowObject::RenderItem(AViewObject* o){
     float xbase = -1.0f + 30.0f * (depth + 1) * cliInvSize.x;
     float ybase = 1.0f - 30.0f * objectList.Size() * cliInvSize.y;
 
@@ -142,41 +132,41 @@ void TreeWindow::RenderItem(AViewObject* o){
     }
 }
 
-void TreeWindow::OnChar(char c){}
+void TreeWindowObject::OnChar(char c){}
 
-void TreeWindow::OnUnichar(wchar_t c){}
+void TreeWindowObject::OnUnichar(wchar_t c){}
 
-void TreeWindow::OnResize(int x, int y){
-    UpdateWindowSize(x, y);
+void TreeWindowObject::OnResize(Vector2 size){
+    UpdateWindowSize(size);
 }
 
-void TreeWindow::UpdateCursor(int x, int y){
-    AWindow::UpdateCursor(x, y);
+void TreeWindowObject::UpdateCursor(Point2 pos){
+    AWindowObject::UpdateCursor(pos);
 }
 
-void TreeWindow::UpdateWindowSize(int x, int y){
-    AWindow::UpdateWindowSize(x, y);
+void TreeWindowObject::UpdateWindowSize(Vector2 size){
+    AWindowObject::UpdateWindowSize(size);
 }
 
-void TreeWindow::OnMouseMove(int x, int y){
-    UpdateCursor(x, y);
+void TreeWindowObject::OnMouseMove2D(Point2 pos){
+    UpdateCursor(pos);
     if (dragObject)
         Main::SetCursor(IDC_UPARROW);
 }
 
-void TreeWindow::OnLeftDown(int x, int y){
+void TreeWindowObject::OnLeftDown2D(Point2 pos){
     size_t selected;
 
-    UpdateCursor(x, y);
+    UpdateCursor(pos);
 
     selected = (size_t)((1.0f - cursorPos.y) / (30.0f * cliInvSize.y));
     dragObject = (selected < objectList.Size() ? objectList[selected] : NULL);
 }
 
-void TreeWindow::OnLeftUp(int x, int y){
+void TreeWindowObject::OnLeftUp2D(Point2 pos){
     size_t selected;
 
-    UpdateCursor(x, y);
+    UpdateCursor(pos);
 
     if (!dragObject)
         return;
@@ -186,41 +176,41 @@ void TreeWindow::OnLeftUp(int x, int y){
         AViewObject* o = objectList[selected];
         if (o == dragObject){
             if (Main::data->curObject != o){
-                DebugLog("TreeWindow Select Object %S", o->name.GetString());
+                DebugLog("TreeWindowObject Select Object %S", o->name.GetString());
                 Main::SelectObject(o);
                 dragObject = NULL;
                 return;
             }
             o->unfold = !o->unfold;
-            DebugLog("TreeWindow %s Object %S", o->unfold ? "Unfold" : "Fold", o->name.GetString());
+            DebugLog("TreeWindowObject %s Object %S", o->unfold ? "Unfold" : "Fold", o->name.GetString());
         }else{
             if (!o || !Main::AddObjectChild(o, dragObject)){
                 dragObject = NULL;
                 return;
             }
-            DebugLog("TreeWindow Set %S As Child Of %S", dragObject->name.GetString(), o->name.GetString());
+            DebugLog("TreeWindowObject Set %S As Child Of %S", dragObject->name.GetString(), o->name.GetString());
         }
     }
     dragObject = NULL;
 }
 
-void TreeWindow::OnRightDown(int x, int y){
+void TreeWindowObject::OnRightDown2D(Point2 pos){
     size_t selPos;
 
-    UpdateCursor(x, y);
+    UpdateCursor(pos);
     
     selPos = (size_t)((1.0f - cursorPos.y) / (30.0f * cliInvSize.y));
     selObject = (selPos < objectList.Size() ? objectList[selPos] : NULL);
     Main::SetMenu(basicMenu);
 }
 
-void TreeWindow::OnRightUp(int x, int y){
-    UpdateCursor(x, y);
+void TreeWindowObject::OnRightUp2D(Point2 pos){
+    UpdateCursor(pos);
 }
 
-void TreeWindow::OnMouseWheel(int delta){}
+void TreeWindowObject::OnMouseWheel(int delta){}
 
-void TreeWindow::OnMenuAccel(int id, bool accel){
+void TreeWindowObject::OnMenuAccel(int id, bool accel){
     switch (id){
     case IDM_DELETE:
         if (Main::data->curObject)

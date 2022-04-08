@@ -55,6 +55,7 @@ PROGOBJ		= main\
 				editor\object\GUIManagerObject editor\object\GUIObject editor\object\GUIMeshObject\
 				editor\main\Window editor\main\Tool editor\main\Operation\
 				editor\main\Transform\
+				editor\windows\TreeWindowObject editor\windows\AudioPlayerWindowObject\
 				manager\WindowManager
 PLATOBJ		=  utils\File utils\os\Shell utils\os\Log utils\os\Thread utils\os\System\
 				utils\os\Time utils\os\Font utils\os\Appframe utils\os\Resource\

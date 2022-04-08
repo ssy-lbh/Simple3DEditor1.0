@@ -1,6 +1,7 @@
 #include <editor/object/WindowObject.h>
 
-AWindowObject::AWindowObject() : AViewObject(L"Window", ViewObjectType::OBJECT_WINDOW) {}
+AWindowObject::AWindowObject() : AGUIObject(L"Window", ViewObjectType::OBJECT_WINDOW) {}
+AWindowObject::AWindowObject(const wchar_t* name) : AGUIObject(name, ViewObjectType::OBJECT_WINDOW) {}
 AWindowObject::~AWindowObject(){}
 
 void AWindowObject::UpdateCursor(Point2 pos){
@@ -14,9 +15,12 @@ void AWindowObject::UpdateWindowSize(Vector2 size){
     aspect = (float)cliSize.x / cliSize.y;
 }
 
+bool AWindowObject::OnHit2D(Point2 pos){
+    return pos.x >= -1.0f && pos.x <= 1.0f &&
+            pos.y >= -1.0f && pos.y <= 1.0f;
+}
+
 void AWindowObject::OnRender(){}
-void AWindowObject::OnCreate(){}
-void AWindowObject::OnClose(){}
 void AWindowObject::OnTimer(int id){}
 void AWindowObject::OnChar(char c){}
 void AWindowObject::OnUnichar(wchar_t c){}

@@ -90,6 +90,8 @@ class CameraObject;
 class GUIManagerObject;
 class AGUIObject;
 class GUIMeshObject;
+class PointLightObject;
+class AWindowObject;
 
 // main
 enum class SelectionType;

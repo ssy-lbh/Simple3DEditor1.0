@@ -1,30 +1,33 @@
-#ifndef __EDITOR_OBJECT_WINDOWOBJECT__
-#define __EDITOR_OBJECT_WINDOWOBJECT__
+#ifndef __EDITOR_WINDOWS_TREEWINDOWOBJECT__
+#define __EDITOR_WINDOWS_TREEWINDOWOBJECT__
 
 #include <define.h>
 
-#include <editor/object/GUIObject.h>
+#include <utils/List.h>
+#include <editor/object/WindowObject.h>
 
-class AWindowObject : public AGUIObject {
+class TreeWindowObject final : public AWindowObject {
+private:
+    List<AViewObject*> objectList;
+    int depth;
+
+    Menu* basicMenu;
+
+    AViewObject* dragObject = NULL;
+    AViewObject* selObject = NULL;
+
+    void AddObject(AViewObject* o);
+
 protected:
-    Vector2 cursorCoord;
-    Vector2 cursorPos = Vector2::zero;
-    Vector2 cliSize;
-    Vector2 cliInvSize;
-    float aspect;
-
-    AWindowObject(const wchar_t* name);
-
     void UpdateCursor(Point2 pos);
     void UpdateWindowSize(Vector2 size);
 
 public:
-    AWindowObject();
-    virtual ~AWindowObject() override;
+    TreeWindowObject();
+    virtual ~TreeWindowObject() override;
 
     virtual bool OnHit2D(Point2 pos) override;
     virtual void OnRender() override;
-    virtual void OnTimer(int id) override;
     virtual void OnChar(char c) override;
     virtual void OnUnichar(wchar_t c) override;
     virtual void OnResize(Vector2 size) override;
@@ -33,12 +36,10 @@ public:
     virtual void OnLeftUp2D(Point2 pos) override;
     virtual void OnRightDown2D(Point2 pos) override;
     virtual void OnRightUp2D(Point2 pos) override;
-    virtual void OnFocus() override;
-    virtual void OnKillFocus() override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
-    virtual void OnDropFileA(const char* path) override;
-    virtual void OnDropFileW(const wchar_t* path) override;
+
+    void RenderItem(AViewObject* o);
 };
 
 #endif

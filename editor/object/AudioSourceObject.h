@@ -6,6 +6,22 @@
 #include <utils/math3d/LinearAlgebra.h>
 #include <editor/main/ViewObject.h>
 
+class IAudioSourceLoader {
+public:
+    virtual void AudioSourceLoad(AudioSourceObject* o) = 0;
+};
+
+class CAudioSourceLoader : public IAudioSourceLoader {
+private:
+    AudioSourceObject*& ref;
+
+public:
+    CAudioSourceLoader(AudioSourceObject*& ref);
+    ~CAudioSourceLoader();
+
+    virtual void AudioSourceLoad(AudioSourceObject* o) override;
+};
+
 class AudioSourceObject final : public AViewObject {
 private:
     uint alSrc;
@@ -27,7 +43,7 @@ private:
     Point3 recPos;
     bool dopplerEffect = true;
 
-    AudioPlayerWindow* window = NULL;
+    IAudioSourceLoader* loader = NULL;
 
 public:
     // 输入的数据内部引用，自动回收，不能调用后释放data所在内存
@@ -46,12 +62,12 @@ public:
     int GetOffset();
     bool IsLoop();
     float GetGain();
-    AudioPlayerWindow* GetWindowRef();
+    IAudioSourceLoader* GetLoader();
 
     void SetOffset(int offset);
     void SetLoop(bool loop);
     void SetGain(float gain);
-    void SetWindowRef(AudioPlayerWindow* window);
+    void SetLoader(IAudioSourceLoader* loader);
 
     void Play();
     void Stop();

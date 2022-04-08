@@ -122,9 +122,9 @@ void NodeMapWindow::Node::OnRightDrag2D(Vector2 dir){
 }
 
 void NodeMapWindow::Node::OnRightUp2D(Point2 pos){
-    if (AGUIObject::guiMgr){
+    if (AGUIObject::parentGUIMgr){
         try {
-            Connect(dynamic_cast<Node*>(AGUIObject::guiMgr->GetCurrent()));
+            Connect(dynamic_cast<Node*>(AGUIObject::parentGUIMgr->GetCurrent()));
         }catch(std::bad_cast e){
             DebugError("Connect To A Non-node Object");
         }
@@ -202,6 +202,8 @@ NodeMapWindow::NodeMapWindow(){
             this->selectedNodes.Clear();
         }
     }));
+
+    bktex = new GLTexture2D(IDT_NODEMAP_BACKGROUND);
 }
 
 NodeMapWindow::~NodeMapWindow(){
@@ -247,10 +249,6 @@ void NodeMapWindow::OnRender(){
 
     nodeMgr->transform.position = -viewPos;
     nodeMgr->OnChainRender();
-}
-
-void NodeMapWindow::OnCreate(){
-    bktex = new GLTexture2D(IDT_NODEMAP_BACKGROUND);
 }
 
 void NodeMapWindow::OnChar(char c){

@@ -47,7 +47,7 @@ Vector2 Vector2::operator*(float w) const{
     return Vector2(x * w, y * w);
 }
 
-Vector3 Vector2::operator*(Vector2 v) const{
+Vector2 Vector2::operator*(Vector2 v) const{
     return Vector2(x * v.x, y * v.y);
 }
 
@@ -83,7 +83,7 @@ Vector2 Vector2::operator/(float w) const{
     return Vector2(x * w, y * w);
 }
 
-Vector3 Vector2::operator/(Vector2 v) const{
+Vector2 Vector2::operator/(Vector2 v) const{
     return Vector2(x / v.x, y / v.y);
 }
 

@@ -90,13 +90,16 @@ void GUIManagerObject::OnRightUp(Point3 ori, Vector3 dir){
 
 void GUIManagerObject::OnMouseMove2D(Point2 pos){
     UpdateCursor(pos);
-    if (leftDown && cur){
-        cur->OnLeftDrag2D(cursorPos - startPos);
-        return;
-    }
-    if (rightDown && cur){
-        cur->OnRightDrag2D(cursorPos - startPos);
-        return;
+    if (focus){
+        focus->OnMouseMove2D(cursorPos);
+        if (leftDown){
+            focus->OnLeftDrag2D(cursorPos - startPos);
+            return;
+        }
+        if (rightDown){
+            focus->OnRightDrag2D(cursorPos - startPos);
+            return;
+        }
     }
     FindCurrent();
 }
@@ -112,9 +115,9 @@ void GUIManagerObject::OnLeftDown2D(Point2 pos){
         if (focus)
             focus->OnFocus();
     }
-    if (cur){
+    if (focus){
         leftDown = true;
-        cur->OnLeftDown2D(cursorPos);
+        focus->OnLeftDown2D(cursorPos);
     }
 }
 
@@ -140,9 +143,9 @@ void GUIManagerObject::OnRightDown2D(Point2 pos){
         if (focus)
             focus->OnFocus();
     }
-    if (cur){
+    if (focus){
         rightDown = true;
-        cur->OnRightDown2D(cursorPos);
+        focus->OnRightDown2D(cursorPos);
     }
 }
 

@@ -8,6 +8,32 @@
 #include <utils/os/Time.h>
 #include <editor/AudioPlayerWindow.h>
 
+CAudioSourceLoader::CAudioSourceLoader(AudioSourceObject*& ref) : ref(ref) {}
+
+CAudioSourceLoader::~CAudioSourceLoader(){
+    // 相当于加载NULL
+    if (ref)
+        ref->SetLoader(NULL);
+    ref = NULL;
+}
+
+void CAudioSourceLoader::AudioSourceLoad(AudioSourceObject* o){
+    if (o){
+        if (o->GetLoader()){
+            DebugError("CAudioSourceLoader::LoadObject Object Has Already Been Loaded");
+            return;
+        }
+        if (ref)
+            ref->SetLoader(NULL);
+        ref = o;
+        o->SetLoader(this);
+    }else{
+        if (ref)
+            ref->SetLoader(NULL);
+        ref = NULL;
+    }
+}
+
 static const int REPLAY_ERROR = 4000;
 
 AudioSourceObject::AudioSourceObject(uenum format, char* data, int size, int freq) : AViewObject(L"AudioSource", ViewObjectType::OBJECT_AUDIO_SOURCE) {
@@ -55,7 +81,7 @@ AudioSourceObject::~AudioSourceObject(){
     alDeleteSources(1, &alSrc);
     alDeleteBuffers(1, &alBuf);
 
-    if (window) window->LoadObject(NULL);
+    if (loader) loader->AudioSourceLoad(NULL);
 }
 
 void AudioSourceObject::OnRender(){
@@ -120,8 +146,8 @@ float AudioSourceObject::GetGain(){
     return gain;
 }
 
-AudioPlayerWindow* AudioSourceObject::GetWindowRef(){
-    return window;
+IAudioSourceLoader* AudioSourceObject::GetLoader(){
+    return loader;
 }
 
 void AudioSourceObject::SetOffset(int offset){
@@ -138,8 +164,8 @@ void AudioSourceObject::SetGain(float gain){
     alSourcef(alSrc, AL_GAIN, gain);
 }
 
-void AudioSourceObject::SetWindowRef(AudioPlayerWindow* window){
-    this->window = window;
+void AudioSourceObject::SetLoader(IAudioSourceLoader* loader){
+    this->loader = loader;
 }
 
 void AudioSourceObject::Play(){

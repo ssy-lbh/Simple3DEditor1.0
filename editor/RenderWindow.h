@@ -30,7 +30,6 @@ public:
     virtual ~RenderWindow() override;
     
     virtual void OnRender() override;
-    virtual void OnCreate() override;
     virtual void OnTimer(int id) override;
     virtual void OnChar(char c) override;
     virtual void OnUnichar(wchar_t c) override;

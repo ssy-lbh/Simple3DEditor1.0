@@ -25,8 +25,6 @@ bool AWindow::IsFocus(){
 }
 
 void AWindow::OnRender(){}
-void AWindow::OnCreate(){}
-void AWindow::OnClose(){}
 void AWindow::OnTimer(int id){}
 void AWindow::OnChar(char c){}
 void AWindow::OnUnichar(wchar_t c){}

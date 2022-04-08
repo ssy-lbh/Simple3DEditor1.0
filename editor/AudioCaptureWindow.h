@@ -3,10 +3,9 @@
 
 #include <define.h>
 
-#include <editor/gui/UIManager.h>
-#include <editor/gui/Menu.h>
 #include <utils/String.h>
 #include <utils/math3d/LinearAlgebra.h>
+#include <editor/main/Window.h>
 
 typedef struct ALCdevice_struct ALCdevice;
 
@@ -55,8 +54,6 @@ public:
     void ProcessOutput();
 
     virtual void OnRender() override;
-    virtual void OnCreate() override;
-    virtual void OnClose() override;
     virtual void OnChar(char c) override;
     virtual void OnUnichar(wchar_t c) override;
     virtual void OnResize(int x, int y) override;
