@@ -3,7 +3,9 @@
 
 #include <define.h>
 
-class GLRenderTexture2D final : public Object {
+#include <utils/gl/GLTexture2D.h>
+
+class GLRenderTexture2D final : public GLTexture2D {
 private:
     uint tex;
     int x, y;

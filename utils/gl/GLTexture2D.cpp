@@ -8,6 +8,8 @@
 #include <utils/os/Log.h>
 #include <utils/gl/GLRenderTexture2D.h>
 
+GLTexture2D::GLTexture2D(){}
+
 GLTexture2D::GLTexture2D(const char* path){
     int channel;
     DataBuffer data = Resource::GetTexture(String(path), &x, &y, &channel, 0);

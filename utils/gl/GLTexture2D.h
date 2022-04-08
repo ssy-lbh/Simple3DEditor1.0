@@ -3,12 +3,14 @@
 
 #include <define.h>
 
-class GLTexture2D final : public Object {
-private:
+class GLTexture2D : public Object {
+protected:
     uint tex;
     bool delTex = true;
     int x, y;
     uenum format;
+
+    GLTexture2D();
 
     void InitData(DataBuffer& data, int x, int y, int channel);
     

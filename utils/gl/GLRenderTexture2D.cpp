@@ -4,7 +4,7 @@
 
 #include <utils/os/Log.h>
 
-GLRenderTexture2D::GLRenderTexture2D(int x, int y, uenum format) : x(x), y(y), format(format) {
+GLRenderTexture2D::GLRenderTexture2D(int x, int y, uenum format) : GLTexture2D(), x(x), y(y), format(format) {
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
 
@@ -20,9 +20,7 @@ GLRenderTexture2D::GLRenderTexture2D(int x, int y, uenum format) : x(x), y(y), f
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-GLRenderTexture2D::~GLRenderTexture2D(){
-    glDeleteTextures(1, &tex);
-}
+GLRenderTexture2D::~GLRenderTexture2D(){}
 
 bool GLRenderTexture2D::Enable(){
     glEnable(GL_TEXTURE_2D);
