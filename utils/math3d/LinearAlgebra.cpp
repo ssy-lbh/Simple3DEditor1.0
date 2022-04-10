@@ -474,9 +474,9 @@ Vector4 &Vector4::operator=(const Point3 &v){
     return *this;
 }
 
-Vector4::Vector4(float x, float y) : x(x), y(y), z(0.0f), w(0.0f) {}
+Vector4::Vector4(float x, float y) : x(x), y(y), z(0.0f), w(1.0f) {}
 
-Vector4::Vector4(float x, float y, float z) : x(x), y(y), z(z), w(0.0f) {}
+Vector4::Vector4(float x, float y, float z) : x(x), y(y), z(z), w(1.0f) {}
 
 Vector4::Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 

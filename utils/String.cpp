@@ -1,5 +1,6 @@
 #include <utils/String.h>
 
+#include <cstring>
 #include <windows.h>
 
 #include <utils/os/Log.h>

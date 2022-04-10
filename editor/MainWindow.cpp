@@ -16,10 +16,10 @@
 #include <utils/gl/GLSkyBox.h>
 #include <utils/gl/GLSimplified.h>
 #include <editor/gui/Menu.h>
-#include <editor/gui/ViewManager.h>
 #include <editor/gui/GUIUtils.h>
 #include <editor/dialog/ColorBoard.h>
 #include <editor/dialog/Tips.h>
+#include <editor/main/ViewManager.h>
 #include <editor/main/ViewObject.h>
 #include <editor/object/AllObjects.h>
 

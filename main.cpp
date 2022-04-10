@@ -403,6 +403,8 @@ int Main::MainEntry(int argc, char** argv){
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
+    glEnableClientState(GL_VERTEX_ARRAY);
+
     // 不知道为什么，arial.ttf最大值字符为0x6FF
     glFontSize(12);
 

@@ -13,7 +13,7 @@
 #include <utils/os/Log.h>
 #include <utils/os/Font.h>
 #include <utils/math3d/Mesh.h>
-#include <editor/gui/ViewManager.h>
+#include <editor/main/ViewManager.h>
 #include <editor/object/GUIObject.h>
 
 GUIMeshObject::GUIMeshObject() : GUIManagerObject(L"GUIMesh", ViewObjectType::OBJECT_GUI_MESH) {

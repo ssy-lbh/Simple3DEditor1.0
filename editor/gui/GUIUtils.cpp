@@ -10,7 +10,7 @@
 #include <utils/gl/GLTexture2D.h>
 #include <utils/os/Log.h>
 #include <utils/os/Font.h>
-#include <editor/gui/ViewManager.h>
+#include <editor/main/ViewManager.h>
 
 RoundButton::RoundButton() : AGUIObject(L"RoundButton", ViewObjectType::OBJECT_GUI_ROUND_BUTTON) {}
 RoundButton::RoundButton(Point2 center, float radius)

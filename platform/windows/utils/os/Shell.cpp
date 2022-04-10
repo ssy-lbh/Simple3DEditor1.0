@@ -204,7 +204,8 @@ bool ShellCheckFileExistence(const WString file, size_t times, size_t interval){
 bool ShellFFmpeg(const String src, const String dst){
     StringBuilderA cmd;
 
-    cmd += ".\\bin\\ffmpeg.exe -i \"";
+    cmd += EXECUTABLE_FFMPEG;
+    cmd += " -i \"";
     cmd += src;
     cmd += "\" -y ";
     cmd += dst;
@@ -218,7 +219,8 @@ bool ShellFFmpeg(const String src, const String dst){
 bool ShellFFmpeg(const WString src, const WString dst){
     StringBuilderW cmd;
 
-    cmd += L".\\bin\\ffmpeg.exe -i \"";
+    cmd += EXECUTABLE_FFMPEG;
+    cmd += L" -i \"";
     cmd += src;
     cmd += L"\" -y ";
     cmd += dst;

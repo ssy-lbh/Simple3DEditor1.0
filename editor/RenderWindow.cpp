@@ -13,7 +13,7 @@
 #include <utils/gl/GLShader.h>
 #include <utils/gl/GLProgram.h>
 #include <editor/gui/Menu.h>
-#include <editor/gui/ViewManager.h>
+#include <editor/main/ViewManager.h>
 #include <editor/main/ViewObject.h>
 #include <editor/object/GUIManagerObject.h>
 

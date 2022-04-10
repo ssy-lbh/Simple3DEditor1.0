@@ -3,7 +3,7 @@
 #include <lib/opengl/gl/gl.h>
 
 #include <main.h>
-#include <editor/gui/ViewManager.h>
+#include <editor/main/ViewManager.h>
 #include <utils/gl/GLUtils.h>
 #include <utils/gl/GLTexture2D.h>
 #include <utils/os/Font.h>

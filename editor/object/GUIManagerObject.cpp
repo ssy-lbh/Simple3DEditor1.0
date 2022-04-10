@@ -10,7 +10,7 @@
 #include <utils/gl/GLTexture2D.h>
 #include <utils/os/Log.h>
 #include <utils/os/Font.h>
-#include <editor/gui/ViewManager.h>
+#include <editor/main/ViewManager.h>
 #include <editor/object/GUIObject.h>
 
 GUIManagerObject::GUIManagerObject() : AGUIObject(L"GUIManager", ViewObjectType::OBJECT_GUI_MANAGER) {}

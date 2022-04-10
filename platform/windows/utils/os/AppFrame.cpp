@@ -11,9 +11,9 @@
 #include <utils/os/Thread.h>
 #include <utils/os/System.h>
 #include <utils/gl/GLEW.h>
+#include <editor/main/ViewManager.h>
 #include <editor/main/ViewObject.h>
 #include <editor/gui/UIManager.h>
-#include <editor/gui/ViewManager.h>
 
 bool AppFrame::init = false;
 
