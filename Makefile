@@ -10,6 +10,8 @@
 # 说明一下，我写过Vulkan，但是因为不够熟练才没使用
 # 今后我会挑战一下
 
+# 以后SoundTouch和ReactPhysics3D物理引擎我打算单独编译成一个动态库
+
 # 大小写平台名称
 PLATFORM 	= windows
 PLATFORM_U	= WINDOWS
@@ -191,6 +193,9 @@ plugin: $(OUTPUTDLIB)
 	$(RM) $(PLUGIN_PATH)/plugin.dll
 
 physics: $(OUTPUTDLIB)
-	$(GCC) $(TEST_PATH)/$@/main.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)/$@/main.exe
+	$(GCC) -c $(TEST_PATH)/$@/main.cpp -I"." -o $(TEST_PATH)/$@/main.o
+	$(GCC) -c $(TEST_PATH)/$@/Test.cpp -I"." -o $(TEST_PATH)/$@/Test.o
+	$(GCC) -c $(TEST_PATH)/$@/TestSuite.cpp -I"." -o $(TEST_PATH)/$@/TestSuite.o
+	$(GCC) $(addprefix $(TEST_PATH)/$@/, main.o Test.o TestSuite.o) $(OUTPUTDLIB) -o $(TEST_PATH)/$@/main.exe
 	$(TEST_PATH)/$@/main.exe
-	$(RM) $(TEST_PATH)/$@/main.exe
+	$(RM) $(TEST_PATH)/$@/main.exe $(addprefix $(TEST_PATH)/$@/, main.o Test.o TestSuite.o)
