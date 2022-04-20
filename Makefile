@@ -28,7 +28,7 @@ LFLAGS		= -m64 -shared
 LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32\
 				"lib\openal\OpenAL32.lib" "lib\glew\glew32.lib" "lib\freetype\freetype.lib"\
 				"lib\glut\glut64.lib" "lib\ftgl\ftgl_D.lib"
-RES  		= windres.exe
+RES  		= windres
 MKDIR   	= mkdir
 GIT  		= git
 

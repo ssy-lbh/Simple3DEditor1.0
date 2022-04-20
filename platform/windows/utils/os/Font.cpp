@@ -215,18 +215,6 @@ void Font::SetSize(uint x, uint y){
     FT_Set_Pixel_Sizes(face, x, y);
 }
 
-void Font::SetTransform(Matrix2x3 m){
-    FT_Vector pos;
-    FT_Matrix mat;
-
-    pos.x = m._13; pos.y = m._23;
-
-    mat.xx = m._11; mat.xy = m._21;
-    mat.yx = m._12; mat.yy = m._22;
-
-    FT_Set_Transform(face, &mat, &pos);
-}
-
 uint Font::LoadChar(uint c){
     FT_Glyph glyph;
     FT_BitmapGlyph bitmap;

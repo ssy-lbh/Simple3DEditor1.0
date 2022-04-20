@@ -62,19 +62,34 @@ class Face;
 class Mesh;
 
 // vecmath
-class Rect;
 class CCamera;
-class Vector2;
-class Point2;
-class Vector3;
-class Point3;
-class Vector4;
-class Complex;
-class Quaternion;
-class Matrix4x4;
-class Matrix3x4;
-class Matrix2x3;
-class Matrix2x4;
+template <typename T>
+class TRect;
+template <typename T>
+class TVector2;
+template <typename T>
+class TPoint2;
+template <typename T>
+class TVector3;
+template <typename T>
+class TPoint3;
+template <typename T>
+class TVector4;
+template <typename T>
+class TComplex;
+template <typename T>
+class TQuaternion;
+template <typename T>
+class TMatrix4x4;
+typedef TRect<float> Rect;
+typedef TVector2<float> Vector2;
+typedef TPoint2<float> Point2;
+typedef TVector3<float> Vector3;
+typedef TPoint3<float> Point3;
+typedef TVector4<float> Vector4;
+typedef TComplex<float> Complex;
+typedef TQuaternion<float> Quaternion;
+typedef TMatrix4x4<float> Matrix4x4;
 
 // viewobject
 enum class ViewObjectType;

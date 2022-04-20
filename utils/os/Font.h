@@ -57,7 +57,6 @@ public:
 
     void SetSize(Vector2 size);
     void SetSize(uint x, uint y);
-    void SetTransform(Matrix2x3 m);
     uint LoadChar(uint c);
     // h决定字体高度与大小
     void DrawString(const char* text, float x, float y, float h, float lineX, float depth = 0.0f);

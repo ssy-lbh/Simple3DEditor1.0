@@ -106,21 +106,30 @@ constexpr T GetRate(T x, T a, T b){
 }
 
 template <typename T>
-constexpr T Lerp(T a, T b, float t){
-    return (b - a) * t + a;
+constexpr T Saturate(T x){
+    return (x <= 0 ? 0 : (x >= 0 ? 0 : x));
 }
-
-Quaternion Slerp(Quaternion a, Quaternion b, float t);
 
 template <typename T>
 constexpr T Clamp(T x, T a, T b){
     return (x <= a ? a : (x >= b ? b : x));
 }
 
+template <typename T>
+constexpr T Lerp(T a, T b, float t){
+    return (b - a) * t + a;
+}
+
+template <typename T>
+constexpr T LerpClamped(T a, T b, float t){
+    return (b - a) * Saturate(t) + a;
+}
+
 // 排序为前小后大
-inline void Sort(float& x, float& y){
+template <typename T>
+void Sort(T& x, T& y){
     if (x > y){
-        float t;
+        T t;
         t = x; x = y; y = t;
     }
 }
