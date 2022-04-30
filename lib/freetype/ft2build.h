@@ -24,8 +24,8 @@
    * A typical example is
    *
    * ```
-   *   #include <ft2build.h>
-   *   #include <freetype/freetype.h>
+   *   #include <lib/freetype/ft2build.h>
+   *   #include <lib/freetype/freetype/freetype.h>
    * ```
    *
    */
@@ -34,7 +34,7 @@
 #ifndef FT2BUILD_H_
 #define FT2BUILD_H_
 
-#include <freetype/config/ftheader.h>
+#include <lib/freetype/freetype/config/ftheader.h>
 
 #endif /* FT2BUILD_H_ */
 

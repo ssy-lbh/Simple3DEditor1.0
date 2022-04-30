@@ -19,8 +19,8 @@
 #ifndef FTSTROKE_H_
 #define FTSTROKE_H_
 
-#include <freetype/ftoutln.h>
-#include <freetype/ftglyph.h>
+#include <lib/freetype/freetype/ftoutln.h>
+#include <lib/freetype/freetype/ftglyph.h>
 
 
 FT_BEGIN_HEADER

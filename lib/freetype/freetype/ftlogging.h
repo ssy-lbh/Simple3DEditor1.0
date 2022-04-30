@@ -20,7 +20,7 @@
 #define FTLOGGING_H_
 
 
-#include <ft2build.h>
+#include <lib/freetype/ft2build.h>
 #include FT_CONFIG_CONFIG_H
 
 

@@ -23,8 +23,8 @@
 #define FTSNAMES_H_
 
 
-#include <freetype/freetype.h>
-#include <freetype/ftparams.h>
+#include <lib/freetype/freetype/freetype.h>
+#include <lib/freetype/freetype/ftparams.h>
 
 #ifdef FREETYPE_H
 #error "freetype.h of FreeType 1 has been loaded!"

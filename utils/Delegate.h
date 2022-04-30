@@ -26,6 +26,15 @@ public:
     Delegate<U...>& operator-=(Delegate<U...>& d){ funcs -= d.funcs; return *this; }
     Delegate<U...>& operator!(){ return !funcs; }
 
+    // 尤其要注意一下是否可行，可能实现有问题
+    template <typename T>
+    Delegate<U...>& operator-=(T t){
+        for (size_t i = 0; i < funcs.Size(); i++)
+            if (funcs[i].template target<T>() == t)
+                funcs.RemoveAt(i);
+        return *this;
+    }
+
     Delegate<U...>& Add(std::function<void(U...)>&& f){ funcs += f; return *this; }
 
     Delegate<U...>& operator()(U... params){

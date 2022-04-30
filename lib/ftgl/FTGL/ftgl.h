@@ -29,7 +29,7 @@
 #define __ftgl__
 
 /* We need the Freetype headers */
-#include <ft2build.h>
+#include <lib/freetype/ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 #include FT_OUTLINE_H
@@ -107,29 +107,29 @@ namespace FTGL
     #define FTGL_EXPORT
 #endif
 
-#include <FTGL/FTPoint.h>
-#include <FTGL/FTBBox.h>
-#include <FTGL/FTBuffer.h>
+#include <lib/ftgl/FTGL/FTPoint.h>
+#include <lib/ftgl/FTGL/FTBBox.h>
+#include <lib/ftgl/FTGL/FTBuffer.h>
 
-#include <FTGL/FTGlyph.h>
-#include <FTGL/FTBitmapGlyph.h>
-#include <FTGL/FTBufferGlyph.h>
-#include <FTGL/FTExtrdGlyph.h>
-#include <FTGL/FTOutlineGlyph.h>
-#include <FTGL/FTPixmapGlyph.h>
-#include <FTGL/FTPolyGlyph.h>
-#include <FTGL/FTTextureGlyph.h>
+#include <lib/ftgl/FTGL/FTGlyph.h>
+#include <lib/ftgl/FTGL/FTBitmapGlyph.h>
+#include <lib/ftgl/FTGL/FTBufferGlyph.h>
+#include <lib/ftgl/FTGL/FTExtrdGlyph.h>
+#include <lib/ftgl/FTGL/FTOutlineGlyph.h>
+#include <lib/ftgl/FTGL/FTPixmapGlyph.h>
+#include <lib/ftgl/FTGL/FTPolyGlyph.h>
+#include <lib/ftgl/FTGL/FTTextureGlyph.h>
 
-#include <FTGL/FTFont.h>
-#include <FTGL/FTGLBitmapFont.h>
-#include <FTGL/FTBufferFont.h>
-#include <FTGL/FTGLExtrdFont.h>
-#include <FTGL/FTGLOutlineFont.h>
-#include <FTGL/FTGLPixmapFont.h>
-#include <FTGL/FTGLPolygonFont.h>
-#include <FTGL/FTGLTextureFont.h>
+#include <lib/ftgl/FTGL/FTFont.h>
+#include <lib/ftgl/FTGL/FTGLBitmapFont.h>
+#include <lib/ftgl/FTGL/FTBufferFont.h>
+#include <lib/ftgl/FTGL/FTGLExtrdFont.h>
+#include <lib/ftgl/FTGL/FTGLOutlineFont.h>
+#include <lib/ftgl/FTGL/FTGLPixmapFont.h>
+#include <lib/ftgl/FTGL/FTGLPolygonFont.h>
+#include <lib/ftgl/FTGL/FTGLTextureFont.h>
 
-#include <FTGL/FTLayout.h>
-#include <FTGL/FTSimpleLayout.h>
+#include <lib/ftgl/FTGL/FTLayout.h>
+#include <lib/ftgl/FTGL/FTSimpleLayout.h>
 
 #endif  //  __ftgl__

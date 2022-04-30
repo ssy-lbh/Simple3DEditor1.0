@@ -29,7 +29,7 @@
 #define FTSIZES_H_
 
 
-#include <freetype/freetype.h>
+#include <lib/freetype/freetype/freetype.h>
 
 #ifdef FREETYPE_H
 #error "freetype.h of FreeType 1 has been loaded!"

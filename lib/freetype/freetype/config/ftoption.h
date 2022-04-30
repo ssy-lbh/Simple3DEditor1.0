@@ -20,7 +20,7 @@
 #define FTOPTION_H_
 
 
-#include <ft2build.h>
+#include <lib/freetype/ft2build.h>
 
 
 FT_BEGIN_HEADER
@@ -52,7 +52,7 @@ FT_BEGIN_HEADER
    *
    *   ```
    *     #define FT_CONFIG_OPTIONS_H  <myftoptions.h>
-   *     #include <freetype/config/ftheader.h>
+   *     #include <lib/freetype/freetype/config/ftheader.h>
    *   ```
    *
    *   will use `$BUILD/myftoptions.h` instead of this file for macro

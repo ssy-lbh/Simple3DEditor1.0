@@ -12,45 +12,90 @@
 
 # 以后SoundTouch和ReactPhysics3D物理引擎我打算单独编译成一个动态库
 
-# 大小写平台名称
-PLATFORM 	= windows
-PLATFORM_U	= WINDOWS
+RM			:= bin/linux/rm
+TR 			:= bin/linux/tr
+DIRNAME 	:= bin/linux/dirname
+INCLIST 	:= bin/tools/inclist
+MKDIR   	:= bin/linux/mkdir
+ECHO 		:= echo
 
-GCC			= g++
-DLLTOOL		= dlltool
-RM			= bin/linux/rm
-DIRNAME 	= bin/linux/dirname
+ifeq ($(OS), Windows_NT)
+    ifeq ($(PROCESSOR_ARCHITEW6432), AMD64)
+        ARCH := amd64
+    else
+        ifeq ($(PROCESSOR_ARCHITECTURE), AMD64)
+            ARCH := amd64
+        endif
+        ifeq ($(PROCESSOR_ARCHITECTURE), x86)
+            ARCH := ia32
+        endif
+    endif
+else
+	UNAME_P := $(shell uname -p)
+    ifeq ($(UNAME_P), x86_64)
+        ARCH := amd64
+    endif
+    ifneq ($(filter %86, $(UNAME_P)),)
+        ARCH := ia32
+    endif
+    ifneq ($(filter arm%, $(UNAME_P)),)
+        ARCH := arm
+    endif
+endif
 
-CFLAGS 		= -I"." -I"./lib/freetype" -I"./lib/ftgl"\
-				-m64 -O3 -std=c++11 -finput-charset=UTF-8 -fexec-charset=UTF-8
-OFLAGS		= -m64 -s
-LFLAGS		= -m64 -shared
-LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32\
+ifeq ($(OS), Windows_NT)
+    PLATFORM := windows
+else
+	ifneq ($(findstring /cygdrive/, $(PATH)),)
+		PLATFORM := cygwin
+	else
+		UNAME := $(shell uname || echo unknown)
+		ifeq ($(UNAME), Linux)
+			PLATFORM := linux
+		endif
+		ifeq ($(UNAME), Solaris)
+			PLATFORM := solaris
+		endif
+	endif
+endif
+
+BUILD_PATH	:= build
+TEST_PATH	:= test
+PLUGIN_PATH := plugins
+
+toupper		= $(shell $(ECHO) $1 | $(TR) a-z A-Z)
+tolower		= $(shell $(ECHO) $1 | $(TR) A-Z a-z)
+
+# 递归的wildcard
+rwildcard	= $(foreach D, $(wildcard $(1:=/*)), $(call rwildcard, $D, $2) $(filter $(subst *, %, $2), $D))
+src2obj		= $(1:%.cpp=$(BUILD_PATH)/%.o)
+
+GCC			:= g++
+DLLTOOL		:= dlltool
+
+CFLAGS 		:= -I"." -m64 -O3 -std=c++11 -finput-charset=UTF-8 -fexec-charset=UTF-8\
+				-DPLATFORM_$(call toupper, $(PLATFORM)) -DARCH_$(call toupper, $(ARCH))
+OFLAGS		:= -m64 -s
+LFLAGS		:= -m64 -shared
+LIB			:= -lopengl32 -lglu32 -lgdi32 -lcomdlg32\
 				"lib\openal\OpenAL32.lib" "lib\glew\glew32.lib" "lib\freetype\freetype.lib"\
 				"lib\glut\glut64.lib" "lib\ftgl\ftgl_D.lib"
-RES  		= windres
-MKDIR   	= mkdir
-GIT  		= git
-
-BUILD_PATH	= build
-TEST_PATH	= test
-PLUGIN_PATH = plugins
+RES  		:= windres
+GIT  		:= git
 
 # 正常的含有.h和.cpp的代码
-PROGOBJ 	:= $(basename $(wildcard *.cpp\
-				lib/soundtouch/*.cpp\
-				utils/*.cpp utils/*/*.cpp utils/*/*/*.cpp utils/*/*/*/*.cpp utils/*/*/*/*/*.cpp utils/*/*/*/*/*/*.cpp\
-				editor/*.cpp editor/*/*.cpp editor/*/*/*.cpp editor/*/*/*/*.cpp\
-				manager/*.cpp))
+PROGOBJ 	:= lib/soundtouch utils editor manager
+PROGOBJ 	:= $(basename $(call rwildcard, $(PROGOBJ), *.cpp))\
+				main
 # 不需要的代码
 REMOVEOBJ 	:= lib/soundtouch/soundtouch_wapper
 # 只有.cpp的代码
 EXTRAOBJ	:= lib/soundtouch/mmx_optimized lib/soundtouch/sse_optimized lib/soundtouch/cpu_detect_x86
 # 平台相关代码
-PLATOBJ 	:= $(basename $(wildcard $(addprefix platform/$(PLATFORM)/, *.cpp */*.cpp */*/*.cpp */*/*/*.cpp)))
+PLATOBJ 	:= platform/$(PLATFORM)
+PLATOBJ 	:= $(basename $(call rwildcard, $(PLATOBJ), *.cpp))
 
 PROGOBJ 	:= $(filter-out $(EXTRAOBJ) $(REMOVEOBJ), $(PROGOBJ))
-PLATOBJ 	:= $(PLATOBJ:platform/$(PLATFORM)/%=%)
 
 RESOBJ		:= res string
 OUTPUT 		:= main.exe
@@ -76,9 +121,10 @@ PLATOBJ 	:= $(addprefix $(BUILD_PATH)/, $(addsuffix .o, $(PLATOBJ)))
 EXTRAOBJ 	:= $(addprefix $(BUILD_PATH)/, $(addsuffix .o, $(EXTRAOBJ)))
 RESOBJ		:= $(addprefix $(BUILD_PATH)/, $(addsuffix .o, $(RESOBJ)))
 
-ALLOBJ 		:= $(PROGOBJ) $(PLATOBJ) $(EXTRAOBJ) $(RESOBJ)
+CPPOBJ 		:= $(PROGOBJ) $(PLATOBJ) $(EXTRAOBJ)
+ALLOBJ		:= $(CPPOBJ) $(RESOBJ)
 
-.PHONY:all build clean run rebuild reexec commit merge sign lib mkdir
+.PHONY:all build cleanall cleandep clean run rebuild reexec commit merge sign lib mkdir
 
 all: build lib
 
@@ -99,25 +145,37 @@ $(OUTPUTDLIB): $(ALLOBJ)
 $(OUTPUT): $(ALLOBJ)
 	$(GCC) $(ALLOBJ) -o $@ $(LIB) $(OFLAGS)
 
+# 注:不使用依赖项文件时使用如下编译流程
 # 常规的源代码
 $(PROGOBJ): $(BUILD_PATH)/%.o: %.cpp %.h
-	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
+	$(GCC) -c $< -o $@ $(CFLAGS)
 
 # 这一类为平台相关代码源文件
-$(PLATOBJ): $(BUILD_PATH)/%.o: platform/$(PLATFORM)/%.cpp %.h
-	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
+$(PLATOBJ): $(BUILD_PATH)/platform/$(PLATFORM)/%.o: platform/$(PLATFORM)/%.cpp %.h
+	$(GCC) -c $< -o $@ $(CFLAGS)
 
 # 这一类源文件没有头文件，直接编译
 $(EXTRAOBJ): $(BUILD_PATH)/%.o: %.cpp
-	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
+	$(GCC) -c $< -o $@ $(CFLAGS)
 
 # 其实我个人觉得，把nasm的内置指令incbin用好了当资源表用是相当可行的，理论上只要不乱加汇编代码跨平台是没问题的
 # 采用nasm的话，res.h里面就不是各种id了，而是一堆extern char[0]，指向资源数据的指针，借助了符号链接的功能
 $(RESOBJ): $(BUILD_PATH)/%.o: %.rc
 	$(RES) -i $< -o $@
 
+# 依赖项文件
+DEPFILES	:= $(CPPOBJ:%.o=%.d)
+
+# 不使用时用'#'注释掉
+include $(DEPFILES)
+
+$(DEPFILES): $(BUILD_PATH)/%.d: %.cpp
+	$(GCC) -MM $(CFLAGS) $< -MT $(call src2obj, $<) > $@
+	$(ECHO) "	$(GCC) -c $< -o $(call src2obj, $<) $(CFLAGS)" >> $@
+
 OBJDIRS		:= $(sort $(shell $(DIRNAME) $(ALLOBJ)))
 # 有一些目录会套多层，其中间没有文件
+OBJDIRS 	:= $(sort $(OBJDIRS) $(shell $(DIRNAME) $(OBJDIRS)))
 OBJDIRS 	:= $(sort $(OBJDIRS) $(shell $(DIRNAME) $(OBJDIRS)))
 
 mkdir:
@@ -165,8 +223,13 @@ merge:
 sign: $(OUTPUT)
 	$(SIGNTOOL) timestamp /t $(TIMESTAMP) $(OUTPUT)
 
+cleanall: clean cleandep
+
 clean:
 	$(RM) $(OUTPUT) $(OUTPUTDLIB) $(ALLOBJ)
+
+cleandep:
+	$(RM) $(DEPFILES)
 
 # glslc <file> --target-spv=spv1.0 [-x glsl/hlsl] -o <out> 编译GLSL/HLSL为SPIR-V
 # dxc -T {stage}[[ps/vs/gs/hs/ds/cs/lib/ms]_6_[0-7]] <file> -E <entry> -I <include> [-spirv]

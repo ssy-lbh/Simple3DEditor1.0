@@ -5,6 +5,14 @@
 #define NULL __null
 #endif
 
+#if defined(WIN32) ||defined(_WIN32) || defined(_WIN64) ||defined(__WIN32__) || defined(__WINDOWS__)
+    #define WINDOWS_OS
+#elif defined(__APPLE__)     // Apple platform
+    #define APPLE_OS
+#elif defined(__linux__) || defined(linux) || defined(__linux)    // Linux platform
+    #define LINUX_OS
+#endif
+
 #ifndef _WIN64
 typedef unsigned int size_t;
 #else
@@ -15,14 +23,15 @@ typedef unsigned long long size_t;
 #define interface class
 #endif
 
-typedef unsigned char uchar;
-typedef unsigned short ushort;
-typedef unsigned int uint;
-typedef unsigned long ulong;
+using uint = unsigned int;
+using uchar = unsigned char;
+using ushort = unsigned short;
+using luint = long unsigned int;
+using ulong = unsigned long;
 
-typedef unsigned int uenum;
+using uenum = unsigned int;
 // 暂时我也用不到64位整数
-typedef unsigned long uhash;
+using uhash = unsigned long;
 
 #ifdef PLATFORM_WINDOWS
 typedef void* handle;

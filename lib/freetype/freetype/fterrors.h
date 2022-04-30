@@ -89,7 +89,7 @@
    *       const char*  err_msg;
    *     } ft_errors[] =
    *
-   *     #include <freetype/fterrors.h>
+   *     #include <lib/freetype/freetype/fterrors.h>
    *   ```
    *
    *   An alternative to using an array is a switch statement.
@@ -124,7 +124,7 @@
 
 
   /* include module base error codes */
-#include <freetype/ftmoderr.h>
+#include <lib/freetype/freetype/ftmoderr.h>
 
 
   /*******************************************************************/
@@ -197,7 +197,7 @@
 
 
   /* now include the error codes */
-#include <freetype/fterrdef.h>
+#include <lib/freetype/freetype/fterrdef.h>
 
 
 #ifdef FT_ERROR_END_LIST
@@ -235,7 +235,7 @@
   /* FT_INCLUDE_ERR_PROTOS: Control whether function prototypes should be */
   /*                        included with                                 */
   /*                                                                      */
-  /*                          #include <freetype/fterrors.h>              */
+  /*                          #include <lib/freetype/freetype/fterrors.h>              */
   /*                                                                      */
   /*                        This is only true where `FT_ERRORDEF` is      */
   /*                        undefined.                                    */

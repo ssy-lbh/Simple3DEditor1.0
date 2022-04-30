@@ -80,9 +80,9 @@
    *   In addition to the normal scheme of including header files like
    *
    *   ```
-   *     #include <freetype/freetype.h>
-   *     #include <freetype/ftmm.h>
-   *     #include <freetype/ftglyph.h>
+   *     #include <lib/freetype/freetype/freetype.h>
+   *     #include <lib/freetype/freetype/ftmm.h>
+   *     #include <lib/freetype/freetype/ftglyph.h>
    *   ```
    *
    *   it is possible to used named macros instead.  They can be used
@@ -114,7 +114,7 @@
    *
    */
 #ifndef FT_CONFIG_CONFIG_H
-#define FT_CONFIG_CONFIG_H  <freetype/config/ftconfig.h>
+#define FT_CONFIG_CONFIG_H  <lib/freetype/freetype/config/ftconfig.h>
 #endif
 
 
@@ -129,7 +129,7 @@
    *
    */
 #ifndef FT_CONFIG_STANDARD_LIBRARY_H
-#define FT_CONFIG_STANDARD_LIBRARY_H  <freetype/config/ftstdlib.h>
+#define FT_CONFIG_STANDARD_LIBRARY_H  <lib/freetype/freetype/config/ftstdlib.h>
 #endif
 
 
@@ -144,7 +144,7 @@
    *
    */
 #ifndef FT_CONFIG_OPTIONS_H
-#define FT_CONFIG_OPTIONS_H  <freetype/config/ftoption.h>
+#define FT_CONFIG_OPTIONS_H  <lib/freetype/freetype/config/ftoption.h>
 #endif
 
 
@@ -177,7 +177,7 @@
    *   base FreeType~2 API.
    *
    */
-#define FT_FREETYPE_H  <freetype/freetype.h>
+#define FT_FREETYPE_H  <lib/freetype/freetype/freetype.h>
 
 
   /**************************************************************************
@@ -280,7 +280,7 @@
    *   scalable outline management API of FreeType~2.
    *
    */
-#define FT_OUTLINE_H  <freetype/ftoutln.h>
+#define FT_OUTLINE_H  <lib/freetype/freetype/ftoutln.h>
 
 
   /**************************************************************************
@@ -538,7 +538,7 @@
    *   API of the optional glyph management component.
    *
    */
-#define FT_GLYPH_H  <freetype/ftglyph.h>
+#define FT_GLYPH_H  <lib/freetype/freetype/ftglyph.h>
 
 
   /**************************************************************************

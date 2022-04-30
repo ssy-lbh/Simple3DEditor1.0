@@ -3,11 +3,21 @@
 
 #include <define.h>
 
-#define PI 3.1415926535897932384626433832795f
+const float FLOAT_LOWEST = __FLT_MIN__;
+const float FLOAT_LOWEST_DENORM = __FLT_DENORM_MIN__;
+const float FLOAT_HIGHEST = __FLT_MAX__;
+const float FLOAT_SMALLEST = -__FLT_MAX__;
+const float FLOAT_LARGEST = __FLT_MAX__;
+const float EPSILON = __FLT_EPSILON__;
+constexpr float PI = 3.14159265F;
+constexpr float PI_TIMES_2 = 6.28318530F;
 
 constexpr float Sqrt(float x){ return __builtin_sqrtf(x); }
 constexpr double Sqrt(double x){ return __builtin_sqrt(x); }
 constexpr long double Sqrt(long double x){ return __builtin_sqrtl(x); }
+constexpr float Cbrt(float x){ return __builtin_cbrtf(x); }
+constexpr double Cbrt(double x){ return __builtin_cbrt(x); }
+constexpr long double Cbrt(long double x){ return __builtin_cbrtl(x); }
 constexpr float Sin(float x){ return __builtin_sinf(x); }
 constexpr double Sin(double x){ return __builtin_sin(x); }
 constexpr long double Sin(long double x){ return __builtin_sinl(x); }
@@ -88,10 +98,35 @@ constexpr long double Atanh(long double x){ return __builtin_atanhl(x); }
 constexpr float Copysign(float x, float sign){ return __builtin_copysignf(x, sign); }
 constexpr double Copysign(double x, double sign){ return __builtin_copysign(x, sign); }
 constexpr long double Copysign(long double x, long double sign){ return __builtin_copysignl(x, sign); }
+constexpr float InfinityF(){ return __builtin_huge_valf(); }
+constexpr double InfinityD(){ return __builtin_huge_val(); }
+constexpr long double InfinityLD(){ return __builtin_huge_vall(); }
+constexpr bool IsNaN(float x){ return __builtin_isnan(x); }
+constexpr bool IsNaN(double x){ return __builtin_isnan(x); }
+constexpr bool IsNaN(long double x){ return __builtin_isnan(x); }
+constexpr bool IsInf(float x){ return __builtin_isinf(x); }
+constexpr bool IsInf(double x){ return __builtin_isinf(x); }
+constexpr bool IsInf(long double x){ return __builtin_isinf(x); }
+constexpr bool IsFinite(float x){ return __builtin_isfinite(x); }
+constexpr bool IsFinite(double x){ return __builtin_isfinite(x); }
+constexpr bool IsFinite(long double x){ return __builtin_isfinite(x); }
+constexpr bool IsNormal(float x){ return __builtin_isnormal(x); }
+constexpr bool IsNormal(double x){ return __builtin_isnormal(x); }
+constexpr bool IsNormal(long double x){ return __builtin_isnormal(x); }
+// 正态分布曲线积分，2/Sqrt(PI)*积分(0-x){exp(-x^2)}
+constexpr float Error(float x){  return __builtin_erff(x); }
+constexpr double Error(double x){  return __builtin_erf(x); }
+constexpr long double Error(long double x){  return __builtin_erfl(x); }
+// Gamma函数，可视作(x-1)!
+// x->(0,1) gamma(x)*gamma(1-x)=PI/sin(PI*x)
+// gamma(0.5)=Sqrt(PI)
+constexpr float Gamma(float x){  return __builtin_gammaf(x); }
+constexpr double Gamma(double x){  return __builtin_gamma(x); }
+constexpr long double Gamma(long double x){  return __builtin_gammal(x); }
 
-constexpr float ToRadian(float x){ return x * 0.017453292519f; }
-constexpr float ToRadianHalf(float x){ return x * 0.008726646259971f; }
-constexpr float ToAngle(float x){ return x * 57.29577951308f; }
+constexpr float ToRadian(float x){ return x * 0.017453292519F; }
+constexpr float ToRadianHalf(float x){ return x * 0.008726646259971F; }
+constexpr float ToAngle(float x){ return x * 57.29577951308F; }
 
 // 参数需要为定点数
 template <typename T>
