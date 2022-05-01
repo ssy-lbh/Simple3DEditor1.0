@@ -2,6 +2,80 @@
 
 #include <util/math3d/Math.h>
 
+// 可能是因为一旦全特化，编译器直接将函数汇编输出
+// 所以这里将声明和实现分离
+template <>
+TVector2<int> TVector2<int>::operator/(int w) const{
+    return TVector2<int>(x / w, y / w);
+}
+
+template <>
+TVector2<int> &TVector2<int>::operator/=(int w){
+    x /= w; y /= w;
+    return *this;
+}
+
+template <>
+TVector3<int> TVector3<int>::operator/(int w) const{
+    return TVector3<int>(x / w, y / w, z / w);
+}
+
+template <>
+TVector3<int> &TVector3<int>::operator/=(int w){
+    x /= w; y /= w; z /= w;
+    return *this;
+}
+
+template <>
+TVector4<int> TVector4<int>::operator/(int w) const{
+    return TVector4<int>(x / w, y / w, z / w, this->w);
+}
+
+template <>
+TVector4<int> &TVector4<int>::operator/=(int w){
+    x /= w; y /= w; z /= w;
+    return *this;
+}
+
+template <>
+TComplex<int> operator/(const TComplex<int>& c, int x){
+    return TComplex<int>(c.real / x, c.imag / x);
+}
+
+template <>
+TComplex<int> &TComplex<int>::operator/=(int x){
+    real /= x; imag /= x;
+    return *this;
+}
+
+template <>
+TQuaternion<int> TQuaternion<int>::operator/(int s) const{
+    return TQuaternion<int>(x / s, y / s, z / s, w / s);
+}
+
+template <>
+TQuaternion<int> &TQuaternion<int>::operator/=(int s){
+    x /= s; y /= s; z /= s; w /= s;
+    return *this;
+}
+
+template <>
+TMatrix4x4<int> TMatrix4x4<int>::operator/(int w) const{
+    return {_11 / w, _12 / w, _13 / w, _14 / w,
+            _21 / w, _22 / w, _23 / w, _24 / w,
+            _31 / w, _32 / w, _33 / w, _34 / w,
+            _41 / w, _42 / w, _43 / w, _44 / w};
+}
+
+template <>
+TMatrix4x4<int> &TMatrix4x4<int>::operator/=(int w){
+    _11 /= w; _12 /= w; _13 /= w; _14 /= w;
+    _21 /= w; _22 /= w; _23 /= w; _24 /= w;
+    _31 /= w; _32 /= w; _33 /= w; _34 /= w;
+    _41 /= w; _42 /= w; _43 /= w; _44 /= w;
+    return *this;
+}
+
 Matrix3x4::Matrix3x4(){}
 
 Matrix3x4::Matrix3x4(Quaternion &&q){

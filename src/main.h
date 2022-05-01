@@ -3,6 +3,7 @@
 
 #include <define.h>
 
+#include <base/Factory.h>
 #include <util/List.h>
 #include <util/os/AppFrame.h>
 #include <util/math3d/LinearAlgebra.h>
@@ -97,6 +98,8 @@ public:
     List<Face*> selFaces;
 
     float animFrame = 0.0f;
+
+    FactoryRegistryW<AWindow> windowRegistry;
 
     GlobalData();
     ~GlobalData();

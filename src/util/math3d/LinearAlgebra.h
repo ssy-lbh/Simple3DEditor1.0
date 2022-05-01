@@ -719,6 +719,11 @@ TVector2<T> TVector2<T>::operator/(T w) const{
     return TVector2<T>(x * w, y * w);
 }
 
+// 我总觉得类型萃取什么的可能影响性能
+// 而且编译已经很慢了>_<
+template <>
+TVector2<int> TVector2<int>::operator/(int w) const;
+
 template <typename T>
 TVector2<T> TVector2<T>::operator/(const TVector2<T>& v) const{
     return TVector2<T>(x / v.x, y / v.y);
@@ -730,6 +735,9 @@ TVector2<T> &TVector2<T>::operator/=(T w){
     x *= w; y *= w;
     return *this;
 }
+
+template <>
+TVector2<int> &TVector2<int>::operator/=(int w);
 
 template <typename T>
 T TVector2<T>::Cross(const TVector2<T>& v1, const TVector2<T>& v2){
@@ -939,6 +947,9 @@ TVector3<T> TVector3<T>::operator/(T w) const{
     return TVector3<T>(x * w, y * w, z * w);
 }
 
+template <>
+TVector3<int> TVector3<int>::operator/(int w) const;
+
 template <typename T>
 TVector3<T> TVector3<T>::operator/(const TVector3<T>& v) const{
     return TVector3<T>(x / v.x, y / v.y, z / v.z);
@@ -950,6 +961,9 @@ TVector3<T> &TVector3<T>::operator/=(T w){
     x *= w; y *= w; z *= w;
     return *this;
 }
+
+template <>
+TVector3<int> &TVector3<int>::operator/=(int w);
 
 template <typename T>
 TVector3<T> &TVector3<T>::operator*=(const TQuaternion<T>& q){
@@ -1258,6 +1272,9 @@ TVector4<T> TVector4<T>::operator/(T w) const{
     return TVector4<T>(x * w, y * w, z * w, this->w);
 }
 
+template <>
+TVector4<int> TVector4<int>::operator/(int w) const;
+
 template <typename T>
 TVector4<T> &TVector4<T>::operator+=(const TVector3<T>& v){
     x += v.x; y += v.y; z += v.z;
@@ -1282,6 +1299,9 @@ TVector4<T> &TVector4<T>::operator/=(T w){
     x *= w; y *= w; z *= w;
     return *this;
 }
+
+template <>
+TVector4<int> &TVector4<int>::operator/=(int w);
 
 template <typename T>
 TVector4<T> TVector4<T>::operator-() const{
@@ -1473,6 +1493,9 @@ TComplex<T> operator/(const TComplex<T>& c, T x){
     return TComplex<T>(c.real * inv, c.imag * inv);
 }
 
+template <>
+TComplex<int> operator/(const TComplex<int>& c, int x);
+
 template <typename T>
 TComplex<T> operator/(T x, const TComplex<T>& c){
     return x * c.Inverse();
@@ -1524,6 +1547,9 @@ TComplex<T> &TComplex<T>::operator/=(T x){
     real *= inv; imag *= inv;
     return *this;
 }
+
+template <>
+TComplex<int> &TComplex<int>::operator/=(int x);
 
 template <typename T>
 TComplex<T> TComplex<T>::operator-() const{
@@ -1624,6 +1650,9 @@ TQuaternion<T> TQuaternion<T>::operator/(T s) const{
     return TQuaternion<T>(x * s, y * s, z * s, w * s);
 }
 
+template <>
+TQuaternion<int> TQuaternion<int>::operator/(int s) const;
+
 template <typename T>
 TQuaternion<T> &TQuaternion<T>::operator*=(const TQuaternion<T>& q){
     return (*this = *this * q);
@@ -1646,6 +1675,9 @@ TQuaternion<T> &TQuaternion<T>::operator/=(T s){
     x *= s; y *= s; z *= s; w *= s;
     return *this;
 }
+
+template <>
+TQuaternion<int> &TQuaternion<int>::operator/=(int s);
 
 template <typename T>
 TQuaternion<T> TQuaternion<T>::operator-() const{
@@ -2105,6 +2137,9 @@ TMatrix4x4<T> TMatrix4x4<T>::operator/(T w) const{
             _41 * w, _42 * w, _43 * w, _44 * w};
 }
 
+template <>
+TMatrix4x4<int> TMatrix4x4<int>::operator/(int w) const;
+
 template <typename T>
 TMatrix4x4<T> &TMatrix4x4<T>::operator+=(const TMatrix4x4<T>& m){
     _11 += m._11; _12 += m._12; _13 += m._13; _14 += m._14;
@@ -2141,6 +2176,9 @@ TMatrix4x4<T> &TMatrix4x4<T>::operator/=(T w){
     _41 *= w; _42 *= w; _43 *= w; _44 *= w;
     return *this;
 }
+
+template <>
+TMatrix4x4<int> &TMatrix4x4<int>::operator/=(int w);
 
 template <typename T>
 TMatrix4x4<T> TMatrix4x4<T>::operator*(const TMatrix4x4<T>& m) const{

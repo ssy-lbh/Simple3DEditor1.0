@@ -165,6 +165,8 @@ void LocalData::DestoryCamera(){
 GlobalData::GlobalData(){
     scene = new AViewObject(L"Scene");
     screen = new AViewObject(L"Screen");
+
+    windowRegistry.Register<MainWindow>(L"主窗口");
 }
 
 GlobalData::~GlobalData(){

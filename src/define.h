@@ -97,13 +97,21 @@ template <typename T>
 class TMatrix4x4;
 typedef TRect<float> Rect;
 typedef TVector2<float> Vector2;
+typedef TVector2<int> Vector2Int;
 typedef TPoint2<float> Point2;
+typedef TPoint2<int> Point2Int;
 typedef TVector3<float> Vector3;
+typedef TVector3<int> Vector3Int;
 typedef TPoint3<float> Point3;
+typedef TPoint3<int> Point3Int;
 typedef TVector4<float> Vector4;
+typedef TVector4<int> Vector4Int;
 typedef TComplex<float> Complex;
+typedef TComplex<int> ComplexInt;
 typedef TQuaternion<float> Quaternion;
+typedef TQuaternion<int> QuaternionInt;
 typedef TMatrix4x4<float> Matrix4x4;
+typedef TMatrix4x4<int> Matrix4x4Int;
 
 // viewobject
 enum class ViewObjectType;

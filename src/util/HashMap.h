@@ -3,6 +3,9 @@
 
 #include <define.h>
 
+#include <cstring>
+#include <functional>
+
 #include <util/String.h>
 
 // 此HashMap默认ANSI编码以及指针为值类型
@@ -41,11 +44,8 @@ private:
     }
 
     T QueryValue(HashNode* node, const char* key){
-        if (!node)
-            return 0;// 可以作为NULL
-        if (node->key == key)
-            return node->val;
-        return QueryValue(node->next, key);
+        node = QueryNode(node, key);
+        return node == NULL ? 0 : node->val;
     }
 
     HashNode* QueryNode(HashNode* node, const char* key){
@@ -53,7 +53,7 @@ private:
             return NULL;
         if (node->key == key)
             return node;
-        return QueryValue(node->next, key);
+        return QueryNode(node->next, key);
     }
 
     void DeleteNode(HashNode*& node, const char* key){
@@ -79,7 +79,7 @@ public:
         return QueryValue(nodes[GetHash(key, strlen(key))], key);
     }
 
-    T Get(String& key){
+    T Get(const String& key){
         return QueryValue(nodes[GetHash(key.GetString(), key.GetLength())], key.GetString());
     }
 
@@ -95,7 +95,7 @@ public:
         return 0;
     }
 
-    T Set(String& key, T val){
+    T Set(const String& key, T val){
         HashNode*& root = nodes[GetHash(key.GetString(), key.GetLength())];
         HashNode* node = QueryNode(root);
         if (node){
@@ -111,27 +111,15 @@ public:
         DeleteNode(nodes[GetHash(key, strlen(key))], key);
     }
 
-    void Delete(String& key){
+    void Delete(const String& key){
         DeleteNode(nodes[GetHash(key.GetString(), key.GetLength())], key.GetString());
     }
 
-    HashMapA<T, bitSize>& Foreach(void(*func)(T)){
+    HashMapA<T, bitSize>& Foreach(std::function<void(const String&, T)> func){
         for (size_t i = 0; i < (1 << bitSize); i++){
             HashNode* node = nodes[i];
             while (node){
-                func(node->val);
-                node = node->next;
-            }
-        }
-        return *this;
-    }
-
-    template <typename Tp>
-    HashMapA<T, bitSize>& Foreach(void(*func)(T, Tp), Tp user){
-        for (size_t i = 0; i < (1 << bitSize); i++){
-            HashNode* node = nodes[i];
-            while (node){
-                func(node->val, user);
+                func(node->key, node->val);
                 node = node->next;
             }
         }
@@ -182,11 +170,8 @@ private:
     }
 
     T QueryValue(HashNode* node, const wchar_t* key){
-        if (!node)
-            return 0;// 可以作为NULL
-        if (node->key == key)
-            return node->val;
-        return QueryValue(node->next, key);
+        node = QueryNode(node, key);
+        return node == NULL ? 0 : node->val;
     }
 
     HashNode* QueryNode(HashNode* node, const wchar_t* key){
@@ -194,7 +179,7 @@ private:
             return NULL;
         if (node->key == key)
             return node;
-        return QueryValue(node->next, key);
+        return QueryNode(node->next, key);
     }
 
     void DeleteNode(HashNode*& node, const wchar_t* key){
@@ -226,7 +211,7 @@ public:
 
     T Set(const wchar_t* key, T val){
         HashNode*& root = nodes[GetHash(key, wcslen(key))];
-        HashNode* node = QueryNode(root);
+        HashNode* node = QueryNode(root, key);
         if (node){
             T preval = node->val;
             node->val = val;
@@ -255,23 +240,11 @@ public:
         DeleteNode(nodes[GetHash(key.GetString(), key.GetLength())], key.GetString());
     }
 
-    HashMapW<T, bitSize>& Foreach(void(*func)(T)){
+    HashMapW<T, bitSize>& Foreach(std::function<void(const WString&, T)> func){
         for (size_t i = 0; i < (1 << bitSize); i++){
             HashNode* node = nodes[i];
             while (node){
-                func(node->val);
-                node = node->next;
-            }
-        }
-        return *this;
-    }
-
-    template <typename Tp>
-    HashMapW<T, bitSize>& Foreach(void(*func)(T, Tp), Tp user){
-        for (size_t i = 0; i < (1 << bitSize); i++){
-            HashNode* node = nodes[i];
-            while (node){
-                func(node->val, user);
+                func(node->key, node->val);
                 node = node->next;
             }
         }

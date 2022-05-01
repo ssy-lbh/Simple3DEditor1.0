@@ -105,7 +105,11 @@ PLATOBJ 	:= $(PLATOBJ:$(SOURCE_PATH)/%=%)
 
 PROGOBJ 	:= $(filter-out $(EXTRAOBJ) $(REMOVEOBJ), $(PROGOBJ))
 
-RESOBJ		:= res string
+RESOBJ 		:= .
+RESOBJ 		:= $(addprefix $(SOURCE_PATH)/, $(RESOBJ))
+RESOBJ 		:= $(basename $(call rwildcard, $(RESOBJ), *.rc))
+RESOBJ 		:= $(RESOBJ:$(SOURCE_PATH)/%=%)
+
 OUTPUT 		:= main.exe
 # 动态库
 OUTPUTDLIB	:= main.dll
@@ -178,7 +182,7 @@ DEPFILES	:= $(CPPOBJ:%.o=%.d)
 # 不使用时用'#'注释掉
 # 一般而言有了大批量定义改动后才需要使用
 #! 如果使用，请不要轻易改动头文件！！！
-#-include $(DEPFILES)
+-include $(DEPFILES)
 
 $(DEPFILES): $(BUILD_PATH)/%.d: $(SOURCE_PATH)/%.cpp
 	$(GCC) -MM $(CFLAGS) $< -MT $(call src2obj, $<) > $@
