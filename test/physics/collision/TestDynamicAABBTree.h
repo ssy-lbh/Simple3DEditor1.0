@@ -28,10 +28,10 @@
 
 // Libraries
 #include "../Test.h"
-#include <utils/physics3d/collision/broadphase/DynamicAABBTree.h>
-#include <utils/physics3d/memory/MemoryManager.h>
-#include <utils/physics3d/engine/PhysicsCommon.h>
-#include <utils/physics3d/utils/Profiler.h>
+#include <util/physics3d/collision/broadphase/DynamicAABBTree.h>
+#include <util/physics3d/memory/MemoryManager.h>
+#include <util/physics3d/engine/PhysicsCommon.h>
+#include <util/physics3d/utils/Profiler.h>
 #include <vector>
 
 /// Reactphysics3D namespace

@@ -28,8 +28,8 @@
 
 // Libraries
 #include "../Test.h"
-#include <utils/physics3d/containers/Set.h>
-#include <utils/physics3d/memory/DefaultAllocator.h>
+#include <util/physics3d/containers/Set.h>
+#include <util/physics3d/memory/DefaultAllocator.h>
 
 // Key to test map with always same hash values
 namespace reactphysics3d {

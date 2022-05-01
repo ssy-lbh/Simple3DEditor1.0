@@ -27,7 +27,7 @@
 #define TEST_AABB_H
 
 // Libraries
-#include <utils/physics3d/reactphysics3d.h>
+#include <util/physics3d/reactphysics3d.h>
 
 /// Reactphysics3D namespace
 namespace reactphysics3d {

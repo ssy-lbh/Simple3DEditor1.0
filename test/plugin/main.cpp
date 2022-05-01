@@ -1,6 +1,6 @@
 #include <main.h>
 
-#include <utils/String.h>
+#include <util/String.h>
 #include <manager/PluginManager.h>
 
 int main(int argc, char** argv){

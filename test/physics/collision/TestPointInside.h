@@ -28,13 +28,13 @@
 
 // Libraries
 #include "../Test.h"
-#include <utils/physics3d/collision/shapes/BoxShape.h>
-#include <utils/physics3d/collision/shapes/SphereShape.h>
-#include <utils/physics3d/collision/shapes/CapsuleShape.h>
-#include <utils/physics3d/collision/shapes/ConvexMeshShape.h>
-#include <utils/physics3d/engine/PhysicsWorld.h>
-#include <utils/physics3d/engine/PhysicsCommon.h>
-#include <utils/physics3d/collision/PolygonVertexArray.h>
+#include <util/physics3d/collision/shapes/BoxShape.h>
+#include <util/physics3d/collision/shapes/SphereShape.h>
+#include <util/physics3d/collision/shapes/CapsuleShape.h>
+#include <util/physics3d/collision/shapes/ConvexMeshShape.h>
+#include <util/physics3d/engine/PhysicsWorld.h>
+#include <util/physics3d/engine/PhysicsCommon.h>
+#include <util/physics3d/collision/PolygonVertexArray.h>
 
 /// Reactphysics3D namespace
 namespace reactphysics3d {

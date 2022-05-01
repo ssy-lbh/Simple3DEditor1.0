@@ -28,20 +28,20 @@
 
 // Libraries
 #include "../Test.h"
-#include <utils/physics3d/engine/PhysicsCommon.h>
-#include <utils/physics3d/engine/PhysicsWorld.h>
-#include <utils/physics3d/body/CollisionBody.h>
-#include <utils/physics3d/collision/shapes/BoxShape.h>
-#include <utils/physics3d/collision/shapes/SphereShape.h>
-#include <utils/physics3d/collision/shapes/CapsuleShape.h>
-#include <utils/physics3d/collision/shapes/ConvexMeshShape.h>
-#include <utils/physics3d/collision/shapes/TriangleShape.h>
-#include <utils/physics3d/collision/shapes/ConcaveMeshShape.h>
-#include <utils/physics3d/collision/shapes/HeightFieldShape.h>
-#include <utils/physics3d/collision/TriangleMesh.h>
-#include <utils/physics3d/collision/TriangleVertexArray.h>
-#include <utils/physics3d/collision/RaycastInfo.h>
-#include <utils/physics3d/collision/PolygonVertexArray.h>
+#include <util/physics3d/engine/PhysicsCommon.h>
+#include <util/physics3d/engine/PhysicsWorld.h>
+#include <util/physics3d/body/CollisionBody.h>
+#include <util/physics3d/collision/shapes/BoxShape.h>
+#include <util/physics3d/collision/shapes/SphereShape.h>
+#include <util/physics3d/collision/shapes/CapsuleShape.h>
+#include <util/physics3d/collision/shapes/ConvexMeshShape.h>
+#include <util/physics3d/collision/shapes/TriangleShape.h>
+#include <util/physics3d/collision/shapes/ConcaveMeshShape.h>
+#include <util/physics3d/collision/shapes/HeightFieldShape.h>
+#include <util/physics3d/collision/TriangleMesh.h>
+#include <util/physics3d/collision/TriangleVertexArray.h>
+#include <util/physics3d/collision/RaycastInfo.h>
+#include <util/physics3d/collision/PolygonVertexArray.h>
 #include <vector>
 
 /// Reactphysics3D namespace

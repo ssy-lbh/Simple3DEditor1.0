@@ -28,8 +28,8 @@
 
 // Libraries
 #include "../Test.h"
-#include <utils/physics3d/containers/Stack.h>
-#include <utils/physics3d/memory/DefaultAllocator.h>
+#include <util/physics3d/containers/Stack.h>
+#include <util/physics3d/memory/DefaultAllocator.h>
 
 /// Reactphysics3D namespace
 namespace reactphysics3d {

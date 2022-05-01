@@ -2,7 +2,7 @@
 #define TEST_HALF_EDGE_STRUCTURE_H
 
 // Libraries
-#include <utils/physics3d/reactphysics3d.h>
+#include <util/physics3d/reactphysics3d.h>
 #include "../Test.h"
 #include <vector>
 

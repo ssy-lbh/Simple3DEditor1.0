@@ -1,0 +1,170 @@
+#include <windows.h>
+
+#include "res.h"
+
+1 VERSIONINFO
+  FILEVERSION 1,0,0,1
+  PRODUCTVERSION 1,0,0,1
+  FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+  FILEFLAGS 0x1L
+#else
+  FILEFLAGS 0x0L
+#endif
+  FILEOS 0x40004L
+  FILETYPE 0x1L
+  FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404b0"
+        BEGIN
+            VALUE "CompanyName", "lin-boheng@gitee.com"
+            VALUE "FileDescription", "3D编辑器"
+            VALUE "FileVersion", "1.0.7"
+            VALUE "InternalName", "StereoVision.exe"
+            VALUE "LegalCopyright", "Copyright (C) lin-boheng@gitee.com 2021"
+            VALUE "OriginalFilename", "main.exe"
+            VALUE "ProductName", "StereoVision"
+            VALUE "ProductVersion", "1.0.7"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+IDI_ICON1 ICON                  "res/icon/app_icon3.ico"
+
+IDC_NORMAL CURSOR               "res/cursor/cursor_normal.cur"
+IDC_CLICKED CURSOR              "res/cursor/cursor_clicked.cur"
+
+IDS_BASIC_VERT SHADER           "res/shader/basic/basic_vert.vert"
+IDS_BASIC_FRAG SHADER           "res/shader/basic/basic_frag.frag"
+IDS_BRUSH_CLEAR SHADER          "res/shader/brush/brush_clear.comp"
+IDS_BRUSH_OVERLAY SHADER        "res/shader/brush/brush_overlay.comp"
+IDS_BRUSH_RGB_ADD SHADER        "res/shader/brush/brush_rgb_add.comp"
+IDS_BRUSH_CMK_ADD SHADER        "res/shader/brush/brush_cmk_add.comp"
+IDS_BRUSH_WATERCOLOR SHADER     "res/shader/brush/brush_watercolor.comp"
+IDS_BRUSH_RGB_MUL SHADER        "res/shader/brush/brush_rgb_mul.comp"
+IDS_BRUSH_RGB_AVERAGE SHADER    "res/shader/brush/brush_rgb_average.comp"
+
+IDT_SKYBOX_LEFT TEXTURE         "res/skybox/left.jpg"
+IDT_SKYBOX_RIGHT TEXTURE        "res/skybox/right.jpg"
+IDT_SKYBOX_FRONT TEXTURE        "res/skybox/front.jpg"
+IDT_SKYBOX_BACK TEXTURE         "res/skybox/back.jpg"
+IDT_SKYBOX_TOP TEXTURE          "res/skybox/top.jpg"
+IDT_SKYBOX_DOWN TEXTURE         "res/skybox/down.jpg"
+IDT_EARTH_WATER TEXTURE         "res/texture/earth_water.png"
+IDT_NODEMAP_BACKGROUND TEXTURE  "res/texture/nodemap_background.png"
+IDT_BUTTON_MOVE TEXTURE         "res/texture/btn_move.png"
+IDT_BUTTON_ROTATE TEXTURE       "res/texture/btn_rotate.png"
+
+IDC_MENU MENU
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        MENUITEM "保存\tCtrl+S",                    IDM_SAVE
+        MENUITEM "载入\tCtrl+L",                    IDM_LOAD
+        MENUITEM "打印\tCtrl+P",                    IDM_PRINT
+        MENUITEM SEPARATOR
+        MENUITEM "退出\tESC",                       IDM_EXIT
+    END
+    POPUP "网格体(&M)"
+    BEGIN
+        MENUITEM "平面",                            IDM_MESH_BASIC_PLANE
+        MENUITEM "方块",                            IDM_MESH_BASIC_BLOCK
+        MENUITEM "球体",                            IDM_MESH_BASIC_SPHERE
+        MENUITEM "圆柱体",                          IDM_MESH_BASIC_CYLINDER
+        MENUITEM "胶囊体",                          IDM_MESH_BASIC_CAPSULE
+    END
+    POPUP "工具(&T)"
+    BEGIN
+        MENUITEM "点选\tAlt+1",                     IDM_TOOL_EMPTY
+        MENUITEM "框选\tAlt+2",                     IDM_TOOL_SELECTBOX
+    END
+    POPUP "纹理(&P)"
+    BEGIN
+        MENUITEM "启用",                            IDM_TEXTURE_ENABLE
+        MENUITEM "停用",                            IDM_TEXTURE_DISABLE
+        MENUITEM "加载",                            IDM_TEXTURE_LOAD
+        MENUITEM "使用画布纹理",                     IDM_TEXTURE_USE_PAINT
+    END
+    POPUP "窗口(&W)"
+    BEGIN
+        MENUITEM "窗口菜单\tCtrl+W",                IDM_MENU_WINDOW
+    END
+    POPUP "动画(&A)"
+    BEGIN
+        MENUITEM "插值\tShift+I",                   IDM_MENU_INSERT
+        MENUITEM "渲染",                            IDM_RENDER_ANIMATION
+    END
+    POPUP "版本(&V)"
+    BEGIN
+        MENUITEM "关于...\tAlt+?",                  IDM_ABOUT
+    END
+END
+
+IDC_MENU ACCELERATORS
+BEGIN
+    "?",            IDM_ABOUT,              ASCII, ALT, NOINVERT
+    "^S",           IDM_SAVE,               ASCII, NOINVERT
+    "^L",           IDM_LOAD,               ASCII, NOINVERT
+    "^P",           IDM_PRINT,              ASCII, NOINVERT
+    VK_ESCAPE,      IDM_EXIT,               VIRTKEY, NOINVERT
+
+    VK_LEFT,        IDM_LEFT,               VIRTKEY, NOINVERT
+    VK_RIGHT,       IDM_RIGHT,              VIRTKEY, NOINVERT
+    VK_UP,          IDM_UP,                 VIRTKEY, NOINVERT
+    VK_DOWN,        IDM_DOWN,               VIRTKEY, NOINVERT
+    VK_RETURN,      IDM_CONFIRM,            VIRTKEY, NOINVERT
+    "q",            IDM_CANCEL,             ASCII, NOINVERT
+
+    "p",            IDM_POINT,              ASCII, NOINVERT
+    "f",            IDM_TOPOLOGY,           ASCII, NOINVERT
+    "g",            IDM_MOVE,               ASCII, NOINVERT
+    "r",            IDM_ROTATE,             ASCII, NOINVERT
+    "s",            IDM_SIZE,               ASCII, NOINVERT
+    "c",            IDM_SELECT_COLOR,       ASCII, NOINVERT
+
+    "x",            IDM_OP_X,               ASCII, NOINVERT
+    "y",            IDM_OP_Y,               ASCII, NOINVERT
+    "z",            IDM_OP_Z,               ASCII, NOINVERT
+    "X",            IDM_OP_PLANE_X,         ASCII, NOINVERT
+    "Y",            IDM_OP_PLANE_Y,         ASCII, NOINVERT
+    "Z",            IDM_OP_PLANE_Z,         ASCII, NOINVERT
+
+    VK_DELETE,      IDM_DELETE,             VIRTKEY, NOINVERT
+    "e",            IDM_EXCLUDE,            ASCII, NOINVERT
+
+    "A",            IDM_MENU_BASIC,         ASCII, NOINVERT
+    "^W",           IDM_MENU_WINDOW,        ASCII, NOINVERT
+    "I",            IDM_MENU_INSERT,        ASCII, NOINVERT
+
+    "1",            IDM_TOOL_EMPTY,         ASCII, ALT, NOINVERT
+    "2",            IDM_TOOL_SELECTBOX,     ASCII, ALT, NOINVERT
+END
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "关于 StereoVision"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+BEGIN
+    ICON            IDR_MAINFRAME, IDC_STATIC, 14, 14, 21, 20
+    LTEXT           "StereoVision, 版本 1.0.7", IDC_STATIC, 42, 14, 114, 8, SS_NOPREFIX
+    LTEXT           "版权所有(c) lin-boheng@gitee.com 2021", IDC_STATIC, 24, 26, 114, 8
+    DEFPUSHBUTTON   "确定", IDOK, 113, 41, 50, 14, WS_GROUP
+END
+
+IDD_TEXT DIALOGEX 0, 0, 200, 25
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "请输入："
+FONT 10, "MS Shell Dlg", 0, 0, 0x1
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+BEGIN
+    EDITTEXT        IDC_TEXT_EDIT, 0, 0, 200, 10, ES_CENTER | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "取消", IDCANCEL, 130, 10, 40, 15, WS_GROUP
+    DEFPUSHBUTTON   "确定", IDOK, 30, 10, 40, 15, WS_GROUP
+END

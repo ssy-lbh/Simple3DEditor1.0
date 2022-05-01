@@ -12,6 +12,8 @@
 
 # 以后SoundTouch和ReactPhysics3D物理引擎我打算单独编译成一个动态库
 
+# 这仓库里面的类我会在以后复用
+
 RM			:= bin/linux/rm
 TR 			:= bin/linux/tr
 DIRNAME 	:= bin/linux/dirname
@@ -62,6 +64,8 @@ endif
 BUILD_PATH	:= build
 TEST_PATH	:= test
 PLUGIN_PATH := plugins
+SOURCE_PATH := src
+LIB_PATH 	:= $(SOURCE_PATH)/lib
 
 toupper		= $(shell $(ECHO) $1 | $(TR) a-z A-Z)
 tolower		= $(shell $(ECHO) $1 | $(TR) A-Z a-z)
@@ -72,28 +76,32 @@ src2obj		= $(1:%.cpp=$(BUILD_PATH)/%.o)
 
 GCC			:= g++
 DLLTOOL		:= dlltool
-
-CFLAGS 		:= -I"." -m64 -O3 -std=c++11 -finput-charset=UTF-8 -fexec-charset=UTF-8\
+CFLAGS 		:= -I"$(SOURCE_PATH)" -m64 -O3 -std=c++11 -finput-charset=UTF-8 -fexec-charset=UTF-8\
 				-DPLATFORM_$(call toupper, $(PLATFORM)) -DARCH_$(call toupper, $(ARCH))
 OFLAGS		:= -m64 -s
 LFLAGS		:= -m64 -shared
-LIB			:= -lopengl32 -lglu32 -lgdi32 -lcomdlg32\
-				"lib\openal\OpenAL32.lib" "lib\glew\glew32.lib" "lib\freetype\freetype.lib"\
-				"lib\glut\glut64.lib" "lib\ftgl\ftgl_D.lib"
+LIB_FILES	:= openal/OpenAL32 glew/glew32 freetype/freetype\
+				glut/glut64 ftgl/ftgl_D
+LIB			:= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 -lws2_32\
+				$(foreach FILE, $(LIB_FILES), $(LIB_PATH)/$(FILE).lib)
 RES  		:= windres
 GIT  		:= git
 
 # 正常的含有.h和.cpp的代码
-PROGOBJ 	:= lib/soundtouch utils editor manager
-PROGOBJ 	:= $(basename $(call rwildcard, $(PROGOBJ), *.cpp))\
-				main
+PROGOBJ 	:= lib/soundtouch util editor manager base io
+PROGOBJ 	:= $(addprefix $(SOURCE_PATH)/, $(PROGOBJ))
+PROGOBJ 	:= $(basename $(call rwildcard, $(PROGOBJ), *.cpp))
+PROGOBJ 	:= $(PROGOBJ:$(SOURCE_PATH)/%=%)
+PROGOBJ 	+= main
 # 不需要的代码
 REMOVEOBJ 	:= lib/soundtouch/soundtouch_wapper
 # 只有.cpp的代码
 EXTRAOBJ	:= lib/soundtouch/mmx_optimized lib/soundtouch/sse_optimized lib/soundtouch/cpu_detect_x86
 # 平台相关代码
 PLATOBJ 	:= platform/$(PLATFORM)
+PLATOBJ 	:= $(addprefix $(SOURCE_PATH)/, $(PLATOBJ))
 PLATOBJ 	:= $(basename $(call rwildcard, $(PLATOBJ), *.cpp))
+PLATOBJ 	:= $(PLATOBJ:$(SOURCE_PATH)/%=%)
 
 PROGOBJ 	:= $(filter-out $(EXTRAOBJ) $(REMOVEOBJ), $(PROGOBJ))
 
@@ -124,9 +132,10 @@ RESOBJ		:= $(addprefix $(BUILD_PATH)/, $(addsuffix .o, $(RESOBJ)))
 CPPOBJ 		:= $(PROGOBJ) $(PLATOBJ) $(EXTRAOBJ)
 ALLOBJ		:= $(CPPOBJ) $(RESOBJ)
 
-.PHONY:all build cleanall cleandep clean run rebuild reexec commit merge sign lib mkdir
+.PHONY: all mkdir build lib cleanall cleandep clean run rebuild reexec sign commit merge
 
-all: build lib
+# build之前应该mkdir
+all: mkdir build lib
 
 run: build
 	$(OUTPUT)
@@ -147,29 +156,31 @@ $(OUTPUT): $(ALLOBJ)
 
 # 注:不使用依赖项文件时使用如下编译流程
 # 常规的源代码
-$(PROGOBJ): $(BUILD_PATH)/%.o: %.cpp %.h
+$(PROGOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp $(SOURCE_PATH)/%.h
 	$(GCC) -c $< -o $@ $(CFLAGS)
 
 # 这一类为平台相关代码源文件
-$(PLATOBJ): $(BUILD_PATH)/platform/$(PLATFORM)/%.o: platform/$(PLATFORM)/%.cpp %.h
+$(PLATOBJ): $(BUILD_PATH)/platform/$(PLATFORM)/%.o: $(SOURCE_PATH)/platform/$(PLATFORM)/%.cpp $(SOURCE_PATH)/%.h
 	$(GCC) -c $< -o $@ $(CFLAGS)
 
 # 这一类源文件没有头文件，直接编译
-$(EXTRAOBJ): $(BUILD_PATH)/%.o: %.cpp
+$(EXTRAOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp
 	$(GCC) -c $< -o $@ $(CFLAGS)
 
 # 其实我个人觉得，把nasm的内置指令incbin用好了当资源表用是相当可行的，理论上只要不乱加汇编代码跨平台是没问题的
 # 采用nasm的话，res.h里面就不是各种id了，而是一堆extern char[0]，指向资源数据的指针，借助了符号链接的功能
-$(RESOBJ): $(BUILD_PATH)/%.o: %.rc
+$(RESOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.rc
 	$(RES) -i $< -o $@
 
 # 依赖项文件
 DEPFILES	:= $(CPPOBJ:%.o=%.d)
 
 # 不使用时用'#'注释掉
-include $(DEPFILES)
+# 一般而言有了大批量定义改动后才需要使用
+#! 如果使用，请不要轻易改动头文件！！！
+#-include $(DEPFILES)
 
-$(DEPFILES): $(BUILD_PATH)/%.d: %.cpp
+$(DEPFILES): $(BUILD_PATH)/%.d: $(SOURCE_PATH)/%.cpp
 	$(GCC) -MM $(CFLAGS) $< -MT $(call src2obj, $<) > $@
 	$(ECHO) "	$(GCC) -c $< -o $(call src2obj, $<) $(CFLAGS)" >> $@
 
@@ -179,7 +190,7 @@ OBJDIRS 	:= $(sort $(OBJDIRS) $(shell $(DIRNAME) $(OBJDIRS)))
 OBJDIRS 	:= $(sort $(OBJDIRS) $(shell $(DIRNAME) $(OBJDIRS)))
 
 mkdir:
-	$(MKDIR) $(OBJDIRS)
+	-$(MKDIR) $(OBJDIRS)
 
 # 当前分支
 BRANCH		= master-2.0
@@ -226,10 +237,10 @@ sign: $(OUTPUT)
 cleanall: clean cleandep
 
 clean:
-	$(RM) $(OUTPUT) $(OUTPUTDLIB) $(ALLOBJ)
+	-$(RM) $(OUTPUT) $(OUTPUTDLIB) $(ALLOBJ)
 
 cleandep:
-	$(RM) $(DEPFILES)
+	-$(RM) $(DEPFILES)
 
 # glslc <file> --target-spv=spv1.0 [-x glsl/hlsl] -o <out> 编译GLSL/HLSL为SPIR-V
 # dxc -T {stage}[[ps/vs/gs/hs/ds/cs/lib/ms]_6_[0-7]] <file> -E <entry> -I <include> [-spirv]
