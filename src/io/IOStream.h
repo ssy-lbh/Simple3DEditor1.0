@@ -10,6 +10,7 @@
 
 class IInputStream : public IReadable, public ICloseable, public IFlushable {
 public:
+    using IReadable::Read;
     virtual size_t Read(void* buf, size_t len) = 0;
     virtual size_t Available();
     virtual void Flush();
@@ -18,6 +19,7 @@ public:
 
 class IOutputStream : public IWritable, public ICloseable, public IFlushable {
 public:
+    using IWritable::Write;
     virtual size_t Write(const void* buf, size_t len) = 0;
     virtual void Flush();
     virtual void Close();

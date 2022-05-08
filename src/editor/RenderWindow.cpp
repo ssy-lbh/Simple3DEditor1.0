@@ -153,6 +153,12 @@ void RenderWindow::OnDropFileA(const char* path){}
 
 void RenderWindow::OnDropFileW(const wchar_t* path){}
 
+void RenderWindow::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+}
+
+void RenderWindow::Deserialize(IInputStream& os){}
+
 void RenderWindow::OnInsSave(){
     static const WString filter = Resource::GetWString(IDS_PICFILE_FILTER);
     WString file = ShellFileSelectWindow(filter, FILESELECT_REQ_PATH, true);

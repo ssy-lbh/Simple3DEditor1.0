@@ -139,7 +139,7 @@ void AViewObject::OnChainRender(){
 
 void AViewObject::OnRender(){
     const RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
-    if (options->editor && Main::data->selType == SelectionType::SELECT_OBJECT && Main::data->curObject == this){
+    if (Main::data->curObject == this && options->editor && Main::data->selType == SelectionType::SELECT_OBJECT){
         glDisable(GL_LIGHTING);
         glEnable(GL_POINT_SMOOTH);
         glPointSize(10.0f);

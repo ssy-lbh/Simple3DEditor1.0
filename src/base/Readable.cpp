@@ -1,5 +1,7 @@
 #include <base/Readable.h>
 
+#include <util/String.h>
+#include <util/StringBuilder.h>
 #include <util/math3d/Math.h>
 
 char IReadable::skipBuffer[SKIP_BUFFER_SIZE];
@@ -8,6 +10,12 @@ int IReadable::Read() {
     char c;
     Read(&c, 1);
     return c;
+}
+
+bool IReadable::ReadBool(){
+    bool b;
+    Read(&b, sizeof(bool));
+    return b;
 }
 
 short IReadable::ReadShort(){
@@ -49,4 +57,18 @@ size_t IReadable::Skip(size_t n) {
         rem -= rd;
     }
     return n - rem;
+}
+
+String IReadable::ReadString(){
+    int n = ReadInt();
+    char* str = new char[n];
+    Read(str, n * sizeof(char));
+    return String(str, n);
+}
+
+WString IReadable::ReadWString(){
+    int n = ReadInt();
+    wchar_t* str = new wchar_t[n];
+    Read(str, n * sizeof(wchar_t));
+    return WString(str, n);
 }

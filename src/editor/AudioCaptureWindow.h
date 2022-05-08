@@ -11,13 +11,13 @@ typedef struct ALCdevice_struct ALCdevice;
 
 class AudioCaptureWindow final : public AWindow {
 private:
-    static const int SAMPLE_SIZE_BIT = 14;
-    static const int SAMPLE_SIZE = (1 << SAMPLE_SIZE_BIT);
-    static const int SAMPLE_MASK = (SAMPLE_SIZE - 1);
-    static const int QUEUE_SIZE_BIT = 2;
-    static const int QUEUE_SIZE = (1 << QUEUE_SIZE_BIT);
-    static const int QUEUE_MASK = (QUEUE_SIZE - 1);
-    static const int FREQUENCY = 44100;
+    static constexpr int SAMPLE_SIZE_BIT = 14;
+    static constexpr int SAMPLE_SIZE = (1 << SAMPLE_SIZE_BIT);
+    static constexpr int SAMPLE_MASK = (SAMPLE_SIZE - 1);
+    static constexpr int QUEUE_SIZE_BIT = 2;
+    static constexpr int QUEUE_SIZE = (1 << QUEUE_SIZE_BIT);
+    static constexpr int QUEUE_MASK = (QUEUE_SIZE - 1);
+    static constexpr int FREQUENCY = 44100;
 
     GUIManagerObject* guiMgr;
 
@@ -47,6 +47,9 @@ protected:
     void UpdateWindowSize(int x, int y);
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.audiocap";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"变声器";
+
     AudioCaptureWindow();
     virtual ~AudioCaptureWindow() override;
 
@@ -66,6 +69,9 @@ public:
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileA(const char* path) override;
     virtual void OnDropFileW(const wchar_t* path) override;
+
+    virtual void Serialize(IOutputStream& os) override;
+    virtual void Deserialize(IInputStream& os) override;
 
     void Launch();
     void Stop();

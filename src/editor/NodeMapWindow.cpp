@@ -9,153 +9,179 @@
 #include <editor/gui/Menu.h>
 #include <editor/object/GUIManagerObject.h>
 
-NodeMapWindow::MoveButton::MoveButton(Point2 center, float radius, NodeMapWindow* window) : center(center), radius(radius), window(window) {}
-NodeMapWindow::MoveButton::~MoveButton(){}
+class MoveButton : public AGUIObject {
+private:
+    Point2 center;
+    float radius;
+    Point2 start;
+    NodeMapWindow* window;
 
-bool NodeMapWindow::MoveButton::OnHit2D(Point2 pos){
-    return (pos - center).SqrMagnitude() <= radius * radius;
-}
+public:
+    MoveButton(Point2 center, float radius, NodeMapWindow* window) : center(center), radius(radius), window(window) {}
+    virtual ~MoveButton() override{}
 
-void NodeMapWindow::MoveButton::OnRender(){
-    glColor3f(0.3f, 0.3f, 0.3f);
-    GLUtils::DrawCorner(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
-}
-
-void NodeMapWindow::MoveButton::OnLeftDown2D(Point2 pos){
-    start = window->viewPos;
-}
-
-void NodeMapWindow::MoveButton::OnLeftDrag2D(Vector2 dir){
-    window->viewPos = start - dir;
-}
-
-NodeMapWindow::Node::Node(NodeMapWindow* window) : Node(Point2::zero, window) {}
-
-NodeMapWindow::Node::Node(Point2 pos, NodeMapWindow* window) : position(pos), window(window) {
-    guiMgr = new GUIManagerObject();
-
-    //TODO 做好适配变换的组件
-    // UIEditA* name = new UIEditA(Vector2(0.05f, 0.0f), 0.2f, [](char* s, void* user){
-    //     DebugLog("Edit %s", s);
-    // });
-    // name->SetCornerRadius(0.2f);
-    // name->SetBackgroundColor(Vector3(0.1f, 0.1f, 0.1f));
-    // name->SetFontColor(Vector3(1.0f, 1.0f, 1.0f));
-    // name->SetSelectionColor(Vector3(0.0f, 0.0f, 1.0f));
-    // uiMgr->AddButton(name);
-}
-
-NodeMapWindow::Node::~Node(){
-    if (guiMgr) delete guiMgr;
-}
-
-bool NodeMapWindow::Node::OnHit2D(Point2 pos){
-    relaPos = pos - position;
-    return relaPos.x >= 0.0f && relaPos.x <= 0.3f && relaPos.y >= 0.0f && relaPos.y <= 0.3f;
-}
-
-void NodeMapWindow::Node::OnRender(){
-    glColorv3(focus ? Vector3(0.5f, 0.5f, 0.1f) :
-        window->selectedNodes.HasValue(this) ? Vector3(0.3f, 0.3f, 0.1f) : Vector3(0.05f, 0.05f, 0.05f));
-    GLUtils::DrawRoundRect(
-        position.x,
-        position.y,
-        0.3f,
-        0.3f,
-        0.05f,
-        0.05f
-    );
-
-    if (connNode){
-        glColor3f(1.0f, 1.0f, 0.2f);
-        glLineWidth(1.0f);
-        Vector2 begin = Vector2(position.x + 0.3f, position.y + 0.15f);
-        //DebugLog("access %p", connNode);
-        Vector2 end = connNode->position + offset;
-        GLUtils::DrawBezier(begin, begin + Vector2(0.3f, 0.0f), end - Vector2(0.3f, 0.0f), end, 0.01f);
+    virtual bool OnHit2D(Point2 pos) override{
+        return (pos - center).SqrMagnitude() <= radius * radius;
     }
 
-    if (rightDown){
-        glColor3f(0.5f, 0.5f, 0.2f);
-        glLineWidth(1.0f);
-        GLUtils::DrawBezier(rightStart, rightStart + Vector2(0.3f, 0.0f), rightEnd - Vector2(0.3f, 0.0f), rightEnd, 0.01f);
+    virtual void OnRender() override{
+        glColor3f(0.3f, 0.3f, 0.3f);
+        GLUtils::DrawCorner(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
     }
 
-    guiMgr->OnChainRender();
-}
+    virtual void OnLeftDown2D(Point2 pos) override{
+        start = window->viewPos;
+    }
 
-void NodeMapWindow::Node::OnMouseMove2D(Point2 pos){
-    guiMgr->OnMouseMove2D(pos - position);
-}
+    virtual void OnLeftDrag2D(Vector2 dir) override{
+        window->viewPos = start - dir;
+    }
+};
 
-void NodeMapWindow::Node::OnLeftDown2D(Point2 pos){
-    start = position;
-    guiMgr->OnLeftDown2D(pos - position);
-}
+class Node : public AGUIObject {
+private:
+    NodeMapWindow* window;
+    Point2 relaPos;
+    Point2 start;
+    Point2 rightStart;
+    Point2 rightEnd;
+    Point2 position;
+    Node* connNode = NULL;
+    Vector2 offset;
+    bool focus = false;
+    bool rightDown = false;
 
-void NodeMapWindow::Node::OnLeftDrag2D(Vector2 dir){
-    position = start + dir;
-}
+    GUIManagerObject* guiMgr = NULL;
 
-void NodeMapWindow::Node::OnLeftUp2D(Point2 pos){
-    guiMgr->OnLeftUp2D(pos - position);
-}
+public:
+    Node(NodeMapWindow* window) : Node(Point2::zero, window) {}
 
-void NodeMapWindow::Node::OnFocus(){
-    if (!window->selectedNodes.HasValue(this))
-        window->selectedNodes.Add(this);
-    focus = true;
-}
+    Node(Point2 pos, NodeMapWindow* window) : position(pos), window(window) {
+        guiMgr = new GUIManagerObject();
 
-void NodeMapWindow::Node::OnKillFocus(){
-    this->focus = false;
-}
+        //TODO 做好适配变换的组件
+        // UIEditA* name = new UIEditA(Vector2(0.05f, 0.0f), 0.2f, [](char* s, void* user){
+        //     DebugLog("Edit %s", s);
+        // });
+        // name->SetCornerRadius(0.2f);
+        // name->SetBackgroundColor(Vector3(0.1f, 0.1f, 0.1f));
+        // name->SetFontColor(Vector3(1.0f, 1.0f, 1.0f));
+        // name->SetSelectionColor(Vector3(0.0f, 0.0f, 1.0f));
+        // uiMgr->AddButton(name);
+    }
 
-void NodeMapWindow::Node::OnRightDown2D(Point2 pos){
-    rightStart = pos;
-    rightEnd = pos;
-    rightDown = true;
-}
+    virtual ~Node() override{
+        if (guiMgr) delete guiMgr;
+    }
 
-void NodeMapWindow::Node::OnRightDrag2D(Vector2 dir){
-    rightEnd = rightStart + dir;
-}
+    virtual bool OnHit2D(Point2 pos) override{
+        relaPos = pos - position;
+        return relaPos.x >= 0.0f && relaPos.x <= 0.3f && relaPos.y >= 0.0f && relaPos.y <= 0.3f;
+    }
 
-void NodeMapWindow::Node::OnRightUp2D(Point2 pos){
-    if (AGUIObject::parentGUIMgr){
-        try {
-            Connect(dynamic_cast<Node*>(AGUIObject::parentGUIMgr->GetCurrent()));
-        }catch(std::bad_cast e){
-            DebugError("Connect To A Non-node Object");
+    virtual void OnRender() override{
+        glColorv3(focus ? Vector3(0.5f, 0.5f, 0.1f) :
+            window->selectedNodes.HasValue(this) ? Vector3(0.3f, 0.3f, 0.1f) : Vector3(0.05f, 0.05f, 0.05f));
+        GLUtils::DrawRoundRect(
+            position.x,
+            position.y,
+            0.3f,
+            0.3f,
+            0.05f,
+            0.05f
+        );
+
+        if (connNode){
+            glColor3f(1.0f, 1.0f, 0.2f);
+            glLineWidth(1.0f);
+            Vector2 begin = Vector2(position.x + 0.3f, position.y + 0.15f);
+            //DebugLog("access %p", connNode);
+            Vector2 end = connNode->position + offset;
+            GLUtils::DrawBezier(begin, begin + Vector2(0.3f, 0.0f), end - Vector2(0.3f, 0.0f), end, 0.01f);
         }
+
+        if (rightDown){
+            glColor3f(0.5f, 0.5f, 0.2f);
+            glLineWidth(1.0f);
+            GLUtils::DrawBezier(rightStart, rightStart + Vector2(0.3f, 0.0f), rightEnd - Vector2(0.3f, 0.0f), rightEnd, 0.01f);
+        }
+
+        guiMgr->OnChainRender();
     }
-    rightDown = false;
-}
 
-void NodeMapWindow::Node::OnChar(char c){
-    guiMgr->OnChar(c);
-}
+    virtual void OnMouseMove2D(Point2 pos) override{
+        guiMgr->OnMouseMove2D(pos - position);
+    }
 
-void NodeMapWindow::Node::Connect(Node* node){
-    Connect(node, Vector2(0.0f, 0.15f));
-}
+    virtual void OnLeftDown2D(Point2 pos) override{
+        start = position;
+        guiMgr->OnLeftDown2D(pos - position);
+    }
 
-void NodeMapWindow::Node::Connect(Node* node, Vector2 offset){
-    if (node == this)
-        return;
-    connNode = node;
-    this->offset = offset;
-}
+    virtual void OnLeftDrag2D(Vector2 dir) override{
+        position = start + dir;
+    }
 
-void NodeMapWindow::Node::Disconnect(){
-    connNode = NULL;
-}
+    virtual void OnLeftUp2D(Point2 pos) override{
+        guiMgr->OnLeftUp2D(pos - position);
+    }
 
-void NodeMapWindow::Node::Disconnect(Node* node){
-    DebugLog("NodeMapWindow::Node::Disconnect %p %p", this, node);
-    if (connNode == node)
+    virtual void OnFocus() override{
+        if (!window->selectedNodes.HasValue(this))
+            window->selectedNodes.Add(this);
+        focus = true;
+    }
+
+    virtual void OnKillFocus() override{
+        this->focus = false;
+    }
+
+    virtual void OnRightDown2D(Point2 pos) override{
+        rightStart = pos;
+        rightEnd = pos;
+        rightDown = true;
+    }
+
+    virtual void OnRightDrag2D(Vector2 dir) override{
+        rightEnd = rightStart + dir;
+    }
+
+    virtual void OnRightUp2D(Point2 pos) override{
+        if (AGUIObject::parentGUIMgr){
+            try {
+                Connect(dynamic_cast<Node*>(AGUIObject::parentGUIMgr->GetCurrent()));
+            }catch(std::bad_cast e){
+                DebugError("Connect To A Non-node Object");
+            }
+        }
+        rightDown = false;
+    }
+
+    virtual void OnChar(char c) override{
+        guiMgr->OnChar(c);
+    }
+
+    void Connect(Node* node){
+        Connect(node, Vector2(0.0f, 0.15f));
+    }
+
+    void Connect(Node* node, Vector2 offset){
+        if (node == this)
+            return;
+        connNode = node;
+        this->offset = offset;
+    }
+
+    void Disconnect(){
         connNode = NULL;
-}
+    }
+    
+    void Disconnect(Node* node){
+        DebugLog("NodeMapWindow::Node::Disconnect %p %p", this, node);
+        if (connNode == node)
+            connNode = NULL;
+    }
+};
 
 NodeMapWindow::NodeMapWindow(){
     DebugLog("NodeMapWindow Launched");
@@ -327,3 +353,9 @@ void NodeMapWindow::OnMenuAccel(int id, bool accel){
         break;
     }
 }
+
+void NodeMapWindow::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+}
+
+void NodeMapWindow::Deserialize(IInputStream& os){}

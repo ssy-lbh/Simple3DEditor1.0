@@ -316,6 +316,12 @@ void AudioCaptureWindow::OnDropFileA(const char* path){}
 
 void AudioCaptureWindow::OnDropFileW(const wchar_t* path){}
 
+void AudioCaptureWindow::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+}
+
+void AudioCaptureWindow::Deserialize(IInputStream& os){}
+
 void AudioCaptureWindow::Launch(){
     if (capture){
         DebugError("AudioCaptureWindow::Launch Already Launched");

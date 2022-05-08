@@ -3,69 +3,25 @@
 
 #include <define.h>
 
-#include <util/List.h>
 #include <editor/main/Window.h>
-#include <editor/main/Tool.h>
-#include <editor/main/Operation.h>
 
 class UVEditWindow final : public AWindow {
 private:
     IOperation* curOp = NULL;
     ITool* curTool = NULL;
 
-    class MoveOperation final : public IOperation {
-    private:
-        struct MoveInfo {
-            Vertex* vert;
-            Vector2 uv;
-        };
-
-        Vector2 start;
-        List<MoveInfo> moveInfo;
-        bool x, y;
-        UVEditWindow* main;
-
-    public:
-        MoveOperation(UVEditWindow* main);
-        virtual ~MoveOperation() override;
-        virtual void OnEnter() override;
-        virtual void OnMove() override;
-        virtual void OnCommand(int id) override;
-        virtual void OnConfirm() override;
-        virtual void OnUndo() override;
-    };
-
-    class EmptyTool final : public ITool {
-    private:
-        UVEditWindow* window;
-
-    public:
-        EmptyTool(UVEditWindow* window);
-        ~EmptyTool() override;
-        virtual void OnLeftDown() override;
-    };
-
-    class SelectTool final : public ITool {
-    private:
-        UVEditWindow* window;
-        Vector2 start;
-        Vector2 end;
-        bool leftDown;
-        
-    public:
-        SelectTool(UVEditWindow* window);
-        virtual ~SelectTool() override;
-        virtual void OnLeftDown() override;
-        virtual void OnLeftUp() override;
-        virtual void OnMove() override;
-        virtual void OnRender() override;
-    };
+    friend class MoveOperation;
+    friend class EmptyTool;
+    friend class SelectTool;
 
 protected:
     void UpdateCursor(int x, int y);
     void UpdateWindowSize(int x, int y);
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.uvedit";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"UV编辑器";
+
     UVEditWindow();
     ~UVEditWindow();
 
@@ -78,6 +34,9 @@ public:
     virtual void OnRightUp(int x, int y) override;
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileW(const wchar_t* path) override;
+
+    virtual void Serialize(IOutputStream& os) override;
+    virtual void Deserialize(IInputStream& os) override;
 
     void SetOperation(IOperation* op);
     void SetTool(ITool* tool);

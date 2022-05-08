@@ -15,6 +15,9 @@
 #include <util/gl/GLTexture2D.h>
 #include <util/gl/GLSkyBox.h>
 #include <util/gl/GLSimplified.h>
+#include <editor/main/Tool.h>
+#include <editor/main/Operation.h>
+#include <editor/gui/Menu.h>
 #include <editor/gui/Menu.h>
 #include <editor/gui/GUIUtils.h>
 #include <editor/dialog/ColorBoard.h>
@@ -23,502 +26,604 @@
 #include <editor/main/ViewObject.h>
 #include <editor/object/AllObjects.h>
 
-MainWindow::MoveOperation::MoveOperation(MainWindow* main) : main(main) {}
-MainWindow::MoveOperation::~MoveOperation(){}
+class MoveOperation : public IOperation {
+private:
+    struct MoveInfo {
+        union {
+            AViewObject* obj;
+            Vertex* vert;
+            Edge* e;
+            Face* f;
+        };
+        Vector3 pos;
+    };
 
-void MainWindow::MoveOperation::OnEnter(){
-    DebugLog("MoveOperation OnEnter");
+    Point2 start;
+    List<MoveInfo> moveInfo;
+    bool x, y, z;
+    MainWindow* main;
 
-    x = y = z = true;
-    start = main->cursorPos;
+public:
+    MoveOperation(MainWindow* main) : main(main) {}
+    virtual ~MoveOperation() override{}
 
-    switch (Main::data->selType){
-    case SelectionType::SELECT_OBJECT:{
-        MoveInfo info;
-        info.obj = Main::data->curObject;
-        info.pos = info.obj->GetWorldPos();
-        moveInfo.Add(info);
-    }
-        break;
-    case SelectionType::SELECT_VERTICES:
-        if (Main::data->selPoints.Empty())
-            break;
-        Main::data->selPoints.Foreach([=](Vertex* v){
+    virtual void OnEnter() override{
+        DebugLog("MoveOperation OnEnter");
+
+        x = y = z = true;
+        start = main->cursorPos;
+
+        switch (Main::data->selType){
+        case SelectionType::SELECT_OBJECT:{
             MoveInfo info;
-            info.vert = v;
-            info.pos = v->GetWorldPos();
-            this->moveInfo.Add(info);
-        });
-        break;
-    case SelectionType::SELECT_EDGES:
-        break;
-    case SelectionType::SELECT_FACES:
-        break;
+            info.obj = Main::data->curObject;
+            info.pos = info.obj->GetWorldPos();
+            moveInfo.Add(info);
+        }
+            break;
+        case SelectionType::SELECT_VERTICES:
+            if (Main::data->selPoints.Empty())
+                break;
+            Main::data->selPoints.Foreach([=](Vertex* v){
+                MoveInfo info;
+                info.vert = v;
+                info.pos = v->GetWorldPos();
+                this->moveInfo.Add(info);
+            });
+            break;
+        case SelectionType::SELECT_EDGES:
+            break;
+        case SelectionType::SELECT_FACES:
+            break;
+        }
     }
-}
 
-void MainWindow::MoveOperation::OnMove(){
-    Vector2 mov;
-    Vector3 delta;
+    virtual void OnMove() override{
+        Vector2 mov;
+        Vector3 delta;
 
-    if (moveInfo.Empty())
-        return;
+        if (moveInfo.Empty())
+            return;
 
-    mov = (main->cursorPos - start) * main->camDis;
-    delta = main->camRight * mov.x * main->aspect + main->camUp * mov.y;
-    delta = Vector3(x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
+        mov = (main->cursorPos - start) * main->camDis;
+        delta = main->camRight * mov.x * main->aspect + main->camUp * mov.y;
+        delta = Vector3(x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
 
-    //DebugLog("MoveOperation OnMove %f %f %f", delta.x, delta.y, delta.z);
+        //DebugLog("MoveOperation OnMove %f %f %f", delta.x, delta.y, delta.z);
 
-    switch (Main::data->selType){
-    case SelectionType::SELECT_OBJECT:
-        moveInfo.Foreach([=](MoveInfo info){
-            info.obj->SetWorldPos(info.pos + delta);
-        });
-        break;
-    case SelectionType::SELECT_VERTICES:
+        switch (Main::data->selType){
+        case SelectionType::SELECT_OBJECT:
+            moveInfo.Foreach([=](MoveInfo info){
+                info.obj->SetWorldPos(info.pos + delta);
+            });
+            break;
+        case SelectionType::SELECT_VERTICES:
+            moveInfo.Foreach([=](MoveInfo info){
+                info.vert->SetWorldPos(info.pos + delta);
+            });
+            break;
+        case SelectionType::SELECT_EDGES:
+            break;
+        case SelectionType::SELECT_FACES:
+            break;
+        }
+    }
+    
+    virtual void OnCommand(int id) override{
+        switch (id){
+        case IDM_OP_X: x = true; y = z = false; break;
+        case IDM_OP_Y: y = true; z = x = false; break;
+        case IDM_OP_Z: z = true; x = y = false; break;
+        case IDM_OP_PLANE_X: x = false; y = z = true; break;
+        case IDM_OP_PLANE_Y: y = false; z = x = true; break;
+        case IDM_OP_PLANE_Z: z = false; x = y = true; break;
+        }
+    }
+
+    virtual void OnConfirm() override{
+        DebugLog("MoveOperation OnConfirm");
+        moveInfo.Clear();
+    }
+
+    virtual void OnUndo() override{
+        DebugLog("MoveOperation OnUndo");
+
+        switch (Main::data->selType){
+        case SelectionType::SELECT_OBJECT:
+            moveInfo.Foreach([](MoveInfo info){
+                info.obj->SetWorldPos(info.pos);
+            });
+            break;
+        case SelectionType::SELECT_VERTICES:
+            moveInfo.Foreach([](MoveInfo info){
+                info.vert->SetWorldPos(info.pos);
+            });
+            break;
+        case SelectionType::SELECT_EDGES:
+            break;
+        case SelectionType::SELECT_FACES:
+            break;
+        }
+
+        moveInfo.Clear();
+    }
+};
+
+class ExcludeOperation : public IOperation {
+private:
+    struct MoveInfo {
+        Vertex* vert;
+        Point3 pos;
+    };
+
+    Point2 start;
+    List<MoveInfo> moveInfo;
+    bool x, y, z;
+    MainWindow* main;
+
+public:
+    ExcludeOperation(MainWindow* main) : main(main) {}
+    virtual ~ExcludeOperation() override{}
+
+    virtual void OnEnter() override{
+        DebugLog("ExcludeOperation OnEnter");
+        List<Vertex*> copies;
+        size_t cnt;
+        Mesh* mesh;
+
+        if (Main::data->selType != SelectionType::SELECT_VERTICES){
+            DebugError("ExcludeOperation Unsupported Select Mode");
+            return;
+        }
+
+        mesh = Main::GetMesh();
+
+        if (!mesh)
+            return;
+
+        cnt = Main::data->selPoints.Size();
+
+        x = y = z = true;
+        start = main->cursorPos;
+
+        for (size_t i = 0; i < cnt; i++){
+            copies.Add(Main::data->selPoints[i]);
+            Main::data->selPoints[i] = mesh->AddVertex(Main::data->selPoints[i]->pos);
+            mesh->AddEdge(copies[i], Main::data->selPoints[i]);
+        }
+        for (size_t i = 0; i < cnt; i++){
+            for (size_t j = i + 1; j < cnt; j++){
+                if (copies[i]->EdgeRelateTo(copies[j])){
+                    mesh->AddTriFace(copies[i], copies[j], Main::data->selPoints[j]);
+                    mesh->AddTriFace(copies[i], Main::data->selPoints[i], Main::data->selPoints[j]);
+                }
+            }
+        }
+        if (Main::data->selPoints.Size() > 0){
+            Main::data->selPoints.Foreach([=](Vertex* v){
+                this->moveInfo.Add({v, v->GetWorldPos()});
+            });
+        }
+    }
+
+    virtual void OnMove() override{
+        Vector2 mov;
+        Vector3 delta;
+
+        if (moveInfo.Empty())
+            return;
+
+        mov = (main->cursorPos - start) * main->camDis;
+        delta = main->camRight * mov.x * main->aspect + main->camUp * mov.y;
+        delta = Vector3(x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
+
         moveInfo.Foreach([=](MoveInfo info){
             info.vert->SetWorldPos(info.pos + delta);
         });
-        break;
-    case SelectionType::SELECT_EDGES:
-        break;
-    case SelectionType::SELECT_FACES:
-        break;
-    }
-}
-
-void MainWindow::MoveOperation::OnConfirm(){
-    DebugLog("MoveOperation OnConfirm");
-    moveInfo.Clear();
-}
-
-void MainWindow::MoveOperation::OnUndo(){
-    DebugLog("MoveOperation OnUndo");
-
-    switch (Main::data->selType){
-    case SelectionType::SELECT_OBJECT:
-        moveInfo.Foreach([](MoveInfo info){
-            info.obj->SetWorldPos(info.pos);
-        });
-        break;
-    case SelectionType::SELECT_VERTICES:
-        moveInfo.Foreach([](MoveInfo info){
-            info.vert->SetWorldPos(info.pos);
-        });
-        break;
-    case SelectionType::SELECT_EDGES:
-        break;
-    case SelectionType::SELECT_FACES:
-        break;
+        //DebugLog("ExcludeOperation OnMove %f %f %f", delta.x, delta.y, delta.z);
     }
 
-    moveInfo.Clear();
-}
-
-void MainWindow::MoveOperation::OnCommand(int id){
-    switch (id){
-    case IDM_OP_X: x = true; y = z = false; break;
-    case IDM_OP_Y: y = true; z = x = false; break;
-    case IDM_OP_Z: z = true; x = y = false; break;
-    case IDM_OP_PLANE_X: x = false; y = z = true; break;
-    case IDM_OP_PLANE_Y: y = false; z = x = true; break;
-    case IDM_OP_PLANE_Z: z = false; x = y = true; break;
-    }
-}
-
-MainWindow::ExcludeOperation::ExcludeOperation(MainWindow* main) : main(main) {}
-MainWindow::ExcludeOperation::~ExcludeOperation(){}
-
-void MainWindow::ExcludeOperation::OnEnter(){
-    DebugLog("ExcludeOperation OnEnter");
-    List<Vertex*> copies;
-    size_t cnt;
-    Mesh* mesh;
-
-    if (Main::data->selType != SelectionType::SELECT_VERTICES){
-        DebugError("ExcludeOperation Unsupported Select Mode");
-        return;
-    }
-
-    mesh = Main::GetMesh();
-
-    if (!mesh)
-        return;
-
-    cnt = Main::data->selPoints.Size();
-
-    x = y = z = true;
-    start = main->cursorPos;
-
-    for (size_t i = 0; i < cnt; i++){
-        copies.Add(Main::data->selPoints[i]);
-        Main::data->selPoints[i] = mesh->AddVertex(Main::data->selPoints[i]->pos);
-        mesh->AddEdge(copies[i], Main::data->selPoints[i]);
-    }
-    for (size_t i = 0; i < cnt; i++){
-        for (size_t j = i + 1; j < cnt; j++){
-            if (copies[i]->EdgeRelateTo(copies[j])){
-                mesh->AddTriFace(copies[i], copies[j], Main::data->selPoints[j]);
-                mesh->AddTriFace(copies[i], Main::data->selPoints[i], Main::data->selPoints[j]);
-            }
+    virtual void OnCommand(int id) override{
+        switch (id){
+        case IDM_OP_X: x = true; y = z = false; break;
+        case IDM_OP_Y: y = true; z = x = false; break;
+        case IDM_OP_Z: z = true; x = y = false; break;
+        case IDM_OP_PLANE_X: x = false; y = z = true; break;
+        case IDM_OP_PLANE_Y: y = false; z = x = true; break;
+        case IDM_OP_PLANE_Z: z = false; x = y = true; break;
         }
     }
-    if (Main::data->selPoints.Size() > 0){
-        Main::data->selPoints.Foreach([=](Vertex* v){
-            this->moveInfo.Add({v, v->GetWorldPos()});
+
+    virtual void OnConfirm() override{
+        DebugLog("ExcludeOperation OnConfirm");
+        moveInfo.Clear();
+    }
+
+    virtual void OnUndo() override{
+        DebugLog("ExcludeOperation OnUndo");
+        Mesh* mesh = Main::GetMesh();
+
+        if (!mesh)
+            return;
+        Main::data->selPoints.Clear();
+        moveInfo.Foreach([=](MoveInfo info){
+            mesh->DeleteVertex(info.vert);
         });
+        moveInfo.Clear();
     }
-}
+};
 
-void MainWindow::ExcludeOperation::OnMove(){
-    Vector2 mov;
-    Vector3 delta;
+class RotateOperation : public IOperation {
+private:
+    struct RotateInfo {
+        union {
+            AViewObject* obj;
+            Vertex* vert;
+            Edge* e;
+            Face* f;
+        };
+        Point3 pos;
+        Quaternion rot;
+    };
 
-    if (moveInfo.Empty())
-        return;
+    enum RotateMode {
+        MODE_CAMERA,
+        MODE_X,
+        MODE_Y,
+        MODE_Z
+    };
 
-    mov = (main->cursorPos - start) * main->camDis;
-    delta = main->camRight * mov.x * main->aspect + main->camUp * mov.y;
-    delta = Vector3(x ? delta.x : 0.0f, y ? delta.y : 0.0f, z ? delta.z : 0.0f);
+    Point2 start;
+    List<RotateInfo> rotateInfo;
+    RotateMode mode;
+    MainWindow* main;
+    Point3 center;
+    Point2 screenCenter;
+    float dis;
+    Quaternion rotate;
 
-    moveInfo.Foreach([=](MoveInfo info){
-        info.vert->SetWorldPos(info.pos + delta);
-    });
-    //DebugLog("ExcludeOperation OnMove %f %f %f", delta.x, delta.y, delta.z);
-}
+public:
+    RotateOperation(MainWindow* main) : main(main) {}
+    virtual ~RotateOperation() override{}
 
-void MainWindow::ExcludeOperation::OnConfirm(){
-    DebugLog("ExcludeOperation OnConfirm");
-    moveInfo.Clear();
-}
+    virtual void OnEnter() override{
+        DebugLog("RotateOperation OnEnter");
 
-void MainWindow::ExcludeOperation::OnUndo(){
-    DebugLog("ExcludeOperation OnUndo");
-    Mesh* mesh = Main::GetMesh();
+        mode = MODE_CAMERA;
+        start = main->cursorPos;
+        center = Vector3::zero;
 
-    if (!mesh)
-        return;
-    Main::data->selPoints.Clear();
-    moveInfo.Foreach([=](MoveInfo info){
-        mesh->DeleteVertex(info.vert);
-    });
-    moveInfo.Clear();
-}
-
-void MainWindow::ExcludeOperation::OnCommand(int id){
-    switch (id){
-    case IDM_OP_X: x = true; y = z = false; break;
-    case IDM_OP_Y: y = true; z = x = false; break;
-    case IDM_OP_Z: z = true; x = y = false; break;
-    case IDM_OP_PLANE_X: x = false; y = z = true; break;
-    case IDM_OP_PLANE_Y: y = false; z = x = true; break;
-    case IDM_OP_PLANE_Z: z = false; x = y = true; break;
-    }
-}
-
-MainWindow::RotateOperation::RotateOperation(MainWindow* main) : main(main) {}
-MainWindow::RotateOperation::~RotateOperation(){}
-
-void MainWindow::RotateOperation::OnEnter(){
-    DebugLog("RotateOperation OnEnter");
-
-    mode = MODE_CAMERA;
-    start = main->cursorPos;
-    center = Vector3::zero;
-
-    switch (Main::data->selType){
-    case SelectionType::SELECT_OBJECT:{
-        RotateInfo info;
-        info.obj = Main::data->curObject;
-        // 欧拉角任意轴向旋转未实现
-        if (info.obj->transform.rotationMode != Transform::ROT_QUATERNION){
-            mode = MODE_X;
-            info.rot = info.obj->transform.rotation.Get();
-        }else{
-            info.pos = info.obj->transform.rotationXYZ.Get();
-        }
-        rotateInfo.Add(info);
-        center = info.obj->GetParentChainMat() * Point3::zero;
-        screenCenter = main->GetScreenPosition(center);
-    }
-        break;
-    case SelectionType::SELECT_VERTICES:
-        if (Main::data->selPoints.Empty())
-            break;
-        Main::data->selPoints.Foreach([=](Vertex* v){
+        switch (Main::data->selType){
+        case SelectionType::SELECT_OBJECT:{
             RotateInfo info;
-            info.vert = v;
-            info.pos = v->GetWorldPos();
-            this->rotateInfo.Add(info);
-            this->center += info.pos;
-        });
-        center /= Main::data->selPoints.Size();
-        screenCenter = main->GetScreenPosition(center);
-        break;
-    case SelectionType::SELECT_EDGES:
-        break;
-    case SelectionType::SELECT_FACES:
-        break;
+            info.obj = Main::data->curObject;
+            // 欧拉角任意轴向旋转未实现
+            if (info.obj->transform.rotationMode != Transform::ROT_QUATERNION){
+                mode = MODE_X;
+                info.rot = info.obj->transform.rotation.Get();
+            }else{
+                info.pos = info.obj->transform.rotationXYZ.Get();
+            }
+            rotateInfo.Add(info);
+            center = info.obj->GetParentChainMat() * Point3::zero;
+            screenCenter = main->GetScreenPosition(center);
+        }
+            break;
+        case SelectionType::SELECT_VERTICES:
+            if (Main::data->selPoints.Empty())
+                break;
+            Main::data->selPoints.Foreach([=](Vertex* v){
+                RotateInfo info;
+                info.vert = v;
+                info.pos = v->GetWorldPos();
+                this->rotateInfo.Add(info);
+                this->center += info.pos;
+            });
+            center /= Main::data->selPoints.Size();
+            screenCenter = main->GetScreenPosition(center);
+            break;
+        case SelectionType::SELECT_EDGES:
+            break;
+        case SelectionType::SELECT_FACES:
+            break;
+        }
+
+        dis = (main->cursorPos - screenCenter).Magnitude();
     }
 
-    dis = (main->cursorPos - screenCenter).Magnitude();
-}
+    virtual void OnMove() override{
+        float delta;
 
-void MainWindow::RotateOperation::OnMove(){
-    float delta;
+        if (rotateInfo.Empty())
+            return;
+        
+        delta = ((main->cursorPos - screenCenter).Magnitude() - dis) * 360.0f;
 
-    if (rotateInfo.Empty())
-        return;
-    
-    delta = ((main->cursorPos - screenCenter).Magnitude() - dis) * 360.0f;
+        //DebugLog("RotateOperation Rotate %f Degree", delta);
 
-    //DebugLog("RotateOperation Rotate %f Degree", delta);
-
-    switch (Main::data->selType){
-    case SelectionType::SELECT_OBJECT:{
-        Vector3 rotVec;
-        if (Main::data->curObject->transform.rotationMode != Transform::ROT_QUATERNION){
-            switch (mode){
-            case MODE_CAMERA: rotVec = Vector3::zero; break;
-            case MODE_X: rotVec = Vector3(delta, 0.0f, 0.0f); break;
-            case MODE_Y: rotVec = Vector3(0.0f, delta, 0.0f); break;
-            case MODE_Z: rotVec = Vector3(0.0f, 0.0f, delta); break;
+        switch (Main::data->selType){
+        case SelectionType::SELECT_OBJECT:{
+            Vector3 rotVec;
+            if (Main::data->curObject->transform.rotationMode != Transform::ROT_QUATERNION){
+                switch (mode){
+                case MODE_CAMERA: rotVec = Vector3::zero; break;
+                case MODE_X: rotVec = Vector3(delta, 0.0f, 0.0f); break;
+                case MODE_Y: rotVec = Vector3(0.0f, delta, 0.0f); break;
+                case MODE_Z: rotVec = Vector3(0.0f, 0.0f, delta); break;
+                }
+                rotateInfo.Foreach([=](RotateInfo info){
+                    info.obj->transform.SetRotationXYZ(info.pos + rotVec);
+                });
+            }else{
+                switch (mode){
+                case MODE_CAMERA: rotate = Quaternion::AxisAngle(main->camForward, delta); break;
+                case MODE_X: rotate = Quaternion::AxisAngle(Vector3(1.0f, 0.0f, 0.0f), delta); break;
+                case MODE_Y: rotate = Quaternion::AxisAngle(Vector3(0.0f, 1.0f, 0.0f), delta); break;
+                case MODE_Z: rotate = Quaternion::AxisAngle(Vector3(0.0f, 0.0f, 1.0f), delta); break;
+                }
+                rotateInfo.Foreach([=](RotateInfo info){
+                    info.obj->transform.SetRotation(rotate * info.rot);
+                });
             }
-            rotateInfo.Foreach([=](RotateInfo info){
-                info.obj->transform.SetRotationXYZ(info.pos + rotVec);
-            });
-        }else{
+        }
+            break;
+        case SelectionType::SELECT_VERTICES:
             switch (mode){
             case MODE_CAMERA: rotate = Quaternion::AxisAngle(main->camForward, delta); break;
-            case MODE_X: rotate = Quaternion::AxisAngle(Vector3(1.0f, 0.0f, 0.0f), delta); break;
-            case MODE_Y: rotate = Quaternion::AxisAngle(Vector3(0.0f, 1.0f, 0.0f), delta); break;
-            case MODE_Z: rotate = Quaternion::AxisAngle(Vector3(0.0f, 0.0f, 1.0f), delta); break;
+            case MODE_X: rotate = Quaternion::RotateX(delta); break;
+            case MODE_Y: rotate = Quaternion::RotateY(delta); break;
+            case MODE_Z: rotate = Quaternion::RotateZ(delta); break;
             }
             rotateInfo.Foreach([=](RotateInfo info){
-                info.obj->transform.SetRotation(rotate * info.rot);
+                info.vert->SetWorldPos(this->center + this->rotate * (info.pos - this->center));
             });
-        }
-    }
-        break;
-    case SelectionType::SELECT_VERTICES:
-        switch (mode){
-        case MODE_CAMERA: rotate = Quaternion::AxisAngle(main->camForward, delta); break;
-        case MODE_X: rotate = Quaternion::RotateX(delta); break;
-        case MODE_Y: rotate = Quaternion::RotateY(delta); break;
-        case MODE_Z: rotate = Quaternion::RotateZ(delta); break;
-        }
-        rotateInfo.Foreach([=](RotateInfo info){
-            info.vert->SetWorldPos(this->center + this->rotate * (info.pos - this->center));
-        });
-        break;
-    case SelectionType::SELECT_EDGES:
-        break;
-    case SelectionType::SELECT_FACES:
-        break;
-    }
-}
-
-void MainWindow::RotateOperation::OnConfirm(){
-    DebugLog("RotateOperation OnConfirm");
-    rotateInfo.Clear();
-}
-
-void MainWindow::RotateOperation::OnUndo(){
-    DebugLog("RotateOperation OnUndo");
-    
-    switch (Main::data->selType){
-    case SelectionType::SELECT_OBJECT:
-        rotateInfo.Foreach([](RotateInfo info){
-            info.obj->transform.SetRotationXYZ(info.pos);
-        });
-        break;
-    case SelectionType::SELECT_VERTICES:
-        rotateInfo.Foreach([](RotateInfo info){
-            info.vert->SetWorldPos(info.pos);
-        });
-        break;
-    case SelectionType::SELECT_EDGES:
-        break;
-    case SelectionType::SELECT_FACES:
-        break;
-    }
-
-    rotateInfo.Clear();
-}
-
-void MainWindow::RotateOperation::OnCommand(int id){
-    switch (id){
-    case IDM_OP_X: mode = MODE_X; break;
-    case IDM_OP_Y: mode = MODE_Y; break;
-    case IDM_OP_Z: mode = MODE_Z; break;
-    case IDM_OP_PLANE_X: mode = MODE_X; break;
-    case IDM_OP_PLANE_Y: mode = MODE_Y; break;
-    case IDM_OP_PLANE_Z: mode = MODE_Z; break;
-    }
-}
-
-MainWindow::SizeOperation::SizeOperation(MainWindow* main) : main(main) {}
-MainWindow::SizeOperation::~SizeOperation(){}
-
-void MainWindow::SizeOperation::OnEnter(){
-    DebugLog("SizeOperation OnEnter");
-
-    x = y = z = true;
-    start = main->cursorPos;
-    center = Vector3::zero;
-
-    switch (Main::data->selType){
-    case SelectionType::SELECT_OBJECT:{
-        SizeInfo info;
-        info.obj = Main::data->curObject;
-        info.vec = info.obj->transform.scale.Get();
-        sizeInfo.Add(info);
-        center = info.obj->GetParentChainMat() * Point3::zero;
-        screenCenter = main->GetScreenPosition(center);
-    }
-        break;
-    case SelectionType::SELECT_VERTICES:
-        if (Main::data->selPoints.Empty())
             break;
-        Main::data->selPoints.Foreach([=](Vertex* v){
-            SizeInfo info;
-            info.vert = v;
-            info.vec = v->GetWorldPos();
-            this->sizeInfo.Add(info);
-            this->center += info.vec;
-        });
-        center /= Main::data->selPoints.Size();
-        screenCenter = main->GetScreenPosition(center);
-        break;
-    case SelectionType::SELECT_EDGES:
-        break;
-    case SelectionType::SELECT_FACES:
-        break;
+        case SelectionType::SELECT_EDGES:
+            break;
+        case SelectionType::SELECT_FACES:
+            break;
+        }
     }
 
-    startSize = (main->cursorPos - screenCenter).Magnitude();
-}
-
-void MainWindow::SizeOperation::OnMove(){
-    if (sizeInfo.Empty())
-        return;
-    
-    scale = (main->cursorPos - screenCenter).Magnitude() / startSize;
-
-    //DebugLog("SizeOperation Scale %f", scale);
-    
-    switch (Main::data->selType){
-    case SelectionType::SELECT_OBJECT:
-        sizeInfo.Foreach([=](SizeInfo info){
-            info.obj->transform.scale.Set(Vector3(
-                this->x ? info.vec.x * this->scale : info.vec.x,
-                this->y ? info.vec.y * this->scale : info.vec.y,
-                this->z ? info.vec.z * this->scale : info.vec.z
-            ));
-        });
-        break;
-    case SelectionType::SELECT_VERTICES:
-        sizeInfo.Foreach([=](SizeInfo info){
-            Vector3 res = this->center + (info.vec - this->center) * this->scale;
-            info.vert->SetWorldPos(Vector3(
-                this->x ? res.x : info.vec.x,
-                this->y ? res.y : info.vec.y,
-                this->z ? res.z : info.vec.z
-            ));
-        });
-        break;
-    case SelectionType::SELECT_EDGES:
-        break;
-    case SelectionType::SELECT_FACES:
-        break;
+    virtual void OnCommand(int id) override{
+        switch (id){
+        case IDM_OP_X: mode = MODE_X; break;
+        case IDM_OP_Y: mode = MODE_Y; break;
+        case IDM_OP_Z: mode = MODE_Z; break;
+        case IDM_OP_PLANE_X: mode = MODE_X; break;
+        case IDM_OP_PLANE_Y: mode = MODE_Y; break;
+        case IDM_OP_PLANE_Z: mode = MODE_Z; break;
+        }
     }
-}
 
-void MainWindow::SizeOperation::OnConfirm(){
-    DebugLog("SizeOperation OnConfirm");
-    sizeInfo.Clear();
-}
-
-void MainWindow::SizeOperation::OnUndo(){
-    DebugLog("SizeOperation OnUndo");
-
-    switch (Main::data->selType){
-    case SelectionType::SELECT_OBJECT:
-        sizeInfo.Foreach([](SizeInfo info){
-            info.obj->transform.scale.Set(info.vec);
-        });
-        break;
-    case SelectionType::SELECT_VERTICES:
-        sizeInfo.Foreach([](SizeInfo info){
-            info.vert->SetWorldPos(info.vec);
-        });
-        break;
-    case SelectionType::SELECT_EDGES:
-        break;
-    case SelectionType::SELECT_FACES:
-        break;
+    virtual void OnConfirm() override{
+        DebugLog("RotateOperation OnConfirm");
+        rotateInfo.Clear();
     }
-    
-    sizeInfo.Clear();
-}
 
-void MainWindow::SizeOperation::OnCommand(int id){
-    switch (id){
-    case IDM_OP_X: x = true; y = z = false; break;
-    case IDM_OP_Y: y = true; z = x = false; break;
-    case IDM_OP_Z: z = true; x = y = false; break;
-    case IDM_OP_PLANE_X: x = false; y = z = true; break;
-    case IDM_OP_PLANE_Y: y = false; z = x = true; break;
-    case IDM_OP_PLANE_Z: z = false; x = y = true; break;
-    }
-}
-
-MainWindow::EmptyTool::EmptyTool(MainWindow* window) : window(window) {}
-MainWindow::EmptyTool::~EmptyTool(){}
-
-void MainWindow::EmptyTool::OnLeftDown(){
-    if (Main::data->curObject){
-        Main::data->curObject->OnSelect(window->camPos, window->cursorDir);
-    }
-}
-
-MainWindow::SelectTool::SelectTool(MainWindow* window) : window(window) {}
-MainWindow::SelectTool::~SelectTool(){}
-
-void MainWindow::SelectTool::OnLeftDown(){
-    start = window->cursorPos;
-    end = window->cursorPos;
-    leftDown = true;
-}
-
-void MainWindow::SelectTool::OnLeftUp(){
-    leftDown = false;
-    if (start.x == end.x && start.y == end.y){
-        Main::data->selPoints.Clear();
-        return;
-    }
-    if (Main::data->curObject){
-        SelectInfo info;
-        info.camPos = window->camPos;
-        info.camDir = window->camDir;
-        info.zBound = Vector2(window->camDis * 0.02, window->camDis * 20.0);
-        info.rect = Rect(Vector2(start.x * window->aspect, start.y), Vector2(end.x * window->aspect, end.y));
+    virtual void OnUndo() override{
+        DebugLog("RotateOperation OnUndo");
         
-        Main::data->curObject->OnSelect(&info);
-    }
-}
+        switch (Main::data->selType){
+        case SelectionType::SELECT_OBJECT:
+            rotateInfo.Foreach([](RotateInfo info){
+                info.obj->transform.SetRotationXYZ(info.pos);
+            });
+            break;
+        case SelectionType::SELECT_VERTICES:
+            rotateInfo.Foreach([](RotateInfo info){
+                info.vert->SetWorldPos(info.pos);
+            });
+            break;
+        case SelectionType::SELECT_EDGES:
+            break;
+        case SelectionType::SELECT_FACES:
+            break;
+        }
 
-void MainWindow::SelectTool::OnMove(){
-    end = window->cursorPos;
-}
-
-void MainWindow::SelectTool::OnRender(){
-    if (leftDown){
-        glColor4f(1.0f, 1.0f, 0.0f, 0.1f);
-        GLUtils::DrawRect(start, end);
+        rotateInfo.Clear();
     }
-}
+};
+
+class SizeOperation : public IOperation {
+private:
+    struct SizeInfo {
+        union {
+            AViewObject* obj;
+            Vertex* vert;
+            Edge* e;
+            Face* f;
+        };
+        Vector3 vec;
+    };
+
+    Point3 center;
+    Point2 start;
+    List<SizeInfo> sizeInfo;
+    bool x, y, z;
+    MainWindow* main;
+    Point2 screenCenter;
+    float startSize;
+    float scale;
+
+public:
+    SizeOperation(MainWindow* main) : main(main) {}
+    virtual ~SizeOperation() override{}
+
+    virtual void OnEnter() override{
+        DebugLog("SizeOperation OnEnter");
+
+        x = y = z = true;
+        start = main->cursorPos;
+        center = Vector3::zero;
+
+        switch (Main::data->selType){
+        case SelectionType::SELECT_OBJECT:{
+            SizeInfo info;
+            info.obj = Main::data->curObject;
+            info.vec = info.obj->transform.scale.Get();
+            sizeInfo.Add(info);
+            center = info.obj->GetParentChainMat() * Point3::zero;
+            screenCenter = main->GetScreenPosition(center);
+        }
+            break;
+        case SelectionType::SELECT_VERTICES:
+            if (Main::data->selPoints.Empty())
+                break;
+            Main::data->selPoints.Foreach([=](Vertex* v){
+                SizeInfo info;
+                info.vert = v;
+                info.vec = v->GetWorldPos();
+                this->sizeInfo.Add(info);
+                this->center += info.vec;
+            });
+            center /= Main::data->selPoints.Size();
+            screenCenter = main->GetScreenPosition(center);
+            break;
+        case SelectionType::SELECT_EDGES:
+            break;
+        case SelectionType::SELECT_FACES:
+            break;
+        }
+
+        startSize = (main->cursorPos - screenCenter).Magnitude();
+    }
+
+    virtual void OnMove() override{
+        if (sizeInfo.Empty())
+            return;
+        
+        scale = (main->cursorPos - screenCenter).Magnitude() / startSize;
+
+        //DebugLog("SizeOperation Scale %f", scale);
+        
+        switch (Main::data->selType){
+        case SelectionType::SELECT_OBJECT:
+            sizeInfo.Foreach([=](SizeInfo info){
+                info.obj->transform.scale.Set(Vector3(
+                    this->x ? info.vec.x * this->scale : info.vec.x,
+                    this->y ? info.vec.y * this->scale : info.vec.y,
+                    this->z ? info.vec.z * this->scale : info.vec.z
+                ));
+            });
+            break;
+        case SelectionType::SELECT_VERTICES:
+            sizeInfo.Foreach([=](SizeInfo info){
+                Vector3 res = this->center + (info.vec - this->center) * this->scale;
+                info.vert->SetWorldPos(Vector3(
+                    this->x ? res.x : info.vec.x,
+                    this->y ? res.y : info.vec.y,
+                    this->z ? res.z : info.vec.z
+                ));
+            });
+            break;
+        case SelectionType::SELECT_EDGES:
+            break;
+        case SelectionType::SELECT_FACES:
+            break;
+        }
+    }
+
+    virtual void OnCommand(int id) override{
+        switch (id){
+        case IDM_OP_X: x = true; y = z = false; break;
+        case IDM_OP_Y: y = true; z = x = false; break;
+        case IDM_OP_Z: z = true; x = y = false; break;
+        case IDM_OP_PLANE_X: x = false; y = z = true; break;
+        case IDM_OP_PLANE_Y: y = false; z = x = true; break;
+        case IDM_OP_PLANE_Z: z = false; x = y = true; break;
+        }
+    }
+
+    virtual void OnConfirm() override{
+        DebugLog("SizeOperation OnConfirm");
+        sizeInfo.Clear();
+    }
+
+    virtual void OnUndo() override{
+        DebugLog("SizeOperation OnUndo");
+
+        switch (Main::data->selType){
+        case SelectionType::SELECT_OBJECT:
+            sizeInfo.Foreach([](SizeInfo info){
+                info.obj->transform.scale.Set(info.vec);
+            });
+            break;
+        case SelectionType::SELECT_VERTICES:
+            sizeInfo.Foreach([](SizeInfo info){
+                info.vert->SetWorldPos(info.vec);
+            });
+            break;
+        case SelectionType::SELECT_EDGES:
+            break;
+        case SelectionType::SELECT_FACES:
+            break;
+        }
+        
+        sizeInfo.Clear();
+    }
+};
+
+class EmptyTool : public ITool {
+private:
+    MainWindow* window;
+
+public:
+    EmptyTool(MainWindow* window) : window(window) {}
+    ~EmptyTool() override{}
+
+    virtual void OnLeftDown() override{
+        if (Main::data->curObject){
+            Main::data->curObject->OnSelect(window->camPos, window->cursorDir);
+        }
+    }
+};
+
+class SelectTool : public ITool {
+private:
+    MainWindow* window;
+    Point2 start;
+    Point2 end;
+    bool leftDown;
+    
+public:
+    SelectTool(MainWindow* window) : window(window) {}
+    virtual ~SelectTool() override{}
+    
+    virtual void OnLeftDown() override{
+        start = window->cursorPos;
+        end = window->cursorPos;
+        leftDown = true;
+    }
+
+    virtual void OnLeftUp() override{
+        leftDown = false;
+        if (start.x == end.x && start.y == end.y){
+            Main::data->selPoints.Clear();
+            return;
+        }
+        if (Main::data->curObject){
+            SelectInfo info;
+            info.camPos = window->camPos;
+            info.camDir = window->camDir;
+            info.zBound = Vector2(window->camDis * 0.02, window->camDis * 20.0);
+            info.rect = Rect(Vector2(start.x * window->aspect, start.y), Vector2(end.x * window->aspect, end.y));
+            
+            Main::data->curObject->OnSelect(&info);
+        }
+    }
+
+    virtual void OnMove() override{
+        end = window->cursorPos;
+    }
+
+    virtual void OnRender() override{
+        if (leftDown){
+            glColor4f(1.0f, 1.0f, 0.0f, 0.1f);
+            GLUtils::DrawRect(start, end);
+        }
+    }
+};
 
 MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Vector3::up, 5.0f) {
     DebugLog("MainWindow Launched");
@@ -643,15 +748,15 @@ MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f,
     skyBox->Set(GLSkyBox::TOP, new GLTexture2D(IDT_SKYBOX_TOP));
     skyBox->Set(GLSkyBox::DOWN, new GLTexture2D(IDT_SKYBOX_DOWN));
 
-    // 我其实也想问问有这么写C++的么？
-    // 不过也不如Java构造接口实现类时方便啊
-    // 而且类的内部函数是友元的，内部访问变量是通过this引用
-    class MoveButton final : public RoundButton {
+    class MoveButton : public RoundButton {
     public:
         Point3 startPos;
 
         MoveButton() : RoundButton(Vector2(0.55f, 0.85f), 0.12f) {}
-    } *moveBtn = new MoveButton();
+    };
+
+    // 可能是因为符号冲突，如果MoveButton定义在全局，类名称冲突时可能出问题
+    MoveButton* moveBtn = new MoveButton();
     moveBtn->SetIcon(IDT_BUTTON_MOVE);
     moveBtn->onClick += [=]{
         moveBtn->startPos = this->camLookat;
@@ -661,7 +766,7 @@ MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f,
     };
     guiMgr->AddChild(moveBtn);
 
-    class RotateButton final : public RoundButton {
+    class RotateButton : public RoundButton {
     public:
         Quaternion start;
         Vector3 up;
@@ -670,11 +775,11 @@ MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f,
 
         RotateButton(MainWindow* window) : RoundButton(Vector2(0.85f, 0.85f), 0.12f), window(window) {}
 
-        virtual void OnRender() override {
+        virtual void OnRender() override{
             Quaternion q = -window->camDir;
-            Vector2 right = (q * Vector3::right).XZ() * radius;
-            Vector2 forward = (q * Vector3::forward).XZ() * radius;
-            Vector2 up = (q * Vector3::up).XZ() * radius;
+            Vector2 right = q.GetXAxis().XZ() * radius;
+            Vector2 forward = q.GetYAxis().XZ() * radius;
+            Vector2 up = q.GetZAxis().XZ() * radius;
             float light = (hover ? 1.0f : 0.8f);
 
             glColor3f(0.1f, 0.1f, 0.1f);
@@ -691,8 +796,9 @@ MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f,
             glEnd();
             glDisable(GL_LINE_SMOOTH);
         }
-    } *rotBtn = new RotateButton(this);
-    rotBtn->SetIcon(IDT_BUTTON_ROTATE);
+    };
+
+    RotateButton* rotBtn = new RotateButton(this);
     rotBtn->onClick += [=]{
         rotBtn->start = this->camDir;
         rotBtn->up = this->camUp;
@@ -1418,6 +1524,12 @@ void MainWindow::OnDropFileW(const wchar_t* path){
     }
     LoadMesh(Main::data->curObject, path);
 }
+
+void MainWindow::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+}
+
+void MainWindow::Deserialize(IInputStream& os){}
 
 Point2 MainWindow::GetScreenPosition(Point3 pos){
     return CCamera::GetScreenPosition(pos, aspect);

@@ -18,58 +18,17 @@ private:
 
     GLRenderTexture2D* paintTex = NULL;
 
-    class ClearBrush final : public ITool {
-    private:
-        PaintWindow* window;
-        uint colorLoc;
-        Vector3 color = Vector3::one;
-
-        GLComputeProgram* prog = NULL;
-        bool err = false;
-
-    public:
-        ClearBrush(PaintWindow* window);
-        virtual ~ClearBrush() override;
-
-        virtual void OnLeftDown() override;
-        virtual void OnCommand(int id) override;
-    };
-
-    class DefaultBrush final : public ITool {
-    private:
-        PaintWindow* window;
-        bool draw = false;
-
-        // Uniform位置
-        uint paintLoc;
-        uint offsetLoc;
-        uint positionLoc;
-        uint radiusLoc;
-        uint colorLoc;
-
-        Vector3 color = Vector3::one;
-
-        GLComputeProgram* prog = NULL;
-        bool err = false;
-
-    public:
-        DefaultBrush(PaintWindow* window);
-        DefaultBrush(PaintWindow* window, int shaderId);
-        virtual ~DefaultBrush() override;
-
-        virtual void OnLeftDown() override;
-        virtual void OnLeftUp() override;
-        virtual void OnMove() override;
-        virtual void OnCommand(int id) override;
-
-        void Draw();
-    };
+    friend class ClearBrush;
+    friend class DefaultBrush;
 
 protected:
     void UpdateCursor(int x, int y);
     void UpdateWindowSize(int x, int y);
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.paint";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"绘画窗口";
+
     PaintWindow();
     virtual ~PaintWindow();
 
@@ -81,6 +40,9 @@ public:
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
     virtual void OnMenuAccel(int id, bool accel) override;
+
+    virtual void Serialize(IOutputStream& os) override;
+    virtual void Deserialize(IInputStream& os) override;
 
     void SetOperation(IOperation* op);
     void SetBrush(ITool* tool);

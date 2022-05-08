@@ -1,0 +1,10 @@
+#include <editor/AnimationWindow.h>
+#include <editor/AttributeWindow.h>
+#include <editor/AudioCaptureWindow.h>
+#include <editor/AudioPlayerWindow.h>
+#include <editor/MainWindow.h>
+#include <editor/NodeMapWindow.h>
+#include <editor/PaintWindow.h>
+#include <editor/RenderWindow.h>
+#include <editor/TreeWindow.h>
+#include <editor/UVEditWindow.h>

@@ -17,11 +17,11 @@ struct AudioWaveFormat {
 
 class AudioPlayerWindow final : public AWindow, public CAudioSourceLoader {
 private:
-    static const int SAMPLE_SIZE_BIT = 12;
-    static const int SAMPLE_SIZE = (1 << SAMPLE_SIZE_BIT);
-    static const int SAMPLE_MASK = (SAMPLE_SIZE - 1);
-    static const int GRAPH_SIZE_BIT = 10;
-    static const int GRAPH_SIZE = (1 << GRAPH_SIZE_BIT);
+    static constexpr int SAMPLE_SIZE_BIT = 12;
+    static constexpr int SAMPLE_SIZE = (1 << SAMPLE_SIZE_BIT);
+    static constexpr int SAMPLE_MASK = (SAMPLE_SIZE - 1);
+    static constexpr int GRAPH_SIZE_BIT = 10;
+    static constexpr int GRAPH_SIZE = (1 << GRAPH_SIZE_BIT);
 
     GUIManagerObject* guiMgr;
 
@@ -32,6 +32,9 @@ private:
     bool displayWave = false;
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.audioplay";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"音频播放器";
+
     AudioPlayerWindow();
     virtual ~AudioPlayerWindow() override;
 
@@ -52,6 +55,9 @@ public:
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileA(const char* path) override;
     virtual void OnDropFileW(const wchar_t* path) override;
+
+    virtual void Serialize(IOutputStream& os) override;
+    virtual void Deserialize(IInputStream& os) override;
 
     void OnInsLoad();
 

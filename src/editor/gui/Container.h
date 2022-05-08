@@ -5,8 +5,19 @@
 
 #include <editor/main/Window.h>
 
+class AContainer : public AWindow {
+protected:
+    // 以下对象用于窗口归并等功能
+    SelectionWindow* selWindow = NULL;
+
+    friend class SelectionWindow;
+
+    AContainer();
+    AContainer(SelectionWindow* selWindow);
+};
+
 //TODO 容器期望集成选择夹、属性窗口等容器
-class LRContainer final : public AWindow {
+class LRContainer : public AContainer {
 private:
     AWindow* lWindow;
     AWindow* rWindow;
@@ -16,13 +27,15 @@ private:
     bool adjustPos = false;
     bool dragEnable = true;
 
-    // 以下对象用于窗口归并
-    SelectionWindow* selWindow = NULL;
     Menu* joinMenu = NULL;
 
     void InitMenu();
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.cont.lr";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+
+    LRContainer();
     LRContainer(AWindow* lWindow, AWindow* rWindow);
     LRContainer(AWindow* lWindow, AWindow* rWindow, SelectionWindow* selWindow);
     ~LRContainer();
@@ -45,6 +58,9 @@ public:
     virtual void OnDropFileA(const char* path) override;
     virtual void OnDropFileW(const wchar_t* path) override;
 
+    virtual void Serialize(IOutputStream& os) override;
+    virtual void Deserialize(IInputStream& os) override;
+
     void UpdateFocus();
     void FreeWindow();
     AWindow* GetLeftWindow();
@@ -54,7 +70,7 @@ public:
     bool DragEnabled();
 };
 
-class UDContainer final : public AWindow {
+class UDContainer : public AContainer {
 private:
     AWindow* uWindow;
     AWindow* dWindow;
@@ -64,13 +80,15 @@ private:
     bool adjustPos = false;
     bool dragEnable = true;
 
-    // 以下对象用于窗口归并
-    SelectionWindow* selWindow = NULL;
     Menu* joinMenu = NULL;
 
     void InitMenu();
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.cont.ud";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+
+    UDContainer();
     UDContainer(AWindow* uWindow, AWindow* dWindow);
     UDContainer(AWindow* uWindow, AWindow* dWindow, SelectionWindow* selWindow);
     virtual ~UDContainer() override;
@@ -93,6 +111,9 @@ public:
     virtual void OnDropFileA(const char* path) override;
     virtual void OnDropFileW(const wchar_t* path) override;
 
+    virtual void Serialize(IOutputStream& os) override;
+    virtual void Deserialize(IInputStream& os) override;
+
     void UpdateFocus();
     void FreeWindow();
     AWindow* GetUpWindow();
@@ -102,7 +123,7 @@ public:
     bool DragEnabled();
 };
 
-class SelectionWindow final : public AWindow {
+class SelectionWindow : public AWindow {
 private:
     AWindow* curWindow;
     Menu* selMenu;
@@ -110,6 +131,9 @@ private:
     void InitMenu();
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.cont.sel";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+
     SelectionWindow();
     SelectionWindow(AWindow* initialWnd);
     virtual ~SelectionWindow() override;
@@ -131,6 +155,9 @@ public:
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileA(const char* path) override;
     virtual void OnDropFileW(const wchar_t* path) override;
+
+    virtual void Serialize(IOutputStream& os) override;
+    virtual void Deserialize(IInputStream& os) override;
 
     AWindow* GetWindow();
     void SetWindow(AWindow* window, bool del = true);

@@ -16,6 +16,7 @@ protected:
     AReader() {}
 
 public:
+    using IReadable::Read;
     virtual size_t Read(char* s, size_t size) = 0;
     virtual bool Ready();
 };
@@ -27,6 +28,7 @@ protected:
     AWriter() {}
 
 public:
+    using IAppendable::Append;
     virtual void Write(char c);
     virtual void Write(const char* s, size_t size) = 0;
     virtual void Write(const char* s);

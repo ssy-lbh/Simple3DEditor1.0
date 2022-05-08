@@ -3,9 +3,10 @@
 
 #include <define.h>
 
+#include <io/Serializable.h>
 #include <util/math3d/LinearAlgebra.h>
 
-class AWindow : public Object {
+class AWindow : public Object, public IMemorable {
 protected:
     bool focus = false;
 
@@ -19,6 +20,9 @@ protected:
     void UpdateWindowSize(int x, int y);
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.base.wnd";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+
     AWindow();
     virtual ~AWindow();
 
@@ -40,6 +44,11 @@ public:
     virtual void OnMenuAccel(int id, bool accel);
     virtual void OnDropFileA(const char* path);
     virtual void OnDropFileW(const wchar_t* path);
+
+    // 窗口序列化时应先os.WriteWithLen(WINDOW_ID)，这样才能在反序列化时识别窗口
+    virtual void Serialize(IOutputStream& os) override;
+    // 除了WINDOW_ID，其他数据按顺序依次读取就行
+    virtual void Deserialize(IInputStream& is) override;
 };
 
 class AGUIWindow : public AWindow {
@@ -47,6 +56,9 @@ protected:
     GUIManagerObject* guiMgr;
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.base.guiwnd";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+
     AGUIWindow();
     virtual ~AGUIWindow() override;
 
@@ -58,6 +70,9 @@ public:
     virtual void OnLeftUp(int x, int y) override;
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
+
+    virtual void Serialize(IOutputStream& os) override;
+    using AWindow::Deserialize;
 };
 
 #endif

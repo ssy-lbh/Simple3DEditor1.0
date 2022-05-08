@@ -1,6 +1,7 @@
 #include <util/physics/MeshCollider.h>
 
 #include <main.h>
+#include <util/math3d/LinearAlgebra.h>
 #include <util/physics/Rigidbody.h>
 #include <util/physics/AllColliders.h>
 

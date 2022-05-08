@@ -3,6 +3,8 @@
 #include <lib/opengl/gl/gl.h>
 #include <lib/opengl/gl/glu.h>
 
+#include <util/math3d/LinearAlgebra.h>
+
 CCamera::CCamera() : camPos(Point3::zero), camLookat(Point3(0.0f, 5.0f, 0.0f)), camDis(5.0f) {
     SetRotation(Quaternion::one);
 }

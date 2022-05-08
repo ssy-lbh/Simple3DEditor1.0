@@ -147,8 +147,6 @@ Matrix3x4::Matrix3x4(float _11, float _12, float _13, float _14,
                      _21(_21), _22(_22), _23(_23), _24(_24),
                      _31(_31), _32(_32), _33(_33), _34(_34) {}
 
-Matrix3x4::~Matrix3x4(){}
-
 const Matrix3x4 Matrix3x4::zero      = {0.0F, 0.0F, 0.0F, 0.0F,
                                         0.0F, 0.0F, 0.0F, 0.0F,
                                         0.0F, 0.0F, 0.0F, 0.0F};
@@ -334,8 +332,6 @@ Matrix2x3::Matrix2x3(float _11, float _12, float _13,
                      float _21, float _22, float _23) :
                      _11(_11), _12(_12), _13(_13),
                      _21(_21), _22(_22), _23(_23) {}
-
-Matrix2x3::~Matrix2x3(){}
 
 const Matrix2x3 Matrix2x3::zero      = {0.0F, 0.0F, 0.0F,
                                         0.0F, 0.0F, 0.0F};

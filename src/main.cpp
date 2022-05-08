@@ -4,9 +4,9 @@
 #include <lib/glut/glut.h>
 
 #include <res.h>
+#include <editor/AllWindows.h>
 #include <editor/gui/Container.h>
 #include <editor/gui/Menu.h>
-#include <editor/MainWindow.h>
 #include <editor/dialog/Tips.h>
 #include <util/AudioUtils.h>
 #include <util/StringBuilder.h>
@@ -166,12 +166,28 @@ GlobalData::GlobalData(){
     scene = new AViewObject(L"Scene");
     screen = new AViewObject(L"Screen");
 
-    windowRegistry.Register<MainWindow>(L"主窗口");
+    RegisterWindow<AWindow>();
+
+    RegisterWindow<LRContainer>();
+    RegisterWindow<UDContainer>();
+    RegisterWindow<SelectionWindow>();
+
+    RegisterWindow<AnimationWindow>();
+    RegisterWindow<AttributeWindow>();
+    RegisterWindow<AudioCaptureWindow>();
+    RegisterWindow<AudioPlayerWindow>();
+    RegisterWindow<MainWindow>();
+    RegisterWindow<NodeMapWindow>();
+    RegisterWindow<PaintWindow>();
+    RegisterWindow<RenderWindow>();
+    RegisterWindow<TreeWindow>();
+    RegisterWindow<UVEditWindow>();
 }
 
 GlobalData::~GlobalData(){
     if (scene) delete scene;
     if (screen) delete screen;
+    Free(windowReg);
 }
 
 void GlobalData::SelectObject(AViewObject* o){
@@ -225,6 +241,21 @@ void GlobalData::OnAnimationFrame(float frame){
     animFrame = frame;
     scene->OnAnimationFrame(frame);
     screen->OnAnimationFrame(frame);
+}
+
+AWindow* GlobalData::ConstructWindow(const String& id){
+    WindowInfo* info = windowReg.Get(id);
+    if (!info){
+        DebugError("GlobalData::ParseWindow Unrecognized Window ID %s", id.GetString());
+        return NULL;
+    }
+    return info->factory();
+}
+
+AWindow* GlobalData::ConstructWindow(IInputStream& is){
+    AWindow* window = ConstructWindow(is.ReadString());
+    window->Deserialize(is);
+    return window;
 }
 
 #ifdef PLATFORM_WINDOWS
@@ -380,6 +411,8 @@ Mesh* Main::GetMesh(AViewObject* o){
     return NULL;
 }
 
+#include <io/File.h>
+
 int Main::MainEntry(int argc, char** argv){
     Init();
     AudioUtils::InitOpenAL();
@@ -411,6 +444,10 @@ int Main::MainEntry(int argc, char** argv){
     glFontSize(12);
 
     mainFrame->SetWindow(new MainWindow());
+    // {
+    //     File f("test.bin");
+    //     mainFrame->SetWindow(data->ConstructWindow(f));
+    // }
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 
@@ -433,6 +470,12 @@ int Main::MainEntry(int argc, char** argv){
             Time::Sleep(0.0167f - localData->deltaTime);
         }
     }
+
+    // {
+    //     File f("test.bin");
+    //     f.CreateNew();
+    //     mainFrame->GetWindow()->Serialize(f);
+    // }
 
     int code = appFrame->GetExitCode();
 

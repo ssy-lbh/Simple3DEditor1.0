@@ -14,17 +14,25 @@
 #include <editor/AttributeWindow.h>
 #include <editor/gui/Menu.h>
 #include <editor/main/ViewManager.h>
+#include <util/Utils.h>
 #include <util/math3d/Math.h>
 #include <util/math3d/LinearAlgebra.h>
 #include <util/gl/GLUtils.h>
 #include <util/os/Log.h>
 #include <util/os/AppFrame.h>
 
+AContainer::AContainer(){}
+AContainer::AContainer(SelectionWindow* selWindow) : selWindow(selWindow) {}
+
+LRContainer::LRContainer() : lWindow(NULL), rWindow(NULL) {
+    cliSize = Vector2(2.0f, 0.0f);
+}
+
 LRContainer::LRContainer(AWindow* lWindow, AWindow* rWindow) : lWindow(lWindow), rWindow(rWindow) {
     cliSize = Vector2(2.0f, 0.0f);
 }
 
-LRContainer::LRContainer(AWindow* lWindow, AWindow* rWindow, SelectionWindow* selWindow) : selWindow(selWindow) {
+LRContainer::LRContainer(AWindow* lWindow, AWindow* rWindow, SelectionWindow* selWindow) : AContainer(selWindow) {
     cliSize = Vector2(2.0f, 0.0f);
     this->lWindow = new SelectionWindow(lWindow);
     this->rWindow = new SelectionWindow(rWindow);
@@ -204,6 +212,25 @@ void LRContainer::OnDropFileW(const wchar_t* path){
         focusWindow->OnDropFileW(path);
 }
 
+void LRContainer::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+    os.Write(GetRate((float)dis, 0.0f, cliSize.x));
+    os.Write(lWindow != NULL);
+    if (lWindow)
+        lWindow->Serialize(os);
+    os.Write(rWindow != NULL);
+    if (rWindow)
+        rWindow->Serialize(os);
+}
+
+void LRContainer::Deserialize(IInputStream& is){
+    dis = Lerp(0.0f, cliSize.x, Saturate(is.ReadFloat()));
+    if (is.ReadBool())
+        lWindow = Main::data->ConstructWindow(is);
+    if (is.ReadBool())
+        rWindow = Main::data->ConstructWindow(is);
+}
+
 void LRContainer::UpdateFocus(){
     if (cursorCoord.x < dis){
         if (focusWindow != lWindow){
@@ -260,11 +287,15 @@ bool LRContainer::DragEnabled(){
     return dragEnable;
 }
 
+UDContainer::UDContainer() : uWindow(NULL), dWindow(NULL) {
+    cliSize = Vector2(0.0f, 2.0f);
+} 
+
 UDContainer::UDContainer(AWindow* uWindow, AWindow* dWindow) : uWindow(uWindow), dWindow(dWindow) {
     cliSize = Vector2(0.0f, 2.0f);
 }
 
-UDContainer::UDContainer(AWindow* uWindow, AWindow* dWindow, SelectionWindow* selWindow) : selWindow(selWindow) {
+UDContainer::UDContainer(AWindow* uWindow, AWindow* dWindow, SelectionWindow* selWindow) : AContainer(selWindow) {
     cliSize = Vector2(0.0f, 2.0f);
     this->uWindow = new SelectionWindow(uWindow);
     this->dWindow = new SelectionWindow(dWindow);
@@ -443,6 +474,25 @@ void UDContainer::OnDropFileW(const wchar_t* path){
         focusWindow->OnDropFileW(path);
 }
 
+void UDContainer::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+    os.Write(GetRate((float)dis, 0.0f, cliSize.y));
+    os.Write(uWindow != NULL);
+    if (uWindow)
+        uWindow->Serialize(os);
+    os.Write(dWindow != NULL);
+    if (dWindow)
+        dWindow->Serialize(os);
+}
+
+void UDContainer::Deserialize(IInputStream& is){
+    dis = Lerp(0.0f, cliSize.y, Saturate(is.ReadFloat()));
+    if (is.ReadBool())
+        uWindow = Main::data->ConstructWindow(is);
+    if (is.ReadBool())
+        dWindow = Main::data->ConstructWindow(is);
+}
+
 void UDContainer::UpdateFocus(){
     if (cursorCoord.y < dis){
         if (focusWindow != dWindow){
@@ -518,16 +568,19 @@ SelectionWindow::~SelectionWindow(){
 void SelectionWindow::InitMenu(){
     selMenu = new Menu();
 
-    selMenu->AddItem(new MenuItem(L"主窗口", [=]{ this->SetWindow(new MainWindow()); }));
-    selMenu->AddItem(new MenuItem(L"UV编辑器", [=]{ this->SetWindow(new UVEditWindow()); }));
-    selMenu->AddItem(new MenuItem(L"绘画窗口", [=]{ this->SetWindow(new PaintWindow()); }));
-    selMenu->AddItem(new MenuItem(L"音频播放器", [=]{ this->SetWindow(new AudioPlayerWindow()); }));
-    selMenu->AddItem(new MenuItem(L"变声器", [=]{ this->SetWindow(new AudioCaptureWindow()); }));
-    selMenu->AddItem(new MenuItem(L"树形图", [=]{ this->SetWindow(new TreeWindow()); }));
-    selMenu->AddItem(new MenuItem(L"节点编辑器", [=]{ this->SetWindow(new NodeMapWindow()); }));
-    selMenu->AddItem(new MenuItem(L"动画控制器", [=]{ this->SetWindow(new AnimationWindow()); }));
-    selMenu->AddItem(new MenuItem(L"渲染窗口", [=]{ this->SetWindow(new RenderWindow()); }));
-    selMenu->AddItem(new MenuItem(L"属性窗口(未完成)", [=]{ this->SetWindow(new AttributeWindow()); }));
+    // 直接无序注册所有窗口
+    Main::data->windowReg.Foreach([=](const WString& id, WindowInfo* info){
+        if (info->displayName.GetLength() == 0)
+            return;
+        // 这里复制了name和factory存入lambda函数对象中
+        WString name = info->displayName;
+        std::function<AWindow*()> factory = info->factory;
+        this->selMenu->AddItem(new MenuItem(
+            Value<const wchar_t*>([name](){ return name.GetString(); }),
+            [this, factory]{ this->SetWindow(factory()); }
+        ));
+    });
+
     selMenu->AddItem(new MenuItem());
     selMenu->AddItem(new MenuItem(L"左右分割至左侧", [=]{ this->SetWindow(new LRContainer(this->curWindow, NULL, this), false); }));
     selMenu->AddItem(new MenuItem(L"左右分割至右侧", [=]{ this->SetWindow(new LRContainer(NULL, this->curWindow, this), false); }));
@@ -641,6 +694,21 @@ void SelectionWindow::OnDropFileW(const wchar_t* path){
     AWindow::OnDropFileW(path);
     if (curWindow)
         curWindow->OnDropFileW(path);
+}
+
+void SelectionWindow::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+    os.Write(curWindow != NULL);
+    if (curWindow)
+        curWindow->Serialize(os);
+}
+
+void SelectionWindow::Deserialize(IInputStream& is){
+    if (is.ReadBool()){
+        curWindow = Main::data->ConstructWindow(is);
+        if (InstanceOf<AContainer>(curWindow))
+            ((AContainer*)curWindow)->selWindow = this;
+    }
 }
 
 AWindow* SelectionWindow::GetWindow(){

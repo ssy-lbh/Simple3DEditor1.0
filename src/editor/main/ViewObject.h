@@ -3,6 +3,7 @@
 
 #include <define.h>
 
+#include <io/Serializable.h>
 #include <util/List.h>
 #include <util/Delegate.h>
 #include <util/math3d/Geometry.h>

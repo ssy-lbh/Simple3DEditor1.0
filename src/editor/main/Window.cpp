@@ -69,6 +69,12 @@ void AWindow::OnMenuAccel(int id, bool accel){}
 void AWindow::OnDropFileA(const char* path){}
 void AWindow::OnDropFileW(const wchar_t* path){}
 
+void AWindow::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+}
+
+void AWindow::Deserialize(IInputStream& is){}
+
 AGUIWindow::AGUIWindow(){
     guiMgr = new GUIManagerObject();
 }
@@ -112,4 +118,8 @@ void AGUIWindow::OnRightDown(int x, int y){
 void AGUIWindow::OnRightUp(int x, int y){
     UpdateCursor(x, y);
     guiMgr->OnRightUp2D(cursorPos);
+}
+
+void AGUIWindow::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
 }

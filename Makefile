@@ -72,7 +72,7 @@ tolower		= $(shell $(ECHO) $1 | $(TR) A-Z a-z)
 
 # 递归的wildcard
 rwildcard	= $(foreach D, $(wildcard $(1:=/*)), $(call rwildcard, $D, $2) $(filter $(subst *, %, $2), $D))
-src2obj		= $(1:%.cpp=$(BUILD_PATH)/%.o)
+src2obj		= $(1:$(SOURCE_PATH)/%.cpp=$(BUILD_PATH)/%.o)
 
 GCC			:= g++
 DLLTOOL		:= dlltool
@@ -158,24 +158,6 @@ $(OUTPUTDLIB): $(ALLOBJ)
 $(OUTPUT): $(ALLOBJ)
 	$(GCC) $(ALLOBJ) -o $@ $(LIB) $(OFLAGS)
 
-# 注:不使用依赖项文件时使用如下编译流程
-# 常规的源代码
-$(PROGOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp $(SOURCE_PATH)/%.h
-	$(GCC) -c $< -o $@ $(CFLAGS)
-
-# 这一类为平台相关代码源文件
-$(PLATOBJ): $(BUILD_PATH)/platform/$(PLATFORM)/%.o: $(SOURCE_PATH)/platform/$(PLATFORM)/%.cpp $(SOURCE_PATH)/%.h
-	$(GCC) -c $< -o $@ $(CFLAGS)
-
-# 这一类源文件没有头文件，直接编译
-$(EXTRAOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp
-	$(GCC) -c $< -o $@ $(CFLAGS)
-
-# 其实我个人觉得，把nasm的内置指令incbin用好了当资源表用是相当可行的，理论上只要不乱加汇编代码跨平台是没问题的
-# 采用nasm的话，res.h里面就不是各种id了，而是一堆extern char[0]，指向资源数据的指针，借助了符号链接的功能
-$(RESOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.rc
-	$(RES) -i $< -o $@
-
 # 依赖项文件
 DEPFILES	:= $(CPPOBJ:%.o=%.d)
 
@@ -187,6 +169,24 @@ DEPFILES	:= $(CPPOBJ:%.o=%.d)
 $(DEPFILES): $(BUILD_PATH)/%.d: $(SOURCE_PATH)/%.cpp
 	$(GCC) -MM $(CFLAGS) $< -MT $(call src2obj, $<) > $@
 	$(ECHO) "	$(GCC) -c $< -o $(call src2obj, $<) $(CFLAGS)" >> $@
+
+# 注:不使用依赖项文件时使用如下编译流程
+# 常规的源代码
+#$(PROGOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp $(SOURCE_PATH)/%.h
+#	$(GCC) -c $< -o $@ $(CFLAGS)
+
+# 这一类为平台相关代码源文件
+#$(PLATOBJ): $(BUILD_PATH)/platform/$(PLATFORM)/%.o: $(SOURCE_PATH)/platform/$(PLATFORM)/%.cpp $(SOURCE_PATH)/%.h
+#	$(GCC) -c $< -o $@ $(CFLAGS)
+
+# 这一类源文件没有头文件，直接编译
+#$(EXTRAOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp
+#	$(GCC) -c $< -o $@ $(CFLAGS)
+
+# 其实我个人觉得，把nasm的内置指令incbin用好了当资源表用是相当可行的，理论上只要不乱加汇编代码跨平台是没问题的
+# 采用nasm的话，res.h里面就不是各种id了，而是一堆extern char[0]，指向资源数据的指针，借助了符号链接的功能
+$(RESOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.rc
+	$(RES) -i $< -o $@
 
 OBJDIRS		:= $(sort $(shell $(DIRNAME) $(ALLOBJ)))
 # 有一些目录会套多层，其中间没有文件
@@ -206,8 +206,7 @@ MERGE 		= master-2.0
 # 一键提交代码
 commit:
 	$(GIT) checkout $(BRANCH)
-	$(GIT) add *
-	$(GIT) commit -m $(COMMITMSG)
+	$(GIT) commit -a -m $(COMMITMSG)
 	$(GIT) push -u origin $(BRANCH)
 
 # 一键合并分支
@@ -240,8 +239,14 @@ sign: $(OUTPUT)
 
 cleanall: clean cleandep
 
+# 不再动的部分
+FIXED_OBJ 	:= util/physics3d
+FIXED_OBJ 	:= $(addprefix $(SOURCE_PATH)/, $(FIXED_OBJ))
+FIXED_OBJ 	:= $(call rwildcard, $(FIXED_OBJ), *.cpp)
+FIXED_OBJ 	:= $(FIXED_OBJ:$(SOURCE_PATH)/%.cpp=$(BUILD_PATH)/%.o)
+
 clean:
-	-$(RM) $(OUTPUT) $(OUTPUTDLIB) $(ALLOBJ)
+	-$(RM) $(filter-out $(FIXED_OBJ), $(OUTPUT) $(OUTPUTDLIB) $(ALLOBJ))
 
 cleandep:
 	-$(RM) $(DEPFILES)

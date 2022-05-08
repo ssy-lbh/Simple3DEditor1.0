@@ -1,6 +1,7 @@
 #include <util/physics/Rigidbody.h>
 
 #include <editor/main/ViewObject.h>
+#include <util/math3d/LinearAlgebra.h>
 
 Rigidbody::Rigidbody(AViewObject* object) : object(object) {}
 Rigidbody::~Rigidbody(){}

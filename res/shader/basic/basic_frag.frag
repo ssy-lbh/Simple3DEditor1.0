@@ -1,11 +1,9 @@
-#version 420
+#version 120
 
-layout (location = 0) in vec4 fragColor;
-layout (location = 1) in vec4 fragTexCoord;
-layout (location = 2) in vec2 fragNormal;
-
-layout (location = 0) out vec4 outColor;
+varying vec4 fragColor;
+varying vec4 fragTexCoord;
+varying vec3 fragNormal;
 
 void main(){
-    outColor = fragColor;
+    gl_FragColor = fragColor;
 }

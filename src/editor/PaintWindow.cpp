@@ -13,149 +13,158 @@
 #include <util/gl/GLFrameBuffer.h>
 #include <util/gl/GLComputeProgram.h>
 
-PaintWindow::ClearBrush::ClearBrush(PaintWindow* window) : window(window) {
-    prog = new GLComputeProgram(IDS_BRUSH_CLEAR);
-    if (prog->CompileShader()){
-        DebugError("Compute Shader %d Compile Error:", IDS_BRUSH_CLEAR);
-        prog->PrintShaderLog();
-        err = true;
-    }
-    if (prog->LinkProgram()){
-        DebugError("Program Link Error:");
-        prog->PrintProgramLog();
-        err = true;
-    }
+class ClearBrush : public ITool {
+private:
+    PaintWindow* window;
+    uint colorLoc;
+    Vector3 color = Vector3::one;
 
-    if (err)
-        return;
+    GLComputeProgram* prog = NULL;
+    bool err = false;
 
-    colorLoc = prog->GetLoc("color");
-}
+public:
+    ClearBrush(PaintWindow* window) : window(window) {
+        prog = new GLComputeProgram(IDS_BRUSH_CLEAR);
+        if (prog->CompileShader()){
+            DebugError("Compute Shader %d Compile Error:", IDS_BRUSH_CLEAR);
+            prog->PrintShaderLog();
+            err = true;
+        }
+        if (prog->LinkProgram()){
+            DebugError("Program Link Error:");
+            prog->PrintProgramLog();
+            err = true;
+        }
 
-PaintWindow::ClearBrush::~ClearBrush(){
-    if (prog) delete prog;
-}
+        if (err)
+            return;
 
-void PaintWindow::ClearBrush::OnLeftDown(){
-    GLuint kernel;
-
-    if (err)
-        return;
-
-    prog->BindTexture(0, window->paintTex, GL_READ_WRITE, GL_RGBA32F);
-
-    kernel = prog->GetProgram();
-    glProgramUniform3f(kernel, colorLoc, color.x, color.y, color.z);
-
-    prog->Dispatch((window->GetWidth() + 7) >> 3, (window->GetHeight() + 7) >> 3, 1);
-}
-
-void PaintWindow::ClearBrush::OnCommand(int id){
-    switch (id){
-    case IDM_SELECT_COLOR:
-        color = ColorBoard::GetColor();
-        break;
-    }
-}
-
-PaintWindow::DefaultBrush::DefaultBrush(PaintWindow* window) : window(window) {
-    prog = new GLComputeProgram(IDS_BRUSH_OVERLAY);
-    if (prog->CompileShader()){
-        DebugError("Compute Shader %d Compile Error:", IDS_BRUSH_OVERLAY);
-        prog->PrintShaderLog();
-        err = true;
-    }
-    if (prog->LinkProgram()){
-        DebugError("Program Link Error:");
-        prog->PrintProgramLog();
-        err = true;
+        colorLoc = prog->GetLoc("color");
     }
 
-    if (err)
-        return;
-
-    paintLoc = prog->GetLoc("paint");
-    offsetLoc = prog->GetLoc("offset");
-    positionLoc = prog->GetLoc("position");
-    radiusLoc = prog->GetLoc("radius");
-    colorLoc = prog->GetLoc("color");
-}
-
-PaintWindow::DefaultBrush::DefaultBrush(PaintWindow* window, int shaderId) : window(window) {
-    prog = new GLComputeProgram(shaderId);
-    if (prog->CompileShader()){
-        DebugError("Compute Shader %d Compile Error:", shaderId);
-        prog->PrintShaderLog();
-        err = true;
-    }
-    if (prog->LinkProgram()){
-        DebugError("Program Link Error:");
-        prog->PrintProgramLog();
-        err = true;
+    virtual ~ClearBrush() override{
+        if (prog) delete prog;
     }
 
-    if (err)
-        return;
+    virtual void OnLeftDown() override{
+        GLuint kernel;
 
-    paintLoc = prog->GetLoc("paint");
-    offsetLoc = prog->GetLoc("offset");
-    positionLoc = prog->GetLoc("position");
-    radiusLoc = prog->GetLoc("radius");
-    colorLoc = prog->GetLoc("color");
-}
+        if (err)
+            return;
 
-PaintWindow::DefaultBrush::~DefaultBrush(){
-    if (prog) delete prog;
-}
+        prog->BindTexture(0, window->paintTex, GL_READ_WRITE, GL_RGBA32F);
 
-void PaintWindow::DefaultBrush::OnLeftDown(){
-    draw = true;
-}
+        kernel = prog->GetProgram();
+        glProgramUniform3f(kernel, colorLoc, color.x, color.y, color.z);
 
-void PaintWindow::DefaultBrush::OnLeftUp(){
-    draw = false;
-}
-
-void PaintWindow::DefaultBrush::OnMove(){
-    if (draw){
-        Draw();
+        prog->Dispatch((window->GetWidth() + 7) >> 3, (window->GetHeight() + 7) >> 3, 1);
     }
-}
 
-void PaintWindow::DefaultBrush::OnCommand(int id){
-    switch (id){
-    case IDM_SELECT_COLOR:
-        color = ColorBoard::GetColor();
-        break;
+    virtual void OnCommand(int id) override{
+        switch (id){
+        case IDM_SELECT_COLOR:
+            color = ColorBoard::GetColor();
+            break;
+        }
     }
-}
+};
 
-void PaintWindow::DefaultBrush::Draw(){
-    GLint offset[2];
-    GLint position[2];
-    GLfloat radius = 10.0f;
-    GLuint kernel;
+class DefaultBrush : public ITool {
+private:
+    PaintWindow* window;
+    bool draw = false;
 
-    if (err)
-        return;
+    // Uniform位置
+    uint paintLoc;
+    uint offsetLoc;
+    uint positionLoc;
+    uint radiusLoc;
+    uint colorLoc;
 
-    prog->BindTexture(0, window->paintTex, GL_READ_WRITE, GL_RGBA32F);
+    Vector3 color = Vector3::one;
 
-    position[0] = window->GetWidth() * (window->cursorPos.x + 1.0f) * 0.5f;
-    position[1] = window->GetHeight() * (window->cursorPos.y + 1.0f) * 0.5f;
-    offset[0] = position[0] - 12;
-    offset[1] = position[1] - 12;
+    GLComputeProgram* prog = NULL;
+    bool err = false;
 
-    kernel = prog->GetProgram();
+public:
+    DefaultBrush(PaintWindow* window) : DefaultBrush(window, IDS_BRUSH_OVERLAY) {}
 
-    glProgramUniform1i(kernel, paintLoc, 0);
-    glProgramUniform2i(kernel, offsetLoc, offset[0], offset[1]);
-    glProgramUniform2i(kernel, positionLoc, position[0], position[1]);
-    glProgramUniform1f(kernel, radiusLoc, radius);
-    glProgramUniform3f(kernel, colorLoc, color.x, color.y, color.z);
-;
-    prog->Dispatch(3, 3, 1);
-}
+    DefaultBrush(PaintWindow* window, int shaderId) : window(window) {
+        prog = new GLComputeProgram(shaderId);
+        if (prog->CompileShader()){
+            DebugError("Compute Shader %d Compile Error:", shaderId);
+            prog->PrintShaderLog();
+            err = true;
+        }
+        if (prog->LinkProgram()){
+            DebugError("Program Link Error:");
+            prog->PrintProgramLog();
+            err = true;
+        }
+
+        if (err)
+            return;
+
+        paintLoc = prog->GetLoc("paint");
+        offsetLoc = prog->GetLoc("offset");
+        positionLoc = prog->GetLoc("position");
+        radiusLoc = prog->GetLoc("radius");
+        colorLoc = prog->GetLoc("color");
+    }
+
+    virtual ~DefaultBrush() override{
+        if (prog) delete prog;
+    }
+
+    virtual void OnLeftDown() override{
+        draw = true;
+    }
+    
+    virtual void OnLeftUp() override{
+        draw = false;
+    }
+
+    virtual void OnMove() override{
+        if (draw){
+            Draw();
+        }
+    }
+
+    virtual void OnCommand(int id) override{
+        switch (id){
+        case IDM_SELECT_COLOR:
+            color = ColorBoard::GetColor();
+            break;
+        }
+    }
+
+    void Draw(){
+        GLint offset[2];
+        GLint position[2];
+        GLfloat radius = 10.0f;
+        GLuint kernel;
+
+        if (err)
+            return;
+
+        prog->BindTexture(0, window->paintTex, GL_READ_WRITE, GL_RGBA32F);
+
+        position[0] = window->GetWidth() * (window->cursorPos.x + 1.0f) * 0.5f;
+        position[1] = window->GetHeight() * (window->cursorPos.y + 1.0f) * 0.5f;
+        offset[0] = position[0] - 12;
+        offset[1] = position[1] - 12;
+
+        kernel = prog->GetProgram();
+
+        glProgramUniform1i(kernel, paintLoc, 0);
+        glProgramUniform2i(kernel, offsetLoc, offset[0], offset[1]);
+        glProgramUniform2i(kernel, positionLoc, position[0], position[1]);
+        glProgramUniform1f(kernel, radiusLoc, radius);
+        glProgramUniform3f(kernel, colorLoc, color.x, color.y, color.z);
+
+        prog->Dispatch(3, 3, 1);
+    }
+};
 
 PaintWindow::PaintWindow(){
     DebugLog("PaintWindow Launched");
@@ -301,6 +310,12 @@ void PaintWindow::OnMenuAccel(int id, bool accel){
     if (brush)
         brush->OnCommand(id);
 }
+
+void PaintWindow::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+}
+
+void PaintWindow::Deserialize(IInputStream& os){}
 
 void PaintWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);

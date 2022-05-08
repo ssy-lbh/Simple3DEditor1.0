@@ -3,7 +3,7 @@
 
 #include <define.h>
 
-#include <base/Factory.h>
+#include <util/HashMap.h>
 #include <util/List.h>
 #include <util/os/AppFrame.h>
 #include <util/math3d/LinearAlgebra.h>
@@ -78,6 +78,11 @@ enum class SelectionType {
     SELECT_FACES
 };
 
+struct WindowInfo {
+    std::function<AWindow*()> factory;
+    WString displayName;
+};
+
 //TODO 可加入全局拖拽功能，在窗口之间传送数据
 class GlobalData final : public Object {
 public:
@@ -99,8 +104,6 @@ public:
 
     float animFrame = 0.0f;
 
-    FactoryRegistryW<AWindow> windowRegistry;
-
     GlobalData();
     ~GlobalData();
 
@@ -110,6 +113,25 @@ public:
     void OnTimer(int id);
 
     void OnAnimationFrame(float frame);
+
+    HashMapA<WindowInfo*> windowReg;
+
+    // id用于标记文件等数据中的类型信息，对于每一类的类应唯一
+    // 注册的窗口类有以下要求
+    // 1. 继承自editor/main/Window.h中的AWindow类
+    // 2. 内部定义static constexpr const char* WINDOW_ID作为全局窗口唯一标识符，注意唯一
+    // 3. 内部定义static constexpr const wchar_t* WINDOW_DISPLAY_NAME作为窗口显示名称，内容不作要求
+    // 4. 如果窗口不能给用户自由选择和使用(比如容器)，可将WINDOW_DISPLAY_NAME设为L""
+    template <typename T>
+    void RegisterWindow(){
+        WindowInfo* info = new WindowInfo;
+        info->factory = []{ return new T(); };
+        info->displayName = T::WINDOW_DISPLAY_NAME;
+        windowReg.Set(T::WINDOW_ID, info);
+    }
+
+    AWindow* ConstructWindow(const String& id);
+    AWindow* ConstructWindow(IInputStream& is);
 };
 
 class Main final : public Object {

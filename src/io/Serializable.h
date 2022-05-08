@@ -16,6 +16,10 @@ public:
 };
 
 // 多继承中只含有接口，期望数据不会有不确定性
-class IMemorable : public ISerializable, public IDeserializable {};
+class IMemorable : public ISerializable, public IDeserializable {
+public:
+    using ISerializable::Serialize;
+    using IDeserializable::Deserialize;
+};
 
 #endif

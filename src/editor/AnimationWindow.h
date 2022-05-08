@@ -9,8 +9,8 @@
 
 class AnimationWindow : public AWindow {
 private:
-    static const float DEFAULT_START_FRAME;
-    static const float DEFAULT_END_FRAME;
+    static constexpr float DEFAULT_START_FRAME = 0.0f;
+    static constexpr float DEFAULT_END_FRAME = 250.0f;
 
     UIManager* uiMgr;
 
@@ -24,54 +24,18 @@ private:
 
     AnimationCurve* curve = NULL;
 
-    class FrameIndicator : public IButton {
-    private:
-        AnimationWindow* window;
-        float pos = 0.0f;
-        float origin;
-    
-    public:
-        FrameIndicator(AnimationWindow* window);
-        virtual ~FrameIndicator() override;
-
-        virtual bool Trigger(Vector2 pos) override;
-        virtual void Click(Vector2 pos) override;
-        virtual void Drag(Vector2 dir) override;
-        virtual void Render() override;
-    };
-
-    class Bottom : public IButton {
-    private:
-        static const Vector3 COLOR;
-        static const float DEPTH;
-        static const float BOUND_TOP;
-        static const float BOUND_BOTTOM;
-
-    public:
-        Bottom();
-        virtual ~Bottom() override;
-
-        virtual void Render() override;
-    };
-
-    class PlayButton : public IButton {
-    private:
-        AnimationWindow* window;
-    
-    public:
-        PlayButton(AnimationWindow* window);
-        virtual ~PlayButton() override;
-
-        virtual bool Trigger(Vector2 pos) override;
-        virtual void Click(Vector2 pos) override;
-        virtual void Render() override;
-    };
+    friend class FrameIndicator;
+    friend class Bottom;
+    friend class PlayButton;
 
 protected:
     void UpdateCursor(int x, int y);
     void UpdateWindowSize(int x, int y);
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.anim";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"动画控制器";
+
     AnimationWindow();
     virtual ~AnimationWindow() override;
 
@@ -84,6 +48,9 @@ public:
     virtual void OnRightUp(int x, int y) override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
+
+    virtual void Serialize(IOutputStream& os) override;
+    virtual void Deserialize(IInputStream& os) override;
     
     void SetCurve(AnimationCurve* curve);
     void SetProperty(Property* prop);

@@ -232,3 +232,9 @@ void TreeWindow::OnMenuAccel(int id, bool accel){
         break;
     }
 }
+
+void TreeWindow::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+}
+
+void TreeWindow::Deserialize(IInputStream& os){}

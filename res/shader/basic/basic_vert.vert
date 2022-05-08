@@ -1,23 +1,14 @@
-#version 420
+#version 120
 
-layout (location = 0) in vec3 inLocation;
-layout (location = 1) in vec4 inColor;
-layout (location = 2) in vec2 inTexCoord;
-layout (location = 3) in vec3 inNormal;
+attribute vec3 inLocation;
 
-layout (binding = 0) uniform Transform {
-    mat4x4 proj;
-    mat4x4 modelview;
-} trans;
-
-layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec2 fragTexCoord;
-layout (location = 2) out vec3 fragNormal;
+varying vec4 fragColor;
+varying vec4 fragTexCoord;
+varying vec3 fragNormal;
 
 void main(){
-    //gl_Position = trans.proj * trans.modelview * vec4(inLocation, 1.0);
-    gl_Position = vec4(inLocation, 1.0);
-    fragColor = inColor;
-    fragTexCoord = inTexCoord;
-    fragNormal = mat3x3(trans.proj * trans.modelview) * inNormal;
+    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(inLocation, 1.0);
+    fragColor = gl_Color;
+    fragTexCoord = gl_MultiTexCoord0;
+    fragNormal = gl_NormalMatrix * gl_Normal;
 }

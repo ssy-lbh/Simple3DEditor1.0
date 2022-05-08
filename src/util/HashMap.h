@@ -8,6 +8,8 @@
 
 #include <util/String.h>
 
+// 哈希表是无序的
+
 // 此HashMap默认ANSI编码以及指针为值类型
 // 默认指针不为NULL，若想设置为NULL请删除
 template <typename T, const uint bitSize = 6>
@@ -85,7 +87,7 @@ public:
 
     T Set(const char* key, T val){
         HashNode*& root = nodes[GetHash(key, strlen(key))];
-        HashNode* node = QueryNode(root);
+        HashNode* node = QueryNode(root, key);
         if (node){
             T preval = node->val;
             node->val = val;
@@ -97,7 +99,7 @@ public:
 
     T Set(const String& key, T val){
         HashNode*& root = nodes[GetHash(key.GetString(), key.GetLength())];
-        HashNode* node = QueryNode(root);
+        HashNode* node = QueryNode(root, key.GetString());
         if (node){
             T preval = node->val;
             node->val = val;
@@ -129,7 +131,7 @@ public:
 
 template <typename T, const uint bitSize>
 void Free(HashMapA<T*, bitSize>& map){
-    map.Foreach([](T* item){
+    map.Foreach([](const String& key, T* item){
         delete item;
     });
 }
@@ -223,7 +225,7 @@ public:
 
     T Set(WString& key, T val){
         HashNode*& root = nodes[GetHash(key.GetString(), key.GetLength())];
-        HashNode* node = QueryNode(root);
+        HashNode* node = QueryNode(root, key.GetString());
         if (node){
             T preval = node->val;
             node->val = val;
@@ -254,7 +256,7 @@ public:
 
 template <typename T, const uint bitSize>
 void Free(HashMapW<T*, bitSize>& map){
-    map.Foreach([](T* item){
+    map.Foreach([](const WString& key, T* item){
         delete item;
     });
 }

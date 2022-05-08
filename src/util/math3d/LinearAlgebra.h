@@ -31,8 +31,7 @@ public:
     TVector2<T> &operator=(const TVector2<T> &) = default;
     TVector2<T> &operator=(const TVector3<T> &);
     TVector2<T> &operator=(const TVector4<T> &);
-    TVector2<T>(T, T);
-    ~TVector2<T>();
+    constexpr TVector2<T>(T, T);
     TVector2<T> operator+(const TVector2<T>&) const;
     TVector2<T> operator-(const TVector2<T>&) const;
     TVector2<T> operator/(T) const;
@@ -75,8 +74,7 @@ public:
     TPoint2<T> &operator=(TPoint2<T> &&) = default;
     TPoint2<T> &operator=(const TVector2<T> &);
     TPoint2<T> &operator=(const TPoint2<T> &) = default;
-    TPoint2<T>(T, T);
-    ~TPoint2<T>();
+    constexpr TPoint2<T>(T, T);
 };
 
 template <typename T>
@@ -108,9 +106,8 @@ public:
     TVector3<T> &operator=(const TVector2<T> &);
     TVector3<T> &operator=(const TVector3<T> &) = default;
     TVector3<T> &operator=(const TVector4<T> &);
-    TVector3<T>(T, T);
-    TVector3<T>(T, T, T);
-    ~TVector3<T>();
+    constexpr TVector3<T>(T, T);
+    constexpr TVector3<T>(T, T, T);
     TVector3<T> operator+(const TVector3<T>&) const;
     TVector3<T> operator-(const TVector3<T>&) const;
     TVector3<T> operator/(T) const;
@@ -166,9 +163,8 @@ public:
     TPoint3<T> &operator=(TPoint3<T> &&) = default;
     TPoint3<T> &operator=(const TVector3<T> &);
     TPoint3<T> &operator=(const TPoint3<T> &) = default;
-    TPoint3<T>(T, T);
-    TPoint3<T>(T, T, T);
-    ~TPoint3<T>();
+    constexpr TPoint3<T>(T, T);
+    constexpr TPoint3<T>(T, T, T);
 };
 
 // 齐次三维坐标向量
@@ -216,11 +212,10 @@ public:
     TVector4<T> &operator=(const TVector3<T> &);
     TVector4<T> &operator=(const TPoint3<T> &);
     TVector4<T> &operator=(const TVector4<T> &) = default;
-    TVector4<T>(T, T);
-    TVector4<T>(T, T, T);
-    TVector4<T>(T, T, T, T);
+    constexpr TVector4<T>(T, T);
+    constexpr TVector4<T>(T, T, T);
+    constexpr TVector4<T>(T, T, T, T);
     TVector4<T>(const TVector3<T>&, T);
-    ~TVector4<T>();
     TVector4<T> operator+(const TVector3<T>&) const;
     TVector4<T> operator+(const TVector4<T>&) const;
     TVector4<T> operator-(const TVector3<T>&) const;
@@ -264,7 +259,7 @@ public:
     static const TComplex<T> one;
     static const TComplex<T> i;
 
-    TComplex<T>();
+    constexpr TComplex<T>();
     TComplex<T>(T &&);
     TComplex<T>(TVector2<T> &&);
     TComplex<T>(TComplex<T> &&) = default;
@@ -277,8 +272,7 @@ public:
     TComplex<T> &operator=(const T &);
     TComplex<T> &operator=(const TVector2<T> &);
     TComplex<T> &operator=(const TComplex<T> &) = default;
-    TComplex<T>(T, T);
-    ~TComplex<T>();
+    constexpr TComplex<T>(T, T);
     TComplex<T> operator+(const TComplex<T>&) const;
     TComplex<T> operator-(const TComplex<T>&) const;
     TComplex<T> operator*(const TComplex<T>&) const;
@@ -319,14 +313,13 @@ public:
 
     static const TQuaternion<T> one;
 
-    TQuaternion<T>();
+    constexpr TQuaternion<T>();
     TQuaternion<T>(TQuaternion<T> &&) = default;
     TQuaternion<T>(const TQuaternion<T> &) = default;
     TQuaternion<T> &operator=(TQuaternion<T> &&) = default;
     TQuaternion<T> &operator=(const TQuaternion<T> &) = default;
-    TQuaternion<T>(T, T, T, T);
+    constexpr TQuaternion<T>(T, T, T, T);
     TQuaternion<T>(const TVector3<T>&, T);
-    ~TQuaternion<T>();
     TQuaternion<T> operator*(const TQuaternion<T>&) const;
     TQuaternion<T> operator*(T) const;
     TQuaternion<T> operator/(const TQuaternion<T>&) const;
@@ -355,6 +348,9 @@ public:
     T Magnitude() const;
     T SqrMagnitude() const;
     TVector3<T> GetAxis() const;
+    TVector3<T> GetXAxis() const;
+    TVector3<T> GetYAxis() const;
+    TVector3<T> GetZAxis() const;
 
     static TQuaternion<T> EulerXYZ(const TVector3<T>&);
     static TQuaternion<T> EulerXZY(const TVector3<T>&);
@@ -396,12 +392,11 @@ public:
     TMatrix4x4<T> &operator=(TMatrix4x4<T> &&) = default;
     TMatrix4x4<T> &operator=(const TQuaternion<T> &);
     TMatrix4x4<T> &operator=(const TMatrix4x4<T> &) = default;
-    TMatrix4x4<T>(T);
-    TMatrix4x4<T>(T, T, T, T,
-                  T, T, T, T,
-                  T, T, T, T,
-                  T, T, T, T);
-    ~TMatrix4x4<T>();
+    constexpr TMatrix4x4<T>(T);
+    constexpr TMatrix4x4<T>(T, T, T, T,
+                            T, T, T, T,
+                            T, T, T, T,
+                            T, T, T, T);
     TMatrix4x4<T> operator+(const TMatrix4x4<T>&) const;
     TMatrix4x4<T> operator-(const TMatrix4x4<T>&) const;
     TMatrix4x4<T> operator*(T) const;
@@ -459,7 +454,6 @@ public:
     Matrix3x4(float, float, float, float,
               float, float, float, float,
               float, float, float, float);
-    ~Matrix3x4();
     Matrix3x4 operator+(Matrix3x4) const;
     Matrix3x4 operator-(Matrix3x4) const;
     Matrix3x4 operator*(float) const;
@@ -506,7 +500,6 @@ public:
     Matrix2x3 &operator=(const Matrix2x3 &) = default;
     Matrix2x3(float, float, float,
               float, float, float);
-    ~Matrix2x3();
     Matrix2x3 operator+(Matrix2x3) const;
     Matrix2x3 operator-(Matrix2x3) const;
     Matrix2x3 operator*(float) const;
@@ -588,7 +581,6 @@ public:
     TRect<T>();
     TRect<T>(const TVector2<T>& p1, const TVector2<T>& p2);
     TRect<T>(T left, T right, T bottom, T top);
-    ~TRect<T>();
 
     T GetAspect() const;
     T GetWidth() const;
@@ -648,9 +640,7 @@ TVector2<T> &TVector2<T>::operator=(const TVector4<T> &v){
 }
 
 template <typename T>
-TVector2<T>::TVector2(T x, T y) : x(x), y(y) {}
-template <typename T>
-TVector2<T>::~TVector2(){}
+constexpr TVector2<T>::TVector2(T x, T y) : x(x), y(y) {}
 
 template <typename T>
 const TVector2<T> TVector2<T>::zero     = { 0.0F, 0.0F};
@@ -827,9 +817,7 @@ TPoint2<T> &TPoint2<T>::operator=(const TVector2<T> &v){
 }
 
 template <typename T>
-TPoint2<T>::TPoint2(T x, T y) : TVector2<T>(x, y) {}
-template <typename T>
-TPoint2<T>::~TPoint2(){}
+constexpr TPoint2<T>::TPoint2(T x, T y) : TVector2<T>(x, y) {}
 
 template <typename T>
 const TPoint2<T> TPoint2<T>::zero       = { 0.0F, 0.0F};
@@ -870,11 +858,9 @@ TVector3<T> &TVector3<T>::operator=(const TVector4<T> &v){
 }
 
 template <typename T>
-TVector3<T>::TVector3(T x, T y) : x(x), y(y), z(0.0f) {}
+constexpr TVector3<T>::TVector3(T x, T y) : x(x), y(y), z(0.0f) {}
 template <typename T>
-TVector3<T>::TVector3(T x, T y, T z) : x(x), y(y), z(z) {}
-template <typename T>
-TVector3<T>::~TVector3(){}
+constexpr TVector3<T>::TVector3(T x, T y, T z) : x(x), y(y), z(z) {}
 
 template <typename T>
 const TVector3<T> TVector3<T>::zero     = { 0.0F, 0.0F, 0.0F};
@@ -1137,11 +1123,9 @@ TPoint3<T> &TPoint3<T>::operator=(const TVector3<T> &v){
 }
 
 template <typename T>
-TPoint3<T>::TPoint3(T x, T y) : TVector3<T>(x, y, 0.0f) {}
+constexpr TPoint3<T>::TPoint3(T x, T y) : TVector3<T>(x, y, 0.0f) {}
 template <typename T>
-TPoint3<T>::TPoint3(T x, T y, T z) : TVector3<T>(x, y, z) {}
-template <typename T>
-TPoint3<T>::~TPoint3(){}
+constexpr TPoint3<T>::TPoint3(T x, T y, T z) : TVector3<T>(x, y, z) {}
 
 template <typename T>
 const TPoint3<T> TPoint3<T>::zero       = { 0.0F, 0.0F, 0.0F};
@@ -1214,15 +1198,13 @@ TVector4<T> &TVector4<T>::operator=(const TPoint3<T> &v){
 }
 
 template <typename T>
-TVector4<T>::TVector4(T x, T y) : x(x), y(y), z(0.0f), w(1.0f) {}
+constexpr TVector4<T>::TVector4(T x, T y) : x(x), y(y), z(0.0f), w(1.0f) {}
 template <typename T>
-TVector4<T>::TVector4(T x, T y, T z) : x(x), y(y), z(z), w(1.0f) {}
+constexpr TVector4<T>::TVector4(T x, T y, T z) : x(x), y(y), z(z), w(1.0f) {}
 template <typename T>
-TVector4<T>::TVector4(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) {}
+constexpr TVector4<T>::TVector4(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) {}
 template <typename T>
 TVector4<T>::TVector4(const TVector3<T>& v, T w) : x(v.x), y(v.y), z(v.z), w(w) {}
-template <typename T>
-TVector4<T>::~TVector4(){}
 
 template <typename T>
 const TVector4<T> TVector4<T>::zero     = { 0.0F, 0.0F, 0.0F, 0.0F};
@@ -1390,7 +1372,7 @@ TVector4<T> TVector4<T>::RotateZ(T angle) const{
 }
 
 template <typename T>
-TComplex<T>::TComplex() : real(0.0f), imag(0.0f) {}
+constexpr TComplex<T>::TComplex() : real(0.0f), imag(0.0f) {}
 template <typename T>
 TComplex<T>::TComplex(T &&real) : real(real), imag(0.0f) {}
 template <typename T>
@@ -1425,9 +1407,7 @@ TComplex<T> &TComplex<T>::operator=(const TVector2<T> &v){
 }
 
 template <typename T>
-TComplex<T>::TComplex(T real, T imag) : real(real), imag(imag) {}
-template <typename T>
-TComplex<T>::~TComplex(){}
+constexpr TComplex<T>::TComplex(T real, T imag) : real(real), imag(imag) {}
 
 template <typename T>
 const TComplex<T> TComplex<T>::one          = { 1.0F, 0.0F};
@@ -1614,13 +1594,11 @@ T TComplex<T>::SqrMagnitude() const{
 }
 
 template <typename T>
-TQuaternion<T>::TQuaternion() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) {}
+constexpr TQuaternion<T>::TQuaternion() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) {}
 template <typename T>
-TQuaternion<T>::TQuaternion(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) {}
+constexpr TQuaternion<T>::TQuaternion(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) {}
 template <typename T>
 TQuaternion<T>::TQuaternion(const TVector3<T>& v, T w) : x(v.x), y(v.y), z(v.z), w(w) {}
-template <typename T>
-TQuaternion<T>::~TQuaternion(){}
 
 template <typename T>
 const TQuaternion<T> TQuaternion<T>::one     = { 0.0F, 0.0F, 0.0F, 1.0F};
@@ -1784,6 +1762,33 @@ T TQuaternion<T>::SqrMagnitude() const{
 template <typename T>
 TVector3<T> TQuaternion<T>::GetAxis() const{
     return TVector3<T>(x, y, z);
+}
+
+template <typename T>
+TVector3<T> TQuaternion<T>::GetXAxis() const{
+    return TVector3<T>(
+        1.0f - 2.0f * (y * y + z * z),
+        2.0f * (x * y + z * w),
+        2.0f * (x * z + y * w)
+    );
+}
+
+template <typename T>
+TVector3<T> TQuaternion<T>::GetYAxis() const{
+    return TVector3<T>(
+        2.0f * (x * y - z * w),
+        1.0f - 2.0f * (z * z + x * x),
+        2.0f * (y *z + x * w)
+    );
+}
+
+template <typename T>
+TVector3<T> TQuaternion<T>::GetZAxis() const{
+    return TVector3<T>(
+        2.0f * (x * z - y * w),
+        2.0f * (y * z - x * w),
+        1.0f - 2.0f * (x * x + y * y)
+    );
 }
 
 // 欧拉角 => [w, x, y, z]
@@ -2074,24 +2079,21 @@ TMatrix4x4<T> &TMatrix4x4<T>::operator=(const TQuaternion<T> &q){
 }
 
 template <typename T>
-TMatrix4x4<T>::TMatrix4x4(T x) :
+constexpr TMatrix4x4<T>::TMatrix4x4(T x) :
                      _11(x), _12(0.0f), _13(0.0f), _14(0.0f),
                      _21(0.0f), _22(x), _23(0.0f), _24(0.0f),
                      _31(0.0f), _32(0.0f), _33(x), _34(0.0f),
                      _41(0.0f), _42(0.0f), _43(0.0f), _44(x) {}
 
 template <typename T>
-TMatrix4x4<T>::TMatrix4x4(T _11, T _12, T _13, T _14,
-                          T _21, T _22, T _23, T _24,
-                          T _31, T _32, T _33, T _34,
-                          T _41, T _42, T _43, T _44) :
-                          _11(_11), _12(_12), _13(_13), _14(_14),
-                          _21(_21), _22(_22), _23(_23), _24(_24),
-                          _31(_31), _32(_32), _33(_33), _34(_34),
-                          _41(_41), _42(_42), _43(_43), _44(_44) {}
-
-template <typename T>
-TMatrix4x4<T>::~TMatrix4x4(){}
+constexpr TMatrix4x4<T>::TMatrix4x4(T _11, T _12, T _13, T _14,
+                                    T _21, T _22, T _23, T _24,
+                                    T _31, T _32, T _33, T _34,
+                                    T _41, T _42, T _43, T _44) :
+                                    _11(_11), _12(_12), _13(_13), _14(_14),
+                                    _21(_21), _22(_22), _23(_23), _24(_24),
+                                    _31(_31), _32(_32), _33(_33), _34(_34),
+                                    _41(_41), _42(_42), _43(_43), _44(_44) {}
 
 template <typename T>
 const TMatrix4x4<T> TMatrix4x4<T>::zero      = {0.0F, 0.0F, 0.0F, 0.0F,
@@ -2391,9 +2393,6 @@ TRect<T>::TRect(T left, T right, T bottom, T top)
     : left(left), right(right), bottom(bottom), top(top) {
     Sort(left, right); Sort(bottom, top);
 }
-
-template <typename T>
-TRect<T>::~TRect(){}
 
 template <typename T>
 const TRect<T> TRect<T>::zero = {0.0F, 0.0F, 0.0F, 0.0F};

@@ -4,108 +4,140 @@
 
 #include <main.h>
 #include <res.h>
-#include <editor/gui/Menu.h>
+#include <io/IOStream.h>
+#include <util/List.h>
 #include <util/gl/GLTexture2D.h>
 #include <util/gl/GLUtils.h>
 #include <util/math3d/Mesh.h>
 #include <util/math3d/Geometry.h>
 #include <editor/main/ViewObject.h>
+#include <editor/main/Tool.h>
+#include <editor/main/Operation.h>
+#include <editor/gui/Menu.h>
 
-UVEditWindow::MoveOperation::MoveOperation(UVEditWindow* main) : main(main) {}
-UVEditWindow::MoveOperation::~MoveOperation(){}
+class MoveOperation : public IOperation {
+private:
+    struct MoveInfo {
+        Vertex* vert;
+        Vector2 uv;
+    };
 
-void UVEditWindow::MoveOperation::OnEnter(){
-    DebugLog("MoveOperation OnEnter");
-    x = y = true;
-    start = main->cursorPos;
-    if (Main::data->selPoints.Size() > 0){
-        Main::data->selPoints.Foreach([=](Vertex* v){
-            this->moveInfo.Add({v, v->uv});
+    Vector2 start;
+    List<MoveInfo> moveInfo;
+    bool x, y;
+    UVEditWindow* main;
+
+public:
+    MoveOperation(UVEditWindow* main) : main(main) {}
+    virtual ~MoveOperation() override{}
+
+    virtual void OnEnter() override{
+        DebugLog("MoveOperation OnEnter");
+        x = y = true;
+        start = main->cursorPos;
+        if (Main::data->selPoints.Size() > 0){
+            Main::data->selPoints.Foreach([=](Vertex* v){
+                this->moveInfo.Add({v, v->uv});
+            });
+        }
+    }
+    virtual void OnMove() override{
+        Vector2 mov;
+        if (moveInfo.Size() > 0){
+            mov = (main->cursorPos - start) * 0.5f;
+            mov = Vector2(x ? mov.x : 0.0f, y ? mov.y : 0.0f);
+            moveInfo.Foreach([=](MoveInfo info){
+                info.vert->uv = info.uv + mov;
+            });
+            DebugLog("MoveOperation OnMove %f %f", x ? mov.x : 0.0f, y ? mov.y : 0.0f);
+        }
+    }
+
+    virtual void OnCommand(int id) override{
+        switch (id){
+        case IDM_OP_X: x = true; y = false; break;
+        case IDM_OP_Y: y = true; x = false; break;
+        case IDM_OP_Z: x = y = false; break;
+        case IDM_OP_PLANE_X: x = false; y = true; break;
+        case IDM_OP_PLANE_Y: y = false; x = true; break;
+        case IDM_OP_PLANE_Z: x = y = true; break;
+        }
+    }
+
+    virtual void OnConfirm() override{
+        DebugLog("MoveOperation OnConfirm");
+    }
+
+    virtual void OnUndo() override{
+        DebugLog("MoveOperation OnUndo");
+        moveInfo.Foreach([](MoveInfo info){
+            info.vert->uv = info.uv;
         });
     }
-}
+};
 
-void UVEditWindow::MoveOperation::OnMove(){
-    Vector2 mov;
-    if (moveInfo.Size() > 0){
-        mov = (main->cursorPos - start) * 0.5f;
-        mov = Vector2(x ? mov.x : 0.0f, y ? mov.y : 0.0f);
-        moveInfo.Foreach([=](MoveInfo info){
-            info.vert->uv = info.uv + mov;
-        });
-        DebugLog("MoveOperation OnMove %f %f", x ? mov.x : 0.0f, y ? mov.y : 0.0f);
+class EmptyTool : public ITool {
+private:
+    UVEditWindow* window;
+
+public:
+    EmptyTool(UVEditWindow* window) : window(window) {}
+    ~EmptyTool() override{}
+
+    virtual void OnLeftDown() override{
+        if (!Main::data->curObject)
+            return;
+        Main::data->curObject->OnSelectUV(Vector2((window->cursorPos.x + 1.0f) * 0.5f, (window->cursorPos.y + 1.0f) * 0.5f), 5.0f / window->cliSize.y);
     }
-}
+};
 
-void UVEditWindow::MoveOperation::OnConfirm(){
-    DebugLog("MoveOperation OnConfirm");
-}
+class SelectTool : public ITool {
+private:
+    UVEditWindow* window;
+    Vector2 start;
+    Vector2 end;
+    bool leftDown;
+    
+public:
+    SelectTool(UVEditWindow* window) : window(window) {}
+    virtual ~SelectTool() override{}
 
-void UVEditWindow::MoveOperation::OnUndo(){
-    DebugLog("MoveOperation OnUndo");
-    moveInfo.Foreach([](MoveInfo info){
-        info.vert->uv = info.uv;
-    });
-}
-
-void UVEditWindow::MoveOperation::OnCommand(int id){
-    switch (id){
-    case IDM_OP_X: x = true; y = false; break;
-    case IDM_OP_Y: y = true; x = false; break;
-    case IDM_OP_Z: x = y = false; break;
-    case IDM_OP_PLANE_X: x = false; y = true; break;
-    case IDM_OP_PLANE_Y: y = false; x = true; break;
-    case IDM_OP_PLANE_Z: x = y = true; break;
+    virtual void OnLeftDown() override{
+        start = window->cursorPos;
+        end = window->cursorPos;
+        leftDown = true;
     }
-}
 
-UVEditWindow::EmptyTool::EmptyTool(UVEditWindow* window) : window(window) {}
-UVEditWindow::EmptyTool::~EmptyTool(){}
-
-void UVEditWindow::EmptyTool::OnLeftDown(){
-    if (!Main::data->curObject)
-        return;
-    Main::data->curObject->OnSelectUV(Vector2((window->cursorPos.x + 1.0f) * 0.5f, (window->cursorPos.y + 1.0f) * 0.5f), 5.0f / window->cliSize.y);
-}
-
-UVEditWindow::SelectTool::SelectTool(UVEditWindow* window) : window(window) {}
-UVEditWindow::SelectTool::~SelectTool(){}
-
-void UVEditWindow::SelectTool::OnLeftDown(){
-    start = window->cursorPos;
-    end = window->cursorPos;
-    leftDown = true;
-}
-
-void UVEditWindow::SelectTool::OnLeftUp(){
-    leftDown = false;
-    if (start.x == end.x && start.y == end.y){
-        Main::data->selPoints.Clear();
-        return;
+    virtual void OnLeftUp() override{
+        leftDown = false;
+        if (start.x == end.x && start.y == end.y){
+            Main::data->selPoints.Clear();
+            return;
+        }
+        if (!Main::data->curObject)
+            return;
+        Main::data->curObject->OnSelectUV(
+            Vector2((start.x + 1.0f) * 0.5f, (start.y + 1.0f) * 0.5f),
+            Vector2((end.x + 1.0f) * 0.5f, (end.y + 1.0f) * 0.5f)
+        );
     }
-    if (!Main::data->curObject)
-        return;
-    Main::data->curObject->OnSelectUV(
-        Vector2((start.x + 1.0f) * 0.5f, (start.y + 1.0f) * 0.5f),
-        Vector2((end.x + 1.0f) * 0.5f, (end.y + 1.0f) * 0.5f)
-    );
-}
 
-void UVEditWindow::SelectTool::OnMove(){
-    end = window->cursorPos;
-}
-
-void UVEditWindow::SelectTool::OnRender(){
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    if (leftDown){
-        glColor4f(1.0f, 1.0f, 0.0f, 0.1f);
-        GLUtils::DrawRect(start, end);
+    virtual void OnMove() override{
+        end = window->cursorPos;
     }
-}
+
+    virtual void OnRender() override{
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(-1.0, 1.0, -1.0, 1.0, 0.0, 2.0);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        if (leftDown){
+            glColor4f(1.0f, 1.0f, 0.0f, 0.1f);
+            GLUtils::DrawRect(start, end);
+        }
+    }
+};
 
 UVEditWindow::UVEditWindow(){
     DebugLog("UVEditWindow Launched");
@@ -275,6 +307,12 @@ void UVEditWindow::UpdateCursor(int x, int y){
 void UVEditWindow::UpdateWindowSize(int x, int y){
     AWindow::UpdateWindowSize(x, y);
 }
+
+void UVEditWindow::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+}
+
+void UVEditWindow::Deserialize(IInputStream& os){}
 
 void UVEditWindow::SetOperation(IOperation* op){
     if (curOp){

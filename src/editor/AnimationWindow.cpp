@@ -12,100 +12,115 @@
 #include <editor/main/ViewObject.h>
 #include <editor/gui/AnimationCurve.h>
 
-AnimationWindow::FrameIndicator::FrameIndicator(AnimationWindow* window) : window(window) {
-    pos = Clamp(((window->frame - window->startFrame) / (window->endFrame - window->startFrame)) * 2.0f - 1.0f, -1.0f, 1.0f);
-}
+class FrameIndicator : public IButton {
+private:
+    AnimationWindow* window;
+    float pos = 0.0f;
+    float origin;
 
-AnimationWindow::FrameIndicator::~FrameIndicator(){}
-
-bool AnimationWindow::FrameIndicator::Trigger(Vector2 pos){
-    return pos.x >= this->pos - 0.05f && pos.x <= this->pos + 0.05f && pos.y >= 0.9f && pos.y <= 1.0f;
-}
-
-void AnimationWindow::FrameIndicator::Click(Vector2 pos){
-    origin = this->pos;
-}
-
-void AnimationWindow::FrameIndicator::Drag(Vector2 dir){
-    pos = Clamp(origin + dir.x, -1.0f, 1.0f);
-    window->SetFrame(Lerp(window->startFrame, window->endFrame, (pos + 1.0f) * 0.5f));
-}
-
-void AnimationWindow::FrameIndicator::Render(){
-    char frame[10];
-    float width;
-
-    pos = Clamp(((window->frame - window->startFrame) / (window->endFrame - window->startFrame)) * 2.0f - 1.0f, -1.0f, 1.0f);
-
-    glLineWidth(2.0f);
-    glColor3f(0.2f, 0.3f, 1.0f);
-    glBegin(GL_LINES);
-    glVertex2f(pos, 1.0f);
-    glVertex2f(pos, -0.8f);
-    glEnd();
-    glLineWidth(1.0f);
-
-    glColor3f(0.2f, 0.3f, 1.0f);
-    GLUtils::DrawRoundRect(pos - 0.05f, 0.9f, 0.1f, 0.1f, 0.02f, 0.05f);
-
-    __builtin_snprintf(frame, 10, "%d", (int)Floor(window->frame));
-    width = glGetStringWidth(frame);
-
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glRasterPos2f(pos - width * window->cliInvSize.x, 0.95f - 6.0f * window->cliInvSize.y);
-    glDrawString(frame);
-}
-
-const Vector3 AnimationWindow::Bottom::COLOR = Vector3(0.0f, 0.0f, 0.0f);
-const float AnimationWindow::Bottom::DEPTH = -1.0f;
-const float AnimationWindow::Bottom::BOUND_TOP = -0.8f;
-const float AnimationWindow::Bottom::BOUND_BOTTOM = -1.0f;
-
-AnimationWindow::Bottom::Bottom(){}
-AnimationWindow::Bottom::~Bottom(){}
-
-void AnimationWindow::Bottom::Render(){
-    glColor3f(COLOR.x, COLOR.y, COLOR.z);
-    glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(-1.0f, BOUND_TOP, DEPTH);
-    glVertex3f(1.0f, BOUND_TOP, DEPTH);
-    glVertex3f(1.0f, BOUND_BOTTOM, DEPTH);
-    glVertex3f(-1.0f, BOUND_BOTTOM, DEPTH);
-    glEnd();
-}
-
-AnimationWindow::PlayButton::PlayButton(AnimationWindow* window) : window(window) {}
-AnimationWindow::PlayButton::~PlayButton(){}
-
-bool AnimationWindow::PlayButton::Trigger(Vector2 pos){
-    return pos.x >= -0.1f && pos.x <= 0.1f && pos.y >= -0.98f && pos.y <= -0.82f;
-}
-
-void AnimationWindow::PlayButton::Click(Vector2 pos){
-    window->IsPlaying() ? window->Stop() : window->Play();
-    DebugLog("AnimationWindow %s", window->IsPlaying() ? "Play" : "Stop");
-}
-
-void AnimationWindow::PlayButton::Render(){
-    glColor3f(0.3f, 0.3f, 0.3f);
-    GLUtils::DrawRect(-0.1f, -0.98f, 0.1f, -0.82f);
-
-    if (!window->IsPlaying()){
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glBegin(GL_TRIANGLES);
-        glVertex2f(-0.05f, -0.97f);
-        glVertex2f(0.05f, -0.9f);
-        glVertex2f(-0.05f, -0.83f);
-        glEnd();
-    }else{
-        glColor3f(1.0f, 1.0f, 1.0f);
-        GLUtils::DrawRect(-0.04f, -0.97f, -0.02f, -0.83f);
-        GLUtils::DrawRect(0.02f, -0.97f, 0.04f, -0.83f);
+public:
+    FrameIndicator(AnimationWindow* window) : window(window) {
+        pos = Clamp(((window->frame - window->startFrame) / (window->endFrame - window->startFrame)) * 2.0f - 1.0f, -1.0f, 1.0f);
     }
-}
 
-const float AnimationWindow::DEFAULT_START_FRAME = 0.0f;
-const float AnimationWindow::DEFAULT_END_FRAME = 250.0f;
+    virtual ~FrameIndicator() override{}
+
+    virtual bool Trigger(Vector2 pos) override{
+        return pos.x >= this->pos - 0.05f && pos.x <= this->pos + 0.05f && pos.y >= 0.9f && pos.y <= 1.0f;
+    }
+
+    virtual void Click(Vector2 pos) override{
+        origin = this->pos;
+    }
+
+    virtual void Drag(Vector2 dir) override{
+        pos = Clamp(origin + dir.x, -1.0f, 1.0f);
+        window->SetFrame(Lerp(window->startFrame, window->endFrame, (pos + 1.0f) * 0.5f));
+    }
+
+    virtual void Render() override{
+        char frame[10];
+        float width;
+
+        pos = Clamp(((window->frame - window->startFrame) / (window->endFrame - window->startFrame)) * 2.0f - 1.0f, -1.0f, 1.0f);
+
+        glLineWidth(2.0f);
+        glColor3f(0.2f, 0.3f, 1.0f);
+        glBegin(GL_LINES);
+        glVertex2f(pos, 1.0f);
+        glVertex2f(pos, -0.8f);
+        glEnd();
+        glLineWidth(1.0f);
+
+        glColor3f(0.2f, 0.3f, 1.0f);
+        GLUtils::DrawRoundRect(pos - 0.05f, 0.9f, 0.1f, 0.1f, 0.02f, 0.05f);
+
+        __builtin_snprintf(frame, 10, "%d", (int)Floor(window->frame));
+        width = glGetStringWidth(frame);
+
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glRasterPos2f(pos - width * window->cliInvSize.x, 0.95f - 6.0f * window->cliInvSize.y);
+        glDrawString(frame);
+    }
+};
+
+class Bottom : public IButton {
+private:
+    static constexpr Vector3 COLOR = {0.0f, 0.0f, 0.0f};
+    static constexpr float DEPTH = -1.0f;
+    static constexpr float BOUND_TOP = -0.8f;
+    static constexpr float BOUND_BOTTOM = -1.0f;
+
+public:
+    Bottom(){}
+    virtual ~Bottom() override{}
+
+    virtual void Render() override{
+        glColor3f(COLOR.x, COLOR.y, COLOR.z);
+        glBegin(GL_TRIANGLE_FAN);
+        glVertex3f(-1.0f, BOUND_TOP, DEPTH);
+        glVertex3f(1.0f, BOUND_TOP, DEPTH);
+        glVertex3f(1.0f, BOUND_BOTTOM, DEPTH);
+        glVertex3f(-1.0f, BOUND_BOTTOM, DEPTH);
+        glEnd();
+    }
+};
+
+class PlayButton : public IButton {
+private:
+    AnimationWindow* window;
+
+public:
+    PlayButton(AnimationWindow* window) : window(window) {}
+    virtual ~PlayButton() override{}
+
+    virtual bool Trigger(Vector2 pos) override{
+        return pos.x >= -0.1f && pos.x <= 0.1f && pos.y >= -0.98f && pos.y <= -0.82f;
+    }
+
+    virtual void Click(Vector2 pos) override{
+        window->IsPlaying() ? window->Stop() : window->Play();
+        DebugLog("AnimationWindow %s", window->IsPlaying() ? "Play" : "Stop");
+    }
+
+    virtual void Render() override{
+        glColor3f(0.3f, 0.3f, 0.3f);
+        GLUtils::DrawRect(-0.1f, -0.98f, 0.1f, -0.82f);
+
+        if (!window->IsPlaying()){
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glBegin(GL_TRIANGLES);
+            glVertex2f(-0.05f, -0.97f);
+            glVertex2f(0.05f, -0.9f);
+            glVertex2f(-0.05f, -0.83f);
+            glEnd();
+        }else{
+            glColor3f(1.0f, 1.0f, 1.0f);
+            GLUtils::DrawRect(-0.04f, -0.97f, -0.02f, -0.83f);
+            GLUtils::DrawRect(0.02f, -0.97f, 0.04f, -0.83f);
+        }
+    }
+};
 
 AnimationWindow::AnimationWindow(){
     DebugLog("AnimationWindow Launched");
@@ -264,6 +279,12 @@ void AnimationWindow::OnMenuAccel(int id, bool accel){
         break;
     }
 }
+
+void AnimationWindow::Serialize(IOutputStream& os){
+    os.WriteWithLen(WINDOW_ID);
+}
+
+void AnimationWindow::Deserialize(IInputStream& os){}
 
 void AnimationWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);

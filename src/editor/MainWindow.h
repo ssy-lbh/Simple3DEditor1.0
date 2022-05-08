@@ -6,9 +6,6 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <util/math3d/Camera.h>
 #include <editor/main/Window.h>
-#include <editor/main/Tool.h>
-#include <editor/main/Operation.h>
-#include <editor/gui/Menu.h>
 
 enum class ObjectOperation {
     MOVE,
@@ -39,156 +36,12 @@ private:
 
     ObjectOperation objOp = ObjectOperation::MOVE;
 
-    class MoveOperation final : public IOperation {
-    private:
-        struct MoveInfo {
-            union {
-                AViewObject* obj;
-                Vertex* vert;
-                Edge* e;
-                Face* f;
-            };
-            Vector3 pos;
-        };
-
-        Point2 start;
-        List<MoveInfo> moveInfo;
-        bool x, y, z;
-        MainWindow* main;
-
-    public:
-        MoveOperation(MainWindow* main);
-        virtual ~MoveOperation() override;
-
-        virtual void OnEnter() override;
-        virtual void OnMove() override;
-        virtual void OnCommand(int id) override;
-        virtual void OnConfirm() override;
-        virtual void OnUndo() override;
-    };
-
-    class ExcludeOperation final : public IOperation {
-    private:
-        struct MoveInfo {
-            Vertex* vert;
-            Point3 pos;
-        };
-
-        Point2 start;
-        List<MoveInfo> moveInfo;
-        bool x, y, z;
-        MainWindow* main;
-
-    public:
-        ExcludeOperation(MainWindow* main);
-        virtual ~ExcludeOperation() override;
-
-        virtual void OnEnter() override;
-        virtual void OnMove() override;
-        virtual void OnCommand(int id) override;
-        virtual void OnConfirm() override;
-        virtual void OnUndo() override;
-    };
-
-    class RotateOperation final : public IOperation {
-    private:
-        struct RotateInfo {
-            union {
-                AViewObject* obj;
-                Vertex* vert;
-                Edge* e;
-                Face* f;
-            };
-            Point3 pos;
-            Quaternion rot;
-        };
-
-        enum RotateMode {
-            MODE_CAMERA,
-            MODE_X,
-            MODE_Y,
-            MODE_Z
-        };
-
-        Point2 start;
-        List<RotateInfo> rotateInfo;
-        RotateMode mode;
-        MainWindow* main;
-        Point3 center;
-        Point2 screenCenter;
-        float dis;
-        Quaternion rotate;
-
-    public:
-        RotateOperation(MainWindow* main);
-        virtual ~RotateOperation() override;
-
-        virtual void OnEnter() override;
-        virtual void OnMove() override;
-        virtual void OnCommand(int id) override;
-        virtual void OnConfirm() override;
-        virtual void OnUndo() override;
-    };
-
-    class SizeOperation final : public IOperation {
-    private:
-        struct SizeInfo {
-            union {
-                AViewObject* obj;
-                Vertex* vert;
-                Edge* e;
-                Face* f;
-            };
-            Vector3 vec;
-        };
-
-        Point3 center;
-        Point2 start;
-        List<SizeInfo> sizeInfo;
-        bool x, y, z;
-        MainWindow* main;
-        Point2 screenCenter;
-        float startSize;
-        float scale;
-
-    public:
-        SizeOperation(MainWindow* main);
-        virtual ~SizeOperation() override;
-
-        virtual void OnEnter() override;
-        virtual void OnMove() override;
-        virtual void OnCommand(int id) override;
-        virtual void OnConfirm() override;
-        virtual void OnUndo() override;
-    };
-
-    class EmptyTool final : public ITool {
-    private:
-        MainWindow* window;
-
-    public:
-        EmptyTool(MainWindow* window);
-        ~EmptyTool() override;
-
-        virtual void OnLeftDown() override;
-    };
-
-    class SelectTool final : public ITool {
-    private:
-        MainWindow* window;
-        Point2 start;
-        Point2 end;
-        bool leftDown;
-        
-    public:
-        SelectTool(MainWindow* window);
-        virtual ~SelectTool() override;
-        
-        virtual void OnLeftDown() override;
-        virtual void OnLeftUp() override;
-        virtual void OnMove() override;
-        virtual void OnRender() override;
-    };
+    friend class MoveOperation;
+    friend class ExcludeOperation;
+    friend class RotateOperation;
+    friend class SizeOperation;
+    friend class EmptyTool;
+    friend class SelectTool;
 
 protected:
     // 覆盖了父类函数
@@ -200,6 +53,9 @@ protected:
     void InitCamera();
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.main";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"主窗口";
+
     MainWindow();
     virtual ~MainWindow() override;
 
@@ -218,6 +74,9 @@ public:
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileW(const wchar_t* path) override;
+
+    virtual void Serialize(IOutputStream& os) override;
+    virtual void Deserialize(IInputStream& os) override;
 
     void OnInsSave();
     void OnInsLoad();

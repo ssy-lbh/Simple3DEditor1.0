@@ -26,6 +26,9 @@ protected:
     void InitCamera();
 
 public:
+    static constexpr const char* WINDOW_ID = "lbh.render";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"渲染窗口";
+
     RenderWindow();
     virtual ~RenderWindow() override;
     
@@ -43,6 +46,9 @@ public:
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileA(const char* path) override;
     virtual void OnDropFileW(const wchar_t* path) override;
+
+    virtual void Serialize(IOutputStream& os) override;
+    virtual void Deserialize(IInputStream& os) override;
 
     void OnInsSave();
 

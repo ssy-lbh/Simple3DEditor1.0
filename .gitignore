@@ -25,3 +25,20 @@ $RECYCLE.BIN/
 
 # Build objects
 *.o
+
+# Dynamic Libraries
+*.dll
+
+# Static Libraries
+*.lib
+
+# Portable Executable Files
+*.exe
+
+# Dependency Files
+*.d
+
+# Error Report
+*.txt
+*.rpt
+*.dmp

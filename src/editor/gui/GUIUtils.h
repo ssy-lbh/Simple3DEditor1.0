@@ -19,6 +19,8 @@ protected:
 
     GLTexture2D* texture = NULL;
 
+    RoundButton();
+
 public:
     Point2 center = Point2::zero;
     float radius = 0.0f;
@@ -29,7 +31,6 @@ public:
     Delegate<> onClick;
     Delegate<Vector2> onDrag;
 
-    RoundButton();
     RoundButton(Point2 center, float radius);
     virtual ~RoundButton() override;
 

@@ -3,6 +3,7 @@
 #include <util/os/Log.h>
 #include <util/gl/GLUtils.h>
 #include <util/math3d/Math.h>
+#include <util/math3d/LinearAlgebra.h>
 #include <editor/main/ViewObject.h>
 
 Vertex::Vertex(){}

@@ -19,6 +19,10 @@ public:
     virtual IAppendableW& Append(const WString& s);
 };
 
-class IAppendable : public IAppendableA, public IAppendableW {};
+class IAppendable : public IAppendableA, public IAppendableW {
+public:
+    using IAppendableA::Append;
+    using IAppendableW::Append;
+};
 
 #endif

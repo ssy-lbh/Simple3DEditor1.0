@@ -55,10 +55,6 @@ class WString;
 class PackString;
 class PackWString;
 class StringBuilder;
-class File;
-class ISerializable;
-class IDeserializable;
-class IMemorable;
 class DataBuffer;
 class PackDataBuffer;
 
@@ -136,6 +132,7 @@ class IUndo;
 enum class ObjectOperation;
 class MainWindow;
 class LocalData;
+struct WindowInfo;
 class GlobalData;
 class Main;
 
@@ -246,5 +243,28 @@ class ACollider;
 class CubeCollider;
 class SphereCollider;
 class MeshCollider;
+
+// base
+class IAppendableA;
+class IAppendableW;
+class ICloseable;
+class IFlushable;
+class IReadable;
+class IWritable;
+
+// io
+class File;
+class ISerializable;
+class IDeserializable;
+class IMemorable;
+class IInputStream;
+class IOutputStream;
+class AReader;
+class AWriter;
+
+// net
+class ASocket;
+class TCPSocket;
+class UDPSocket;
 
 #endif
