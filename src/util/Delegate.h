@@ -1,5 +1,5 @@
-#ifndef __UTILS_DELEGATE__
-#define __UTILS_DELEGATE__
+#ifndef __UTIL_DELEGATE__
+#define __UTIL_DELEGATE__
 
 #include <define.h>
 

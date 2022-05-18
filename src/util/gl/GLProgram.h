@@ -1,5 +1,5 @@
-#ifndef __UTILS_GL_GLPROGRAM__
-#define __UTILS_GL_GLPROGRAM__
+#ifndef __UTIL_GL_GLPROGRAM__
+#define __UTIL_GL_GLPROGRAM__
 
 #include <define.h>
 

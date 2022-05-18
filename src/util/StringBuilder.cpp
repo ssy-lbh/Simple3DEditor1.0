@@ -92,7 +92,6 @@ StringBuilderA& StringBuilderA::Append(double d){
     Check(20);
     ptr += __builtin_snprintf(data + ptr, 19, "%g", d);
     return *this;
-
 }
 
 StringBuilderA& StringBuilderA::Append(const char* s, size_t len){
@@ -205,7 +204,6 @@ StringBuilderW& StringBuilderW::Append(double d){
     Check(20);
     ptr += __mingw_snwprintf(data + ptr, 19, L"%g", d);
     return *this;
-
 }
 
 StringBuilderW& StringBuilderW::Append(const char* s, size_t len){

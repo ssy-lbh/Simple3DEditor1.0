@@ -1,5 +1,5 @@
-#ifndef __UTILS_VALUE__
-#define __UTILS_VALUE__
+#ifndef __UTIL_VALUE__
+#define __UTIL_VALUE__
 
 #include <define.h>
 

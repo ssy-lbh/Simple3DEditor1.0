@@ -1,5 +1,5 @@
-#ifndef __UTILS_OS_FONT__
-#define __UTILS_OS_FONT__
+#ifndef __UTIL_OS_FONT__
+#define __UTIL_OS_FONT__
 
 #include <define.h>
 

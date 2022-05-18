@@ -1,5 +1,5 @@
-#ifndef __UTILS_OS_LOG__
-#define __UTILS_OS_LOG__
+#ifndef __UTIL_OS_LOG__
+#define __UTIL_OS_LOG__
 
 int DebugLog(const char* format, ...);
 int DebugLog(const wchar_t* format, ...);

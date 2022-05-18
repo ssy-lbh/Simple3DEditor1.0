@@ -1,5 +1,5 @@
-#ifndef __UTILS_DATABUFFER__
-#define __UTILS_DATABUFFER__
+#ifndef __UTIL_DATABUFFER__
+#define __UTIL_DATABUFFER__
 
 #include <define.h>
 

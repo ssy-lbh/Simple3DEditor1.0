@@ -1,5 +1,5 @@
-#ifndef __UTILS_OS_TIME__
-#define __UTILS_OS_TIME__
+#ifndef __UTIL_OS_TIME__
+#define __UTIL_OS_TIME__
 
 #include <define.h>
 

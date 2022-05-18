@@ -1,5 +1,5 @@
-#ifndef __UTILS_GL_GLSIMPLIFIED__
-#define __UTILS_GL_GLSIMPLIFIED__
+#ifndef __UTIL_GL_GLSIMPLIFIED__
+#define __UTIL_GL_GLSIMPLIFIED__
 
 #ifndef __GL_H__
 #include <lib/opengl/gl/gl.h>

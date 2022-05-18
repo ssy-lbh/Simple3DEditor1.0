@@ -1,5 +1,5 @@
-#ifndef __UTILS_OS_THREAD__
-#define __UTILS_OS_THREAD__
+#ifndef __UTIL_OS_THREAD__
+#define __UTIL_OS_THREAD__
 
 #include <define.h>
 

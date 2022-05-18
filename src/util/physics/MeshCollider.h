@@ -1,5 +1,5 @@
-#ifndef __UTILS_PHYSICS_MESHCOLLIDER__
-#define __UTILS_PHYSICS_MESHCOLLIDER__
+#ifndef __UTIL_PHYSICS_MESHCOLLIDER__
+#define __UTIL_PHYSICS_MESHCOLLIDER__
 
 #include <define.h>
 

@@ -1,5 +1,5 @@
-#ifndef __UTILS_MATH3D_LINEARALGEBRA__
-#define __UTILS_MATH3D_LINEARALGEBRA__
+#ifndef __UTIL_MATH3D_LINEARALGEBRA__
+#define __UTIL_MATH3D_LINEARALGEBRA__
 
 #include <define.h>
 

@@ -1,5 +1,5 @@
-#ifndef __UTILS_PHYSICS_CUBECOLLIDER__
-#define __UTILS_PHYSICS_CUBECOLLIDER__
+#ifndef __UTIL_PHYSICS_CUBECOLLIDER__
+#define __UTIL_PHYSICS_CUBECOLLIDER__
 
 #include <define.h>
 

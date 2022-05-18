@@ -1,5 +1,5 @@
-#ifndef __UTILS_STRING__
-#define __UTILS_STRING__
+#ifndef __UTIL_STRING__
+#define __UTIL_STRING__
 
 #include <define.h>
 

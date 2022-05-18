@@ -1,5 +1,5 @@
-#ifndef __UTILS_MATH3D_CAMERA__
-#define __UTILS_MATH3D_CAMERA__
+#ifndef __UTIL_MATH3D_CAMERA__
+#define __UTIL_MATH3D_CAMERA__
 
 #include <define.h>
 

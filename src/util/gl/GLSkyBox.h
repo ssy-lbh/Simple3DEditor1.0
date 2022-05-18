@@ -1,5 +1,5 @@
-#ifndef __UTILS_GL_SKYBOX__
-#define __UTILS_GL_SKYBOX__
+#ifndef __UTIL_GL_SKYBOX__
+#define __UTIL_GL_SKYBOX__
 
 #include <define.h>
 

@@ -1,5 +1,5 @@
-#ifndef __UTILS_GL_GLSHADER__
-#define __UTILS_GL_GLSHADER__
+#ifndef __UTIL_GL_GLSHADER__
+#define __UTIL_GL_GLSHADER__
 
 #include <define.h>
 

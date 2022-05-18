@@ -1,5 +1,5 @@
-#ifndef __UTILS_GL_GLUTILS__
-#define __UTILS_GL_GLUTILS__
+#ifndef __UTIL_GL_GLUTILS__
+#define __UTIL_GL_GLUTILS__
 
 #include <define.h>
 

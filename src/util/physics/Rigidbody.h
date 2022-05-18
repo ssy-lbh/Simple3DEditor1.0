@@ -1,5 +1,5 @@
-#ifndef __UTILS_PHYSICS_RIGIDBODY__
-#define __UTILS_PHYSICS_RIGIDBODY__
+#ifndef __UTIL_PHYSICS_RIGIDBODY__
+#define __UTIL_PHYSICS_RIGIDBODY__
 
 #include <define.h>
 

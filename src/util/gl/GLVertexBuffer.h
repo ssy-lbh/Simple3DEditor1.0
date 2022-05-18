@@ -1,5 +1,5 @@
-#ifndef __UTILS_GL_GLVERTEXBUFFER__
-#define __UTILS_GL_GLVERTEXBUFFER__
+#ifndef __UTIL_GL_GLVERTEXBUFFER__
+#define __UTIL_GL_GLVERTEXBUFFER__
 
 #include <define.h>
 

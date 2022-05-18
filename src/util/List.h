@@ -1,5 +1,5 @@
-#ifndef __UTILS_LIST__
-#define __UTILS_LIST__
+#ifndef __UTIL_LIST__
+#define __UTIL_LIST__
 
 #include <define.h>
 

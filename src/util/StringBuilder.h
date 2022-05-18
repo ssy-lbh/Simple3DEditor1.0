@@ -1,5 +1,5 @@
-#ifndef __UTILS_STRINGBUILDER__
-#define __UTILS_STRINGBUILDER__
+#ifndef __UTIL_STRINGBUILDER__
+#define __UTIL_STRINGBUILDER__
 
 #include <define.h>
 

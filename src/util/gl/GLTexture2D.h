@@ -1,5 +1,5 @@
-#ifndef __UTILS_GL_GLTEXTURE2D__
-#define __UTILS_GL_GLTEXTURE2D__
+#ifndef __UTIL_GL_GLTEXTURE2D__
+#define __UTIL_GL_GLTEXTURE2D__
 
 #include <define.h>
 

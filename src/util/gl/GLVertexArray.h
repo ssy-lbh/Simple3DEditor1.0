@@ -1,5 +1,5 @@
-#ifndef __UTILS_GL_GLVERTEXARRAY__
-#define __UTILS_GL_GLVERTEXARRAY__
+#ifndef __UTIL_GL_GLVERTEXARRAY__
+#define __UTIL_GL_GLVERTEXARRAY__
 
 #include <define.h>
 

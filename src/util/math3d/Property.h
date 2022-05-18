@@ -1,5 +1,5 @@
-#ifndef __UTILS_MATH3D_PROPERTY__
-#define __UTILS_MATH3D_PROPERTY__
+#ifndef __UTIL_MATH3D_PROPERTY__
+#define __UTIL_MATH3D_PROPERTY__
 
 #include <define.h>
 

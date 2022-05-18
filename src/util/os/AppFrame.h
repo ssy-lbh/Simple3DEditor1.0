@@ -1,5 +1,5 @@
-#ifndef __UTILS_OS_APPFRAME__
-#define __UTILS_OS_APPFRAME__
+#ifndef __UTIL_OS_APPFRAME__
+#define __UTIL_OS_APPFRAME__
 
 #include <define.h>
 

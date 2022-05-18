@@ -1,5 +1,5 @@
-#ifndef __UTILS_HASHMAP__
-#define __UTILS_HASHMAP__
+#ifndef __UTIL_HASHMAP__
+#define __UTIL_HASHMAP__
 
 #include <define.h>
 

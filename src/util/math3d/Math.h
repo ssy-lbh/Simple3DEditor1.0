@@ -1,5 +1,5 @@
-#ifndef __UTILS_MATH3D_MATH__
-#define __UTILS_MATH3D_MATH__
+#ifndef __UTIL_MATH3D_MATH__
+#define __UTIL_MATH3D_MATH__
 
 #include <define.h>
 

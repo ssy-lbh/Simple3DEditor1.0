@@ -1,5 +1,5 @@
-#ifndef __UTILS_RBTREE__
-#define __UTILS_RBTREE__
+#ifndef __UTIL_RBTREE__
+#define __UTIL_RBTREE__
 
 #include <define.h>
 

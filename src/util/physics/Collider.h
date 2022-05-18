@@ -1,5 +1,5 @@
-#ifndef __UTILS_PHYSICS_COLLIDER__
-#define __UTILS_PHYSICS_COLLIDER__
+#ifndef __UTIL_PHYSICS_COLLIDER__
+#define __UTIL_PHYSICS_COLLIDER__
 
 #include <define.h>
 

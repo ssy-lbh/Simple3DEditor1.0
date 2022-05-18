@@ -1,5 +1,5 @@
-#ifndef __UTILS_GL_GLINDEXBUFFER__
-#define __UTILS_GL_GLINDEXBUFFER__
+#ifndef __UTIL_GL_GLINDEXBUFFER__
+#define __UTIL_GL_GLINDEXBUFFER__
 
 #include <define.h>
 

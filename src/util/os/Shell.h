@@ -1,5 +1,5 @@
-#ifndef __UTILS_OS_SHELL__
-#define __UTILS_OS_SHELL__
+#ifndef __UTIL_OS_SHELL__
+#define __UTIL_OS_SHELL__
 
 #include <define.h>
 

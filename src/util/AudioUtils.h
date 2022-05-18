@@ -1,5 +1,5 @@
-#ifndef __UTILS_AUDIOUTILS__
-#define __UTILS_AUDIOUTILS__
+#ifndef __UTIL_AUDIOUTILS__
+#define __UTIL_AUDIOUTILS__
 
 #include <define.h>
 

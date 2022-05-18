@@ -1,5 +1,5 @@
-#ifndef __UTILS_GL_GLFRAMEBUFFER__
-#define __UTILS_GL_GLFRAMEBUFFER__
+#ifndef __UTIL_GL_GLFRAMEBUFFER__
+#define __UTIL_GL_GLFRAMEBUFFER__
 
 #include <define.h>
 

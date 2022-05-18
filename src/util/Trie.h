@@ -1,5 +1,5 @@
-#ifndef __UTILS_TRIE__
-#define __UTILS_TRIE__
+#ifndef __UTIL_TRIE__
+#define __UTIL_TRIE__
 
 #include <define.h>
 

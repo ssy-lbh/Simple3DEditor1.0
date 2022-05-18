@@ -1,5 +1,5 @@
-#ifndef __UTILS_OS_RESOURCE__
-#define __UTILS_OS_RESOURCE__
+#ifndef __UTIL_OS_RESOURCE__
+#define __UTIL_OS_RESOURCE__
 
 #include <define.h>
 

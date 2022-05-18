@@ -1,5 +1,5 @@
-#ifndef __UTILS_RENDER_VERTEXBUFFER__
-#define __UTILS_RENDER_VERTEXBUFFER__
+#ifndef __UTIL_RENDER_VERTEXBUFFER__
+#define __UTIL_RENDER_VERTEXBUFFER__
 
 #include <define.h>
 

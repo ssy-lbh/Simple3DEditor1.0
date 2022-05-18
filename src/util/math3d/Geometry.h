@@ -1,5 +1,5 @@
-#ifndef __UTILS_MATH3D_GEOMETRY__
-#define __UTILS_MATH3D_GEOMETRY__
+#ifndef __UTIL_MATH3D_GEOMETRY__
+#define __UTIL_MATH3D_GEOMETRY__
 
 #include <define.h>
 

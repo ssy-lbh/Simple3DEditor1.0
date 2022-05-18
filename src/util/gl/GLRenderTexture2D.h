@@ -1,5 +1,5 @@
-#ifndef __UTILS_GL_GLRENDERTEXTURE2D__
-#define __UTILS_GL_GLRENDERTEXTURE2D__
+#ifndef __UTIL_GL_GLRENDERTEXTURE2D__
+#define __UTIL_GL_GLRENDERTEXTURE2D__
 
 #include <define.h>
 

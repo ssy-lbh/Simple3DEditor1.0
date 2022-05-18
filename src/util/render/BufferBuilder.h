@@ -1,5 +1,5 @@
-#ifndef __UTILS_RENDER_BUFFERBUILDER__
-#define __UTILS_RENDER_BUFFERBUILDER__
+#ifndef __UTIL_RENDER_BUFFERBUILDER__
+#define __UTIL_RENDER_BUFFERBUILDER__
 
 #include <define.h>
 

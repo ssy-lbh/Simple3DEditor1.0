@@ -1,5 +1,5 @@
-#ifndef __UTILS_MATH3D_MESH__
-#define __UTILS_MATH3D_MESH__
+#ifndef __UTIL_MATH3D_MESH__
+#define __UTIL_MATH3D_MESH__
 
 #include <define.h>
 

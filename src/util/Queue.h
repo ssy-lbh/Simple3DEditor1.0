@@ -1,5 +1,5 @@
-#ifndef __UTILS_QUEUE__
-#define __UTILS_QUEUE__
+#ifndef __UTIL_QUEUE__
+#define __UTIL_QUEUE__
 
 #include <define.h>
 
