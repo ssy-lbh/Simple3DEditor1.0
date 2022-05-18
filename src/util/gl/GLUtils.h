@@ -5,6 +5,8 @@
 
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 #define glCheckError(tag) GLUtils::CheckGLError(tag, __FILE__, __LINE__)
 
 class GLUtils {
@@ -49,5 +51,7 @@ public:
     static void ResetTexture();
     static void PrintMatrix(Matrix4x4 mat);
 };
+
+}
 
 #endif

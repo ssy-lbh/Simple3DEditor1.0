@@ -6,6 +6,8 @@
 #include <util/os/Log.h>
 #include <util/math3d/Math.h>
 
+namespace simple3deditor {
+
 double Time::GetTime(){
     LARGE_INTEGER time;
     LARGE_INTEGER freq;
@@ -32,4 +34,6 @@ void TimerManager::CreateTimer(int id, int elapseMillis){
 
 void TimerManager::DestroyTimer(int id){
     DebugError("TimerManager::DestroyTimer [Unimplemented]");
+}
+
 }

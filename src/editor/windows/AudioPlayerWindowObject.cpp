@@ -22,6 +22,8 @@
 #include <editor/object/AudioSourceObject.h>
 #include <editor/object/GUIManagerObject.h>
 
+namespace simple3deditor {
+
 AudioPlayerWindowObject::AudioPlayerWindowObject() : AWindowObject(L"AudioPlayerWindow"), CAudioSourceLoader(source) {
     DebugLog("AudioPlayerWindowObject Launched");
 
@@ -585,4 +587,6 @@ ALint AudioPlayerWindowObject::GetWaveFormat(AudioWaveFormat* wav){
         break;
     }
     return format;
+}
+
 }

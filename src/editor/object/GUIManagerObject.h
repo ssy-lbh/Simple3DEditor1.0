@@ -6,6 +6,8 @@
 #include <editor/main/ViewObject.h>
 #include <editor/object/GUIObject.h>
 
+namespace simple3deditor {
+
 // 3D GUI管理器已经基本可用
 class GUIManagerObject : public AGUIObject {
 protected:
@@ -50,5 +52,7 @@ public:
     AGUIObject* GetCurrent();
     AGUIObject* FindCurrent();
 };
+
+}
 
 #endif

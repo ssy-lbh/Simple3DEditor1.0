@@ -12,6 +12,8 @@
 #include <editor/object/AllObjects.h>
 #include <editor/windows/AllWindows.h>
 
+namespace simple3deditor {
+
 TreeWindowObject::TreeWindowObject() : AWindowObject(L"TreeWindow") {
     DebugLog("TreeWindowObject Launched");
 
@@ -221,4 +223,6 @@ void TreeWindowObject::OnMenuAccel(int id, bool accel){
         Main::SetMenu(basicMenu);
         break;
     }
+}
+
 }

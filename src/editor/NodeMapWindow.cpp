@@ -9,7 +9,9 @@
 #include <editor/gui/Menu.h>
 #include <editor/object/GUIManagerObject.h>
 
-class MoveButton : public AGUIObject {
+namespace simple3deditor {
+
+class NodeMapWindow::MoveButton : public AGUIObject {
 private:
     Point2 center;
     float radius;
@@ -38,7 +40,7 @@ public:
     }
 };
 
-class Node : public AGUIObject {
+class NodeMapWindow::Node : public AGUIObject {
 private:
     NodeMapWindow* window;
     Point2 relaPos;
@@ -359,3 +361,5 @@ void NodeMapWindow::Serialize(IOutputStream& os){
 }
 
 void NodeMapWindow::Deserialize(IInputStream& os){}
+
+}

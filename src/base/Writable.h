@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class IWritable {
 public:
     virtual void Write(char c);
@@ -23,5 +25,7 @@ public:
     virtual void WriteWithLen(const String& s);
     virtual void WriteWithLen(const WString& s);
 };
+
+}
 
 #endif

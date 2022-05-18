@@ -49,6 +49,11 @@ typedef void* handle;
 #define EXECUTABLE_SPIRV_CROSS ".\\bin\\spirv\\spirv-cross.exe"
 #endif
 
+// 对象基类
+#include <base/Object.h>
+
+namespace simple3deditor {
+
 // utils
 class String;
 class WString;
@@ -57,11 +62,6 @@ class PackWString;
 class StringBuilder;
 class DataBuffer;
 class PackDataBuffer;
-
-// 对象基类
-class Object;
-
-class Object {};
 
 // geodef
 class Vertex;
@@ -225,11 +225,6 @@ class Property;
 class PropertyVector3;
 class PropertyQuaternion;
 
-// soundtouch
-namespace soundtouch {
-    class SoundTouch;
-};
-
 // manager
 class WindowManager;
 class WindowRegistry;
@@ -266,5 +261,12 @@ class AWriter;
 class ASocket;
 class TCPSocket;
 class UDPSocket;
+
+}
+
+// soundtouch
+namespace soundtouch {
+    class SoundTouch;
+};
 
 #endif

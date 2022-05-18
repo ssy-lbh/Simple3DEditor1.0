@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class DataBuffer : public Object {
 protected:
     char* data;
@@ -81,5 +83,7 @@ public:
     PackDataBuffer(const void* data, size_t size);
     virtual ~PackDataBuffer() override;
 };
+
+}
 
 #endif

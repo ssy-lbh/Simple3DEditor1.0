@@ -5,6 +5,8 @@
 
 #include <util/String.h>
 
+namespace simple3deditor {
+
 // 此Trie默认ANSI编码
 // T最好是指针，可以判断结尾，不浪费内存，携带数据多，速度快
 // T如果是基本数据类型，查不到值时默认为0，不便于判断结尾
@@ -239,6 +241,8 @@ void Free(TrieW<T*>& trie){
     trie.Foreach([](T* item){
         delete item;
     });
+}
+
 }
 
 #endif

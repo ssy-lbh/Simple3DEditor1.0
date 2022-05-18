@@ -14,6 +14,8 @@
 #include <editor/main/Tool.h>
 #include <editor/main/Operation.h>
 
+namespace simple3deditor {
+
 class UIManager final : public Object {
 private:
     List<IButton*> buttons;
@@ -96,5 +98,7 @@ public:
     virtual void OnDropFileA(const char* path);
     virtual void OnDropFileW(const wchar_t* path);
 };
+
+}
 
 #endif

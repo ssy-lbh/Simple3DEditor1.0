@@ -9,15 +9,17 @@
 
 typedef struct ALCdevice_struct ALCdevice;
 
+namespace simple3deditor {
+
 class AudioCaptureWindow final : public AWindow {
 private:
-    static constexpr int SAMPLE_SIZE_BIT = 14;
-    static constexpr int SAMPLE_SIZE = (1 << SAMPLE_SIZE_BIT);
-    static constexpr int SAMPLE_MASK = (SAMPLE_SIZE - 1);
-    static constexpr int QUEUE_SIZE_BIT = 2;
-    static constexpr int QUEUE_SIZE = (1 << QUEUE_SIZE_BIT);
-    static constexpr int QUEUE_MASK = (QUEUE_SIZE - 1);
-    static constexpr int FREQUENCY = 44100;
+    static constexpr uint SAMPLE_SIZE_BIT = 14;
+    static constexpr uint SAMPLE_SIZE = (1 << SAMPLE_SIZE_BIT);
+    static constexpr uint SAMPLE_MASK = (SAMPLE_SIZE - 1);
+    static constexpr uint QUEUE_SIZE_BIT = 2;
+    static constexpr uint QUEUE_SIZE = (1 << QUEUE_SIZE_BIT);
+    static constexpr uint QUEUE_MASK = (QUEUE_SIZE - 1);
+    static constexpr uint FREQUENCY = 44100;
 
     GUIManagerObject* guiMgr;
 
@@ -79,5 +81,7 @@ public:
     bool SetCaptureDevice(const char* name);
     bool CloseCaptureDevice();
 };
+
+}
 
 #endif

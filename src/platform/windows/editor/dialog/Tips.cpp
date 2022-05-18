@@ -6,6 +6,8 @@
 #include <util/os/Log.h>
 #include <util/os/System.h>
 
+namespace simple3deditor {
+
 /* synchronized */
 void DialogTextInput(wchar_t* str, size_t size){
     static volatile bool lock = false;
@@ -71,4 +73,6 @@ void DialogVersionInfo(){
             }
             return (INT_PTR)FALSE;
     });
+}
+
 }

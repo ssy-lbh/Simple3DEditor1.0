@@ -10,6 +10,8 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <editor/object/GUIObject.h>
 
+namespace simple3deditor {
+
 // 看来GUI组件的属性过多，而且大都不为指针，所以大部分属性不要过度封装，直接公开即可
 
 class RoundButton : public AGUIObject {
@@ -194,5 +196,7 @@ public:
     virtual void OnLeftDrag2D(Vector2 dir) override;
     virtual void OnRender() override;
 };
+
+}
 
 #endif

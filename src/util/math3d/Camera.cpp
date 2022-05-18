@@ -5,6 +5,8 @@
 
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 CCamera::CCamera() : camPos(Point3::zero), camLookat(Point3(0.0f, 5.0f, 0.0f)), camDis(5.0f) {
     SetRotation(Quaternion::one);
 }
@@ -67,4 +69,6 @@ void CCamera::InitCamera(float aspect, float near, float far){
     gluLookAt(camPos.x, camPos.y, camPos.z,
             camLookat.x, camLookat.y, camLookat.z,
             camUp.x, camUp.y, camUp.z);
+}
+
 }

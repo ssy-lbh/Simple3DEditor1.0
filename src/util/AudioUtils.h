@@ -6,6 +6,8 @@
 typedef struct ALCdevice_struct ALCdevice;
 typedef struct ALCcontext_struct ALCcontext;
 
+namespace simple3deditor {
+
 #define alCheckError(tag) AudioUtils::CheckALError(tag, __FILE__, __LINE__)
 
 class AudioUtils {
@@ -27,5 +29,7 @@ void alListenerPosv3(Vector3 value);
 void alListenerVelocityv3(Vector3 value);
 void alListenerPosAutoVelv3(Vector3 value);
 void alListenerDirv3(Vector3 dir, Vector3 up);
+
+}
 
 #endif

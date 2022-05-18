@@ -7,6 +7,8 @@
 #include <util/math3d/Math.h>
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 bool GLUtils::CheckGLError(const char* tag, const char* file, int line){
     int loopCnt = 0;
 	for (GLenum error = glGetError(); loopCnt < 32 && error != GL_NO_ERROR; error = glGetError(), ++loopCnt){
@@ -370,4 +372,6 @@ void GLUtils::PrintMatrix(Matrix4x4 mat){
              mat._21, mat._22, mat._23, mat._24,
              mat._31, mat._32, mat._33, mat._34,
              mat._41, mat._42, mat._43, mat._44);
+}
+
 }

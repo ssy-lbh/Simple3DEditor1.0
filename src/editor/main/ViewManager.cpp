@@ -5,6 +5,8 @@
 #include <util/os/Thread.h>
 #include <util/os/AppFrame.h>
 
+namespace simple3deditor {
+
 ViewManager::ViewManager(AppFrame* frame) : frame(frame) {}
 ViewManager::~ViewManager(){}
 
@@ -80,4 +82,6 @@ void ViewManager::SetChildScissor(Rect ratio){
 
 void ViewManager::ResetScissor(){
     SetScissor(curRect);
+}
+
 }

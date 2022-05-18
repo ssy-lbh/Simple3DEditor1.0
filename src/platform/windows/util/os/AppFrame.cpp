@@ -15,6 +15,8 @@
 #include <editor/main/ViewObject.h>
 #include <editor/gui/UIManager.h>
 
+namespace simple3deditor {
+
 bool AppFrame::init = false;
 
 AppFrame::AppFrame(String name, AWindow* mainFrame, size_t height, size_t width, bool async) : name(name), mainFrame(mainFrame), height(height), width(width) {
@@ -451,4 +453,6 @@ void AppFrame::InitWindow(){
     );
 
     hAccel = LoadAcceleratorsA(hInst, MAKEINTRESOURCE(IDC_MENU));
+}
+
 }

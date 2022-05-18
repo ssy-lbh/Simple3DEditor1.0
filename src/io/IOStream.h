@@ -8,6 +8,8 @@
 #include <base/Readable.h>
 #include <base/Writable.h>
 
+namespace simple3deditor {
+
 class IInputStream : public IReadable, public ICloseable, public IFlushable {
 public:
     using IReadable::Read;
@@ -24,5 +26,7 @@ public:
     virtual void Flush();
     virtual void Close();
 };
+
+}
 
 #endif

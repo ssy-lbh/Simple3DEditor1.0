@@ -3,6 +3,8 @@
 #include <editor/main/ViewObject.h>
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 Rigidbody::Rigidbody(AViewObject* object) : object(object) {}
 Rigidbody::~Rigidbody(){}
 
@@ -16,4 +18,6 @@ Quaternion Rigidbody::GetRotation() const{
 
 AViewObject* Rigidbody::GetObject() const{
     return object;
+}
+
 }

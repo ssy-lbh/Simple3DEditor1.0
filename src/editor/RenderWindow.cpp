@@ -17,6 +17,8 @@
 #include <editor/main/ViewObject.h>
 #include <editor/object/GUIManagerObject.h>
 
+namespace simple3deditor {
+
 RenderWindow::RenderWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Vector3::up, 5.0f) {
     DebugLog("RenderWindow Launched");
     guiMgr = new GUIManagerObject();
@@ -187,4 +189,6 @@ void RenderWindow::SetRotation(Quaternion rot){
 
 void RenderWindow::SetDistance(float dis){
     CCamera::SetDistance(dis);
+}
+
 }

@@ -5,6 +5,8 @@
 
 #include <io/IOStream.h>
 
+namespace simple3deditor {
+
 class ISerializable {
 public:
     virtual void Serialize(IOutputStream& os) = 0;
@@ -21,5 +23,7 @@ public:
     using ISerializable::Serialize;
     using IDeserializable::Deserialize;
 };
+
+}
 
 #endif

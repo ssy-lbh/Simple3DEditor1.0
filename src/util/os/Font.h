@@ -3,6 +3,12 @@
 
 #include <define.h>
 
+typedef struct FT_LibraryRec_* FT_Library;
+typedef struct FT_FaceRec_* FT_Face;
+typedef struct _FTGLfont FTGLfont;
+
+namespace simple3deditor {
+
 #define MAX_ASCII_CHARS 0x80
 #define MAX_CACHE_CHARS 0x10000
 
@@ -22,10 +28,6 @@ bool WideCharToBytes(const wchar_t* text, size_t len, char*& outText, size_t& ou
 bool BytesToWideChar(const char* text, size_t len, wchar_t*& outText, size_t& outLen);
 bool WideCharToBytesUTF8(const wchar_t* text, size_t len, char*& outText, size_t& outLen);
 bool BytesToWideCharUTF8(const char* text, size_t len, wchar_t*& outText, size_t& outLen);
-
-typedef struct FT_LibraryRec_* FT_Library;
-typedef struct FT_FaceRec_* FT_Face;
-typedef struct _FTGLfont FTGLfont;
 
 #define MAX_FONT_CHARS 0x10000
 
@@ -97,5 +99,7 @@ public:
     void DrawString(const wchar_t* text);
     void DrawString(const String& text);
 };
+
+}
 
 #endif

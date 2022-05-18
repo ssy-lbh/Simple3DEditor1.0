@@ -11,6 +11,8 @@
 #include <util/String.h>
 #include <editor/main/Transform.h>
 
+namespace simple3deditor {
+
 class SelectInfo final : public Object {
 public:
     Vector3 camPos;
@@ -140,5 +142,7 @@ public:
 
     virtual void OnAnimationFrame(float frame);
 };
+
+}
 
 #endif

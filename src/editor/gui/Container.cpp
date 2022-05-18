@@ -21,6 +21,8 @@
 #include <util/os/Log.h>
 #include <util/os/AppFrame.h>
 
+namespace simple3deditor {
+
 AContainer::AContainer(){}
 AContainer::AContainer(SelectionWindow* selWindow) : selWindow(selWindow) {}
 
@@ -731,4 +733,6 @@ void SelectionWindow::SetWindow(AWindow* window, bool del){
             curWindow->OnMouseMove(cursorCoord.x, cursorCoord.y);
         }
     }
+}
+
 }

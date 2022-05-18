@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class GLSkyBox {
 private:
     GLTexture2D* left = NULL;
@@ -30,5 +32,7 @@ public:
     // 在最前渲染，应取消GL_DEPTH_TEST，调用后glDepthMask为TRUE
     void Render(Vector3 pos, float dis);
 };
+
+}
 
 #endif

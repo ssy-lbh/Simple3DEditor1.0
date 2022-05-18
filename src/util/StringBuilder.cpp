@@ -6,6 +6,8 @@
 #include <util/String.h>
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 StringBuilderA::StringBuilderA(){
     data = new char[32];
     size = 32;
@@ -229,3 +231,5 @@ StringBuilderW& StringBuilderW::operator+=(const String& s){ IAppendableA::Appen
 StringBuilderW& StringBuilderW::operator+=(const WString& s){ IAppendableW::Append(s); return *this; }
 StringBuilderW& StringBuilderW::operator+=(const char* s){ return Append(s); }
 StringBuilderW& StringBuilderW::operator+=(const wchar_t* s){ return Append(s); }
+
+}

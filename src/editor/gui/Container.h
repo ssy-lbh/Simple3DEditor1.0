@@ -5,6 +5,8 @@
 
 #include <editor/main/Window.h>
 
+namespace simple3deditor {
+
 class AContainer : public AWindow {
 protected:
     // 以下对象用于窗口归并等功能
@@ -162,5 +164,7 @@ public:
     AWindow* GetWindow();
     void SetWindow(AWindow* window, bool del = true);
 };
+
+}
 
 #endif

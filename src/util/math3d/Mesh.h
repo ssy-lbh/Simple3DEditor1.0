@@ -5,6 +5,8 @@
 
 #include <util/List.h>
 
+namespace simple3deditor {
+
 class Mesh final : public Object {
 private:
     List<Vertex*> vertices;
@@ -56,5 +58,7 @@ public:
     bool EnableTexture();
     bool DisableTexture();
 };
+
+}
 
 #endif

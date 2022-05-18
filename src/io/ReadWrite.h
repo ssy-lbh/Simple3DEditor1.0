@@ -9,6 +9,8 @@
 #include <base/Writable.h>
 #include <base/Appendable.h>
 
+namespace simple3deditor {
+
 class AReader : public IReadable, public ICloseable {
 protected:
     volatile bool lock = false;
@@ -36,5 +38,7 @@ public:
     virtual AWriter& Append(const char* s, size_t size) override;
     virtual AWriter& Append(char c) override;
 };
+
+}
 
 #endif

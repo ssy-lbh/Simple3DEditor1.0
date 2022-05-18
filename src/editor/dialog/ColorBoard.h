@@ -9,6 +9,8 @@
 #include <util/gl/GLUtils.h>
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 class ColorBoard final : public Object {
 private:
 #ifdef PLATFORM_WINDOWS
@@ -41,5 +43,7 @@ public:
     void UpdateWindowSize(int x, int y);
     void UpdateCursor(int x, int y);
 };
+
+}
 
 #endif

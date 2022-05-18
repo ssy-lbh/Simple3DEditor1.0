@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class Resource final {
 public:
     static String GetString(int id);
@@ -25,5 +27,7 @@ public:
     static void StoreTGA(String path, const void* data, int x, int y, int comp);
     static void StoreHDR(String path, const void* data, int x, int y, int comp);
 };
+
+}
 
 #endif

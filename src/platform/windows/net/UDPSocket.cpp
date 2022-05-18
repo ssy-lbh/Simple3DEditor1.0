@@ -2,6 +2,8 @@
 
 #include <winsock2.h>
 
+namespace simple3deditor {
+
 UDPSocket::UDPSocket(){
     s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 }
@@ -52,4 +54,6 @@ void UDPSocket::Close(){
 
 bool UDPSocket::IsClosed(){
     return s == -1;
+}
+
 }

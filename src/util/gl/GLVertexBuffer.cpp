@@ -4,6 +4,8 @@
 
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 GLVertexBuffer::GLVertexBuffer(){
     glGenBuffers(1, &buffer);
 }
@@ -14,4 +16,6 @@ GLVertexBuffer::~GLVertexBuffer(){
 
 uint GLVertexBuffer::GetBuffer(){
     return buffer;
+}
+
 }

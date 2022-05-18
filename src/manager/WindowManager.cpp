@@ -2,6 +2,8 @@
 
 #include <util/String.h>
 
+namespace simple3deditor {
+
 WindowManager::WindowManager(){}
 
 WindowManager::~WindowManager(){
@@ -40,4 +42,6 @@ IWindow* WindowManager::NewWindow(WString name){
 
 List<WindowRegistry*>& WindowManager::GetWindows(){
     return windows;
+}
+
 }

@@ -6,6 +6,8 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <util/physics/Collider.h>
 
+namespace simple3deditor {
+
 class CubeCollider final : public ACollider {
 public:
     Vector3 scale = Vector3::one;
@@ -17,5 +19,7 @@ public:
     virtual void OnCollideSphere(const SphereCollider* collider) const override;
     virtual void OnCollideMesh(const MeshCollider* collider) const override;
 };
+
+}
 
 #endif

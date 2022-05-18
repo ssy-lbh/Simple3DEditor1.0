@@ -14,6 +14,8 @@
 #include <util/gl/GLLights.h>
 #include <util/gl/GLUtils.h>
 
+namespace simple3deditor {
+
 SelectInfo::SelectInfo(){}
 SelectInfo::~SelectInfo(){}
 
@@ -279,4 +281,6 @@ void AViewObject::OnAnimationFrame(float frame){
     transform.SetFrame(frame);
     for (size_t i = 0; i < len; i++)
         children[i]->OnAnimationFrame(frame);
+}
+
 }

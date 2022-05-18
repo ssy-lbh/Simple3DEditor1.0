@@ -5,6 +5,8 @@
 
 #include <base/Appendable.h>
 
+namespace simple3deditor {
+
 class StringBuilderA final : public Object, public IAppendable {
 private:
     char* data;
@@ -114,5 +116,7 @@ public:
     StringBuilderW& operator+=(const char* s);
     StringBuilderW& operator+=(const wchar_t* s);
 };
+
+}
 
 #endif

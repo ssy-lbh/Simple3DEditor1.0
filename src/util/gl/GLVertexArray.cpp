@@ -4,6 +4,8 @@
 
 #include <util/gl/GLVertexBuffer.h>
 
+namespace simple3deditor {
+
 GLVertexArray::GLVertexArray(){
     glGenVertexArrays(1, &array);
 }
@@ -26,4 +28,6 @@ void GLVertexArray::SetFormat(uint idx, uint size, uenum type, uint offset){
 
 uint GLVertexArray::GetArray(){
     return array;
+}
+
 }

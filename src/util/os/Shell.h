@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 #ifdef PLATFORM_WINDOWS
 #define MSGBOX_YES 6
 #define MSGBOX_NO 7
@@ -40,5 +42,7 @@ bool ShellPrint(const WString file);
 
 String GetAppDirectoryA();
 WString GetAppDirectoryW();
+
+}
 
 #endif

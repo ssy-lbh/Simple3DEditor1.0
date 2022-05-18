@@ -1,7 +1,9 @@
 #include <util/math3d/Property.h>
 
-#include <editor/gui/AnimationCurve.h>
 #include <util/math3d/LinearAlgebra.h>
+#include <editor/gui/AnimationCurve.h>
+
+namespace simple3deditor {
 
 Property::Property(){}
 Property::Property(float value) : value(value) {}
@@ -72,4 +74,6 @@ void PropertyQuaternion::InsertValue(float frame){
 
 void PropertyQuaternion::InsertValue(float frame, Quaternion val){
     x.InsertValue(frame, val.x); y.InsertValue(frame, val.y); z.InsertValue(frame, val.z); w.InsertValue(frame, val.w);
+}
+
 }

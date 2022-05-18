@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class Time {
 public:
     // 以秒计的系统绝对时间
@@ -13,10 +15,13 @@ public:
     static void Sleep(float time);
 };
 
+//TODO 未实现
 class TimerManager {
 public:
     static void CreateTimer(int id, int elapseMillis);
     static void DestroyTimer(int id);
 };
+
+}
 
 #endif

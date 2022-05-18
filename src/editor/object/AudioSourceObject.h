@@ -6,6 +6,8 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <editor/main/ViewObject.h>
 
+namespace simple3deditor {
+
 class IAudioSourceLoader {
 public:
     virtual void AudioSourceLoad(AudioSourceObject* o) = 0;
@@ -80,5 +82,7 @@ public:
     void SetDopplerEffect(bool on);
     bool HasDopplerEffect();
 };
+
+}
 
 #endif

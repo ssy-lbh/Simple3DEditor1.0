@@ -6,6 +6,8 @@
 #include <util/List.h>
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 class ViewManager final : public Object {
 private:
     AppFrame* frame;
@@ -36,5 +38,7 @@ public:
     void SetScissor(Rect rect);
     void ResetScissor();
 };
+
+}
 
 #endif

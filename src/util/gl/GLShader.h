@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class GLShader final : public Object {
 private:
     uint shader;
@@ -24,5 +26,7 @@ public:
     uint GetShader();
     uenum GetStage();
 };
+
+}
 
 #endif

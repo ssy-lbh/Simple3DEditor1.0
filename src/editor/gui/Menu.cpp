@@ -6,6 +6,8 @@
 #include <util/os/Log.h>
 #include <util/gl/GLUtils.h>
 
+namespace simple3deditor {
+
 MenuItem::MenuItem() : type(MenuItemType::SEPERATOR) {}
 MenuItem::MenuItem(Value<const wchar_t*>&& name) : type(MenuItemType::DEFAULT), name(name) {}
 
@@ -24,10 +26,6 @@ MenuItem::MenuItem(Value<const wchar_t*>&& name, Menu* menu) : type(MenuItemType
 MenuItem::~MenuItem(){
     onDestory(this);
 }
-
-const float Menu::WIDTH_PIXELS = 250.0f;
-const float Menu::CORNER_PIXELS = 10.0f;
-const float Menu::LINE_PIXELS = 30.0f;
 
 Menu::Menu(){}
 
@@ -261,4 +259,6 @@ void Menu::PressRight(){
             curMenu->selected = 0;
         }
     }
+}
+
 }

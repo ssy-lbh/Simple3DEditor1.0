@@ -21,6 +21,7 @@
     "files.associations": {
         "*.h": "cpp",
         "*.hlsl": "hlsl",
+        "*.msl": "metal",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -69,6 +70,28 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "ratio": "cpp",
-        "cfloat": "cpp"
+        "cfloat": "cpp",
+        "any": "cpp",
+        "barrier": "cpp",
+        "bitset": "cpp",
+        "chrono": "cpp",
+        "complex": "cpp",
+        "coroutine": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "unordered_set": "cpp",
+        "optional": "cpp",
+        "future": "cpp",
+        "ranges": "cpp",
+        "scoped_allocator": "cpp",
+        "shared_mutex": "cpp",
+        "span": "cpp",
+        "sstream": "cpp",
+        "stop_token": "cpp",
+        "syncstream": "cpp",
+        "thread": "cpp",
+        "regex": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp"
     }
 }

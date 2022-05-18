@@ -6,6 +6,8 @@
 #include <util/physics/Rigidbody.h>
 #include <util/physics/AllColliders.h>
 
+namespace simple3deditor {
+
 static bool CastToBox(const Vector3& pos, const Vector3& dir, const Vector3& scale, Vector3& output){
     if (pos.x > scale.x && dir.x < 0.0f){
         output = dir * ((scale.x - pos.x) / dir.x) + pos;
@@ -129,3 +131,5 @@ void CubeCollider::OnCollideCube(const CubeCollider* collider) const{
 void CubeCollider::OnCollideSphere(const SphereCollider* collider) const{}
 
 void CubeCollider::OnCollideMesh(const MeshCollider* collider) const{}
+
+}

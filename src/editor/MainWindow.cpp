@@ -26,7 +26,9 @@
 #include <editor/main/ViewObject.h>
 #include <editor/object/AllObjects.h>
 
-class MoveOperation : public IOperation {
+namespace simple3deditor {
+
+class MainWindow::MoveOperation : public IOperation {
 private:
     struct MoveInfo {
         union {
@@ -149,7 +151,7 @@ public:
     }
 };
 
-class ExcludeOperation : public IOperation {
+class MainWindow::ExcludeOperation : public IOperation {
 private:
     struct MoveInfo {
         Vertex* vert;
@@ -253,7 +255,7 @@ public:
     }
 };
 
-class RotateOperation : public IOperation {
+class MainWindow::RotateOperation : public IOperation {
 private:
     struct RotateInfo {
         union {
@@ -425,7 +427,7 @@ public:
     }
 };
 
-class SizeOperation : public IOperation {
+class MainWindow::SizeOperation : public IOperation {
 private:
     struct SizeInfo {
         union {
@@ -564,7 +566,7 @@ public:
     }
 };
 
-class EmptyTool : public ITool {
+class MainWindow::EmptyTool : public ITool {
 private:
     MainWindow* window;
 
@@ -579,7 +581,7 @@ public:
     }
 };
 
-class SelectTool : public ITool {
+class MainWindow::SelectTool : public ITool {
 private:
     MainWindow* window;
     Point2 start;
@@ -622,6 +624,45 @@ public:
             glColor4f(1.0f, 1.0f, 0.0f, 0.1f);
             GLUtils::DrawRect(start, end);
         }
+    }
+};
+
+class MainWindow::MoveButton : public RoundButton {
+public:
+    Point3 startPos;
+
+    MoveButton() : RoundButton(Vector2(0.55f, 0.85f), 0.12f) {}
+};
+
+class MainWindow::RotateButton : public RoundButton {
+public:
+    Quaternion start;
+    Vector3 up;
+    Vector3 right;
+    MainWindow* window;
+
+    RotateButton(MainWindow* window) : RoundButton(Vector2(0.85f, 0.85f), 0.12f), window(window) {}
+
+    virtual void OnRender() override{
+        Quaternion q = -window->camDir;
+        Vector2 right = q.GetXAxis().XZ() * radius;
+        Vector2 forward = q.GetYAxis().XZ() * radius;
+        Vector2 up = q.GetZAxis().XZ() * radius;
+        float light = (hover ? 1.0f : 0.8f);
+
+        glColor3f(0.1f, 0.1f, 0.1f);
+        GLUtils::DrawCornerWithUV(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
+
+        glEnable(GL_LINE_SMOOTH);
+        glBegin(GL_LINES);
+        glColor3f(light, 0.0f, 0.0f);
+        glVertexv2(center - right); glVertexv2(center + right);
+        glColor3f(0.0f, light, 0.0f);
+        glVertexv2(center - forward); glVertexv2(center + forward);
+        glColor3f(0.0f, 0.0f, light);
+        glVertexv2(center - up); glVertexv2(center + up);
+        glEnd();
+        glDisable(GL_LINE_SMOOTH);
     }
 };
 
@@ -748,13 +789,6 @@ MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f,
     skyBox->Set(GLSkyBox::TOP, new GLTexture2D(IDT_SKYBOX_TOP));
     skyBox->Set(GLSkyBox::DOWN, new GLTexture2D(IDT_SKYBOX_DOWN));
 
-    class MoveButton : public RoundButton {
-    public:
-        Point3 startPos;
-
-        MoveButton() : RoundButton(Vector2(0.55f, 0.85f), 0.12f) {}
-    };
-
     // 可能是因为符号冲突，如果MoveButton定义在全局，类名称冲突时可能出问题
     MoveButton* moveBtn = new MoveButton();
     moveBtn->SetIcon(IDT_BUTTON_MOVE);
@@ -765,38 +799,6 @@ MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f,
         this->SetLookAt(moveBtn->startPos - (this->camRight * dir.x + this->camUp * dir.y) * this->camDis);
     };
     guiMgr->AddChild(moveBtn);
-
-    class RotateButton : public RoundButton {
-    public:
-        Quaternion start;
-        Vector3 up;
-        Vector3 right;
-        MainWindow* window;
-
-        RotateButton(MainWindow* window) : RoundButton(Vector2(0.85f, 0.85f), 0.12f), window(window) {}
-
-        virtual void OnRender() override{
-            Quaternion q = -window->camDir;
-            Vector2 right = q.GetXAxis().XZ() * radius;
-            Vector2 forward = q.GetYAxis().XZ() * radius;
-            Vector2 up = q.GetZAxis().XZ() * radius;
-            float light = (hover ? 1.0f : 0.8f);
-
-            glColor3f(0.1f, 0.1f, 0.1f);
-            GLUtils::DrawCornerWithUV(center.x, center.y, 0.0f, 360.0f, radius, 0.05f);
-
-            glEnable(GL_LINE_SMOOTH);
-            glBegin(GL_LINES);
-            glColor3f(light, 0.0f, 0.0f);
-            glVertexv2(center - right); glVertexv2(center + right);
-            glColor3f(0.0f, light, 0.0f);
-            glVertexv2(center - forward); glVertexv2(center + forward);
-            glColor3f(0.0f, 0.0f, light);
-            glVertexv2(center - up); glVertexv2(center + up);
-            glEnd();
-            glDisable(GL_LINE_SMOOTH);
-        }
-    };
 
     RotateButton* rotBtn = new RotateButton(this);
     rotBtn->onClick += [=]{
@@ -1533,4 +1535,6 @@ void MainWindow::Deserialize(IInputStream& os){}
 
 Point2 MainWindow::GetScreenPosition(Point3 pos){
     return CCamera::GetScreenPosition(pos, aspect);
+}
+
 }

@@ -8,26 +8,31 @@
 
 #include <util/String.h>
 
+namespace simple3deditor {
+
 // 哈希表是无序的
 
 // 此HashMap默认ANSI编码以及指针为值类型
 // 默认指针不为NULL，若想设置为NULL请删除
-template <typename T, const uint bitSize = 6>
+template <typename T, const uint BIT_SIZE = 6>
 class HashMapA {
 private:
+    static constexpr uint NODE_SIZE = (1 << BIT_SIZE);
+    static constexpr uint NODE_MASK = NODE_SIZE - 1;
+
     struct HashNode {
         String key;
         T val;
         HashNode* next = NULL;
     };
 
-    HashNode* nodes[(1 << bitSize)] = {NULL};
+    HashNode* nodes[NODE_SIZE] = {NULL};
 
     uhash GetHash(const char* s, size_t len){
         uhash hash = len;
         for (size_t i = 0; i < len; i++)
             hash = (hash << 4) ^ (hash >> 28) ^ s[i];
-        return hash & ((1 << bitSize) - 1);
+        return hash & NODE_MASK;
     }
 
     void DeleteNode(HashNode* node){
@@ -73,7 +78,7 @@ public:
     HashMapA(){}
 
     ~HashMapA(){
-        for (size_t i = 0; i < (1 << bitSize); i++)
+        for (size_t i = 0; i < NODE_SIZE; i++)
             DeleteNode(nodes[i]);
     }
 
@@ -117,8 +122,8 @@ public:
         DeleteNode(nodes[GetHash(key.GetString(), key.GetLength())], key.GetString());
     }
 
-    HashMapA<T, bitSize>& Foreach(std::function<void(const String&, T)> func){
-        for (size_t i = 0; i < (1 << bitSize); i++){
+    HashMapA<T, BIT_SIZE>& Foreach(std::function<void(const String&, T)> func){
+        for (size_t i = 0; i < NODE_SIZE; i++){
             HashNode* node = nodes[i];
             while (node){
                 func(node->key, node->val);
@@ -129,8 +134,8 @@ public:
     }
 };
 
-template <typename T, const uint bitSize>
-void Free(HashMapA<T*, bitSize>& map){
+template <typename T, const uint BIT_SIZE>
+void Free(HashMapA<T*, BIT_SIZE>& map){
     map.Foreach([](const String& key, T* item){
         delete item;
     });
@@ -138,22 +143,25 @@ void Free(HashMapA<T*, bitSize>& map){
 
 // 此HashMap默认UTF-16LE编码以及指针为值类型
 // 默认指针不为NULL，若想设置为NULL请删除
-template <typename T, const uint bitSize = 6>
+template <typename T, const uint BIT_SIZE = 6>
 class HashMapW {
 private:
+    static constexpr uint NODE_SIZE = (1 << BIT_SIZE);
+    static constexpr uint NODE_MASK = NODE_SIZE - 1;
+
     struct HashNode {
         WString key;
         T val;
         HashNode* next = NULL;
     };
 
-    HashNode* nodes[(1 << bitSize)] = {NULL};
+    HashNode* nodes[NODE_SIZE] = {NULL};
 
     uhash GetHash(const wchar_t* s, size_t len){
         uhash hash = len;
         for (size_t i = 0; i < len; i++)
             hash = (hash << 4) ^ (hash >> 28) ^ s[i];
-        return hash & ((1 << bitSize) - 1);
+        return hash & NODE_MASK;
     }
 
     void DeleteNode(HashNode* node){
@@ -199,7 +207,7 @@ public:
     HashMapW(){}
 
     ~HashMapW(){
-        for (size_t i = 0; i < (1 << bitSize); i++)
+        for (size_t i = 0; i < NODE_SIZE; i++)
             DeleteNode(nodes[i]);
     }
 
@@ -242,8 +250,8 @@ public:
         DeleteNode(nodes[GetHash(key.GetString(), key.GetLength())], key.GetString());
     }
 
-    HashMapW<T, bitSize>& Foreach(std::function<void(const WString&, T)> func){
-        for (size_t i = 0; i < (1 << bitSize); i++){
+    HashMapW<T, BIT_SIZE>& Foreach(std::function<void(const WString&, T)> func){
+        for (size_t i = 0; i < NODE_SIZE; i++){
             HashNode* node = nodes[i];
             while (node){
                 func(node->key, node->val);
@@ -254,11 +262,13 @@ public:
     }
 };
 
-template <typename T, const uint bitSize>
-void Free(HashMapW<T*, bitSize>& map){
+template <typename T, const uint BIT_SIZE>
+void Free(HashMapW<T*, BIT_SIZE>& map){
     map.Foreach([](const WString& key, T* item){
         delete item;
     });
+}
+
 }
 
 #endif

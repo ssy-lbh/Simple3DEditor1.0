@@ -5,6 +5,8 @@
 
 #include <functional>
 
+namespace simple3deditor {
+
 template <typename T>
 class Task final : public Object {
 private:
@@ -21,6 +23,8 @@ public:
 template <typename F, typename... U>
 auto GetTask(F&& f, U&&... args) -> Task<decltype(f(args...))> {
     return Task<decltype(f(args...))>([=](){ return f(args...); });
+}
+
 }
 
 #endif

@@ -4,10 +4,14 @@
 
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 GLIndexBuffer::GLIndexBuffer(){
     glGenBuffers(1, &buffer);
 }
 
 GLIndexBuffer::~GLIndexBuffer(){
     glDeleteBuffers(1, &buffer);
+}
+
 }

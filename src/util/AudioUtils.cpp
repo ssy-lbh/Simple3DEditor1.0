@@ -8,6 +8,8 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 bool AudioUtils::init = false;
 
 ALCdevice* AudioUtils::alDev = NULL;
@@ -141,4 +143,6 @@ void alListenerPosAutoVelv3(Vector3 value){
 void alListenerDirv3(Vector3 dir, Vector3 up){
     float ori[] = {dir.x, dir.y, dir.z, up.x, up.y, up.z};
     alListenerfv(AL_ORIENTATION, ori);
+}
+
 }

@@ -2,6 +2,8 @@
 
 #include <winsock2.h>
 
+namespace simple3deditor {
+
 TCPSocket::TCPSocket(){
     s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 }
@@ -52,4 +54,6 @@ void TCPSocket::Close(){
 
 bool TCPSocket::IsClosed(){
     return s == -1;
+}
+
 }

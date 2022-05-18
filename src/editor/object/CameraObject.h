@@ -6,6 +6,8 @@
 #include <util/math3d/Geometry.h>
 #include <editor/main/ViewObject.h>
 
+namespace simple3deditor {
+
 class CameraObject final : public AViewObject {
 private:
     Vertex pos;
@@ -20,5 +22,7 @@ public:
 
     virtual void OnRender() override;
 };
+
+}
 
 #endif

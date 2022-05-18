@@ -7,6 +7,8 @@
 #include <editor/gui/Menu.h>
 #include <util/List.h>
 
+namespace simple3deditor {
+
 class AnimationWindow : public AWindow {
 private:
     static constexpr float DEFAULT_START_FRAME = 0.0f;
@@ -23,6 +25,10 @@ private:
     bool play = false;
 
     AnimationCurve* curve = NULL;
+
+    class FrameIndicator;
+    class Bottom;
+    class PlayButton;
 
     friend class FrameIndicator;
     friend class Bottom;
@@ -60,5 +66,7 @@ public:
     void Stop();
     bool IsPlaying();
 };
+
+}
 
 #endif

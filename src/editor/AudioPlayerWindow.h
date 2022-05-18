@@ -6,6 +6,8 @@
 #include <editor/main/Window.h>
 #include <editor/object/AudioSourceObject.h>
 
+namespace simple3deditor {
+
 struct AudioWaveFormat {
     short wFormatTag;
     short nChannels;
@@ -17,11 +19,11 @@ struct AudioWaveFormat {
 
 class AudioPlayerWindow final : public AWindow, public CAudioSourceLoader {
 private:
-    static constexpr int SAMPLE_SIZE_BIT = 12;
-    static constexpr int SAMPLE_SIZE = (1 << SAMPLE_SIZE_BIT);
-    static constexpr int SAMPLE_MASK = (SAMPLE_SIZE - 1);
-    static constexpr int GRAPH_SIZE_BIT = 10;
-    static constexpr int GRAPH_SIZE = (1 << GRAPH_SIZE_BIT);
+    static constexpr uint SAMPLE_SIZE_BIT = 12;
+    static constexpr uint SAMPLE_SIZE = (1 << SAMPLE_SIZE_BIT);
+    static constexpr uint SAMPLE_MASK = (SAMPLE_SIZE - 1);
+    static constexpr uint GRAPH_SIZE_BIT = 10;
+    static constexpr uint GRAPH_SIZE = (1 << GRAPH_SIZE_BIT);
 
     GUIManagerObject* guiMgr;
 
@@ -79,5 +81,7 @@ public:
 
     int GetWaveFormat(AudioWaveFormat* wav);
 };
+
+}
 
 #endif

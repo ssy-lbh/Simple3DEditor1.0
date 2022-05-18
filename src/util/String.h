@@ -3,7 +3,10 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 #define DEFAULT_STRING_LENGTH 512
+
 class String : public Object {
 protected:
     char* str;
@@ -203,5 +206,7 @@ public:
     PackWString(const wchar_t* s, size_t len);
     virtual ~PackWString() override;
 };
+
+}
 
 #endif

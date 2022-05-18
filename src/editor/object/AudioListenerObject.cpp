@@ -8,6 +8,8 @@
 #include <util/AudioUtils.h>
 #include <util/os/Time.h>
 
+namespace simple3deditor {
+
 AudioListenerObject::AudioListenerObject() : AViewObject(L"AudioListener", ViewObjectType::OBJECT_AUDIO_LISTENER) {
     recPos = Point3::zero;
 }
@@ -72,4 +74,6 @@ void AudioListenerObject::SetDopplerEffect(bool on){
 
 bool AudioListenerObject::HasDopplerEffect(){
     return dopplerEffect;
+}
+
 }

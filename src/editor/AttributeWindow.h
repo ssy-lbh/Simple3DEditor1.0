@@ -5,6 +5,8 @@
 
 #include <editor/main/Window.h>
 
+namespace simple3deditor {
+
 //TODO 等待开发，显示对象属性
 class AttributeWindow : public AWindow {
 private:
@@ -34,5 +36,7 @@ public:
     virtual void Serialize(IOutputStream& os) override;
     virtual void Deserialize(IInputStream& os) override;
 };
+
+}
 
 #endif

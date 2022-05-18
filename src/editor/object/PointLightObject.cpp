@@ -4,6 +4,8 @@
 #include <util/gl/GLSimplified.h>
 #include <util/gl/GLLights.h>
 
+namespace simple3deditor {
+
 PointLightObject::PointLightObject() : AViewObject(L"PointLight", ViewObjectType::OBJECT_POINT_LIGHT) {
     light = GLLights::Create();
     UpdateLight();
@@ -72,4 +74,6 @@ void PointLightObject::UpdateLight(){
     glLightfv(light, GL_DIFFUSE, diffuse);
     glLightfv(light, GL_SPECULAR, specular);
     glLightfv(light, GL_POSITION, position);
+}
+
 }

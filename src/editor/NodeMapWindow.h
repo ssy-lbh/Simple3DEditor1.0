@@ -7,6 +7,8 @@
 #include <editor/main/Window.h>
 #include <editor/object/GUIObject.h>
 
+namespace simple3deditor {
+
 class Node;
 
 class NodeMapWindow final : public AWindow {
@@ -19,6 +21,9 @@ private:
     Menu* basicMenu;
 
     GLTexture2D* bktex = NULL;
+
+    class MoveButton;
+    class Node;
 
     friend class MoveButton;
     friend class Node;
@@ -53,5 +58,7 @@ public:
 
     void AddNode();
 };
+
+}
 
 #endif

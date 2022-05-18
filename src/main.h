@@ -7,9 +7,12 @@
 #include <util/List.h>
 #include <util/os/AppFrame.h>
 #include <util/math3d/LinearAlgebra.h>
+#include <util/physics3d/engine/PhysicsCommon.h>
+
+namespace simple3deditor {
 
 //TODO 补全撤销功能
-interface IUndo : public Object {
+class IUndo : public Object {
 public:
     virtual void Execute() = 0;
 };
@@ -104,6 +107,9 @@ public:
 
     float animFrame = 0.0f;
 
+    reactphysics3d::PhysicsCommon* physicsCommon = NULL;
+    reactphysics3d::PhysicsWorld* physicsWorld = NULL;
+
     GlobalData();
     ~GlobalData();
 
@@ -170,5 +176,7 @@ public:
     static void Init();
     static void Uninit();
 };
+
+}
 
 #endif

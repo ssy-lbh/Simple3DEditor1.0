@@ -5,6 +5,8 @@
 
 #include <util/physics/Collider.h>
 
+namespace simple3deditor {
+
 class MeshCollider final : public ACollider {
 public:
     Mesh* mesh = NULL;
@@ -16,5 +18,7 @@ public:
     virtual void OnCollideSphere(const SphereCollider* collider) const override;
     virtual void OnCollideMesh(const MeshCollider* collider) const override;
 };
+
+}
 
 #endif

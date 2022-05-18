@@ -1,5 +1,7 @@
 #include <util/render/BufferBuilder.h>
 
+namespace simple3deditor {
+
 BufferBuilder::BufferBuilder(){}
 BufferBuilder::~BufferBuilder(){}
 
@@ -50,4 +52,6 @@ void BufferBuilder::TexCoord(Vector2 uv){
 
 void BufferBuilder::Normal(Vector3 normal){
     this->normal = normal;
+}
+
 }

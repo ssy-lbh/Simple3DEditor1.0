@@ -13,7 +13,9 @@
 #include <util/gl/GLFrameBuffer.h>
 #include <util/gl/GLComputeProgram.h>
 
-class ClearBrush : public ITool {
+namespace simple3deditor {
+
+class PaintWindow::ClearBrush : public ITool {
 private:
     PaintWindow* window;
     uint colorLoc;
@@ -69,7 +71,7 @@ public:
     }
 };
 
-class DefaultBrush : public ITool {
+class PaintWindow::DefaultBrush : public ITool {
 private:
     PaintWindow* window;
     bool draw = false;
@@ -369,4 +371,6 @@ int PaintWindow::GetWidth(){
 
 int PaintWindow::GetHeight(){
     return paintTex->GetHeight();
+}
+
 }

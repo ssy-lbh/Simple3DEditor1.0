@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class IReadable {
 private:
     static constexpr size_t SKIP_BUFFER_SIZE = 2048;
@@ -23,5 +25,7 @@ public:
     // 注意，此函数对应IWritable::WriteWithLen函数
     virtual WString ReadWString();
 };
+
+}
 
 #endif

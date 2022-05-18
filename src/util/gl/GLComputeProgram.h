@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class GLComputeProgram final : public Object {
 private:
     uint prog;
@@ -27,5 +29,7 @@ public:
     void BindTexture(uint unit, GLTexture2D* texture, uenum access, uenum format);
     void BindTexture(uint unit, GLRenderTexture2D* texture, uenum access, uenum format);
 };
+
+}
 
 #endif

@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+namespace simple3deditor {
+
 bool AReader::Ready() {
     return false;
 }
@@ -35,4 +37,6 @@ AWriter& AWriter::Append(const char* s, size_t size) {
 AWriter& AWriter::Append(char c) {
     Write(c);
     return *this;
+}
+
 }

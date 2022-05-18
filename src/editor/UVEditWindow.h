@@ -5,10 +5,16 @@
 
 #include <editor/main/Window.h>
 
+namespace simple3deditor {
+
 class UVEditWindow final : public AWindow {
 private:
     IOperation* curOp = NULL;
     ITool* curTool = NULL;
+
+    class MoveOperation;
+    class EmptyTool;
+    class SelectTool;
 
     friend class MoveOperation;
     friend class EmptyTool;
@@ -41,5 +47,7 @@ public:
     void SetOperation(IOperation* op);
     void SetTool(ITool* tool);
 };
+
+}
 
 #endif

@@ -12,6 +12,8 @@
 #include <util/math3d/Math.h>
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 void glFontSize(uint size) {
     HFONT hFont;
     AppFrame* frame = AppFrame::GetLocalInst();
@@ -398,4 +400,6 @@ void GLFont::DrawString(const wchar_t* text){
 
 void GLFont::DrawString(const String& text){
     FTGL::ftglRenderFont(font, text.GetString(), FTGL::RENDER_ALL);
+}
+
 }

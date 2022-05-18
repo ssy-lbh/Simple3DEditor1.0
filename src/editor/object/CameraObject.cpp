@@ -3,6 +3,8 @@
 #include <main.h>
 #include <util/gl/GLSimplified.h>
 
+namespace simple3deditor {
+
 static const float SCALE = 0.3f;
 
 CameraObject::CameraObject() : AViewObject(L"Camera", ViewObjectType::OBJECT_CAMERA) {
@@ -106,4 +108,6 @@ void CameraObject::OnRender(){
     glVertexv3(v);
     glEnd();
     glDisable(GL_POINT_SMOOTH);
+}
+
 }

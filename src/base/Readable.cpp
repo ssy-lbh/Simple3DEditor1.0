@@ -4,6 +4,8 @@
 #include <util/StringBuilder.h>
 #include <util/math3d/Math.h>
 
+namespace simple3deditor {
+
 char IReadable::skipBuffer[SKIP_BUFFER_SIZE];
 
 int IReadable::Read() {
@@ -71,4 +73,6 @@ WString IReadable::ReadWString(){
     wchar_t* str = new wchar_t[n];
     Read(str, n * sizeof(wchar_t));
     return WString(str, n);
+}
+
 }

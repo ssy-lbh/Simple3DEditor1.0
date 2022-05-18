@@ -5,6 +5,8 @@
 
 #include <util/List.h>
 
+namespace simple3deditor {
+
 class GLVertexFormat {
 public:
     struct VertexAttrib {
@@ -19,5 +21,7 @@ public:
     GLVertexFormat();
     ~GLVertexFormat();
 };
+
+}
 
 #endif

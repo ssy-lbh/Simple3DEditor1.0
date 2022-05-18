@@ -6,6 +6,8 @@
 #include <io/IOStream.h>
 #include <util/String.h>
 
+namespace simple3deditor {
+
 // 设计中
 class File : public Object, public IInputStream, public IOutputStream {
 protected:
@@ -52,5 +54,7 @@ public:
     static bool IsSpecial(String s);
     static bool IsSpecial(WString s);
 };
+
+}
 
 #endif

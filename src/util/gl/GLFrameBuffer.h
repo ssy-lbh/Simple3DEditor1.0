@@ -5,6 +5,8 @@
 
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 class GLFrameBuffer final : public Object {
 private:
     uint frame = 0;
@@ -25,5 +27,7 @@ public:
     void EnableRenderBuffer();
     void DisableRenderBuffer();
 };
+
+}
 
 #endif

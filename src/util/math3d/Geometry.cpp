@@ -6,6 +6,8 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <editor/main/ViewObject.h>
 
+namespace simple3deditor {
+
 Vertex::Vertex(){}
 
 Vertex::Vertex(Point3 pos) : pos(pos) {}
@@ -234,4 +236,6 @@ bool Face::Intersect(Point3 ori, Vector3 dir, Vector3* bary, float* dis){
         *dis = dir.Magnitude() * invX;
     return pos.y >= 0.0f && pos.y <= 1.0f &&
             pos.z >= 0.0f && pos.z <= 1.0f;
+}
+
 }

@@ -2,6 +2,8 @@
 
 #include <lib/glew/gl/glew.h>
 
+namespace simple3deditor {
+
 VertexBuffer::VertexBuffer(uint vertSize) : vertSize(vertSize) {
     glGenVertexArrays(1, &array);
     glGenBuffers(1, &buffer);
@@ -70,4 +72,6 @@ void VertexBuffer::DrawAll(Topology topology){
     SetTopology(topology);
     glBindVertexArray(array);
     glDrawArrays((uenum)topology, 0, count);
+}
+
 }

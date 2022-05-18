@@ -5,6 +5,8 @@
 
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 // 除非管理好引用关系，不然不能直接赋值
 class Property : public Object {
 private:
@@ -101,5 +103,7 @@ public:
     void InsertValue(float frame);
     void InsertValue(float frame, Quaternion val);
 };
+
+}
 
 #endif

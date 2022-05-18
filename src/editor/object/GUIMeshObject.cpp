@@ -16,6 +16,8 @@
 #include <editor/main/ViewManager.h>
 #include <editor/object/GUIObject.h>
 
+namespace simple3deditor {
+
 GUIMeshObject::GUIMeshObject() : GUIManagerObject(L"GUIMesh", ViewObjectType::OBJECT_GUI_MESH) {
     mesh = new Mesh(this);
     tex = new GLRenderTexture2D(500, 500, GL_RGBA32F);
@@ -133,4 +135,6 @@ void GUIMeshObject::OnRenderUVMap(){
 
 Mesh* GUIMeshObject::GetMesh(){
     return mesh;
+}
+
 }

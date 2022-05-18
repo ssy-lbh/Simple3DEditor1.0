@@ -8,6 +8,8 @@
 #include <util/gl/GLTexture2D.h>
 #include <util/os/Font.h>
 
+namespace simple3deditor {
+
 UIManager::UIManager(){}
 
 UIManager::~UIManager(){
@@ -203,3 +205,5 @@ void IWindow::OnMouseWheel(int delta){}
 void IWindow::OnMenuAccel(int id, bool accel){}
 void IWindow::OnDropFileA(const char* path){}
 void IWindow::OnDropFileW(const wchar_t* path){}
+
+}

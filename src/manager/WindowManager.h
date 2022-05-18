@@ -6,6 +6,8 @@
 #include <util/List.h>
 #include <util/String.h>
 
+namespace simple3deditor {
+
 class WindowRegistry : public Object {
 public:
     // 窗口名称
@@ -31,5 +33,7 @@ public:
     IWindow* NewWindow(WString name);
     List<WindowRegistry*>& GetWindows();
 };
+
+}
 
 #endif

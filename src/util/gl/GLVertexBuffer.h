@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class GLVertexBuffer final : public Object {
 private:
     uint buffer;
@@ -13,5 +15,7 @@ public:
 
     uint GetBuffer();
 };
+
+}
 
 #endif

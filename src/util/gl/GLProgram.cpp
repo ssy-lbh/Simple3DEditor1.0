@@ -5,6 +5,8 @@
 #include <util/os/Log.h>
 #include <util/gl/GLShader.h>
 
+namespace simple3deditor {
+
 GLProgram::GLProgram(){
     prog = glCreateProgram();
 }
@@ -50,4 +52,6 @@ void GLProgram::Disable(){
 
 uint GLProgram::GetProgram(){
     return prog;
+}
+
 }

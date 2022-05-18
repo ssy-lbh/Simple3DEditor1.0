@@ -15,7 +15,9 @@
 #include <editor/main/Operation.h>
 #include <editor/gui/Menu.h>
 
-class MoveOperation : public IOperation {
+namespace simple3deditor {
+
+class UVEditWindow::MoveOperation : public IOperation {
 private:
     struct MoveInfo {
         Vertex* vert;
@@ -76,7 +78,7 @@ public:
     }
 };
 
-class EmptyTool : public ITool {
+class UVEditWindow::EmptyTool : public ITool {
 private:
     UVEditWindow* window;
 
@@ -91,7 +93,7 @@ public:
     }
 };
 
-class SelectTool : public ITool {
+class UVEditWindow::SelectTool : public ITool {
 private:
     UVEditWindow* window;
     Vector2 start;
@@ -331,4 +333,6 @@ void UVEditWindow::SetTool(ITool* tool){
     }
     curTool = tool;
     tool->OnSelect();
+}
+
 }

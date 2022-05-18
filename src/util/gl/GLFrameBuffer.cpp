@@ -5,6 +5,8 @@
 #include <editor/main/ViewManager.h>
 #include <util/gl/GLRenderTexture2D.h>
 
+namespace simple3deditor {
+
 GLFrameBuffer::GLFrameBuffer(){
     glGenFramebuffers(1, &frame);
 }
@@ -82,4 +84,6 @@ void GLFrameBuffer::DisableRenderBuffer(){
     glBindFramebuffer(GL_FRAMEBUFFER, frame);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 }

@@ -5,6 +5,8 @@
 
 #include <functional>
 
+namespace simple3deditor {
+
 // 我发现lambda表达式若是直接捕获成员，则是通过this引用访问
 // 如果想拷贝其值，新建一个局部变量用作副本也许可行
 template <typename T>
@@ -198,5 +200,7 @@ public:
     T operator()() const{ return func(); }
     T Get() const{ return func(); }
 };
+
+}
 
 #endif

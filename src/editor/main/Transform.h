@@ -6,6 +6,8 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <util/math3d/Property.h>
 
+namespace simple3deditor {
+
 class Transform final : public Object {
 public:
     enum RotationMode {
@@ -52,5 +54,7 @@ public:
     void InsertRot(float frame);
     void InsertScale(float frame);
 };
+
+}
 
 #endif

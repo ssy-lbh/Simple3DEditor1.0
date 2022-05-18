@@ -11,6 +11,8 @@
 
 #include <util/List.h>
 
+namespace simple3deditor {
+
 class ThreadPool final : public Object {
 private:
     List<std::thread> workers;
@@ -79,5 +81,7 @@ public:
             workers[i].join();
     }
 };
+
+}
 
 #endif

@@ -3,7 +3,10 @@
 
 #include <define.h>
 
-interface IOperation : public Object {
+namespace simple3deditor {
+
+// 含有Object，实际上可以算作抽象类
+class IOperation : public Object {
 public:
     IOperation();
     virtual ~IOperation();
@@ -16,5 +19,7 @@ public:
     virtual void OnMove();
     virtual void OnCommand(int id);
 };
+
+}
 
 #endif

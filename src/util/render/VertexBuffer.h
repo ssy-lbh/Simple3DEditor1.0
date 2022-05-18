@@ -7,6 +7,8 @@
 
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 enum class Topology {
     TRIANGLES = GL_TRIANGLES,
     TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
@@ -42,5 +44,7 @@ public:
     void DrawAll();
     void DrawAll(Topology topology);
 };
+
+}
 
 #endif

@@ -7,6 +7,8 @@
 #include <util/String.h>
 #include <util/StringBuilder.h>
 
+namespace simple3deditor {
+
 String ShellFileSelectWindow(const String filter, int flags, bool save){
     OPENFILENAMEA ofn;
     char buffer[DEFAULT_STRING_LENGTH];
@@ -333,4 +335,6 @@ WString GetAppDirectoryW(){
         div1 = div2;
 
     return res.SubString(0, div1);
+}
+
 }

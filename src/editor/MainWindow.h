@@ -7,6 +7,8 @@
 #include <util/math3d/Camera.h>
 #include <editor/main/Window.h>
 
+namespace simple3deditor {
+
 enum class ObjectOperation {
     MOVE,
     ROTATE,
@@ -36,12 +38,25 @@ private:
 
     ObjectOperation objOp = ObjectOperation::MOVE;
 
+    class MoveOperation;
+    class ExcludeOperation;
+    class RotateOperation;
+    class SizeOperation;
+    class EmptyTool;
+    class SelectTool;
+
     friend class MoveOperation;
     friend class ExcludeOperation;
     friend class RotateOperation;
     friend class SizeOperation;
     friend class EmptyTool;
     friend class SelectTool;
+
+    class MoveButton;
+    class RotateButton;
+
+    friend class MoveButton;
+    friend class RotateButton;
 
 protected:
     // 覆盖了父类函数
@@ -89,5 +104,7 @@ public:
     bool LoadMesh(AViewObject* obj);
     bool LoadMesh(AViewObject* obj, WString path);
 };
+
+}
 
 #endif

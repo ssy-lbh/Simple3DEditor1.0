@@ -6,6 +6,8 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <editor/main/ViewObject.h>
 
+namespace simple3deditor {
+
 class AudioListenerObject final : public AViewObject {
 private:
     Point3 recPos;
@@ -26,5 +28,7 @@ public:
     void SetDopplerEffect(bool on);
     bool HasDopplerEffect();
 };
+
+}
 
 #endif

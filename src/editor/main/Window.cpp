@@ -2,6 +2,8 @@
 
 #include <editor/object/GUIManagerObject.h>
 
+namespace simple3deditor {
+
 AWindow::AWindow(){}
 AWindow::~AWindow(){}
 
@@ -122,4 +124,6 @@ void AGUIWindow::OnRightUp(int x, int y){
 
 void AGUIWindow::Serialize(IOutputStream& os){
     os.WriteWithLen(WINDOW_ID);
+}
+
 }

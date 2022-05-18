@@ -7,6 +7,8 @@
 #include <util/os/Log.h>
 #include <util/os/Resource.h>
 
+namespace simple3deditor {
+
 GLShader::GLShader(uenum stage){
     shader = glCreateShader(stage);
 }
@@ -70,4 +72,6 @@ uenum GLShader::GetStage(){
     int stage;
     glGetShaderiv(shader, GL_SHADER_TYPE, &stage);
     return (uenum)stage;
+}
+
 }

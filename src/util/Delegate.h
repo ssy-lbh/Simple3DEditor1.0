@@ -7,6 +7,8 @@
 
 #include <util/List.h>
 
+namespace simple3deditor {
+
 template <typename... U>
 class Delegate {
 private:
@@ -49,5 +51,7 @@ public:
     void Clear(size_t memory){ funcs.Clear(memory); }
     std::function<void(U...)>& operator[](size_t index){ return funcs[index]; }
 };
+
+}
 
 #endif

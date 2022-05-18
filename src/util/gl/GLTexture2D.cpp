@@ -8,6 +8,8 @@
 #include <util/os/Log.h>
 #include <util/gl/GLRenderTexture2D.h>
 
+namespace simple3deditor {
+
 GLTexture2D::GLTexture2D(){}
 
 GLTexture2D::GLTexture2D(const char* path){
@@ -116,4 +118,6 @@ void GLTexture2D::SetMagFilter(uenum val){
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, val);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 }

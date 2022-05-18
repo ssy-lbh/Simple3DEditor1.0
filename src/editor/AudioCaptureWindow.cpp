@@ -19,6 +19,8 @@
 // 应在一切windows相关类型定义之后
 #include <lib/soundtouch/SoundTouch.h>
 
+namespace simple3deditor {
+
 AudioCaptureWindow::AudioCaptureWindow(){
     DebugLog("AudioCaptureWindow Launched");
     
@@ -126,7 +128,7 @@ void AudioCaptureWindow::ProcessInput(){
     ALint offset = (capOffset & SAMPLE_MASK);
 
     alcGetIntegerv(capDev, ALC_CAPTURE_SAMPLES, 1, &cnt);
-    cnt = Min(cnt, (SAMPLE_SIZE) - offset);
+    cnt = Min((uint)cnt, SAMPLE_SIZE - offset);
 
     alcCaptureSamples(capDev, (soundtouch::SAMPLETYPE*)capBuf + offset, cnt);
 
@@ -196,7 +198,7 @@ void AudioCaptureWindow::ProcessOutput(){
     ALint cnt;
     ALint offset = (recOffset & SAMPLE_MASK);
 
-    cnt = Min((ALint)soundTouch->numSamples(), (SAMPLE_SIZE) - offset);
+    cnt = Min(soundTouch->numSamples(), SAMPLE_SIZE - offset);
 
     soundTouch->receiveSamples((soundtouch::SAMPLETYPE*)recBuf + offset, cnt);
     if (cnt == (SAMPLE_SIZE) - offset)
@@ -390,4 +392,6 @@ bool AudioCaptureWindow::CloseCaptureDevice(){
     capDev = NULL;
 
     return res;
+}
+
 }

@@ -5,6 +5,8 @@
 
 #include <util/math3d/Math.h>
 
+namespace simple3deditor {
+
 template <typename T>
 class TVector2 {
 public:
@@ -2501,6 +2503,8 @@ TRect<T> TRect<T>::ChildRect(T left, T right, T bottom, T top) const{
     rect.top = this->bottom + Round(size.y * Clamp((top + 1.0f) * 0.5f, 0.0f, 1.0f));
 
     return rect;
+}
+
 }
 
 #endif

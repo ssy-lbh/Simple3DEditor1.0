@@ -6,6 +6,8 @@
 #include <util/math3d/Geometry.h>
 #include <editor/main/ViewObject.h>
 
+namespace simple3deditor {
+
 class CubicBezierObject final : public AViewObject {
 private:
     Vertex v[4];
@@ -22,5 +24,7 @@ public:
     virtual void OnRender() override;
     virtual void OnRenderUVMap() override;
 };
+
+}
 
 #endif

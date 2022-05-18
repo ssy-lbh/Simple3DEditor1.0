@@ -13,6 +13,8 @@
 #include <editor/object/AllObjects.h>
 #include <editor/windows/AllWindows.h>
 
+namespace simple3deditor {
+
 TreeWindow::TreeWindow(){
     DebugLog("TreeWindow Launched");
 
@@ -238,3 +240,5 @@ void TreeWindow::Serialize(IOutputStream& os){
 }
 
 void TreeWindow::Deserialize(IInputStream& os){}
+
+}

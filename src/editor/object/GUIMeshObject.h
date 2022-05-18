@@ -7,6 +7,8 @@
 #include <util/gl/GLFrameBuffer.h>
 #include <editor/object/GUIManagerObject.h>
 
+namespace simple3deditor {
+
 class GUIMeshObject final : public GUIManagerObject {
 protected:
     Mesh* mesh;
@@ -32,5 +34,7 @@ public:
 
     Mesh* GetMesh();
 };
+
+}
 
 #endif

@@ -5,6 +5,8 @@
 
 #include <editor/object/GUIObject.h>
 
+namespace simple3deditor {
+
 class AWindowObject : public AGUIObject {
 protected:
     Vector2 cursorCoord;
@@ -40,5 +42,7 @@ public:
     virtual void OnDropFileA(const char* path) override;
     virtual void OnDropFileW(const wchar_t* path) override;
 };
+
+}
 
 #endif

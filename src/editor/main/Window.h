@@ -6,6 +6,8 @@
 #include <io/Serializable.h>
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 class AWindow : public Object, public IMemorable {
 protected:
     bool focus = false;
@@ -74,5 +76,7 @@ public:
     virtual void Serialize(IOutputStream& os) override;
     using AWindow::Deserialize;
 };
+
+}
 
 #endif

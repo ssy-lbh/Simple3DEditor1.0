@@ -5,6 +5,8 @@
 #include <util/physics/AllColliders.h>
 #include <editor/main/ViewObject.h>
 
+namespace simple3deditor {
+
 ACollider::ACollider(ColliderType type) : type(type) {}
 ACollider::~ACollider(){}
 
@@ -36,4 +38,6 @@ void ACollider::OnCollide(const ACollider* collider) const{
         OnCollideMesh(dynamic_cast<const MeshCollider*>(collider));
         break;
     }
+}
+
 }

@@ -4,10 +4,7 @@
 #include <lib/glut/glut.h>
 
 #include <res.h>
-#include <editor/AllWindows.h>
-#include <editor/gui/Container.h>
-#include <editor/gui/Menu.h>
-#include <editor/dialog/Tips.h>
+#include <io/File.h>
 #include <util/AudioUtils.h>
 #include <util/StringBuilder.h>
 #include <util/os/Log.h>
@@ -17,11 +14,21 @@
 #include <util/os/Shell.h>
 #include <util/os/Resource.h>
 #include <util/gl/GLUtils.h>
+#include <editor/AllWindows.h>
+#include <editor/gui/Container.h>
+#include <editor/gui/Menu.h>
+#include <editor/dialog/Tips.h>
 #include <editor/main/ViewObject.h>
 #include <editor/object/MeshObject.h>
 #include <editor/object/GUIMeshObject.h>
 #include <editor/object/CameraObject.h>
 #include <editor/object/AudioListenerObject.h>
+
+#ifdef PLATFORM_WINDOWS
+#include <util/os/System.h>
+#endif
+
+namespace simple3deditor {
 
 LocalData::LocalData(){
     renderOptions.objOp = ObjectOperation::MOVE;
@@ -182,12 +189,18 @@ GlobalData::GlobalData(){
     RegisterWindow<RenderWindow>();
     RegisterWindow<TreeWindow>();
     RegisterWindow<UVEditWindow>();
+
+    physicsCommon = new reactphysics3d::PhysicsCommon();
+    physicsWorld = physicsCommon->createPhysicsWorld();
 }
 
 GlobalData::~GlobalData(){
     if (scene) delete scene;
     if (screen) delete screen;
     Free(windowReg);
+
+    physicsCommon->destroyPhysicsWorld(physicsWorld);
+    delete physicsCommon;
 }
 
 void GlobalData::SelectObject(AViewObject* o){
@@ -259,8 +272,6 @@ AWindow* GlobalData::ConstructWindow(IInputStream& is){
 }
 
 #ifdef PLATFORM_WINDOWS
-#include <util/os/System.h>
-
 void Main::SetCursor(int id){
     AppFrame* frame = AppFrame::GetLocalInst();
     ::SetCursor(LoadCursorA(GetModule(), MAKEINTRESOURCEA(id)));
@@ -411,8 +422,6 @@ Mesh* Main::GetMesh(AViewObject* o){
     return NULL;
 }
 
-#include <io/File.h>
-
 int Main::MainEntry(int argc, char** argv){
     Init();
     AudioUtils::InitOpenAL();
@@ -503,6 +512,8 @@ void Main::Uninit(){
 
 GlobalData* Main::data = NULL;
 
+}
+
 int main(int argc, char** argv){
-    return Main::MainEntry(argc, argv);
+    return simple3deditor::Main::MainEntry(argc, argv);
 }

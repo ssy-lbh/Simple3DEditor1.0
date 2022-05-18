@@ -6,6 +6,8 @@
 
 #include <util/os/Font.h>
 
+namespace simple3deditor {
+
 int DebugLog(const char* format, ...){
     __builtin_va_list list;
     __builtin_va_start(list, format);
@@ -70,4 +72,6 @@ int DebugError(const wchar_t* format, ...){
     __builtin_putchar('\n');
     SetConsoleTextAttribute(hOut, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
     return ret;
+}
+
 }

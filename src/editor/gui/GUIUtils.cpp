@@ -12,6 +12,8 @@
 #include <util/os/Font.h>
 #include <editor/main/ViewManager.h>
 
+namespace simple3deditor {
+
 RoundButton::RoundButton() : AGUIObject(L"RoundButton", ViewObjectType::OBJECT_GUI_ROUND_BUTTON) {}
 RoundButton::RoundButton(Point2 center, float radius)
     : AGUIObject(L"RoundButton", ViewObjectType::OBJECT_GUI_ROUND_BUTTON), center(center), radius(radius) {}
@@ -359,4 +361,6 @@ void VerticalProgressBar::OnRender(){
     glColorv3(hover ? hoverBtnColor : defaultBtnColor);
     GLUtils::DrawRect(posX - btnX, btnPos - btnY,
                         posX + btnX, btnPos + btnY);
+}
+
 }

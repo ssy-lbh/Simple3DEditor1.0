@@ -9,6 +9,8 @@
 #include <util/gl/GLTexture2D.h>
 #include <util/gl/GLRenderTexture2D.h>
 
+namespace simple3deditor {
+
 GLComputeProgram::GLComputeProgram(int resid){
     int resSize;
     const char* srcData;
@@ -101,4 +103,6 @@ void GLComputeProgram::BindTexture(uint unit, GLTexture2D* texture, uenum access
 
 void GLComputeProgram::BindTexture(uint unit, GLRenderTexture2D* texture, uenum access, uenum format){
     BindTexture(unit, texture->GetTexture(), access, format);
+}
+
 }

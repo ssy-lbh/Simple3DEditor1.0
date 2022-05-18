@@ -5,6 +5,8 @@
 
 #include <net/Socket.h>
 
+namespace simple3deditor {
+
 class UDPSocket : public Object, public ISocket {
 private:
     SOCKET s;
@@ -22,5 +24,7 @@ public:
     virtual void Close() override;
     virtual bool IsClosed() override;
 };
+
+}
 
 #endif

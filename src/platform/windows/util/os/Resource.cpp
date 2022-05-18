@@ -14,6 +14,8 @@
 #include <util/os/Log.h>
 #include <util/os/System.h>
 
+namespace simple3deditor {
+
 String Resource::GetString(int id){
     const char* pstr;
     size_t len;
@@ -219,4 +221,6 @@ void Resource::StoreHDR(String path, const void* data, int x, int y, int comp){
     stbi_write_hdr(path.GetString(), x, y, comp, buf);
 
     delete[] buf;
+}
+
 }

@@ -4,6 +4,8 @@
 
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 GLRenderTexture2D::GLRenderTexture2D(int x, int y, uenum format) : GLTexture2D(), x(x), y(y), format(format) {
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -51,4 +53,6 @@ int GLRenderTexture2D::GetHeight(){
 
 uenum GLRenderTexture2D::GetFormat(){
     return format;
+}
+
 }

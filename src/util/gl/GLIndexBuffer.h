@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class GLIndexBuffer final : public Object {
 private:
     uint buffer;
@@ -11,5 +13,7 @@ public:
     GLIndexBuffer();
     ~GLIndexBuffer();
 };
+
+}
 
 #endif

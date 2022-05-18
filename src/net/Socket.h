@@ -7,6 +7,8 @@
 #include <io/IOStream.h>
 #include <util/String.h>
 
+namespace simple3deditor {
+
 #ifdef PLATFORM_WINDOWS64
 typedef unsigned long long SOCKET;
 #endif
@@ -25,5 +27,7 @@ public:
     virtual void Close() = 0;
     virtual bool IsClosed() = 0;
 };
+
+}
 
 #endif

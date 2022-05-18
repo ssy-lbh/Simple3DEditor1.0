@@ -8,6 +8,8 @@
 #include <util/os/Time.h>
 #include <editor/AudioPlayerWindow.h>
 
+namespace simple3deditor {
+
 CAudioSourceLoader::CAudioSourceLoader(AudioSourceObject*& ref) : ref(ref) {}
 
 CAudioSourceLoader::~CAudioSourceLoader(){
@@ -216,4 +218,6 @@ void AudioSourceObject::SetDopplerEffect(bool on){
 
 bool AudioSourceObject::HasDopplerEffect(){
     return dopplerEffect;
+}
+
 }

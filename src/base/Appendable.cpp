@@ -4,6 +4,8 @@
 
 #include <util/String.h>
 
+namespace simple3deditor {
+
 IAppendableA& IAppendableA::Append(const char* s){
     Append(s, strlen(s));
     return *this;
@@ -32,4 +34,6 @@ IAppendableW& IAppendableW::Append(wchar_t c){
 IAppendableW& IAppendableW::Append(const WString& s){
     Append(s.GetString(), s.GetLength());
     return *this;
+}
+
 }

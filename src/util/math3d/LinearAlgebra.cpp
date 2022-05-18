@@ -2,6 +2,8 @@
 
 #include <util/math3d/Math.h>
 
+namespace simple3deditor {
+
 // 可能是因为一旦全特化，编译器直接将函数汇编输出
 // 所以这里将声明和实现分离
 template <>
@@ -441,4 +443,6 @@ Vector2 Matrix2x3::GetScale() const{
         Sqrt(_11 * _11 + _12 * _12),
         Sqrt(_21 * _21 + _22 * _22)
     );
+}
+
 }

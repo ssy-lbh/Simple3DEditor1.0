@@ -6,6 +6,8 @@
 #include <util/math3d/Camera.h>
 #include <editor/main/Window.h>
 
+namespace simple3deditor {
+
 class RenderWindow final : public AWindow, public CCamera {
 private:
     Rect rect;
@@ -54,5 +56,7 @@ public:
 
     void SaveImage(String file);
 };
+
+}
 
 #endif

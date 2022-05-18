@@ -9,6 +9,8 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <editor/gui/UIManager.h>
 
+namespace simple3deditor {
+
 using AnimationFunction = std::function<float(Vector2, Vector2, float)>;
 
 class AnimationCurve : public IButton {
@@ -19,11 +21,10 @@ private:
         SEGMENT
     };
 
-    static const float BOUND_TOP;
-    static const float BOUND_BOTTOM;
-    // 以像素计的大小
-    static const float ERROR_NUM;
-    static const float DEPTH;
+    static constexpr float BOUND_TOP = 0.8f;
+    static constexpr float BOUND_BOTTOM = -0.8f;
+    static constexpr float ERROR_NUM = 10.0f;
+    static constexpr float DEPTH = -1.0f;
 
     float startFrame;
     float endFrame;
@@ -61,5 +62,7 @@ public:
     void RemovePoint(size_t index);
     void FlushRange();
 };
+
+}
 
 #endif

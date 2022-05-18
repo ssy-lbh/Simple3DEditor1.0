@@ -12,7 +12,9 @@
 #include <editor/main/ViewObject.h>
 #include <editor/gui/AnimationCurve.h>
 
-class FrameIndicator : public IButton {
+namespace simple3deditor {
+
+class AnimationWindow::FrameIndicator : public IButton {
 private:
     AnimationWindow* window;
     float pos = 0.0f;
@@ -64,7 +66,7 @@ public:
     }
 };
 
-class Bottom : public IButton {
+class AnimationWindow::Bottom : public IButton {
 private:
     static constexpr Vector3 COLOR = {0.0f, 0.0f, 0.0f};
     static constexpr float DEPTH = -1.0f;
@@ -86,7 +88,7 @@ public:
     }
 };
 
-class PlayButton : public IButton {
+class AnimationWindow::PlayButton : public IButton {
 private:
     AnimationWindow* window;
 
@@ -334,4 +336,6 @@ void AnimationWindow::Stop(){
 
 bool AnimationWindow::IsPlaying(){
     return play;
+}
+
 }

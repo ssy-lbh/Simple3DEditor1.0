@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class GLLights final : public Object {
 private:
     static bool use[8];
@@ -14,5 +16,7 @@ public:
     static void Enable(uenum light);
     static void Disable(uenum light);
 };
+
+}
 
 #endif

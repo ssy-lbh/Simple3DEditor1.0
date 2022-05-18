@@ -1,5 +1,7 @@
 #include <util/os/System.h>
 
+namespace simple3deditor {
+
 static HMODULE GetCurrentModule(){
 	HMODULE hModule;
 
@@ -15,4 +17,6 @@ HMODULE GetModule(){
     static HMODULE hModule = GetCurrentModule();
 
     return hModule;
+}
+
 }

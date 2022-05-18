@@ -8,6 +8,8 @@
 #include <util/Delegate.h>
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 enum class MenuItemType {
     DEFAULT,
     GROUP,
@@ -33,9 +35,9 @@ public:
 // 可以继承以实现多种样式的菜单
 class Menu : public Object {
 protected:
-    static const float WIDTH_PIXELS;
-    static const float CORNER_PIXELS;
-    static const float LINE_PIXELS;
+    static constexpr float WIDTH_PIXELS = 250.0f;
+    static constexpr float CORNER_PIXELS = 10.0f;
+    static constexpr float LINE_PIXELS = 30.0f;
 
     List<MenuItem*> items;
 
@@ -73,5 +75,7 @@ public:
     void PressLeft();
     void PressRight();
 };
+
+}
 
 #endif

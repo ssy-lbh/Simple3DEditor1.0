@@ -6,6 +6,8 @@
 #include <util/math3d/Geometry.h>
 #include <editor/main/ViewObject.h>
 
+namespace simple3deditor {
+
 class PointLightObject final : public AViewObject {
 private:
     Vertex v;
@@ -24,5 +26,7 @@ public:
 
     void UpdateLight();
 };
+
+}
 
 #endif

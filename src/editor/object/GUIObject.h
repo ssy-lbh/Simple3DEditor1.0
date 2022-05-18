@@ -5,6 +5,8 @@
 
 #include <editor/main/ViewObject.h>
 
+namespace simple3deditor {
+
 class AGUIObject : public AViewObject {
 protected:
     GUIManagerObject* parentGUIMgr = NULL;
@@ -23,5 +25,7 @@ public:
     GUIManagerObject* GetGUIManager();
     void SetGUIManager(GUIManagerObject* guiMgr);
 };
+
+}
 
 #endif

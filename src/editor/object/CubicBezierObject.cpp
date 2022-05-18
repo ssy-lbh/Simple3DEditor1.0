@@ -5,6 +5,8 @@
 #include <util/gl/GLSimplified.h>
 #include <util/gl/GLUtils.h>
 
+namespace simple3deditor {
+
 CubicBezierObject::CubicBezierObject() : AViewObject(L"CubicBezier", ViewObjectType::OBJECT_BEZIER_CURVE) {
     v[0].pos = Vector3(-5.0f, 0.0f, 0.0f);
     v[1].pos = Vector3(0.0f, 0.0f, 0.0f);
@@ -116,4 +118,6 @@ void CubicBezierObject::OnRenderUVMap(){
     glColor3f(1.0f, 1.0f, 1.0f);
     GLUtils::DrawBezier(v[0].uv, v[1].uv, v[2].uv, v[3].uv, 0.01f);
     glDisable(GL_LINE_SMOOTH);
+}
+
 }

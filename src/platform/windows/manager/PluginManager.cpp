@@ -6,6 +6,8 @@
 #include <io/File.h>
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 Plugin::Plugin(String name) : name(name) {
     StringBuilderA path;
 
@@ -80,4 +82,6 @@ Plugin* PluginManager::GetPlugin(String name){
 
 List<Plugin*>& PluginManager::GetPlugins(){
     return plugins;
+}
+
 }

@@ -5,6 +5,8 @@
 
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 class CCamera {
 protected:
     void SetLookAt(Point3 at);
@@ -32,5 +34,7 @@ public:
     Vector3 camUp = Vector3::up;
     Vector3 camForward = Vector3::forward;
 };
+
+}
 
 #endif

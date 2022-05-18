@@ -6,6 +6,8 @@
 #include <editor/gui/GUIUtils.h>
 #include <editor/object/GUIManagerObject.h>
 
+namespace simple3deditor {
+
 AttributeWindow::AttributeWindow(){
     DebugLog("AttributeWindow Launched");
     guiMgr = new GUIManagerObject();
@@ -89,4 +91,6 @@ void AttributeWindow::UpdateWindowSize(int x, int y){
 
 void AttributeWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);
+}
+
 }

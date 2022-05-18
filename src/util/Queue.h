@@ -5,6 +5,8 @@
 
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 template <typename T>
 class Queue : public Object {
 private:
@@ -308,6 +310,8 @@ void Free(Queue<T*>& queue){
     queue.Foreach([](T* item){
         delete item;
     });
+}
+
 }
 
 #endif

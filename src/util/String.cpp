@@ -7,6 +7,8 @@
 #include <util/os/System.h>
 #include <util/os/Font.h>
 
+namespace simple3deditor {
+
 String::String(){
     str = new char[1];
     str[0] = '\0';
@@ -881,4 +883,6 @@ PackWString::PackWString(const wchar_t* s, size_t len) : WString(false) {
 
 PackWString::~PackWString(){
     str = NULL;
+}
+
 }

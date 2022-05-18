@@ -13,6 +13,8 @@
 #include <editor/main/ViewManager.h>
 #include <editor/object/GUIObject.h>
 
+namespace simple3deditor {
+
 GUIManagerObject::GUIManagerObject() : AGUIObject(L"GUIManager", ViewObjectType::OBJECT_GUI_MANAGER) {}
 
 GUIManagerObject::GUIManagerObject(const wchar_t* name, ViewObjectType type) : AGUIObject(name, type) {}
@@ -215,4 +217,6 @@ AGUIObject* GUIManagerObject::FindCurrent(){
         }
     });
     return cur;
+}
+
 }

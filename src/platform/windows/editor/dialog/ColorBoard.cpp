@@ -8,6 +8,8 @@
 #include <util/os/System.h>
 #include <util/math3d/Math.h>
 
+namespace simple3deditor {
+
 static void EnableOpenGL(HWND hWnd, HDC* hDC, HGLRC* hRC){
     PIXELFORMATDESCRIPTOR pfd;
 
@@ -243,4 +245,6 @@ void ColorBoard::UpdateWindowSize(int x, int y){
 void ColorBoard::UpdateCursor(int x, int y){
     cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
     cursorPos.y = 1.0f - 2.0f * y / cliSize.y;
+}
+
 }

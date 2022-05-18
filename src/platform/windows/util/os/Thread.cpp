@@ -4,6 +4,8 @@
 
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 void ThreadUtils::ExitThread(int code){
     ::ExitThread(code);
 }
@@ -37,4 +39,6 @@ void ThreadLocal::Set(int idx, void* val){
 
 void* ThreadLocal::Get(int idx){
     return TlsGetValue(tlsIndex[idx]);
+}
+
 }

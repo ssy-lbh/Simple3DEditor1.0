@@ -5,6 +5,8 @@
 #include <util/physics/Rigidbody.h>
 #include <util/physics/AllColliders.h>
 
+namespace simple3deditor {
+
 SphereCollider::SphereCollider(Rigidbody* rb) : ACollider(ColliderType::SPHERE) {
     this->rb = rb;
 }
@@ -34,3 +36,5 @@ void SphereCollider::OnCollideSphere(const SphereCollider* collider) const{
 }
 
 void SphereCollider::OnCollideMesh(const MeshCollider* collider) const{}
+
+}

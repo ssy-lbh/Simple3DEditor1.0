@@ -5,6 +5,8 @@
 
 #include <util/gl/GLTexture2D.h>
 
+namespace simple3deditor {
+
 class GLRenderTexture2D final : public GLTexture2D {
 private:
     uint tex;
@@ -23,5 +25,7 @@ public:
     int GetHeight();
     uenum GetFormat();
 };
+
+}
 
 #endif

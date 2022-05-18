@@ -5,6 +5,8 @@
 
 #include <editor/main/ViewObject.h>
 
+namespace simple3deditor {
+
 class MeshObject : public AViewObject {
 protected:
     Mesh* mesh;
@@ -25,5 +27,7 @@ public:
 
     Mesh* GetMesh();
 };
+
+}
 
 #endif

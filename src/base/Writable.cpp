@@ -4,6 +4,8 @@
 
 #include <util/String.h>
 
+namespace simple3deditor {
+
 void IWritable::Write(char c){
     Write(&c, sizeof(char));
 }
@@ -68,4 +70,6 @@ void IWritable::WriteWithLen(const String& s){
 
 void IWritable::WriteWithLen(const WString& s){
     WriteWithLen(s.GetString(), s.GetLength());
+}
+
 }

@@ -3,6 +3,10 @@
 
 #include <lib/glew/gl/glew.h>
 
+namespace simple3deditor {
+
 void glInitGLEW();
+
+}
 
 #endif

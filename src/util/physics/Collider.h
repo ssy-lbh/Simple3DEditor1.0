@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 enum class ColliderType {
     CUBE,
     SPHERE,
@@ -32,5 +34,7 @@ public:
     virtual void OnCollideSphere(const SphereCollider* collider) const = 0;
     virtual void OnCollideMesh(const MeshCollider* collider) const = 0;
 };
+
+}
 
 #endif

@@ -3,6 +3,8 @@
 #include <util/os/Log.h>
 #include <util/gl/GLUtils.h>
 
+namespace simple3deditor {
+
 Transform::Transform() : position(Vector3::zero), rotation(Quaternion::one), rotationXYZ(Vector3::zero), scale(Vector3::one) {}
 Transform::~Transform(){}
 
@@ -193,4 +195,6 @@ void Transform::InsertRot(float frame){
 
 void Transform::InsertScale(float frame){
     scale.InsertValue(frame);
+}
+
 }

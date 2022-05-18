@@ -6,6 +6,8 @@
 #include <util/List.h>
 #include <editor/object/WindowObject.h>
 
+namespace simple3deditor {
+
 class TreeWindowObject final : public AWindowObject {
 private:
     List<AViewObject*> objectList;
@@ -41,5 +43,7 @@ public:
 
     void RenderItem(AViewObject* o);
 };
+
+}
 
 #endif

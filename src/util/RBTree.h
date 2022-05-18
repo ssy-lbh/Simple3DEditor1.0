@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 // 红黑树节点
 template <typename K, typename V>
 class RBTreeNode {
@@ -176,5 +178,7 @@ public:
         }
     }
 };
+
+}
 
 #endif

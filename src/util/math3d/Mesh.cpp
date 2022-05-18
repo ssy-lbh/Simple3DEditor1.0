@@ -13,6 +13,8 @@
 #include <util/math3d/Geometry.h>
 #include <editor/main/ViewObject.h>
 
+namespace simple3deditor {
+
 Mesh::Mesh(){}
 
 Mesh::Mesh(AViewObject* object) : object(object) {}
@@ -531,4 +533,6 @@ bool Mesh::EnableTexture(){
 bool Mesh::DisableTexture(){
     GLTexture2D::Disable();
     return true;
+}
+
 }

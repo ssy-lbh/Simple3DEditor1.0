@@ -6,6 +6,8 @@
 #include <util/List.h>
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 class Vertex final : public Object {
 public:
     Point3 pos;
@@ -88,5 +90,7 @@ public:
     // 与三角形所在平面相交时写入bary, dis
     bool Intersect(Point3 ori, Vector3 dir, Vector3* bary, float* dis);
 };
+
+}
 
 #endif

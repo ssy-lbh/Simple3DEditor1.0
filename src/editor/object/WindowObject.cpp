@@ -1,5 +1,7 @@
 #include <editor/object/WindowObject.h>
 
+namespace simple3deditor {
+
 AWindowObject::AWindowObject() : AGUIObject(L"Window", ViewObjectType::OBJECT_WINDOW) {}
 AWindowObject::AWindowObject(const wchar_t* name) : AGUIObject(name, ViewObjectType::OBJECT_WINDOW) {}
 AWindowObject::~AWindowObject(){}
@@ -64,3 +66,5 @@ void AWindowObject::OnMouseWheel(int delta){}
 void AWindowObject::OnMenuAccel(int id, bool accel){}
 void AWindowObject::OnDropFileA(const char* path){}
 void AWindowObject::OnDropFileW(const wchar_t* path){}
+
+}

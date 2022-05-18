@@ -4,6 +4,8 @@
 
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 bool GLLights::use[8] = {false, false, false, false,
                          false, false, false, false};
 uenum GLLights::idx[8] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3,
@@ -41,4 +43,6 @@ void GLLights::Enable(uenum light){
 
 void GLLights::Disable(uenum light){
     glDisable(light);
+}
+
 }

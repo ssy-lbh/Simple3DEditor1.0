@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class GLProgram final : public Object {
 private:
     uint prog;
@@ -21,5 +23,7 @@ public:
     static void Disable();
     uint GetProgram();
 };
+
+}
 
 #endif

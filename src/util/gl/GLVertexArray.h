@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class GLVertexArray final : public Object {
 private:
     uint array;
@@ -15,5 +17,7 @@ public:
     void SetFormat(uint idx, uint size, uenum type, uint offset);
     uint GetArray();
 };
+
+}
 
 #endif

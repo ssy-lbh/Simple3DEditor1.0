@@ -10,6 +10,8 @@
 #include <util/List.h>
 #include <util/String.h>
 
+namespace simple3deditor {
+
 // 先就试做一下这个功能吧
 // 看来有必要将一部分代码做成库，交给插件共享，共通加载同一个动态库
 
@@ -44,5 +46,7 @@ public:
     Plugin* GetPlugin(String name);
     List<Plugin*>& GetPlugins();
 };
+
+}
 
 #endif

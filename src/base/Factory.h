@@ -7,6 +7,8 @@
 
 #include <util/HashMap.h>
 
+namespace simple3deditor {
+
 template <typename T>
 using FFactory = std::function<T*()>;
 
@@ -81,5 +83,7 @@ public:
         map.Foreach(func);
     }
 };
+
+}
 
 #endif

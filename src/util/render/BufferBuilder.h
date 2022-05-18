@@ -7,6 +7,8 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <util/render/VertexBuffer.h>
 
+namespace simple3deditor {
+
 // 位置放在[0]，UV放在[1]，法线放在[2]
 class BufferBuilder : public Object {
 private:
@@ -33,5 +35,7 @@ public:
     void TexCoord(Vector2 uv);
     void Normal(Vector3 normal);
 };
+
+}
 
 #endif

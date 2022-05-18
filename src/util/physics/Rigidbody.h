@@ -5,6 +5,8 @@
 
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 // 物理学运算必要的数据就往里面放
 class Rigidbody final : public Object {
 private:
@@ -26,5 +28,7 @@ public:
     Quaternion GetRotation() const;
     AViewObject* GetObject() const;
 };
+
+}
 
 #endif

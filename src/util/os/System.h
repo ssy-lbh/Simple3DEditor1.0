@@ -6,7 +6,11 @@
 #ifdef PLATFORM_WINDOWS
 #include <windows.h>
 
+namespace simple3deditor {
+
 HMODULE GetModule();
+
+}
 #endif
 
 #endif

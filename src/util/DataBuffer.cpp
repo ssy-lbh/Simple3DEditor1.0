@@ -4,6 +4,8 @@
 
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 DataBuffer::DataBuffer(){
     data = new char[32];
     size = 32;
@@ -128,4 +130,6 @@ PackDataBuffer::PackDataBuffer(const void* s, size_t size) : DataBuffer(false) {
 
 PackDataBuffer::~PackDataBuffer(){
     data = NULL;
+}
+
 }

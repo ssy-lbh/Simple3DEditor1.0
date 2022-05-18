@@ -5,7 +5,9 @@
 #include <util/gl/GLTexture2D.h>
 #include <util/gl/GLSimplified.h>
 
-static inline void Set(GLTexture2D** tex, GLTexture2D* newTex){
+namespace simple3deditor {
+
+static inline void SetTex(GLTexture2D** tex, GLTexture2D* newTex){
     if (*tex)
         delete *tex;
     *tex = newTex;
@@ -49,12 +51,12 @@ GLSkyBox::~GLSkyBox(){
 
 void GLSkyBox::Set(Direction dir, GLTexture2D* tex){
     switch (dir){
-    case LEFT: ::Set(&left, tex); break;
-    case RIGHT: ::Set(&right, tex); break;
-    case FRONT: ::Set(&front, tex); break;
-    case BACK: ::Set(&back, tex); break;
-    case TOP: ::Set(&top, tex); break;
-    case DOWN: ::Set(&down, tex); break;
+    case LEFT: SetTex(&left, tex); break;
+    case RIGHT: SetTex(&right, tex); break;
+    case FRONT: SetTex(&front, tex); break;
+    case BACK: SetTex(&back, tex); break;
+    case TOP: SetTex(&top, tex); break;
+    case DOWN: SetTex(&down, tex); break;
     }
 }
 
@@ -82,12 +84,14 @@ void GLSkyBox::Render(Vector3 pos, float dis){
 
     glDepthMask(GL_FALSE);
 
-    ::Draw(left, v010, v000, v001, v011);
-    ::Draw(right, v100, v110, v111, v101);
-    ::Draw(front, v110, v010, v011, v111);
-    ::Draw(back, v000, v100, v101, v001);
-    ::Draw(top, v111, v011, v001, v101);
-    ::Draw(down, v100, v000, v010, v110);
+    Draw(left, v010, v000, v001, v011);
+    Draw(right, v100, v110, v111, v101);
+    Draw(front, v110, v010, v011, v111);
+    Draw(back, v000, v100, v101, v001);
+    Draw(top, v111, v011, v001, v101);
+    Draw(down, v100, v000, v010, v110);
 
     glDepthMask(GL_TRUE);
+}
+
 }

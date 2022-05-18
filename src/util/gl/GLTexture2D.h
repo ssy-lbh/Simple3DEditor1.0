@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class GLTexture2D : public Object {
 protected:
     uint tex;
@@ -33,5 +35,7 @@ public:
     void SetMinFilter(uenum val);
     void SetMagFilter(uenum val);
 };
+
+}
 
 #endif

@@ -5,6 +5,8 @@
 #include <util/String.h>
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 File::File(){}
 
 File::File(File &&f){
@@ -256,4 +258,6 @@ bool File::IsSpecial(WString s){
     if (s.IgnoreCaseEqual(L"CON") || s.IgnoreCaseEqual(L"NUL"))
         return true;
     return false;
+}
+
 }

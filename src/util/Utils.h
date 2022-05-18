@@ -3,16 +3,26 @@
 
 #include <define.h>
 
+#include <typeinfo.h>
 #include <exception>
 
+namespace simple3deditor {
+
 template <typename T, typename Tp>
-bool InstanceOf(Tp* o){
+inline bool InstanceOf(Tp* o){
+    return typeid(*o) == typeid(T);
+}
+
+template <typename T, typename Tp>
+inline bool ChildOf(Tp* o){
     try{
         dynamic_cast<T*>(o);
     }catch(const std::bad_cast& e){
         return false;
     }
     return true;
+}
+
 }
 
 #endif

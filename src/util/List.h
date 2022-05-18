@@ -7,6 +7,8 @@
 
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 template <typename T>
 class List : public Object {
 private:
@@ -15,17 +17,14 @@ private:
     size_t ptr;
 
     void Check(size_t reserve){
-        if (ptr + reserve < size){
+        if (ptr + reserve < size)
             return;
-        }
-        while (ptr + reserve >= size){
+        while (ptr + reserve >= size)
             size <<= 1;
-        }
         //DebugLog("List %p Size Increased %llu", this, size);
         T* newData = new T[size];
-        for (size_t i = 0; i < ptr; i++){
+        for (size_t i = 0; i < ptr; i++)
             newData[i] = data[i];
-        }
         delete[] data;
         data = newData;
     }
@@ -257,6 +256,8 @@ void Free(List<T*>& list){
     list.Foreach([](T* item){
         delete item;
     });
+}
+
 }
 
 #endif

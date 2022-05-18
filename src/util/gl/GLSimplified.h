@@ -8,6 +8,8 @@
 #include <util/math3d/Math.h>
 #include <util/math3d/LinearAlgebra.h>
 
+namespace simple3deditor {
+
 // 内联函数没有符号，无法分离定义与实现，且可在头文件定义
 inline void glVertexv2(Vector2 v){
     glVertex2f(v.x, v.y);
@@ -44,6 +46,8 @@ inline void glLoadMatrix(Matrix4x4 mat){
 
 inline void glMultMatrix(Matrix4x4 mat){
     glMultMatrixf((GLfloat*)&mat);
+}
+
 }
 
 #endif

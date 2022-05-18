@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 class IAppendableA {
 public:
     virtual IAppendableA& Append(const char* s);
@@ -24,5 +26,7 @@ public:
     using IAppendableA::Append;
     using IAppendableW::Append;
 };
+
+}
 
 #endif

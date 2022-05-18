@@ -12,6 +12,8 @@
 #include <handleapi.h>
 #endif
 
+namespace simple3deditor {
+
 // 应保证单个线程内为单例
 class AppFrame final : public Object {
 #ifdef PLATFORM_WINDOWS
@@ -94,5 +96,7 @@ public:
     MessageType GetLastMessageType();
     int GetExitCode();
 };
+
+}
 
 #endif

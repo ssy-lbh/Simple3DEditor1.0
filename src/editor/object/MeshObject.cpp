@@ -9,6 +9,8 @@
 #include <util/gl/GLSimplified.h>
 #include <util/os/Log.h>
 
+namespace simple3deditor {
+
 MeshObject::MeshObject() : AViewObject(L"Mesh", ViewObjectType::OBJECT_MESH) {
     mesh = new Mesh(this);
 }
@@ -65,4 +67,6 @@ void MeshObject::OnRenderUVMap(){
 
 Mesh* MeshObject::GetMesh(){
     return mesh;
+}
+
 }

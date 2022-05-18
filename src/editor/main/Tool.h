@@ -3,7 +3,10 @@
 
 #include <define.h>
 
-interface ITool : public Object {
+namespace simple3deditor {
+
+// 含有Object，实际上可以算作抽象类
+class ITool : public Object {
 public:
     ITool();
     virtual ~ITool();
@@ -18,5 +21,7 @@ public:
     virtual void OnRender();
     virtual void OnCommand(int id);
 };
+
+}
 
 #endif

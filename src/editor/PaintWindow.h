@@ -8,6 +8,7 @@
 #include <editor/main/Operation.h>
 #include <editor/main/Window.h>
 
+namespace simple3deditor {
 
 class PaintWindow final : public AWindow {
 private:
@@ -17,6 +18,9 @@ private:
     ITool* brush = NULL;
 
     GLRenderTexture2D* paintTex = NULL;
+
+    class ClearBrush;
+    class DefaultBrush; 
 
     friend class ClearBrush;
     friend class DefaultBrush;
@@ -52,5 +56,7 @@ public:
     int GetWidth();
     int GetHeight();
 };
+
+}
 
 #endif

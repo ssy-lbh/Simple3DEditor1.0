@@ -162,7 +162,7 @@ constexpr T LerpClamped(T a, T b, float t){
 
 // 排序为前小后大
 template <typename T>
-void Sort(T& x, T& y){
+inline void Sort(T& x, T& y){
     if (x > y){
         T t;
         t = x; x = y; y = t;

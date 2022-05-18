@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+namespace simple3deditor {
+
 #define THREAD_LOCAL_SIZE 20
 
 #define THREAD_LOCAL_APPFRAME 0
@@ -28,5 +30,7 @@ public:
     static void Set(int idx, void* val);
     static void* Get(int idx);
 };
+
+}
 
 #endif

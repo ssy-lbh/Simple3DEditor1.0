@@ -8,6 +8,8 @@
 #include <util/os/Font.h>
 #include <util/math3d/Math.h>
 
+namespace simple3deditor {
+
 static AnimationFunction leftVal = [](Vector2 p1, Vector2 p2, float val){ return p1.y; };
 static AnimationFunction rightVal = [](Vector2 p1, Vector2 p2, float val){ return p2.y; };
 static AnimationFunction linearVal = [](Vector2 p1, Vector2 p2, float val){ return Lerp(p1.y, p2.y, GetRate(val, p1.x, p2.x)); };
@@ -16,11 +18,6 @@ static AnimationFunction squareVal = [](Vector2 p1, Vector2 p2, float val){
     float rate = GetRate(val, p1.x, p2.x);
     return Lerp(p1.y, p2.y, rate <= 0.5f ? 2.0f * rate * rate : rate * (-2.0f * rate + 4.0f) - 1.0f);
 };
-
-const float AnimationCurve::BOUND_TOP = 0.8f;
-const float AnimationCurve::BOUND_BOTTOM = -0.8f;
-const float AnimationCurve::ERROR_NUM = 10.0f;
-const float AnimationCurve::DEPTH = -1.0f;
 
 AnimationCurve::AnimationCurve(float startFrame, float endFrame) : startFrame(startFrame), endFrame(endFrame) {
     points.Add(Vector2(startFrame, 0.0f));
@@ -249,4 +246,6 @@ void AnimationCurve::FlushRange(){
             x = Abs(points[i].y);
     }
     ratio = 0.8f / x;
+}
+
 }
