@@ -203,7 +203,7 @@ void IWindow::OnFocus(){}
 void IWindow::OnKillFocus(){}
 void IWindow::OnMouseWheel(int delta){}
 void IWindow::OnMenuAccel(int id, bool accel){}
-void IWindow::OnDropFileA(const char* path){}
-void IWindow::OnDropFileW(const wchar_t* path){}
+void IWindow::OnDropFileA(const char* path, uint len){}
+void IWindow::OnDropFileW(const wchar_t* path, uint len){}
 
 }

@@ -328,11 +328,12 @@ void AudioPlayerWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void AudioPlayerWindow::OnDropFileA(const char* path){}
+void AudioPlayerWindow::OnDropFileA(const char* path, uint len){}
 
-void AudioPlayerWindow::OnDropFileW(const wchar_t* path){
-    DebugLog("AudioPlayerWindow::OnDropFileW %S", path);
-    PreloadFile(WString(path));
+void AudioPlayerWindow::OnDropFileW(const wchar_t* path, uint len){
+    String file(path, len);
+    DebugLog("AudioPlayerWindow::OnDropFileW %s", file.GetString());
+    PreloadFile(file);
 }
 
 void AudioPlayerWindow::Serialize(IOutputStream& os){
@@ -345,7 +346,7 @@ void AudioPlayerWindow::OnInsLoad(){
     // 暂不使用 L"PCM音频文件(*.wav)\0*.wav\0所有音频类型(.*)\0*.*\0"，此状态下发现Shell时可能的环境错误
     // 若要使用请拖入文件
     static const WString filter = Resource::GetWString(IDS_WAVFILE_FILTER);
-    WString file = ShellFileSelectWindow(filter, FILESELECT_REQ_PATH | FILESELECT_REQ_FILE);
+    String file = ShellFileSelectWindow(filter, FILESELECT_REQ_PATH | FILESELECT_REQ_FILE);
     if (file.GetLength() == 0){
         DebugLog("Stop Loading");
         return;
@@ -353,7 +354,7 @@ void AudioPlayerWindow::OnInsLoad(){
     PreloadFile(file);
 }
 
-void AudioPlayerWindow::PreloadFile(WString file){
+void AudioPlayerWindow::PreloadFile(String& file){
     if (!file.EndsWith(L".wav")){
         static const WString message = Resource::GetWString(IDS_WAVFILE_FORM_WARNING);
         static const WString caption = Resource::GetWString(IDS_WAVFILE_FORM_WARNING_CAPTION);
@@ -363,12 +364,13 @@ void AudioPlayerWindow::PreloadFile(WString file){
             return;
         case MSGBOX_YES:
             DebugLog("AudioPlayerWindow::PreloadFile Preparing FFmpeg");
-            if (!ShellFFmpeg(file, L"temp.wav")){
+            DebugLog("AudioPlayerWindow::PreloadFile Source Audio File %s", file.GetString());
+            if (!ShellFFmpeg(file, "temp.wav")){
                 DebugError("AudioPlayerWindow::PreloadFile ShellFFmpegW Failed");
                 return;
             }
-            LoadFile(L"temp.wav");
-            File::Delete(L"temp.wav");
+            LoadFile("temp.wav");
+            File::Delete("temp.wav");
             return;
         case MSGBOX_CANCEL:
             break;

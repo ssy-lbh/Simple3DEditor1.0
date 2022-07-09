@@ -415,15 +415,16 @@ void AppFrame::FireEvent(AWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, L
         break;
     case WM_DROPFILES:{
         UINT cnt;
+        UINT len;
         char path[MAX_PATH];
         wchar_t wpath[MAX_PATH];
 
         cnt = DragQueryFileA((HDROP)wParam, 0xFFFFFFFF, NULL, 0);
         for (UINT i = 0; i < cnt; i++){
-            DragQueryFileA((HDROP)wParam, i, path, MAX_PATH);
-            window->OnDropFileA(path);
-            DragQueryFileW((HDROP)wParam, i, wpath, MAX_PATH);
-            window->OnDropFileW(wpath);
+            len = DragQueryFileA((HDROP)wParam, i, path, MAX_PATH);
+            window->OnDropFileA(path, len);
+            len = DragQueryFileW((HDROP)wParam, i, wpath, MAX_PATH);
+            window->OnDropFileW(wpath, len);
         }
         DragFinish((HDROP)wParam);
     }

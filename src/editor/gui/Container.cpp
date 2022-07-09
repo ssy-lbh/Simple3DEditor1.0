@@ -202,16 +202,16 @@ void LRContainer::OnMenuAccel(int id, bool accel){
         focusWindow->OnMenuAccel(id, accel);
 }
 
-void LRContainer::OnDropFileA(const char* path){
-    AWindow::OnDropFileA(path);
+void LRContainer::OnDropFileA(const char* path, uint len){
+    AWindow::OnDropFileA(path, len);
     if (focusWindow)
-        focusWindow->OnDropFileA(path);
+        focusWindow->OnDropFileA(path, len);
 }
 
-void LRContainer::OnDropFileW(const wchar_t* path){
-    AWindow::OnDropFileW(path);
+void LRContainer::OnDropFileW(const wchar_t* path, uint len){
+    AWindow::OnDropFileW(path, len);
     if (focusWindow)
-        focusWindow->OnDropFileW(path);
+        focusWindow->OnDropFileW(path, len);
 }
 
 void LRContainer::Serialize(IOutputStream& os){
@@ -464,16 +464,16 @@ void UDContainer::OnMenuAccel(int id, bool accel){
         focusWindow->OnMenuAccel(id, accel);
 }
 
-void UDContainer::OnDropFileA(const char* path){
-    AWindow::OnDropFileA(path);
+void UDContainer::OnDropFileA(const char* path, uint len){
+    AWindow::OnDropFileA(path, len);
     if (focusWindow)
-        focusWindow->OnDropFileA(path);
+        focusWindow->OnDropFileA(path, len);
 }
 
-void UDContainer::OnDropFileW(const wchar_t* path){
-    AWindow::OnDropFileW(path);
+void UDContainer::OnDropFileW(const wchar_t* path, uint len){
+    AWindow::OnDropFileW(path, len);
     if (focusWindow)
-        focusWindow->OnDropFileW(path);
+        focusWindow->OnDropFileW(path, len);
 }
 
 void UDContainer::Serialize(IOutputStream& os){
@@ -686,16 +686,16 @@ void SelectionWindow::OnMenuAccel(int id, bool accel){
         curWindow->OnMenuAccel(id, accel);
 }
 
-void SelectionWindow::OnDropFileA(const char* path){
-    AWindow::OnDropFileA(path);
+void SelectionWindow::OnDropFileA(const char* path, uint len){
+    AWindow::OnDropFileA(path, len);
     if (curWindow)
-        curWindow->OnDropFileA(path);
+        curWindow->OnDropFileA(path, len);
 }
 
-void SelectionWindow::OnDropFileW(const wchar_t* path){
-    AWindow::OnDropFileW(path);
+void SelectionWindow::OnDropFileW(const wchar_t* path, uint len){
+    AWindow::OnDropFileW(path, len);
     if (curWindow)
-        curWindow->OnDropFileW(path);
+        curWindow->OnDropFileW(path, len);
 }
 
 void SelectionWindow::Serialize(IOutputStream& os){

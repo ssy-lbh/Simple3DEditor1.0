@@ -1,10 +1,10 @@
-#version 120
+#version 140
 
-attribute vec3 inLocation;
+in vec3 inLocation;
 
-varying vec4 fragColor;
-varying vec4 fragTexCoord;
-varying vec3 fragNormal;
+out vec4 fragColor;
+out vec4 fragTexCoord;
+out vec3 fragNormal;
 
 void main(){
     gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(inLocation, 1.0);

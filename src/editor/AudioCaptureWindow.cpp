@@ -314,9 +314,9 @@ void AudioCaptureWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void AudioCaptureWindow::OnDropFileA(const char* path){}
+void AudioCaptureWindow::OnDropFileA(const char* path, uint len){}
 
-void AudioCaptureWindow::OnDropFileW(const wchar_t* path){}
+void AudioCaptureWindow::OnDropFileW(const wchar_t* path, uint len){}
 
 void AudioCaptureWindow::Serialize(IOutputStream& os){
     os.WriteWithLen(WINDOW_ID);

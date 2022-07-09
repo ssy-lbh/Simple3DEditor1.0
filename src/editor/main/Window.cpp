@@ -68,8 +68,8 @@ void AWindow::OnKillFocus(){
 
 void AWindow::OnMouseWheel(int delta){}
 void AWindow::OnMenuAccel(int id, bool accel){}
-void AWindow::OnDropFileA(const char* path){}
-void AWindow::OnDropFileW(const wchar_t* path){}
+void AWindow::OnDropFileA(const char* path, uint len){}
+void AWindow::OnDropFileW(const wchar_t* path, uint len){}
 
 void AWindow::Serialize(IOutputStream& os){
     os.WriteWithLen(WINDOW_ID);

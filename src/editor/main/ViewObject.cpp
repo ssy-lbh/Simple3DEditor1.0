@@ -264,16 +264,16 @@ void AViewObject::OnMenuAccel(int id, bool accel){
         children[i]->OnMenuAccel(id, accel);
 }
 
-void AViewObject::OnDropFileA(const char* path){
-    size_t len = children.Size();
-    for (size_t i = 0; i < len; i++)
-        children[i]->OnDropFileA(path);
+void AViewObject::OnDropFileA(const char* path, uint len){
+    size_t size = children.Size();
+    for (size_t i = 0; i < size; i++)
+        children[i]->OnDropFileA(path, len);
 }
 
-void AViewObject::OnDropFileW(const wchar_t* path){
-    size_t len = children.Size();
-    for (size_t i = 0; i < len; i++)
-        children[i]->OnDropFileW(path);
+void AViewObject::OnDropFileW(const wchar_t* path, uint len){
+    size_t size = children.Size();
+    for (size_t i = 0; i < size; i++)
+        children[i]->OnDropFileW(path, len);
 }
 
 void AViewObject::OnAnimationFrame(float frame){

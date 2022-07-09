@@ -55,15 +55,15 @@ public:
     virtual void OnRightUp(int x, int y) override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
-    virtual void OnDropFileA(const char* path) override;
-    virtual void OnDropFileW(const wchar_t* path) override;
+    virtual void OnDropFileA(const char* path, uint len) override;
+    virtual void OnDropFileW(const wchar_t* path, uint len) override;
 
     virtual void Serialize(IOutputStream& os) override;
     virtual void Deserialize(IInputStream& os) override;
 
     void OnInsLoad();
 
-    void PreloadFile(WString file);
+    void PreloadFile(String& file);
     void LoadFile(WString file);
     void LoadObject(AudioSourceObject* o);
     bool IsLoaded();

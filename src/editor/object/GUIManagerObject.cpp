@@ -190,14 +190,14 @@ void GUIManagerObject::OnUnichar(wchar_t c){
         cur->OnUnichar(c);
 }
 
-void GUIManagerObject::OnDropFileA(const char* path){
+void GUIManagerObject::OnDropFileA(const char* path, uint len){
     if (cur)
-        cur->OnDropFileA(path);
+        cur->OnDropFileA(path, len);
 }
 
-void GUIManagerObject::OnDropFileW(const wchar_t* path){
+void GUIManagerObject::OnDropFileW(const wchar_t* path, uint len){
     if (cur)
-        cur->OnDropFileW(path);
+        cur->OnDropFileW(path, len);
 }
 
 AGUIObject* GUIManagerObject::GetCurrent(){

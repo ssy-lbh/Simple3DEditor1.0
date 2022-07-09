@@ -1,9 +1,5 @@
 #include <editor/object/MeshObject.h>
 
-// GLUT依赖于C Runtime
-#include <crtdefs.h>
-#include <lib/glut/glut.h>
-
 #include <main.h>
 #include <util/math3d/Mesh.h>
 #include <util/gl/GLSimplified.h>
@@ -13,17 +9,27 @@ namespace simple3deditor {
 
 MeshObject::MeshObject() : AViewObject(L"Mesh", ViewObjectType::OBJECT_MESH) {
     mesh = new Mesh(this);
+    //InitPhysics();
 }
 
 MeshObject::MeshObject(const wchar_t* name, ViewObjectType type) : AViewObject(name, type) {
     mesh = new Mesh(this);
+    //InitPhysics();
 }
 
 MeshObject::~MeshObject(){
     // 子类析构器在返回前会自动调用父类析构器
     // 因此不要再这里调用AViewObject::~AViewObject，不然会导致多次delete使程序崩溃
     if (mesh) delete mesh;
+    //Main::data->physicsWorld->destroyRigidBody(rb);
 }
+
+// void MeshObject::InitPhysics(){
+//     reactphysics3d::Transform trans;
+//     trans.setToIdentity();
+//     rb = Main::data->physicsWorld->createRigidBody(trans);
+//     rb->enableGravity(true);
+// }
 
 void MeshObject::OnSelect(Point3 ori, Vector3 dir){
     ori = transform.chainInvMat * ori;
@@ -57,6 +63,8 @@ void MeshObject::OnSelectUV(Vector2 uv1, Vector2 uv2){
 
 void MeshObject::OnRender(){
     AViewObject::OnRender();
+    //const reactphysics3d::Vector3& pos = rb->getTransform().getPosition();
+    //DebugLog("%f %f %f", pos.x, pos.y, pos.z);
     mesh->Render();
 }
 

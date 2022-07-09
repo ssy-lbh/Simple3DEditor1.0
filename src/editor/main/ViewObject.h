@@ -29,7 +29,8 @@ public:
 enum class ViewObjectType {
     OBJECT_DEFAULT,
     OBJECT_MESH,
-    OBJECT_BEZIER_CURVE,
+    OBJECT_CUBIC_BEZIER_CURVE,
+    OBJECT_SQUARE_BEZIER_CURVE,
     OBJECT_POINT_LIGHT,
     OBJECT_AUDIO_SOURCE,
     OBJECT_AUDIO_LISTENER,
@@ -137,8 +138,8 @@ public:
     virtual void OnKillFocus();
     virtual void OnMouseWheel(int delta);
     virtual void OnMenuAccel(int id, bool accel);
-    virtual void OnDropFileA(const char* path);
-    virtual void OnDropFileW(const wchar_t* path);
+    virtual void OnDropFileA(const char* path, uint len);
+    virtual void OnDropFileW(const wchar_t* path, uint len);
 
     virtual void OnAnimationFrame(float frame);
 };

@@ -712,6 +712,7 @@ MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f,
     Menu* objectMenu = new Menu();
     objectMenu->AddItem(new MenuItem(L"空对象", [=]{ Main::AddObject(new AViewObject()); }));
     objectMenu->AddItem(new MenuItem(L"网格体", [=]{ Main::AddObject(new MeshObject()); }));
+    objectMenu->AddItem(new MenuItem(L"二次贝塞尔曲线", [=]{ Main::AddObject(new SquareBezierObject()); }));
     objectMenu->AddItem(new MenuItem(L"三次贝塞尔曲线", [=]{ Main::AddObject(new CubicBezierObject()); }));
     objectMenu->AddItem(new MenuItem(L"点光源", [=]{ Main::AddObject(new PointLightObject()); }));
     objectMenu->AddItem(new MenuItem(L"GUI管理器", [=]{ Main::AddObject(new GUIManagerObject()); }));
@@ -1514,7 +1515,7 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         Main::data->curObject->OnMenuAccel(id, accel);
 }
 
-void MainWindow::OnDropFileW(const wchar_t* path){
+void MainWindow::OnDropFileW(const wchar_t* path, uint len){
     wchar_t* suffix = wcsrchr(path, L'.');
     if (wcscmp(suffix, L".obj")){
         static const WString message = Resource::GetWString(IDS_OBJFILE_FORM_WARNING);

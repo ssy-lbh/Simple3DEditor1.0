@@ -54,8 +54,8 @@ public:
     virtual void OnRightUp2D(Point2 pos) override;
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
-    virtual void OnDropFileA(const char* path) override;
-    virtual void OnDropFileW(const wchar_t* path) override;
+    virtual void OnDropFileA(const char* path, uint len) override;
+    virtual void OnDropFileW(const wchar_t* path, uint len) override;
 
     void OnInsLoad();
 

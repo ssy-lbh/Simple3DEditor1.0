@@ -111,6 +111,38 @@ WString ShellFileSelectWindow(const WString filter, int flags, bool save){
     return WString(buffer);
 }
 
+bool ShellCommandLineArgs(const String s, const String args){
+    DWORD_PTR res;
+
+    DebugLog("[Shell] %s", s.GetString());
+    DebugLog("[Shell] Arguments %s", args.GetString());
+
+    res = (DWORD_PTR)ShellExecuteA(NULL, "open", s.GetString(), (args.GetLength() == 0 ? NULL : args.GetString()), NULL, SW_HIDE);
+    
+    if (res >= 32){
+        return true;
+    }else{
+        DebugError("[Shell] Failed %d", res);
+        return false;
+    }
+}
+
+bool ShellCommandLineArgs(const WString s, const WString args){
+    DWORD_PTR res;
+
+    DebugLog("[Shell] %S", s.GetString());
+    DebugLog("[Shell] Arguments %S", args.GetString());
+
+    res = (DWORD_PTR)ShellExecuteW(NULL, L"open", s.GetString(), (args.GetLength() == 0 ? NULL : args.GetString()), NULL, SW_HIDE);
+    
+    if (res >= 32){
+        return true;
+    }else{
+        DebugError("[Shell] Failed %d", res);
+        return false;
+    }
+}
+
 bool ShellCommandLine(const String s){
     DWORD_PTR res;
     size_t argsIdx = s.FindChar(' ');
@@ -204,30 +236,28 @@ bool ShellCheckFileExistence(const WString file, size_t times, size_t interval){
 }
 
 bool ShellFFmpeg(const String src, const String dst){
-    StringBuilderA cmd;
+    StringBuilderA args;
 
-    cmd += EXECUTABLE_FFMPEG;
-    cmd += " -i \"";
-    cmd += src;
-    cmd += "\" -y ";
-    cmd += dst;
+    args += "-i \"";
+    args += src;
+    args += "\" -y ";
+    args += dst;
 
-    if (!ShellCommandLine(cmd.ToString())){
+    if (!ShellCommandLineArgs(String(EXECUTABLE_FFMPEG), args.ToString())){
         return false;
     }
     return ShellCheckFileExistence(dst, 100, 100);
 }
 
 bool ShellFFmpeg(const WString src, const WString dst){
-    StringBuilderW cmd;
+    StringBuilderW args;
 
-    cmd += EXECUTABLE_FFMPEG;
-    cmd += L" -i \"";
-    cmd += src;
-    cmd += L"\" -y ";
-    cmd += dst;
+    args += L"-i \"";
+    args += src;
+    args += L"\" -y ";
+    args += dst;
 
-    if (!ShellCommandLine(cmd.ToString())){
+    if (!ShellCommandLineArgs(WString(EXECUTABLE_FFMPEG), args.ToString())){
         return false;
     }
     return ShellCheckFileExistence(dst, 100, 100);

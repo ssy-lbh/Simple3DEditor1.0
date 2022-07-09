@@ -328,11 +328,11 @@ void AudioPlayerWindowObject::OnMenuAccel(int id, bool accel){
     }
 }
 
-void AudioPlayerWindowObject::OnDropFileA(const char* path){}
+void AudioPlayerWindowObject::OnDropFileA(const char* path, uint len){}
 
-void AudioPlayerWindowObject::OnDropFileW(const wchar_t* path){
+void AudioPlayerWindowObject::OnDropFileW(const wchar_t* path, uint len){
     DebugLog("AudioPlayerWindowObject::OnDropFileW %S", path);
-    PreloadFile(WString(path));
+    PreloadFile(WString(path, len));
 }
 
 void AudioPlayerWindowObject::OnInsLoad(){

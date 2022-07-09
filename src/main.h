@@ -47,9 +47,6 @@ public:
     float recTime;
     float deltaTime;
 
-    // 无延迟渲染
-    bool reqRender = false;
-
     LocalData();
     ~LocalData();
 
@@ -156,8 +153,6 @@ public:
     static void OnAnimationFrame(float frame);
     static void SaveImage(String file, Rect rect);
     static void RenderAnimation(String dir, size_t start, size_t end, Rect rect);
-    // 请求无延迟渲染
-    static void RequestRender();
 
     static void OnMouseMove(Point3 ori, Vector3 dir);
     static void OnLeftDown(Point3 ori, Vector3 dir);

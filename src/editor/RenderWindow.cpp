@@ -151,9 +151,9 @@ void RenderWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void RenderWindow::OnDropFileA(const char* path){}
+void RenderWindow::OnDropFileA(const char* path, uint len){}
 
-void RenderWindow::OnDropFileW(const wchar_t* path){}
+void RenderWindow::OnDropFileW(const wchar_t* path, uint len){}
 
 void RenderWindow::Serialize(IOutputStream& os){
     os.WriteWithLen(WINDOW_ID);

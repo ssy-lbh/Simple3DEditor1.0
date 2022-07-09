@@ -291,7 +291,7 @@ void UVEditWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void UVEditWindow::OnDropFileW(const wchar_t* path){
+void UVEditWindow::OnDropFileW(const wchar_t* path, uint len){
     Mesh* mesh = Main::GetMesh();
     if (!mesh)
         return;

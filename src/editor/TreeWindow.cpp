@@ -23,6 +23,7 @@ TreeWindow::TreeWindow(){
     Menu* objectMenu = new Menu();
     objectMenu->AddItem(new MenuItem(L"空对象", [=]{ this->AddObject(new AViewObject()); }));
     objectMenu->AddItem(new MenuItem(L"网格体", [=]{ this->AddObject(new MeshObject()); }));
+    objectMenu->AddItem(new MenuItem(L"二次贝塞尔曲线", [=]{ this->AddObject(new SquareBezierObject()); }));
     objectMenu->AddItem(new MenuItem(L"三次贝塞尔曲线", [=]{ this->AddObject(new CubicBezierObject()); }));
     objectMenu->AddItem(new MenuItem(L"点光源", [=]{ this->AddObject(new PointLightObject()); }));
     objectMenu->AddItem(new MenuItem(L"GUI管理器", [=]{ this->AddObject(new GUIManagerObject()); }));

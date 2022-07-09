@@ -39,7 +39,7 @@ public:
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
     virtual void OnMenuAccel(int id, bool accel) override;
-    virtual void OnDropFileW(const wchar_t* path) override;
+    virtual void OnDropFileW(const wchar_t* path, uint len) override;
 
     virtual void Serialize(IOutputStream& os) override;
     virtual void Deserialize(IInputStream& os) override;

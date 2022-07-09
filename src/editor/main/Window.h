@@ -44,8 +44,8 @@ public:
     virtual void OnKillFocus();
     virtual void OnMouseWheel(int delta);
     virtual void OnMenuAccel(int id, bool accel);
-    virtual void OnDropFileA(const char* path);
-    virtual void OnDropFileW(const wchar_t* path);
+    virtual void OnDropFileA(const char* path, uint len);
+    virtual void OnDropFileW(const wchar_t* path, uint len);
 
     // 窗口序列化时应先os.WriteWithLen(WINDOW_ID)，这样才能在反序列化时识别窗口
     virtual void Serialize(IOutputStream& os) override;

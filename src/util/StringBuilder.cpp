@@ -112,13 +112,12 @@ StringBuilderA& StringBuilderA::operator+=(char c){ return Append(c); }
 StringBuilderA& StringBuilderA::operator+=(wchar_t c){ return Append(c); }
 StringBuilderA& StringBuilderA::operator+=(int i){ return Append(i); }
 StringBuilderA& StringBuilderA::operator+=(size_t s){ return Append(s); }
-StringBuilderA& StringBuilderA::operator+=(bool b){ return Append(b); }
 StringBuilderA& StringBuilderA::operator+=(float f){ return Append(f); }
 StringBuilderA& StringBuilderA::operator+=(double d){ return Append(d); }
 StringBuilderA& StringBuilderA::operator+=(const String& s){ IAppendableA::Append(s); return *this; }
 StringBuilderA& StringBuilderA::operator+=(const WString& s){ IAppendableW::Append(s); return *this; }
-StringBuilderA& StringBuilderA::operator+=(const char* s){ return Append(s); }
-StringBuilderA& StringBuilderA::operator+=(const wchar_t* s){ return Append(s); }
+StringBuilderA& StringBuilderA::operator+=(const char* s){ return (StringBuilderA&)IAppendableA::Append(s); }
+StringBuilderA& StringBuilderA::operator+=(const wchar_t* s){ return (StringBuilderA&)IAppendableW::Append(s); }
 
 StringBuilderW::StringBuilderW(){
     data = new wchar_t[32];
@@ -229,7 +228,7 @@ StringBuilderW& StringBuilderW::operator+=(float f){ return Append(f); }
 StringBuilderW& StringBuilderW::operator+=(double d){ return Append(d); }
 StringBuilderW& StringBuilderW::operator+=(const String& s){ IAppendableA::Append(s); return *this; }
 StringBuilderW& StringBuilderW::operator+=(const WString& s){ IAppendableW::Append(s); return *this; }
-StringBuilderW& StringBuilderW::operator+=(const char* s){ return Append(s); }
-StringBuilderW& StringBuilderW::operator+=(const wchar_t* s){ return Append(s); }
+StringBuilderW& StringBuilderW::operator+=(const char* s){ return (StringBuilderW&)IAppendableA::Append(s); }
+StringBuilderW& StringBuilderW::operator+=(const wchar_t* s){ return (StringBuilderW&)IAppendableW::Append(s); }
 
 }

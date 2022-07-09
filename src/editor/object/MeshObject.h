@@ -4,12 +4,17 @@
 #include <define.h>
 
 #include <editor/main/ViewObject.h>
+#include <util/physics3d/body/RigidBody.h>
 
 namespace simple3deditor {
 
 class MeshObject : public AViewObject {
 protected:
     Mesh* mesh;
+    // 测试用
+    //reactphysics3d::RigidBody* rb;
+
+    //void InitPhysics();
 
     MeshObject(const wchar_t* name, ViewObjectType type);
 

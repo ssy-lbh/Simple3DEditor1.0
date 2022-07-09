@@ -370,10 +370,6 @@ void Main::RenderAnimation(String dir, size_t start, size_t end, Rect rect){
     }
 }
 
-void Main::RequestRender(){
-    LocalData::GetLocalInst()->reqRender = true;
-}
-
 void Main::OnMouseMove(Point3 ori, Vector3 dir){
     data->curObject->OnMouseMove(ori, dir);
 }
@@ -472,10 +468,11 @@ int Main::MainEntry(int argc, char** argv){
         float time = Time::GetTime();
         localData->deltaTime = time - localData->recTime;
         localData->recTime = time;
-        // 不知道为什么，我的电脑开不了垂直同步，只能出此下策了
-        if (localData->reqRender){
-            localData->reqRender = false;
-        }else{
+
+        // 莫名其妙的问题
+        if (localData->deltaTime > 0.0f){
+            data->physicsWorld->update(localData->deltaTime);
+            // 不知道为什么，我的电脑开不了垂直同步，只能出此下策了
             Time::Sleep(0.0167f - localData->deltaTime);
         }
     }

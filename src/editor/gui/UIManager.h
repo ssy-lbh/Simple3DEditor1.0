@@ -95,8 +95,8 @@ public:
     virtual void OnKillFocus();
     virtual void OnMouseWheel(int delta);
     virtual void OnMenuAccel(int id, bool accel);
-    virtual void OnDropFileA(const char* path);
-    virtual void OnDropFileW(const wchar_t* path);
+    virtual void OnDropFileA(const char* path, uint len);
+    virtual void OnDropFileW(const wchar_t* path, uint len);
 };
 
 }

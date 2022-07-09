@@ -25,6 +25,8 @@ enum class ShaderType {
 
 String ShellFileSelectWindow(const String filter, int flags, bool save = false);
 WString ShellFileSelectWindow(const WString filter, int flags, bool save = false);
+bool ShellCommandLineArgs(const String s, const String args);
+bool ShellCommandLineArgs(const WString s, const WString args);
 bool ShellCommandLine(const String s);
 bool ShellCommandLine(const WString s);
 bool ShellCheckFileExistence(const String file, size_t times, size_t interval);

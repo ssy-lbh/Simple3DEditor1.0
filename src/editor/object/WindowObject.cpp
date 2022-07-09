@@ -64,7 +64,7 @@ void AWindowObject::OnKillFocus(){
 
 void AWindowObject::OnMouseWheel(int delta){}
 void AWindowObject::OnMenuAccel(int id, bool accel){}
-void AWindowObject::OnDropFileA(const char* path){}
-void AWindowObject::OnDropFileW(const wchar_t* path){}
+void AWindowObject::OnDropFileA(const char* path, uint len){}
+void AWindowObject::OnDropFileW(const wchar_t* path, uint len){}
 
 }
