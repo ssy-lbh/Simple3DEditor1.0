@@ -451,10 +451,12 @@ int Main::MainEntry(int argc, char** argv){
     glFontSize(12);
 
     mainFrame->SetWindow(new MainWindow());
-    // {
-    //     File f("test.bin");
-    //     mainFrame->SetWindow(data->ConstructWindow(f));
-    // }
+    {
+        json o;
+        ifstream f("workspace.json");
+        f >> o;
+        mainFrame->SetWindow(data->ConstructWindow(o));
+    }
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 
