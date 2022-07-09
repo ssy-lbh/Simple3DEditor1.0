@@ -43,7 +43,7 @@ using namespace reactphysics3d;
 Collider::Collider(Entity entity, CollisionBody* body, MemoryManager& memoryManager)
            :mMemoryManager(memoryManager), mEntity(entity), mBody(body),
             mMaterial(body->mWorld.mConfig.defaultFrictionCoefficient, body->mWorld.mConfig.defaultRollingRestistance,
-                      body->mWorld.mConfig.defaultBounciness), mUserData(nullptr) {
+                      body->mWorld.mConfig.defaultBounciness), mUserData(NULL) {
 
 }
 
@@ -114,7 +114,7 @@ void Collider::setLocalToBodyTransform(const Transform& transform) {
     mBody->mWorld.mCollidersComponents.setLocalToWorldTransform(mEntity, bodyTransform * transform);
 
     RigidBody* rigidBody = static_cast<RigidBody*>(mBody);
-    if (rigidBody != nullptr) {
+    if (rigidBody != NULL) {
         mBody->mWorld.mRigidBodyComponents.setIsSleeping(mBody->getEntity(), false);
     }
 

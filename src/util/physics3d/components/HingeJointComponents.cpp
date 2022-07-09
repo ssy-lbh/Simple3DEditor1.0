@@ -59,7 +59,7 @@ void HingeJointComponents::allocate(uint32 nbComponentsToAllocate) {
 
     // Allocate memory
     void* newBuffer = mMemoryAllocator.allocate(totalSizeBytes);
-    assert(newBuffer != nullptr);
+    assert(newBuffer != NULL);
 
     // New pointers to components data
     Entity* newJointEntities = static_cast<Entity*>(newBuffer);
@@ -189,7 +189,7 @@ void HingeJointComponents::addComponent(Entity jointEntity, bool isSleeping, con
 
     // Insert the new component data
     new (mJointEntities + index) Entity(jointEntity);
-    mJoints[index] = nullptr;
+    mJoints[index] = NULL;
     new (mLocalAnchorPointBody1 + index) Vector3(0, 0, 0);
     new (mLocalAnchorPointBody2 + index) Vector3(0, 0, 0);
     new (mR1World + index) Vector3(0, 0, 0);
@@ -387,7 +387,7 @@ void HingeJointComponents::destroyComponent(uint32 index) {
     mMapEntityToComponentIndex.remove(mJointEntities[index]);
 
     mJointEntities[index].~Entity();
-    mJoints[index] = nullptr;
+    mJoints[index] = NULL;
     mLocalAnchorPointBody1[index].~Vector3();
     mLocalAnchorPointBody2[index].~Vector3();
     mR1World[index].~Vector3();

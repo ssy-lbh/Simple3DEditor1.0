@@ -155,11 +155,11 @@ void RenderWindow::OnDropFileA(const char* path, uint len){}
 
 void RenderWindow::OnDropFileW(const wchar_t* path, uint len){}
 
-void RenderWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void RenderWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
-void RenderWindow::Deserialize(IInputStream& os){}
+void RenderWindow::Deserialize(json& o){}
 
 void RenderWindow::OnInsSave(){
     static const WString filter = Resource::GetWString(IDS_PICFILE_FILTER);

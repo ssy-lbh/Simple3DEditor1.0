@@ -79,11 +79,11 @@ void AttributeWindow::OnMouseWheel(int delta){}
 
 void AttributeWindow::OnMenuAccel(int id, bool accel){}
 
-void AttributeWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void AttributeWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
-void AttributeWindow::Deserialize(IInputStream& os){}
+void AttributeWindow::Deserialize(json& o){}
 
 void AttributeWindow::UpdateWindowSize(int x, int y){
     AWindow::UpdateWindowSize(x, y);

@@ -58,7 +58,7 @@ DefaultLogger::Formatter* DefaultLogger::getFormatter(Format format) const {
        return it->second;
    }
 
-   return nullptr;
+   return NULL;
 }
 
 // Add a log file destination to the logger

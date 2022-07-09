@@ -33,7 +33,7 @@ using namespace reactphysics3d;
 // Constructor
 Components::Components(MemoryAllocator& allocator, size_t componentDataSize)
     : mMemoryAllocator(allocator), mNbComponents(0), mComponentDataSize(componentDataSize),
-      mNbAllocatedComponents(0), mBuffer(nullptr), mMapEntityToComponentIndex(allocator),
+      mNbAllocatedComponents(0), mBuffer(NULL), mMapEntityToComponentIndex(allocator),
       mDisabledStartIndex(0) {
 
 }

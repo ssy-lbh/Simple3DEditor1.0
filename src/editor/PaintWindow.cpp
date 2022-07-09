@@ -313,11 +313,11 @@ void PaintWindow::OnMenuAccel(int id, bool accel){
         brush->OnCommand(id);
 }
 
-void PaintWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void PaintWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
-void PaintWindow::Deserialize(IInputStream& os){}
+void PaintWindow::Deserialize(json& o){}
 
 void PaintWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);

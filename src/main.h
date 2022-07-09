@@ -9,6 +9,8 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <util/physics3d/engine/PhysicsCommon.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
 
 //TODO 补全撤销功能
@@ -133,8 +135,8 @@ public:
         windowReg.Set(T::WINDOW_ID, info);
     }
 
-    AWindow* ConstructWindow(const String& id);
-    AWindow* ConstructWindow(IInputStream& is);
+    AWindow* ConstructWindow(const char* id);
+    AWindow* ConstructWindow(nlohmann::json& o);
 };
 
 class Main final : public Object {

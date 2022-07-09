@@ -318,11 +318,11 @@ void AudioCaptureWindow::OnDropFileA(const char* path, uint len){}
 
 void AudioCaptureWindow::OnDropFileW(const wchar_t* path, uint len){}
 
-void AudioCaptureWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void AudioCaptureWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
-void AudioCaptureWindow::Deserialize(IInputStream& os){}
+void AudioCaptureWindow::Deserialize(json& o){}
 
 void AudioCaptureWindow::Launch(){
     if (capture){

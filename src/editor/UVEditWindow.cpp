@@ -310,11 +310,11 @@ void UVEditWindow::UpdateWindowSize(int x, int y){
     AWindow::UpdateWindowSize(x, y);
 }
 
-void UVEditWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void UVEditWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
-void UVEditWindow::Deserialize(IInputStream& os){}
+void UVEditWindow::Deserialize(json& o){}
 
 void UVEditWindow::SetOperation(IOperation* op){
     if (curOp){

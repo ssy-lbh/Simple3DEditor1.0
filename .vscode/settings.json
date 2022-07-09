@@ -19,6 +19,7 @@
     "git.ignoreLimitWarning": true,
     "C_Cpp.errorSquiggles": "Disabled",
     "files.associations": {
+        "*.cu": "cpp",
         "*.h": "cpp",
         "*.hlsl": "hlsl",
         "*.msl": "metal",
@@ -92,7 +93,16 @@
         "thread": "cpp",
         "regex": "cpp",
         "valarray": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "codecvt": "cpp",
+        "condition_variable": "cpp",
+        "ctime": "cpp",
+        "map": "cpp",
+        "iomanip": "cpp",
+        "mutex": "cpp",
+        "semaphore": "cpp"
     },
-    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"
+    "C_Cpp.default.configurationProvider": "",
+    "C_Cpp.clang_format_sortIncludes": true,
+    "C_Cpp.default.compilerPath": "E:\\Program Files\\C++\\gcc-v11.1.0-mingw-v8.0.0-x86_64\\\\bin\\g++"
 }

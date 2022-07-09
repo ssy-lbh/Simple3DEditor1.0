@@ -75,7 +75,7 @@ struct RaycastInfo {
         // -------------------- Methods -------------------- //
 
         /// Constructor
-        RaycastInfo() : meshSubpart(-1), triangleIndex(-1), body(nullptr), collider(nullptr) {
+        RaycastInfo() : meshSubpart(-1), triangleIndex(-1), body(NULL), collider(NULL) {
 
         }
 

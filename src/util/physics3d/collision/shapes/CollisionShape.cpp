@@ -38,7 +38,7 @@ CollisionShape::CollisionShape(CollisionShapeName name, CollisionShapeType type,
 
 #ifdef IS_RP3D_PROFILING_ENABLED
 
-        mProfiler = nullptr;
+        mProfiler = NULL;
 #endif
 
 }

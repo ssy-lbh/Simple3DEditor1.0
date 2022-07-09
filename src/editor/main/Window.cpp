@@ -71,11 +71,11 @@ void AWindow::OnMenuAccel(int id, bool accel){}
 void AWindow::OnDropFileA(const char* path, uint len){}
 void AWindow::OnDropFileW(const wchar_t* path, uint len){}
 
-void AWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void AWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
-void AWindow::Deserialize(IInputStream& is){}
+void AWindow::Deserialize(json& o){}
 
 AGUIWindow::AGUIWindow(){
     guiMgr = new GUIManagerObject();
@@ -122,8 +122,8 @@ void AGUIWindow::OnRightUp(int x, int y){
     guiMgr->OnRightUp2D(cursorPos);
 }
 
-void AGUIWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void AGUIWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
 }

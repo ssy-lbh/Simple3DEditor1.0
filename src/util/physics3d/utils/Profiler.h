@@ -382,7 +382,7 @@ class ProfileSample {
         /// Constructor
         ProfileSample(const char* name, Profiler* profiler) :mProfiler(profiler) {
 
-			assert(profiler != nullptr);
+			assert(profiler != NULL);
 
             // Ask the profiler to start profiling a block of code
 			mProfiler->startProfilingBlock(name);
@@ -402,12 +402,12 @@ class ProfileSample {
 
 // Return true if we are at the root of the profiler tree
 inline bool ProfileNodeIterator::isRoot() {
-    return (mCurrentParentNode->getParentNode() == nullptr);
+    return (mCurrentParentNode->getParentNode() == NULL);
 }
 
 // Return true if we are at the end of a branch of the profiler tree
 inline bool ProfileNodeIterator::isEnd() {
-    return (mCurrentChildNode == nullptr);
+    return (mCurrentChildNode == NULL);
 }
 
 // Return the name of the current node

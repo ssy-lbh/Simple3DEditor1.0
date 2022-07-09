@@ -43,8 +43,8 @@ public:
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
 
-    virtual void Serialize(IOutputStream& os) override;
-    virtual void Deserialize(IInputStream& os) override;
+    virtual void Serialize(json& o) override;
+    virtual void Deserialize(json& o) override;
 
     void RenderItem(AViewObject* o);
 };

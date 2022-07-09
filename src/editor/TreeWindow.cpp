@@ -236,10 +236,10 @@ void TreeWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void TreeWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void TreeWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
-void TreeWindow::Deserialize(IInputStream& os){}
+void TreeWindow::Deserialize(json& o){}
 
 }

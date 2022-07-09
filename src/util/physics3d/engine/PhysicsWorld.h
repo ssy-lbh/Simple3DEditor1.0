@@ -286,7 +286,7 @@ class PhysicsWorld {
         // -------------------- Methods -------------------- //
 
         /// Constructor
-        PhysicsWorld(MemoryManager& memoryManager, const WorldSettings& worldSettings = WorldSettings(), Profiler* profiler = nullptr);
+        PhysicsWorld(MemoryManager& memoryManager, const WorldSettings& worldSettings = WorldSettings(), Profiler* profiler = NULL);
 
         /// Notify the world if a body is disabled (slepping or inactive) or not
         void setBodyDisabled(Entity entity, bool isDisabled);
@@ -697,7 +697,7 @@ inline decimal PhysicsWorld::getTimeBeforeSleep() const {
 }
 
 // Set an event listener object to receive events callbacks.
-/// If you use "nullptr" as an argument, the events callbacks will be disabled.
+/// If you use "NULL" as an argument, the events callbacks will be disabled.
 /**
  * @param eventListener Pointer to the event listener object that will receive
  *                      event callbacks during the simulation

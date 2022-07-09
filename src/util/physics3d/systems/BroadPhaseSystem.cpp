@@ -45,7 +45,7 @@ BroadPhaseSystem::BroadPhaseSystem(CollisionDetectionSystem& collisionDetection,
 #ifdef IS_RP3D_PROFILING_ENABLED
 
 
-	mProfiler = nullptr;
+	mProfiler = NULL;
 
 #endif
 

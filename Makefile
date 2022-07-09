@@ -74,7 +74,7 @@ tolower		= $(shell $(ECHO) $1 | $(TR) A-Z a-z)
 rwildcard	= $(foreach D, $(wildcard $(1:=/*)), $(call rwildcard, $D, $2) $(filter $(subst *, %, $2), $D))
 src2obj		= $(1:$(SOURCE_PATH)/%.cpp=$(BUILD_PATH)/%.o)
 
-GCC			:= g++
+CC			:= g++
 DLLTOOL		:= dlltool
 CFLAGS 		:= -I"$(SOURCE_PATH)" -m64 -O3 -std=c++11 -finput-charset=UTF-8 -fexec-charset=UTF-8\
 				-DPLATFORM_$(call toupper, $(PLATFORM)) -DARCH_$(call toupper, $(ARCH))
@@ -153,10 +153,10 @@ rebuild: clean build
 reexec: clean run
 
 $(OUTPUTDLIB): $(ALLOBJ)
-	$(GCC) $(ALLOBJ) -o $@ $(LIB) $(LFLAGS)
+	$(CC) $(ALLOBJ) -o $@ $(LIB) $(LFLAGS)
 
 $(OUTPUT): $(ALLOBJ)
-	$(GCC) $(ALLOBJ) -o $@ $(LIB) $(OFLAGS)
+	$(CC) $(ALLOBJ) -o $@ $(LIB) $(OFLAGS)
 
 # 依赖项文件
 DEPFILES	:= $(CPPOBJ:%.o=%.d)
@@ -167,21 +167,21 @@ DEPFILES	:= $(CPPOBJ:%.o=%.d)
 -include $(DEPFILES)
 
 $(DEPFILES): $(BUILD_PATH)/%.d: $(SOURCE_PATH)/%.cpp
-	$(GCC) -MM $(CFLAGS) $< -MT $(call src2obj, $<) > $@
-	$(ECHO) "	$(GCC) -c $< -o $(call src2obj, $<) $(CFLAGS)" >> $@
+	$(CC) -MM $(CFLAGS) $< -MT $(call src2obj, $<) > $@
+	$(ECHO) "	$(CC) -c $< -o $(call src2obj, $<) $(CFLAGS)" >> $@
 
 # 注:不使用依赖项文件时使用如下编译流程
 # 常规的源代码
 #$(PROGOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp $(SOURCE_PATH)/%.h
-#	$(GCC) -c $< -o $@ $(CFLAGS)
+#	$(CC) -c $< -o $@ $(CFLAGS)
 
 # 这一类为平台相关代码源文件
 #$(PLATOBJ): $(BUILD_PATH)/platform/$(PLATFORM)/%.o: $(SOURCE_PATH)/platform/$(PLATFORM)/%.cpp $(SOURCE_PATH)/%.h
-#	$(GCC) -c $< -o $@ $(CFLAGS)
+#	$(CC) -c $< -o $@ $(CFLAGS)
 
 # 这一类源文件没有头文件，直接编译
 #$(EXTRAOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp
-#	$(GCC) -c $< -o $@ $(CFLAGS)
+#	$(CC) -c $< -o $@ $(CFLAGS)
 
 # 其实我个人觉得，把nasm的内置指令incbin用好了当资源表用是相当可行的，理论上只要不乱加汇编代码跨平台是没问题的
 # 采用nasm的话，res.h里面就不是各种id了，而是一堆extern char[0]，指向资源数据的指针，借助了符号链接的功能
@@ -264,21 +264,21 @@ cleandep:
 
 # 第一个测试，将整个程序当成库使用并启动
 dllboot: $(OUTPUTDLIB)
-	$(GCC) $(TEST_PATH)/$@/boot.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)/$@/boot.exe
+	$(CC) $(TEST_PATH)/$@/boot.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)/$@/boot.exe
 	$(TEST_PATH)/$@/boot.exe
 	$(RM) $(TEST_PATH)/$@/boot.exe
 
 plugin: $(OUTPUTDLIB)
-	$(GCC) $(TEST_PATH)/$@/main.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)/$@/main.exe
-	$(GCC) $(TEST_PATH)/$@/plugin.cpp $(OUTPUTDLIB) -I"." -shared -o $(PLUGIN_PATH)/plugin.dll
+	$(CC) $(TEST_PATH)/$@/main.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)/$@/main.exe
+	$(CC) $(TEST_PATH)/$@/plugin.cpp $(OUTPUTDLIB) -I"." -shared -o $(PLUGIN_PATH)/plugin.dll
 	$(TEST_PATH)/$@/main.exe
 	$(RM) $(TEST_PATH)/$@/main.exe
 	$(RM) $(PLUGIN_PATH)/plugin.dll
 
 physics: $(OUTPUTDLIB)
-	$(GCC) -c $(TEST_PATH)/$@/main.cpp -I"." -o $(TEST_PATH)/$@/main.o
-	$(GCC) -c $(TEST_PATH)/$@/Test.cpp -I"." -o $(TEST_PATH)/$@/Test.o
-	$(GCC) -c $(TEST_PATH)/$@/TestSuite.cpp -I"." -o $(TEST_PATH)/$@/TestSuite.o
-	$(GCC) $(addprefix $(TEST_PATH)/$@/, main.o Test.o TestSuite.o) $(OUTPUTDLIB) -o $(TEST_PATH)/$@/main.exe
+	$(CC) -c $(TEST_PATH)/$@/main.cpp -I"." -o $(TEST_PATH)/$@/main.o
+	$(CC) -c $(TEST_PATH)/$@/Test.cpp -I"." -o $(TEST_PATH)/$@/Test.o
+	$(CC) -c $(TEST_PATH)/$@/TestSuite.cpp -I"." -o $(TEST_PATH)/$@/TestSuite.o
+	$(CC) $(addprefix $(TEST_PATH)/$@/, main.o Test.o TestSuite.o) $(OUTPUTDLIB) -o $(TEST_PATH)/$@/main.exe
 	$(TEST_PATH)/$@/main.exe
 	$(RM) $(TEST_PATH)/$@/main.exe $(addprefix $(TEST_PATH)/$@/, main.o Test.o TestSuite.o)

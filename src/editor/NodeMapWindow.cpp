@@ -356,10 +356,10 @@ void NodeMapWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void NodeMapWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void NodeMapWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
-void NodeMapWindow::Deserialize(IInputStream& os){}
+void NodeMapWindow::Deserialize(json& o){}
 
 }

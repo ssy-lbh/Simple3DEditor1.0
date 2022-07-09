@@ -28,6 +28,8 @@
 #include <util/os/System.h>
 #endif
 
+#include <fstream>
+
 namespace simple3deditor {
 
 LocalData::LocalData(){
@@ -256,18 +258,18 @@ void GlobalData::OnAnimationFrame(float frame){
     screen->OnAnimationFrame(frame);
 }
 
-AWindow* GlobalData::ConstructWindow(const String& id){
+AWindow* GlobalData::ConstructWindow(const char* id){
     WindowInfo* info = windowReg.Get(id);
     if (!info){
-        DebugError("GlobalData::ParseWindow Unrecognized Window ID %s", id.GetString());
+        DebugError("GlobalData::ParseWindow Unrecognized Window ID %s", id);
         return NULL;
     }
     return info->factory();
 }
 
-AWindow* GlobalData::ConstructWindow(IInputStream& is){
-    AWindow* window = ConstructWindow(is.ReadString());
-    window->Deserialize(is);
+AWindow* GlobalData::ConstructWindow(json& o){
+    AWindow* window = ConstructWindow(o.value("id", std::string()).c_str());
+    window->Deserialize(o);
     return window;
 }
 
@@ -477,11 +479,13 @@ int Main::MainEntry(int argc, char** argv){
         }
     }
 
-    // {
-    //     File f("test.bin");
-    //     f.CreateNew();
-    //     mainFrame->GetWindow()->Serialize(f);
-    // }
+    {
+        json o;
+        mainFrame->GetWindow()->Serialize(o);
+        std::ofstream f("workspace.json");
+        f << o;
+        f.close();
+    }
 
     int code = appFrame->GetExitCode();
 

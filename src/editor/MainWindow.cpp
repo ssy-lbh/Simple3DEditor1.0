@@ -1528,11 +1528,11 @@ void MainWindow::OnDropFileW(const wchar_t* path, uint len){
     LoadMesh(Main::data->curObject, path);
 }
 
-void MainWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void MainWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
-void MainWindow::Deserialize(IInputStream& os){}
+void MainWindow::Deserialize(json& o){}
 
 Point2 MainWindow::GetScreenPosition(Point3 pos){
     return CCamera::GetScreenPosition(pos, aspect);

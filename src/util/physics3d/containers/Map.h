@@ -57,14 +57,14 @@ class Map {
             /// Constructor
             Entry() {
                 next = -1;
-                keyValue = nullptr;
+                keyValue = NULL;
             }
 
             /// Constructor
             Entry(size_t hashcode, int nextEntry) {
                 hashCode = hashcode;
                 next = nextEntry;
-                keyValue = nullptr;
+                keyValue = NULL;
             }
 
             /// Copy-constructor
@@ -185,7 +185,7 @@ class Map {
             for (int i=0; i<mNbUsedEntries; i++) {
 
                 // If the entry is not free
-                if (newEntries[i].keyValue != nullptr) {
+                if (newEntries[i].keyValue != NULL) {
 
                     // Get the corresponding bucket
                     int bucket = newEntries[i].hashCode % newCapacity;
@@ -276,7 +276,7 @@ class Map {
                     for (mCurrentEntry += 1; mCurrentEntry < mNbUsedEntries; mCurrentEntry++) {
 
                         // If the entry is not empty
-                        if (mEntries[mCurrentEntry].keyValue != nullptr) {
+                        if (mEntries[mCurrentEntry].keyValue != NULL) {
 
                            // We have found the next non empty entry
                            return;
@@ -314,14 +314,14 @@ class Map {
                 /// Deferencable
                 reference operator*() const {
                     assert(mCurrentEntry >= 0 && mCurrentEntry < mNbUsedEntries);
-                    assert(mEntries[mCurrentEntry].keyValue != nullptr);
+                    assert(mEntries[mCurrentEntry].keyValue != NULL);
                     return *(mEntries[mCurrentEntry].keyValue);
                 }
 
                 /// Deferencable
                 pointer operator->() const {
                     assert(mCurrentEntry >= 0 && mCurrentEntry < mNbUsedEntries);
-                    assert(mEntries[mCurrentEntry].keyValue != nullptr);
+                    assert(mEntries[mCurrentEntry].keyValue != NULL);
                     return mEntries[mCurrentEntry].keyValue;
                 }
 
@@ -354,8 +354,8 @@ class Map {
 
         /// Constructor
         Map(MemoryAllocator& allocator, size_t capacity = 0)
-            : mNbUsedEntries(0), mNbFreeEntries(0), mCapacity(0), mBuckets(nullptr),
-              mEntries(nullptr), mAllocator(allocator), mFreeIndex(-1) {
+            : mNbUsedEntries(0), mNbFreeEntries(0), mCapacity(0), mBuckets(NULL),
+              mEntries(NULL), mAllocator(allocator), mFreeIndex(-1) {
 
             // If the largest prime has not been computed yet
             if (LARGEST_PRIME == -1) {
@@ -373,7 +373,7 @@ class Map {
         /// Copy constructor
         Map(const Map<K, V>& map)
           :mNbUsedEntries(map.mNbUsedEntries), mNbFreeEntries(map.mNbFreeEntries), mCapacity(map.mCapacity),
-           mBuckets(nullptr), mEntries(nullptr), mAllocator(map.mAllocator), mFreeIndex(map.mFreeIndex) {
+           mBuckets(NULL), mEntries(NULL), mAllocator(map.mAllocator), mFreeIndex(map.mFreeIndex) {
 
             assert(capacity() >= 0);
 
@@ -393,7 +393,7 @@ class Map {
 
                     new (&mEntries[i]) Entry(map.mEntries[i].hashCode, map.mEntries[i].next);
 
-                    if (map.mEntries[i].keyValue != nullptr) {
+                    if (map.mEntries[i].keyValue != NULL) {
                        mEntries[i].keyValue = static_cast<Pair<K,V>*>(mAllocator.allocate(sizeof(Pair<K, V>)));
                        new (mEntries[i].keyValue) Pair<K,V>(*(map.mEntries[i].keyValue));
                     }
@@ -494,11 +494,11 @@ class Map {
             }
 
             assert(size() >= 0);
-            assert(mEntries[entryIndex].keyValue == nullptr);
+            assert(mEntries[entryIndex].keyValue == NULL);
             mEntries[entryIndex].hashCode = hashCode;
             mEntries[entryIndex].next = mBuckets[bucket];
             mEntries[entryIndex].keyValue = static_cast<Pair<K,V>*>(mAllocator.allocate(sizeof(Pair<K,V>)));
-            assert(mEntries[entryIndex].keyValue != nullptr);
+            assert(mEntries[entryIndex].keyValue != NULL);
             new (mEntries[entryIndex].keyValue) Pair<K,V>(keyValue);
             mBuckets[bucket] = entryIndex;
         }
@@ -536,12 +536,12 @@ class Map {
                         }
 
                         // Release memory for the key/value pair if any
-                        if (mEntries[i].keyValue != nullptr) {
+                        if (mEntries[i].keyValue != NULL) {
                             mEntries[i].keyValue->~Pair<K,V>();
                             mAllocator.release(mEntries[i].keyValue, sizeof(Pair<K,V>));
-                            mEntries[i].keyValue = nullptr;
+                            mEntries[i].keyValue = NULL;
                         }
-                        assert(mEntries[i].keyValue == nullptr);
+                        assert(mEntries[i].keyValue == NULL);
                         mEntries[i].next = mFreeIndex;
                         mFreeIndex = i;
                         mNbFreeEntries++;
@@ -550,7 +550,7 @@ class Map {
                         for (i += 1; i < mNbUsedEntries; i++) {
 
                             // If the entry is not empty
-                            if (mEntries[i].keyValue != nullptr) {
+                            if (mEntries[i].keyValue != NULL) {
 
                                // We have found the next non empty entry
                                return Iterator(mEntries, mCapacity, mNbUsedEntries, i);
@@ -578,10 +578,10 @@ class Map {
 
                     mBuckets[i] = -1;
                     mEntries[i].next = -1;
-                    if (mEntries[i].keyValue != nullptr) {
+                    if (mEntries[i].keyValue != NULL) {
                         mEntries[i].keyValue->~Pair<K,V>();
                         mAllocator.release(mEntries[i].keyValue, sizeof(Pair<K,V>));
-                        mEntries[i].keyValue = nullptr;
+                        mEntries[i].keyValue = NULL;
                     }
                 }
 
@@ -605,8 +605,8 @@ class Map {
                 mAllocator.release(mEntries, mCapacity * sizeof(Entry));
 
                 mCapacity = 0;
-                mBuckets = nullptr;
-                mEntries = nullptr;
+                mBuckets = NULL;
+                mEntries = NULL;
             }
 
             assert(size() == 0);
@@ -650,7 +650,7 @@ class Map {
                 return end();
             }
 
-            assert(mEntries[entry].keyValue != nullptr);
+            assert(mEntries[entry].keyValue != NULL);
 
             return Iterator(mEntries, mCapacity, mNbUsedEntries, entry);
         }
@@ -669,7 +669,7 @@ class Map {
                 throw std::runtime_error("No item with given key has been found in the map");
             }
 
-            assert(mEntries[entry].keyValue != nullptr);
+            assert(mEntries[entry].keyValue != NULL);
 
             return mEntries[entry].keyValue->second;
         }
@@ -687,7 +687,7 @@ class Map {
                 throw std::runtime_error("No item with given key has been found in the map");
             }
 
-            assert(mEntries[entry].keyValue != nullptr);
+            assert(mEntries[entry].keyValue != NULL);
 
             return mEntries[entry].keyValue->second;
         }
@@ -749,7 +749,7 @@ class Map {
 
                         new (&mEntries[i]) Entry(map.mEntries[i].hashCode, map.mEntries[i].next);
 
-                        if (map.mEntries[i].keyValue != nullptr) {
+                        if (map.mEntries[i].keyValue != NULL) {
                            mEntries[i].keyValue = static_cast<Pair<K,V>*>(mAllocator.allocate(sizeof(Pair<K, V>)));
                            new (mEntries[i].keyValue) Pair<K,V>(*(map.mEntries[i].keyValue));
                         }
@@ -779,7 +779,7 @@ class Map {
             // Find the first used entry
             int entry;
             for (entry=0; entry < mNbUsedEntries; entry++) {
-                if (mEntries[entry].keyValue != nullptr) {
+                if (mEntries[entry].keyValue != NULL) {
                     return Iterator(mEntries, mCapacity, mNbUsedEntries, entry);
                 }
             }

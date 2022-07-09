@@ -62,7 +62,7 @@ class Stack {
         void allocate(size_t capacity) {
 
             T* newArray = static_cast<T*>(mAllocator.allocate(capacity * sizeof(T)));
-            assert(newArray != nullptr);
+            assert(newArray != NULL);
 
             // If there
             if (mCapacity > 0) {
@@ -88,7 +88,7 @@ class Stack {
 
         /// Constructor
         Stack(MemoryAllocator& allocator, size_t capacity = 0)
-              :mAllocator(allocator), mArray(nullptr), mNbElements(0), mCapacity(0) {
+              :mAllocator(allocator), mArray(NULL), mNbElements(0), mCapacity(0) {
 
             if (capacity > 0) {
                 allocate(capacity);
@@ -97,14 +97,14 @@ class Stack {
 
         /// Copy constructor
         Stack(const Stack& stack)
-              :mAllocator(stack.mAllocator), mArray(nullptr),
+              :mAllocator(stack.mAllocator), mArray(NULL),
                mNbElements(stack.mNbElements), mCapacity(stack.mCapacity) {
 
             if (mCapacity > 0) {
 
                 // Allocate memory for the buckets
                 mArray = static_cast<T*>(mAllocator.allocate(mCapacity * sizeof(T)));
-                assert(mArray != nullptr);
+                assert(mArray != NULL);
 
                 if (mNbElements > 0) {
 

@@ -48,14 +48,14 @@ ContactSolverSystem::ContactSolverSystem(MemoryManager& memoryManager, PhysicsWo
                                          CollisionBodyComponents& bodyComponents, RigidBodyComponents& rigidBodyComponents,
                                          ColliderComponents& colliderComponents, decimal& restitutionVelocityThreshold)
               :mMemoryManager(memoryManager), mWorld(world), mRestitutionVelocityThreshold(restitutionVelocityThreshold),
-               mContactConstraints(nullptr), mContactPoints(nullptr),
-               mIslands(islands), mAllContactManifolds(nullptr), mAllContactPoints(nullptr),
+               mContactConstraints(NULL), mContactPoints(NULL),
+               mIslands(islands), mAllContactManifolds(NULL), mAllContactPoints(NULL),
                mBodyComponents(bodyComponents), mRigidBodyComponents(rigidBodyComponents),
                mColliderComponents(colliderComponents), mIsSplitImpulseActive(true) {
 
 #ifdef IS_RP3D_PROFILING_ENABLED
 
-        mProfiler = nullptr;
+        mProfiler = NULL;
 #endif
 
 }
@@ -76,18 +76,18 @@ void ContactSolverSystem::init(List<ContactManifold>* contactManifolds, List<Con
     mNbContactManifolds = 0;
     mNbContactPoints = 0;
 
-    mContactConstraints = nullptr;
-    mContactPoints = nullptr;
+    mContactConstraints = NULL;
+    mContactPoints = NULL;
 
     if (nbContactManifolds == 0 || nbContactPoints == 0) return;
 
     mContactPoints = static_cast<ContactPointSolver*>(mMemoryManager.allocate(MemoryManager::AllocationType::Frame,
                                                                               sizeof(ContactPointSolver) * nbContactPoints));
-    assert(mContactPoints != nullptr);
+    assert(mContactPoints != NULL);
 
     mContactConstraints = static_cast<ContactManifoldSolver*>(mMemoryManager.allocate(MemoryManager::AllocationType::Frame,
                                                                                       sizeof(ContactManifoldSolver) * nbContactManifolds));
-    assert(mContactConstraints != nullptr);
+    assert(mContactConstraints != NULL);
 
     // For each island of the world
     for (uint i = 0; i < mIslands.getNbIslands(); i++) {
@@ -128,8 +128,8 @@ void ContactSolverSystem::initializeForIsland(uint islandIndex) {
         // Get the two bodies of the contact
         RigidBody* body1 = static_cast<RigidBody*>(mBodyComponents.getBody(externalManifold.bodyEntity1));
         RigidBody* body2 = static_cast<RigidBody*>(mBodyComponents.getBody(externalManifold.bodyEntity2));
-        assert(body1 != nullptr);
-        assert(body2 != nullptr);
+        assert(body1 != NULL);
+        assert(body2 != NULL);
         assert(!mBodyComponents.getIsEntityDisabled(externalManifold.bodyEntity1));
         assert(!mBodyComponents.getIsEntityDisabled(externalManifold.bodyEntity2));
 

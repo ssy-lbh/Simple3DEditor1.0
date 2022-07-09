@@ -54,7 +54,7 @@ TriangleVertexArray::TriangleVertexArray(uint nbVertices, const void* verticesSt
     mNbVertices = nbVertices;
     mVerticesStart = static_cast<const uchar*>(verticesStart);
     mVerticesStride = verticesStride;
-    mVerticesNormalsStart = nullptr;
+    mVerticesNormalsStart = NULL;
     mVerticesNormalsStride = 3 * sizeof(float);
     mNbTriangles = nbTriangles;
     mIndicesStart = static_cast<const uchar*>(indexesStart);
@@ -104,7 +104,7 @@ TriangleVertexArray::TriangleVertexArray(uint nbVertices, const void* verticesSt
     mIndexDataType = indexDataType;
     mAreVerticesNormalsProvidedByUser = true;
 
-    assert(mVerticesNormalsStart != nullptr);
+    assert(mVerticesNormalsStart != NULL);
 }
 
 // Destructor

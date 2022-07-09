@@ -72,7 +72,7 @@ CollisionDetectionSystem::CollisionDetectionSystem(PhysicsWorld* world, Collider
 #ifdef IS_RP3D_PROFILING_ENABLED
 
 
-	mProfiler = nullptr;
+	mProfiler = NULL;
     mCollisionDispatch.setProfiler(mProfiler);
     mOverlappingPairs.setProfiler(mProfiler);
 
@@ -544,7 +544,7 @@ bool CollisionDetectionSystem::computeNarrowPhaseOverlapSnapshot(NarrowPhaseInpu
 
     // Test the narrow-phase collision detection on the batches to be tested
     bool collisionFound = testNarrowPhaseCollision(narrowPhaseInput, false, allocator);
-    if (collisionFound && callback != nullptr) {
+    if (collisionFound && callback != NULL) {
 
         // Compute the overlapping colliders
         List<ContactPair> contactPairs(allocator);
@@ -1022,7 +1022,7 @@ void CollisionDetectionSystem::processPotentialContacts(NarrowPhaseInfoBatch& na
 
             // If there is not already a contact pair for this overlapping pair
             auto it = mapPairIdToContactPairIndex->find(pairId);
-            ContactPair* pairContact = nullptr;
+            ContactPair* pairContact = NULL;
             if (it == mapPairIdToContactPairIndex->end()) {
 
                 // Create a new ContactPair
@@ -1075,7 +1075,7 @@ void CollisionDetectionSystem::processPotentialContacts(NarrowPhaseInfoBatch& na
                 pairContact = &((*contactPairs)[pairContactIndex]);
             }
 
-            assert(pairContact != nullptr);
+            assert(pairContact != NULL);
 
             // Add the potential contacts
             for (uint j=0; j < narrowPhaseInfoBatch.contactPoints[i].size(); j++) {
@@ -1121,7 +1121,7 @@ void CollisionDetectionSystem::processPotentialContacts(NarrowPhaseInfoBatch& na
                     // Add the contact point to the manifold
                     contactManifoldInfo.potentialContactPointsIndices.add(contactPointIndex);
 
-                    assert(pairContact != nullptr);
+                    assert(pairContact != NULL);
 
                     // Add the potential contact manifold
                     uint contactManifoldIndex = static_cast<uint>(potentialContactManifolds.size());
@@ -1406,7 +1406,7 @@ void CollisionDetectionSystem::reduceContactPoints(ContactManifoldInfo& manifold
 void CollisionDetectionSystem::reportContactsAndTriggers() {
 
     // Report contacts and triggers to the user
-    if (mWorld->mEventListener != nullptr) {
+    if (mWorld->mEventListener != NULL) {
 
         reportContacts(*(mWorld->mEventListener), mCurrentContactPairs, mCurrentContactManifolds, mCurrentContactPoints, mLostContactPairs);
         reportTriggers(*(mWorld->mEventListener), mCurrentContactPairs, mLostContactPairs);
@@ -1488,7 +1488,7 @@ bool CollisionDetectionSystem::testOverlap(CollisionBody* body1, CollisionBody* 
         computeMiddlePhaseCollisionSnapshot(convexPairs, concavePairs, narrowPhaseInput, false);
 
         // Compute the narrow-phase collision detection
-        return computeNarrowPhaseOverlapSnapshot(narrowPhaseInput, nullptr);
+        return computeNarrowPhaseOverlapSnapshot(narrowPhaseInput, NULL);
     }
 
     return false;

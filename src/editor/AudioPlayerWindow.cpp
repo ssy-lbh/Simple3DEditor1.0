@@ -336,11 +336,11 @@ void AudioPlayerWindow::OnDropFileW(const wchar_t* path, uint len){
     PreloadFile(file);
 }
 
-void AudioPlayerWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void AudioPlayerWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
-void AudioPlayerWindow::Deserialize(IInputStream& os){}
+void AudioPlayerWindow::Deserialize(json& o){}
 
 void AudioPlayerWindow::OnInsLoad(){
     // 暂不使用 L"PCM音频文件(*.wav)\0*.wav\0所有音频类型(.*)\0*.*\0"，此状态下发现Shell时可能的环境错误

@@ -57,14 +57,14 @@ class Set {
             /// Constructor
             Entry() {
                 next = -1;
-                value = nullptr;
+                value = NULL;
             }
 
             /// Constructor
             Entry(size_t hashcode, int nextEntry) {
                 hashCode = hashcode;
                 next = nextEntry;
-                value = nullptr;
+                value = NULL;
             }
 
             /// Copy-constructor
@@ -182,7 +182,7 @@ class Set {
             for (int i=0; i<mNbUsedEntries; i++) {
 
                 // If the entry is not free
-                if (newEntries[i].value != nullptr) {
+                if (newEntries[i].value != NULL) {
 
                     // Get the corresponding bucket
                     int bucket = newEntries[i].hashCode % newCapacity;
@@ -271,7 +271,7 @@ class Set {
                     for (mCurrentEntry += 1; mCurrentEntry < mNbUsedEntries; mCurrentEntry++) {
 
                         // If the entry is not empty
-                        if (mEntries[mCurrentEntry].value != nullptr) {
+                        if (mEntries[mCurrentEntry].value != NULL) {
 
                            // We have found the next non empty entry
                            return;
@@ -309,14 +309,14 @@ class Set {
                 /// Deferencable
                 reference operator*() const {
                     assert(mCurrentEntry >= 0 && mCurrentEntry < mNbUsedEntries);
-                    assert(mEntries[mCurrentEntry].value != nullptr);
+                    assert(mEntries[mCurrentEntry].value != NULL);
                     return *(mEntries[mCurrentEntry].value);
                 }
 
                 /// Deferencable
                 pointer operator->() const {
                     assert(mCurrentEntry >= 0 && mCurrentEntry < mNbUsedEntries);
-                    assert(mEntries[mCurrentEntry].value != nullptr);
+                    assert(mEntries[mCurrentEntry].value != NULL);
                     return mEntries[mCurrentEntry].value;
                 }
 
@@ -349,8 +349,8 @@ class Set {
 
         /// Constructor
         Set(MemoryAllocator& allocator, size_t capacity = 0)
-            : mNbUsedEntries(0), mNbFreeEntries(0), mCapacity(0), mBuckets(nullptr),
-              mEntries(nullptr), mAllocator(allocator), mFreeIndex(-1) {
+            : mNbUsedEntries(0), mNbFreeEntries(0), mCapacity(0), mBuckets(NULL),
+              mEntries(NULL), mAllocator(allocator), mFreeIndex(-1) {
 
             // If the largest prime has not been computed yet
             if (LARGEST_PRIME == -1) {
@@ -368,7 +368,7 @@ class Set {
         /// Copy constructor
         Set(const Set<V, Hash, KeyEqual>& set)
           :mNbUsedEntries(set.mNbUsedEntries), mNbFreeEntries(set.mNbFreeEntries), mCapacity(set.mCapacity),
-           mBuckets(nullptr), mEntries(nullptr), mAllocator(set.mAllocator), mFreeIndex(set.mFreeIndex) {
+           mBuckets(NULL), mEntries(NULL), mAllocator(set.mAllocator), mFreeIndex(set.mFreeIndex) {
 
             if (mCapacity > 0) {
 
@@ -386,7 +386,7 @@ class Set {
 
                     new (&mEntries[i]) Entry(set.mEntries[i].hashCode, set.mEntries[i].next);
 
-                    if (set.mEntries[i].value != nullptr) {
+                    if (set.mEntries[i].value != NULL) {
                        mEntries[i].value = static_cast<V*>(mAllocator.allocate(sizeof(V)));
                        new (mEntries[i].value) V(*(set.mEntries[i].value));
                     }
@@ -471,11 +471,11 @@ class Set {
                 mNbUsedEntries++;
             }
 
-            assert(mEntries[entryIndex].value == nullptr);
+            assert(mEntries[entryIndex].value == NULL);
             mEntries[entryIndex].hashCode = hashCode;
             mEntries[entryIndex].next = mBuckets[bucket];
             mEntries[entryIndex].value = static_cast<V*>(mAllocator.allocate(sizeof(V)));
-            assert(mEntries[entryIndex].value != nullptr);
+            assert(mEntries[entryIndex].value != NULL);
             new (mEntries[entryIndex].value) V(value);
             mBuckets[bucket] = entryIndex;
 
@@ -513,12 +513,12 @@ class Set {
                         }
 
                         // Release memory for the value if any
-                        if (mEntries[i].value != nullptr) {
+                        if (mEntries[i].value != NULL) {
                             mEntries[i].value->~V();
                             mAllocator.release(mEntries[i].value, sizeof(V));
-                            mEntries[i].value = nullptr;
+                            mEntries[i].value = NULL;
                         }
-                        assert(mEntries[i].value == nullptr);
+                        assert(mEntries[i].value == NULL);
                         mEntries[i].next = mFreeIndex;
                         mFreeIndex = i;
                         mNbFreeEntries++;
@@ -527,7 +527,7 @@ class Set {
                         for (i += 1; i < mNbUsedEntries; i++) {
 
                             // If the entry is not empty
-                            if (mEntries[i].value != nullptr) {
+                            if (mEntries[i].value != NULL) {
 
                                // We have found the next non empty entry
                                return Iterator(mEntries, mCapacity, mNbUsedEntries, i);
@@ -548,7 +548,7 @@ class Set {
             List<V> list(listAllocator);
 
             for (int i=0; i < mCapacity; i++) {
-                if (mEntries[i].value != nullptr) {
+                if (mEntries[i].value != NULL) {
                     list.add(*(mEntries[i].value));
                 }
             }
@@ -564,10 +564,10 @@ class Set {
                 for (int i=0; i < mCapacity; i++) {
                     mBuckets[i] = -1;
                     mEntries[i].next = -1;
-                    if (mEntries[i].value != nullptr) {
+                    if (mEntries[i].value != NULL) {
                         mEntries[i].value->~V();
                         mAllocator.release(mEntries[i].value, sizeof(V));
-                        mEntries[i].value = nullptr;
+                        mEntries[i].value = NULL;
                     }
                 }
 
@@ -588,8 +588,8 @@ class Set {
                 mAllocator.release(mEntries, mCapacity * sizeof(Entry));
 
                 mCapacity = 0;
-                mBuckets = nullptr;
-                mEntries = nullptr;
+                mBuckets = NULL;
+                mEntries = NULL;
             }
 
             assert(size() == 0);
@@ -631,7 +631,7 @@ class Set {
                 return end();
             }
 
-            assert(mEntries[entry].value != nullptr);
+            assert(mEntries[entry].value != NULL);
 
             return Iterator(mEntries, mCapacity, mNbUsedEntries, entry);
         }
@@ -684,7 +684,7 @@ class Set {
 
                         new (&mEntries[i]) Entry(set.mEntries[i].hashCode, set.mEntries[i].next);
 
-                        if (set.mEntries[i].value != nullptr) {
+                        if (set.mEntries[i].value != NULL) {
                            mEntries[i].value = static_cast<V*>(mAllocator.allocate(sizeof(V)));
                            new (mEntries[i].value) V(*(set.mEntries[i].value));
                         }
@@ -712,7 +712,7 @@ class Set {
             // Find the first used entry
             int entry;
             for (entry=0; entry < mNbUsedEntries; entry++) {
-                if (mEntries[entry].value != nullptr) {
+                if (mEntries[entry].value != NULL) {
                     return Iterator(mEntries, mCapacity, mNbUsedEntries, entry);
                 }
             }

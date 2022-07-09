@@ -70,7 +70,7 @@ struct JointInfo {
 
         /// Constructor
         JointInfo(JointType constraintType)
-                      : body1(nullptr), body2(nullptr), type(constraintType),
+                      : body1(NULL), body2(NULL), type(constraintType),
                         positionCorrectionTechnique(JointsPositionCorrectionTechnique::NON_LINEAR_GAUSS_SEIDEL),
                         isCollisionEnabled(true) {
 

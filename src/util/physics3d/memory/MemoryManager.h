@@ -111,7 +111,7 @@ inline void* MemoryManager::allocate(AllocationType allocationType, size_t size)
        case AllocationType::Frame: return mSingleFrameAllocator.allocate(size);
     }
 
-    return nullptr;
+    return NULL;
 }
 
 // Release previously allocated memory.

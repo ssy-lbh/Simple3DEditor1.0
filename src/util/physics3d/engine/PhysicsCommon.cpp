@@ -29,7 +29,7 @@
 using namespace reactphysics3d;
 
 // Static variables
-Logger* PhysicsCommon::mLogger = nullptr;
+Logger* PhysicsCommon::mLogger = NULL;
 
 /// Constructor
 /**
@@ -126,7 +126,7 @@ void PhysicsCommon::release() {
  */
 PhysicsWorld* PhysicsCommon::createPhysicsWorld(const PhysicsWorld::WorldSettings& worldSettings) {
 
-    Profiler* profiler = nullptr;
+    Profiler* profiler = NULL;
 
 #ifdef IS_RP3D_PROFILING_ENABLED
 

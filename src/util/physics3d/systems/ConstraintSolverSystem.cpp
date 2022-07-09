@@ -50,7 +50,7 @@ ConstraintSolverSystem::ConstraintSolverSystem(PhysicsWorld& world, Islands& isl
 #ifdef IS_RP3D_PROFILING_ENABLED
 
 
-	mProfiler = nullptr;
+	mProfiler = NULL;
 
 #endif
 

@@ -133,7 +133,7 @@ class Deque {
 
             // Allocate memory for the new array of pointers to chunk
             void* newMemory = mAllocator.allocate(newNbChunks * sizeof(T*));
-            assert(newMemory != nullptr);
+            assert(newMemory != NULL);
             T** newChunks = static_cast<T**>(newMemory);
 
             // If chunks have already been allocated
@@ -151,7 +151,7 @@ class Deque {
             // If we need to allocate the first chunk (in the middle of the chunks array)
             if (mNbChunks == 0) {
                 mChunks[newNbChunks / 2] = static_cast<T*>(mAllocator.allocate(sizeof(T) * CHUNK_NB_ITEMS));
-                assert(mChunks[newNbChunks / 2] != nullptr);
+                assert(mChunks[newNbChunks / 2] != NULL);
             }
 
             mNbChunks = newNbChunks;
@@ -161,10 +161,10 @@ class Deque {
 
                 // Allocate memory for the new chunk
                 mChunks[i] = static_cast<T*>(mAllocator.allocate(sizeof(T) * CHUNK_NB_ITEMS));
-                assert(mChunks[i] != nullptr);
+                assert(mChunks[i] != NULL);
 
                 mChunks[mNbChunks - 1 - i] = static_cast<T*>(mAllocator.allocate(sizeof(T) * CHUNK_NB_ITEMS));
-                assert(mChunks[mNbChunks - 1 -i] != nullptr);
+                assert(mChunks[mNbChunks - 1 -i] != NULL);
             }
 
             // Update the first and last chunk index
@@ -326,7 +326,7 @@ class Deque {
 
         /// Constructor
         Deque(MemoryAllocator& allocator)
-            : mChunks(nullptr), mSize(0), mNbChunks(0), mFirstChunkIndex(1),
+            : mChunks(NULL), mSize(0), mNbChunks(0), mFirstChunkIndex(1),
               mLastChunkIndex(1), mFirstItemIndex(CHUNK_FIRST_ITEM_INDEX),
               mLastItemIndex(CHUNK_FIRST_ITEM_INDEX), mAllocator(allocator) {
 

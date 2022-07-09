@@ -59,7 +59,7 @@ void RigidBodyComponents::allocate(uint32 nbComponentsToAllocate) {
 
     // Allocate memory
     void* newBuffer = mMemoryAllocator.allocate(totalSizeBytes);
-    assert(newBuffer != nullptr);
+    assert(newBuffer != NULL);
 
     // New pointers to components data
     Entity* newBodiesEntities = static_cast<Entity*>(newBuffer);
@@ -331,7 +331,7 @@ void RigidBodyComponents::destroyComponent(uint32 index) {
     mMapEntityToComponentIndex.remove(mBodiesEntities[index]);
 
     mBodiesEntities[index].~Entity();
-    mRigidBodies[index] = nullptr;
+    mRigidBodies[index] = NULL;
     mLinearVelocities[index].~Vector3();
     mAngularVelocities[index].~Vector3();
     mExternalForces[index].~Vector3();

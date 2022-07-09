@@ -38,7 +38,7 @@ SingleFrameAllocator::SingleFrameAllocator(MemoryAllocator& baseAllocator) : mBa
 
     // Allocate a whole block of memory at the beginning
     mMemoryBufferStart = static_cast<char*>(mBaseAllocator.allocate(mTotalSizeBytes));
-    assert(mMemoryBufferStart != nullptr);
+    assert(mMemoryBufferStart != NULL);
 }
 
 // Destructor
@@ -113,7 +113,7 @@ void SingleFrameAllocator::reset() {
 
             // Allocate a whole block of memory at the beginning
             mMemoryBufferStart = static_cast<char*>(mBaseAllocator.allocate(mTotalSizeBytes));
-            assert(mMemoryBufferStart != nullptr);
+            assert(mMemoryBufferStart != NULL);
 
             mNbFramesTooMuchAllocated = 0;
         }
@@ -133,7 +133,7 @@ void SingleFrameAllocator::reset() {
 
         // Allocate a whole block of memory at the beginning
         mMemoryBufferStart = static_cast<char*>(mBaseAllocator.allocate(mTotalSizeBytes));
-        assert(mMemoryBufferStart != nullptr);
+        assert(mMemoryBufferStart != NULL);
 
         mNeedToAllocatedMore = false;
         mNbFramesTooMuchAllocated = 0;

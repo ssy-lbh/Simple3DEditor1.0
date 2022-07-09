@@ -54,7 +54,7 @@ void ColliderComponents::allocate(uint32 nbComponentsToAllocate) {
 
     // Allocate memory
     void* newBuffer = mMemoryAllocator.allocate(totalSizeBytes);
-    assert(newBuffer != nullptr);
+    assert(newBuffer != NULL);
 
     // New pointers to components data
     Entity* newCollidersEntities = static_cast<Entity*>(newBuffer);
@@ -223,9 +223,9 @@ void ColliderComponents::destroyComponent(uint32 index) {
 
     mCollidersEntities[index].~Entity();
     mBodiesEntities[index].~Entity();
-    mColliders[index] = nullptr;
+    mColliders[index] = NULL;
     mLocalToBodyTransforms[index].~Transform();
-    mCollisionShapes[index] = nullptr;
+    mCollisionShapes[index] = NULL;
     mLocalToWorldTransforms[index].~Transform();
     mOverlappingPairs[index].~List<uint64>();
 }

@@ -48,9 +48,9 @@ public:
     virtual void OnDropFileW(const wchar_t* path, uint len);
 
     // 窗口序列化时应先os.WriteWithLen(WINDOW_ID)，这样才能在反序列化时识别窗口
-    virtual void Serialize(IOutputStream& os) override;
+    virtual void Serialize(json& o) override;
     // 除了WINDOW_ID，其他数据按顺序依次读取就行
-    virtual void Deserialize(IInputStream& is) override;
+    virtual void Deserialize(json& o) override;
 };
 
 class AGUIWindow : public AWindow {
@@ -73,7 +73,7 @@ public:
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
 
-    virtual void Serialize(IOutputStream& os) override;
+    virtual void Serialize(json& o) override;
     using AWindow::Deserialize;
 };
 

@@ -106,7 +106,7 @@ void* PoolAllocator::allocate(size_t size) {
     assert(size > 0);
 
     // We cannot allocate zero bytes
-    if (size == 0) return nullptr;
+    if (size == 0) return NULL;
 
 #ifndef NDEBUG
         mNbTimesAllocateMethodCalled++;
@@ -124,7 +124,7 @@ void* PoolAllocator::allocate(size_t size) {
     assert(indexHeap >= 0 && indexHeap < NB_HEAPS);
 
     // If there still are free memory units in the corresponding heap
-    if (mFreeMemoryUnits[indexHeap] != nullptr) {
+    if (mFreeMemoryUnits[indexHeap] != NULL) {
 
         // Return a pointer to the memory unit
         MemoryUnit* unit = mFreeMemoryUnits[indexHeap];
@@ -149,7 +149,7 @@ void* PoolAllocator::allocate(size_t size) {
         // memory units
         MemoryBlock* newBlock = mMemoryBlocks + mNbCurrentMemoryBlocks;
         newBlock->memoryUnits = static_cast<MemoryUnit*>(mBaseAllocator.allocate(BLOCK_SIZE));
-        assert(newBlock->memoryUnits != nullptr);
+        assert(newBlock->memoryUnits != NULL);
         size_t unitSize = mUnitSizes[indexHeap];
         uint nbUnits = BLOCK_SIZE / unitSize;
         assert(nbUnits * unitSize <= BLOCK_SIZE);
@@ -164,7 +164,7 @@ void* PoolAllocator::allocate(size_t size) {
         }
         void* lastUnitPointer = static_cast<void*>(memoryUnitsStartChar + unitSize*(nbUnits-1));
         MemoryUnit* lastUnit = static_cast<MemoryUnit*>(lastUnitPointer);
-        lastUnit->nextUnit = nullptr;
+        lastUnit->nextUnit = NULL;
 
         // Add the new allocated block into the list of free memory units in the heap
         mFreeMemoryUnits[indexHeap] = newBlock->memoryUnits->nextUnit;

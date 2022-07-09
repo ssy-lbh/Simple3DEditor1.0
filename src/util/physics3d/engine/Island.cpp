@@ -31,7 +31,7 @@ using namespace reactphysics3d;
 
 // Constructor
 Island::Island(uint nbMaxBodies, uint nbMaxContactManifolds, MemoryManager& memoryManager)
-       : mBodies(nullptr), mContactManifolds(nullptr), mNbBodies(0), mNbContactManifolds(0) {
+       : mBodies(NULL), mContactManifolds(NULL), mNbBodies(0), mNbContactManifolds(0) {
 
     // Allocate memory for the arrays on the single frame allocator
     mBodies = static_cast<RigidBody**>(memoryManager.allocate(MemoryManager::AllocationType::Frame,

@@ -220,7 +220,7 @@ class List {
 
         /// Constructor
         List(MemoryAllocator& allocator, size_t capacity = 0)
-            : mBuffer(nullptr), mSize(0), mCapacity(0), mAllocator(allocator) {
+            : mBuffer(NULL), mSize(0), mCapacity(0), mAllocator(allocator) {
 
             if (capacity > 0) {
 
@@ -230,7 +230,7 @@ class List {
         }
 
         /// Copy constructor
-        List(const List<T>& list) : mBuffer(nullptr), mSize(0), mCapacity(0), mAllocator(list.mAllocator) {
+        List(const List<T>& list) : mBuffer(NULL), mSize(0), mCapacity(0), mAllocator(list.mAllocator) {
 
             // All all the elements of the list to the current one
             addRange(list);
@@ -255,7 +255,7 @@ class List {
             // Allocate memory for the new array
             void* newMemory = mAllocator.allocate(capacity * sizeof(T));
 
-            if (mBuffer != nullptr) {
+            if (mBuffer != NULL) {
 
                 if (mSize > 0) {
 
@@ -275,7 +275,7 @@ class List {
             }
 
             mBuffer = newMemory;
-            assert(mBuffer != nullptr);
+            assert(mBuffer != NULL);
 
             mCapacity = capacity;
         }
@@ -387,7 +387,7 @@ class List {
                 // Release the memory allocated on the heap
                 mAllocator.release(mBuffer, mCapacity * sizeof(T));
 
-                mBuffer = nullptr;
+                mBuffer = NULL;
                 mCapacity = 0;
             }
         }

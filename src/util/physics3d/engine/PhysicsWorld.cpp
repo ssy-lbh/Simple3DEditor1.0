@@ -58,7 +58,7 @@ PhysicsWorld::PhysicsWorld(MemoryManager& memoryManager, const WorldSettings& wo
                 mFixedJointsComponents(mMemoryManager.getHeapAllocator()), mHingeJointsComponents(mMemoryManager.getHeapAllocator()),
                 mSliderJointsComponents(mMemoryManager.getHeapAllocator()), mCollisionDetection(this, mCollidersComponents, mTransformComponents, mCollisionBodyComponents, mRigidBodyComponents,
                                         mMemoryManager),
-                mCollisionBodies(mMemoryManager.getHeapAllocator()), mEventListener(nullptr),
+                mCollisionBodies(mMemoryManager.getHeapAllocator()), mEventListener(NULL),
                 mName(worldSettings.worldName),  mIslands(mMemoryManager.getSingleFrameAllocator()), mProcessContactPairsOrderIslands(mMemoryManager.getSingleFrameAllocator()),
                 mContactSolverSystem(mMemoryManager, *this, mIslands, mCollisionBodyComponents, mRigidBodyComponents,
                                mCollidersComponents, mConfig.restitutionVelocityThreshold),
@@ -88,7 +88,7 @@ PhysicsWorld::PhysicsWorld(MemoryManager& memoryManager, const WorldSettings& wo
 #ifdef IS_RP3D_PROFILING_ENABLED
 
 
-    assert(profiler != nullptr);
+    assert(profiler != NULL);
     mProfiler = profiler;
 
     // Set the profiler
@@ -175,7 +175,7 @@ CollisionBody* PhysicsWorld::createCollisionBody(const Transform& transform) {
                                         sizeof(CollisionBody)))
                                         CollisionBody(*this, entity);
 
-    assert(collisionBody != nullptr);
+    assert(collisionBody != NULL);
 
     // Add the components
     CollisionBodyComponents::CollisionBodyComponent bodyComponent(collisionBody);
@@ -471,7 +471,7 @@ RigidBody* PhysicsWorld::createRigidBody(const Transform& transform) {
     // Create the rigid body
     RigidBody* rigidBody = new (mMemoryManager.allocate(MemoryManager::AllocationType::Pool,
                                      sizeof(RigidBody))) RigidBody(*this, entity);
-    assert(rigidBody != nullptr);
+    assert(rigidBody != NULL);
 
     CollisionBodyComponents::CollisionBodyComponent bodyComponent(rigidBody);
     mCollisionBodyComponents.addComponent(entity, false, bodyComponent);
@@ -541,7 +541,7 @@ Joint* PhysicsWorld::createJoint(const JointInfo& jointInfo) {
     // Create a new entity for the joint
     Entity entity = mEntityManager.createEntity();
 
-    Joint* newJoint = nullptr;
+    Joint* newJoint = NULL;
 
     const bool isJointDisabled = mRigidBodyComponents.getIsEntityDisabled(jointInfo.body1->getEntity()) &&
                                  mRigidBodyComponents.getIsEntityDisabled(jointInfo.body2->getEntity());
@@ -628,7 +628,7 @@ Joint* PhysicsWorld::createJoint(const JointInfo& jointInfo) {
         default:
         {
             assert(false);
-            return nullptr;
+            return NULL;
         }
     }
 
@@ -661,7 +661,7 @@ Joint* PhysicsWorld::createJoint(const JointInfo& jointInfo) {
  */
 void PhysicsWorld::destroyJoint(Joint* joint) {
 
-    assert(joint != nullptr);
+    assert(joint != NULL);
 
     RP3D_LOG(mConfig.worldName, Logger::Level::Information, Logger::Category::Joint,
              "Joint " + std::to_string(joint->getEntity().id) + ": joint destroyed",  __FILE__, __LINE__);

@@ -51,7 +51,7 @@ void JointComponents::allocate(uint32 nbComponentsToAllocate) {
 
     // Allocate memory
     void* newBuffer = mMemoryAllocator.allocate(totalSizeBytes);
-    assert(newBuffer != nullptr);
+    assert(newBuffer != NULL);
 
     // New pointers to components data
     Entity* newJointsEntities = static_cast<Entity*>(newBuffer);
@@ -192,5 +192,5 @@ void JointComponents::destroyComponent(uint32 index) {
     mJointEntities[index].~Entity();
     mBody1Entities[index].~Entity();
     mBody2Entities[index].~Entity();
-    mJoints[index] = nullptr;
+    mJoints[index] = NULL;
 }

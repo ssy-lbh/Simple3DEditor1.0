@@ -26,7 +26,7 @@ namespace simple3deditor {
 AContainer::AContainer(){}
 AContainer::AContainer(SelectionWindow* selWindow) : selWindow(selWindow) {}
 
-LRContainer::LRContainer() : lWindow(NULL), rWindow(NULL) {
+LRContainer::LRContainer() : lWindow(nullptr), rWindow(nullptr) {
     cliSize = Vector2(2.0f, 0.0f);
 }
 
@@ -52,29 +52,29 @@ void LRContainer::InitMenu(){
     joinMenu->AddItem(new MenuItem(L"归并为左窗口", [=]{
         if (this->selWindow){
             delete this->rWindow;
-            this->rWindow = NULL;
+            this->rWindow = nullptr;
             AWindow* curWindow = ((SelectionWindow*)this->lWindow)->GetWindow();
-            ((SelectionWindow*)this->lWindow)->SetWindow(NULL, false);
+            ((SelectionWindow*)this->lWindow)->SetWindow(nullptr, false);
             delete this->lWindow;
-            this->lWindow = NULL;
+            this->lWindow = nullptr;
             this->selWindow->SetWindow(curWindow, true);
         }
     }));
     joinMenu->AddItem(new MenuItem(L"归并为右窗口", [=]{
         if (this->selWindow){
             delete this->lWindow;
-            this->lWindow = NULL;
+            this->lWindow = nullptr;
             AWindow* curWindow = ((SelectionWindow*)this->rWindow)->GetWindow();
-            ((SelectionWindow*)this->rWindow)->SetWindow(NULL, false);
+            ((SelectionWindow*)this->rWindow)->SetWindow(nullptr, false);
             delete this->rWindow;
-            this->rWindow = NULL;
+            this->rWindow = nullptr;
             this->selWindow->SetWindow(curWindow, true);
         }
     }));
 }
 
 bool LRContainer::IsFocus(){
-    return focusWindow != NULL;
+    return focusWindow != nullptr;
 }
 
 void LRContainer::OnRender(){
@@ -186,7 +186,7 @@ void LRContainer::OnKillFocus(){
     AWindow::OnKillFocus();
     if (focusWindow)
         focusWindow->OnKillFocus();
-    focusWindow = NULL;
+    focusWindow = nullptr;
     //DebugLog("LRContainer::focusWindow %p", focusWindow);
 }
 
@@ -214,23 +214,21 @@ void LRContainer::OnDropFileW(const wchar_t* path, uint len){
         focusWindow->OnDropFileW(path, len);
 }
 
-void LRContainer::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
-    os.Write(GetRate((float)dis, 0.0f, cliSize.x));
-    os.Write(lWindow != NULL);
+void LRContainer::Serialize(json& o){
+    o["id"] = WINDOW_ID;
+    o["div rate"] = GetRate((float)dis, 0.0f, cliSize.x);
     if (lWindow)
-        lWindow->Serialize(os);
-    os.Write(rWindow != NULL);
+        lWindow->Serialize(o["left window"]);
     if (rWindow)
-        rWindow->Serialize(os);
+        rWindow->Serialize(o["right window"]);
 }
 
-void LRContainer::Deserialize(IInputStream& is){
-    dis = Lerp(0.0f, cliSize.x, Saturate(is.ReadFloat()));
-    if (is.ReadBool())
-        lWindow = Main::data->ConstructWindow(is);
-    if (is.ReadBool())
-        rWindow = Main::data->ConstructWindow(is);
+void LRContainer::Deserialize(json& o){
+    dis = Lerp(0.0f, cliSize.x, Saturate(o.value("div rate", 0.5f)));
+    if (o.contains("left window"))
+        lWindow = Main::data->ConstructWindow(o["left window"]);
+    if (o.contains("right window"))
+        rWindow = Main::data->ConstructWindow(o["right window"]);
 }
 
 void LRContainer::UpdateFocus(){
@@ -261,11 +259,11 @@ void LRContainer::UpdateFocus(){
 void LRContainer::FreeWindow(){
     if (lWindow){
         delete lWindow;
-        lWindow = NULL;
+        lWindow = nullptr;
     }
     if (rWindow){
         delete rWindow;
-        rWindow = NULL;
+        rWindow = nullptr;
     }
 }
 
@@ -289,7 +287,7 @@ bool LRContainer::DragEnabled(){
     return dragEnable;
 }
 
-UDContainer::UDContainer() : uWindow(NULL), dWindow(NULL) {
+UDContainer::UDContainer() : uWindow(nullptr), dWindow(nullptr) {
     cliSize = Vector2(0.0f, 2.0f);
 } 
 
@@ -315,29 +313,29 @@ void UDContainer::InitMenu(){
     joinMenu->AddItem(new MenuItem(L"归并为上窗口", [=]{
         if (this->selWindow){
             delete this->dWindow;
-            this->dWindow = NULL;
+            this->dWindow = nullptr;
             AWindow* curWindow = ((SelectionWindow*)this->uWindow)->GetWindow();
-            ((SelectionWindow*)this->uWindow)->SetWindow(NULL, false);
+            ((SelectionWindow*)this->uWindow)->SetWindow(nullptr, false);
             delete this->uWindow;
-            this->uWindow = NULL;
+            this->uWindow = nullptr;
             this->selWindow->SetWindow(curWindow, true);
         }
     }));
     joinMenu->AddItem(new MenuItem(L"归并为下窗口", [=]{
         if (this->selWindow){
             delete this->uWindow;
-            this->uWindow = NULL;
+            this->uWindow = nullptr;
             AWindow* curWindow = ((SelectionWindow*)this->dWindow)->GetWindow();
-            ((SelectionWindow*)this->dWindow)->SetWindow(NULL, false);
+            ((SelectionWindow*)this->dWindow)->SetWindow(nullptr, false);
             delete this->dWindow;
-            this->dWindow = NULL;
+            this->dWindow = nullptr;
             this->selWindow->SetWindow(curWindow, true);
         }
     }));
 }
 
 bool UDContainer::IsFocus(){
-    return focusWindow != NULL;
+    return focusWindow != nullptr;
 }
 
 void UDContainer::OnRender(){
@@ -449,7 +447,7 @@ void UDContainer::OnKillFocus(){
     AWindow::OnKillFocus();
     if (focusWindow)
         focusWindow->OnKillFocus();
-    focusWindow = NULL;
+    focusWindow = nullptr;
 }
 
 void UDContainer::OnMouseWheel(int delta){
@@ -476,23 +474,21 @@ void UDContainer::OnDropFileW(const wchar_t* path, uint len){
         focusWindow->OnDropFileW(path, len);
 }
 
-void UDContainer::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
-    os.Write(GetRate((float)dis, 0.0f, cliSize.y));
-    os.Write(uWindow != NULL);
+void UDContainer::Serialize(json& o){
+    o["id"] = WINDOW_ID;
+    o["div rate"] = GetRate((float)dis, 0.0f, cliSize.y);
     if (uWindow)
-        uWindow->Serialize(os);
-    os.Write(dWindow != NULL);
+        uWindow->Serialize(o["up window"]);
     if (dWindow)
-        dWindow->Serialize(os);
+        dWindow->Serialize(o["down window"]);
 }
 
-void UDContainer::Deserialize(IInputStream& is){
-    dis = Lerp(0.0f, cliSize.y, Saturate(is.ReadFloat()));
-    if (is.ReadBool())
-        uWindow = Main::data->ConstructWindow(is);
-    if (is.ReadBool())
-        dWindow = Main::data->ConstructWindow(is);
+void UDContainer::Deserialize(json& o){
+    dis = Lerp(0.0f, cliSize.y, Saturate(o.value("div rate", 0.5f)));
+    if (o.contains("up window"))
+        uWindow = Main::data->ConstructWindow(o["up window"]);
+    if (o.contains("down window"))
+        dWindow = Main::data->ConstructWindow(o["down window"]);
 }
 
 void UDContainer::UpdateFocus(){
@@ -523,11 +519,11 @@ void UDContainer::UpdateFocus(){
 void UDContainer::FreeWindow(){
     if (uWindow){
         delete uWindow;
-        uWindow = NULL;
+        uWindow = nullptr;
     }
     if (dWindow){
         delete dWindow;
-        dWindow = NULL;
+        dWindow = nullptr;
     }
 }
 
@@ -551,7 +547,7 @@ bool UDContainer::DragEnabled(){
     return dragEnable;
 }
 
-SelectionWindow::SelectionWindow() : curWindow(NULL) {
+SelectionWindow::SelectionWindow() : curWindow(nullptr) {
     DebugLog("SelectionWindow %p Created", this);
     InitMenu();
 }
@@ -698,16 +694,15 @@ void SelectionWindow::OnDropFileW(const wchar_t* path, uint len){
         curWindow->OnDropFileW(path, len);
 }
 
-void SelectionWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
-    os.Write(curWindow != NULL);
+void SelectionWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
     if (curWindow)
-        curWindow->Serialize(os);
+        curWindow->Serialize(o["window"]);
 }
 
-void SelectionWindow::Deserialize(IInputStream& is){
-    if (is.ReadBool()){
-        curWindow = Main::data->ConstructWindow(is);
+void SelectionWindow::Deserialize(json& o){
+    if (o.contains("window")){
+        curWindow = Main::data->ConstructWindow(o["window"]);
         if (InstanceOf<AContainer>(curWindow))
             ((AContainer*)curWindow)->selWindow = this;
     }

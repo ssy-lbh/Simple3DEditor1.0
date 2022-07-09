@@ -179,7 +179,7 @@ class WorldCollisionCallback : public CollisionCallback
 					return &(it->second);
 			}
 			else {
-				return nullptr;
+				return NULL;
 			}
 		}
 
@@ -633,7 +633,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mSphereCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -657,7 +657,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mSphereCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -678,7 +678,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mSphereCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -699,7 +699,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mSphereCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -749,7 +749,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -773,7 +773,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -794,7 +794,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -815,7 +815,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -855,7 +855,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -879,7 +879,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -900,7 +900,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -921,7 +921,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -961,7 +961,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -985,7 +985,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1006,7 +1006,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1027,7 +1027,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mBoxCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1077,7 +1077,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1101,7 +1101,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1122,7 +1122,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1143,7 +1143,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1183,7 +1183,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1207,7 +1207,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1228,7 +1228,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1249,7 +1249,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1299,7 +1299,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1323,7 +1323,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1344,7 +1344,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1365,7 +1365,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1405,7 +1405,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1429,7 +1429,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1450,7 +1450,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1471,7 +1471,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1511,7 +1511,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1535,7 +1535,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1556,7 +1556,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1577,7 +1577,7 @@ class TestCollisionWorld : public Test {
 
 			// Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConvexMeshCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1627,7 +1627,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1651,7 +1651,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1672,7 +1672,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1693,7 +1693,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mSphereCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -1743,7 +1743,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mBoxCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -1785,7 +1785,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mBoxCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -1814,7 +1814,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mBoxCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -1844,7 +1844,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mBoxCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -1903,7 +1903,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mConvexMeshCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -1945,7 +1945,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mConvexMeshCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -1974,7 +1974,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mConvexMeshCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2004,7 +2004,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mConvexMeshCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2063,7 +2063,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mConvexMeshCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2105,7 +2105,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mConvexMeshCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2134,7 +2134,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mConvexMeshCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2164,7 +2164,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mConvexMeshCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2223,7 +2223,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2246,7 +2246,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2267,7 +2267,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2288,7 +2288,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2338,7 +2338,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2361,7 +2361,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2382,7 +2382,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2403,7 +2403,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mCapsuleCollider1);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2453,7 +2453,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2470,7 +2470,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2487,7 +2487,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2504,7 +2504,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mBoxCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2551,7 +2551,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2568,7 +2568,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2585,7 +2585,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2602,7 +2602,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mConvexMeshCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 4);
 
@@ -2649,7 +2649,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mCapsuleCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2673,7 +2673,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mCapsuleCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2694,7 +2694,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mCapsuleCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2715,7 +2715,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mCapsuleCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2755,7 +2755,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mCapsuleCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2779,7 +2779,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mCapsuleCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2800,7 +2800,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mCapsuleCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2821,7 +2821,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mCapsuleCollider2);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2871,7 +2871,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             const CollisionData* collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2895,7 +2895,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2916,7 +2916,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 
@@ -2937,7 +2937,7 @@ class TestCollisionWorld : public Test {
 
             // Get collision data
             collisionData = mCollisionCallback.getCollisionData(mCapsuleCollider1, mConcaveMeshCollider);
-            rp3d_test(collisionData != nullptr);
+            rp3d_test(collisionData != NULL);
             rp3d_test(collisionData->getNbContactPairs() == 1);
             rp3d_test(collisionData->getTotalNbContactPoints() == 1);
 

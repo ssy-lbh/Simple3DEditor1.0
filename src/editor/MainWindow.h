@@ -90,8 +90,8 @@ public:
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileW(const wchar_t* path, uint len) override;
 
-    virtual void Serialize(IOutputStream& os) override;
-    virtual void Deserialize(IInputStream& os) override;
+    virtual void Serialize(json& o) override;
+    virtual void Deserialize(json& o) override;
 
     void OnInsSave();
     void OnInsLoad();

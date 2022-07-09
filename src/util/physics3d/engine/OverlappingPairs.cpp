@@ -41,7 +41,7 @@ OverlappingPairs::OverlappingPairs(MemoryAllocator& persistentMemoryAllocator, M
                                                                          sizeof(Entity) + sizeof(Map<uint64, LastFrameCollisionInfo*>) +
                                                                          sizeof(bool) + sizeof(bool) + sizeof(NarrowPhaseAlgorithmType) +
                                                                          sizeof(bool) + sizeof(bool) + sizeof(bool)),
-                  mNbAllocatedPairs(0), mBuffer(nullptr),
+                  mNbAllocatedPairs(0), mBuffer(NULL),
                   mMapPairIdToPairIndex(persistentMemoryAllocator),
                   mColliderComponents(colliderComponents), mCollisionBodyComponents(collisionBodyComponents),
                   mRigidBodyComponents(rigidBodyComponents), mNoCollisionPairs(noCollisionPairs), mCollisionDispatch(collisionDispatch) {
@@ -198,7 +198,7 @@ void OverlappingPairs::allocate(uint64 nbPairsToAllocate) {
 
     // Allocate memory
     void* newBuffer = mPersistentAllocator.allocate(totalSizeBytes);
-    assert(newBuffer != nullptr);
+    assert(newBuffer != NULL);
 
     // New pointers to components data
     uint64* newPairIds = static_cast<uint64*>(newBuffer);

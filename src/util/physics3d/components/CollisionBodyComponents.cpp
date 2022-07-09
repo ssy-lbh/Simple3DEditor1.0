@@ -51,7 +51,7 @@ void CollisionBodyComponents::allocate(uint32 nbComponentsToAllocate) {
 
     // Allocate memory
     void* newBuffer = mMemoryAllocator.allocate(totalSizeBytes);
-    assert(newBuffer != nullptr);
+    assert(newBuffer != NULL);
 
     // New pointers to components data
     Entity* newBodiesEntities = static_cast<Entity*>(newBuffer);
@@ -94,7 +94,7 @@ void CollisionBodyComponents::addComponent(Entity bodyEntity, bool isSleeping, c
     mBodies[index] = component.body;
     new (mColliders + index) List<Entity>(mMemoryAllocator);
     mIsActive[index] = true;
-    mUserData[index] = nullptr;
+    mUserData[index] = NULL;
 
     // Map the entity with the new component lookup index
     mMapEntityToComponentIndex.add(Pair<Entity, uint32>(bodyEntity, index));
@@ -169,7 +169,7 @@ void CollisionBodyComponents::destroyComponent(uint32 index) {
     mMapEntityToComponentIndex.remove(mBodiesEntities[index]);
 
     mBodiesEntities[index].~Entity();
-    mBodies[index] = nullptr;
+    mBodies[index] = NULL;
     mColliders[index].~List<Entity>();
-    mUserData[index] = nullptr;
+    mUserData[index] = NULL;
 }

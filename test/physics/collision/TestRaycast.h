@@ -64,7 +64,7 @@ class WorldRaycastCallback : public RaycastCallback {
 
         WorldRaycastCallback() {
             isHit = false;
-            shapeToTest = nullptr;
+            shapeToTest = NULL;
         }
 
         virtual decimal notifyRaycastHit(const RaycastInfo& info) override {
@@ -83,9 +83,9 @@ class WorldRaycastCallback : public RaycastCallback {
         }
 
         void reset() {
-            raycastInfo.body = nullptr;
+            raycastInfo.body = NULL;
             raycastInfo.hitFraction = decimal(0.0);
-            raycastInfo.collider = nullptr;
+            raycastInfo.collider = NULL;
             raycastInfo.worldNormal.setToZero();
             raycastInfo.worldPoint.setToZero();
             isHit = false;

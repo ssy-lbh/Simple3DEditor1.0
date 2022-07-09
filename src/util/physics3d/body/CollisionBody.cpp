@@ -45,7 +45,7 @@ CollisionBody::CollisionBody(PhysicsWorld& world, Entity entity)
 
 #ifdef IS_RP3D_PROFILING_ENABLED
 
-        mProfiler = nullptr;
+        mProfiler = NULL;
 #endif
 
 }

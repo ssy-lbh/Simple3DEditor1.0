@@ -71,7 +71,7 @@ class LinkedList {
         // -------------------- Methods -------------------- //
 
         /// Constructor
-        LinkedList(MemoryAllocator& allocator) : mListHead(nullptr), mAllocator(allocator) {
+        LinkedList(MemoryAllocator& allocator) : mListHead(NULL), mAllocator(allocator) {
 
         }
 
@@ -110,13 +110,13 @@ inline void LinkedList<T>::reset() {
 
     // Release all the list elements
     ListElement* element = mListHead;
-    while (element != nullptr) {
+    while (element != NULL) {
         ListElement* nextElement = element->next;
         mAllocator.release(element, sizeof(ListElement));
         element = nextElement;
     }
 
-    mListHead = nullptr;
+    mListHead = NULL;
 }
 
 }

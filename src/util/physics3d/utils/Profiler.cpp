@@ -37,8 +37,8 @@ using namespace reactphysics3d;
 // Constructor
 ProfileNode::ProfileNode(const char* name, ProfileNode* parentNode)
     :mName(name), mNbTotalCalls(0), mStartingTime(0), mTotalTime(0),
-     mRecursionCounter(0), mParentNode(parentNode), mChildNode(nullptr),
-     mSiblingNode(nullptr) {
+     mRecursionCounter(0), mParentNode(parentNode), mChildNode(NULL),
+     mSiblingNode(NULL) {
     reset();
 }
 
@@ -54,7 +54,7 @@ ProfileNode* ProfileNode::findSubNode(const char* name) {
 
     // Try to find the node among the child nodes
     ProfileNode* child = mChildNode;
-    while (child != nullptr) {
+    while (child != NULL) {
         if (child->mName == name) {
             return child;
         }
@@ -108,12 +108,12 @@ void ProfileNode::reset() {
     mTotalTime = 0.0L;
 
     // Reset the child node
-    if (mChildNode != nullptr) {
+    if (mChildNode != NULL) {
         mChildNode->reset();
     }
 
     // Reset the sibling node
-    if (mSiblingNode != nullptr) {
+    if (mSiblingNode != NULL) {
         mSiblingNode->reset();
     }
 }
@@ -121,9 +121,9 @@ void ProfileNode::reset() {
 // Destroy the node
 void ProfileNode::destroy() {
     delete mChildNode;
-    mChildNode = nullptr;
+    mChildNode = NULL;
     delete mSiblingNode;
-    mSiblingNode = nullptr;
+    mSiblingNode = NULL;
 }
 
 // Constructor
@@ -136,12 +136,12 @@ ProfileNodeIterator::ProfileNodeIterator(ProfileNode* startingNode)
 // Enter a given child node
 void ProfileNodeIterator::enterChild(int index) {
     mCurrentChildNode = mCurrentParentNode->getChildNode();
-    while ((mCurrentChildNode != nullptr) && (index != 0)) {
+    while ((mCurrentChildNode != NULL) && (index != 0)) {
         index--;
         mCurrentChildNode = mCurrentChildNode->getSiblingNode();
     }
 
-    if (mCurrentChildNode != nullptr) {
+    if (mCurrentChildNode != NULL) {
         mCurrentParentNode = mCurrentChildNode;
         mCurrentChildNode = mCurrentParentNode->getChildNode();
     }
@@ -149,14 +149,14 @@ void ProfileNodeIterator::enterChild(int index) {
 
 // Enter a given parent node
 void ProfileNodeIterator::enterParent() {
-    if (mCurrentParentNode->getParentNode() != nullptr) {
+    if (mCurrentParentNode->getParentNode() != NULL) {
         mCurrentParentNode = mCurrentParentNode->getParentNode();
     }
     mCurrentChildNode = mCurrentParentNode->getChildNode();
 }
 
 // Constructor
-Profiler::Profiler() :mRootNode("Root", nullptr) {
+Profiler::Profiler() :mRootNode("Root", NULL) {
 
 	mCurrentNode = &mRootNode;
     mNbDestinations = 0;

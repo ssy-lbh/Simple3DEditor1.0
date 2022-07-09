@@ -282,11 +282,11 @@ void AnimationWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void AnimationWindow::Serialize(IOutputStream& os){
-    os.WriteWithLen(WINDOW_ID);
+void AnimationWindow::Serialize(json& o){
+    o["id"] = WINDOW_ID;
 }
 
-void AnimationWindow::Deserialize(IInputStream& os){}
+void AnimationWindow::Deserialize(json& o){}
 
 void AnimationWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);

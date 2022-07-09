@@ -338,7 +338,7 @@ inline uint64 OverlappingPairs::getPairIndex(uint64 pairId) const {
     return mMapPairIdToPairIndex[pairId];
 }
 
-// Return the last frame collision info for a given shape id or nullptr if none is found
+// Return the last frame collision info for a given shape id or NULL if none is found
 inline LastFrameCollisionInfo* OverlappingPairs::getLastFrameCollisionInfo(uint64 pairId, uint64 shapesId) {
 
     assert(mMapPairIdToPairIndex.containsKey(pairId));
@@ -350,7 +350,7 @@ inline LastFrameCollisionInfo* OverlappingPairs::getLastFrameCollisionInfo(uint6
         return it->second;
     }
 
-    return nullptr;
+    return NULL;
 }
 
 // Return the pair of bodies index
