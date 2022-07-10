@@ -319,6 +319,14 @@ AWindow* GlobalData::ConstructWindow(json& o){
     return window;
 }
 
+void GlobalData::LoadSettings(const char* path){
+
+}
+
+void GlobalData::SaveSettings(const char* path){
+    
+}
+
 #ifdef PLATFORM_WINDOWS
 void Main::SetCursor(int id){
     AppFrame* frame = AppFrame::GetLocalInst();

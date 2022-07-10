@@ -108,6 +108,7 @@ public:
 
     float animFrame = 0.0f;
 
+    // 物理引擎
     reactphysics3d::PhysicsCommon* physicsCommon = NULL;
     reactphysics3d::PhysicsWorld* physicsWorld = NULL;
 
@@ -140,6 +141,12 @@ public:
 
     AWindow* ConstructWindow(const char* id);
     AWindow* ConstructWindow(nlohmann::json& o);
+
+    // 设置信息
+    nlohmann::json settings;
+
+    void LoadSettings(const char* path);
+    void SaveSettings(const char* path);
 };
 
 class Main final : public Object {
