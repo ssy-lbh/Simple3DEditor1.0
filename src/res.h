@@ -20,6 +20,8 @@
 #define IDM_MESH_BASIC_CAPSULE              409
 #define IDM_MESH_BASIC_CYLINDER             410
 #define IDM_RENDER_ANIMATION                411
+#define IDM_SAVE_WORKSPACE                  412
+#define IDM_LOAD_WORKSPACE                  413
 
 #define IDM_LEFT                            501
 #define IDM_RIGHT                           502
@@ -98,3 +100,4 @@
 #define IDS_PICFILE_FILTER                  1107
 #define IDS_EXIT_CONFIRM                    1108
 #define IDS_EXIT_CONFIRM_CAPTION            1109
+#define IDS_WORKSPACE_FILTER                1110

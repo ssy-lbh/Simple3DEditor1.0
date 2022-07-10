@@ -124,6 +124,47 @@ void LocalData::OnMenuAccel(int id, bool accel){
             SetMenu(NULL);
         }
         break;
+    case IDM_SAVE_WORKSPACE:{
+        static const WString filter = Resource::GetWString(IDS_WORKSPACE_FILTER);
+        WString file = ShellFileSelectWindow(filter, FILESELECT_REQ_PATH, true);
+        if (file.GetLength() == 0){
+            DebugError("Stop Saving");
+            break;
+        }
+        try {
+            json o;
+            std::ofstream f(file.GetString());
+            AppFrame::GetLocalInst()->GetMainFrame()->Serialize(o);
+            f << o;
+            f.close();
+        }catch(std::exception e){
+            DebugError("Exception [%s] At %s %s", e.what(), __FILE__, __LINE__);
+        }
+    }
+        break;
+    case IDM_LOAD_WORKSPACE:{
+        static const WString filter = Resource::GetWString(IDS_WORKSPACE_FILTER);
+        WString file = ShellFileSelectWindow(filter, FILESELECT_REQ_FILE | FILESELECT_REQ_PATH);
+        if (file.GetLength() == 0){
+            DebugError("Stop Loading");
+            break;
+        }
+        try {
+            std::ifstream f(file.GetString());
+            json o = json::parse(f, nullptr, true, true);
+            AWindow* window = Main::data->ConstructWindow(o);
+            if (window){
+                dynamic_cast<SelectionWindow*>(AppFrame::GetLocalInst()->GetMainFrame())
+                    ->SetWindow(window);
+            } else {
+                DebugError("Workspace File Is Broken");
+            }
+            f.close();
+        }catch(std::exception e){
+            DebugError("Exception [%s] At %s %s", e.what(), __FILE__, __LINE__);
+        }
+    }
+        break;
     case IDM_CANCEL:
         SetMenu(NULL);
         break;
@@ -451,22 +492,7 @@ int Main::MainEntry(int argc, char** argv){
     // 不知道为什么，arial.ttf最大值字符为0x6FF
     glFontSize(12);
 
-    {
-        json o;
-        AWindow* window = NULL;
-        try {
-            std::ifstream f("workspace.json");
-            o = json::parse(f, nullptr, true, true);
-            f.close();
-            window = data->ConstructWindow(o);
-        } catch (std::exception e){}
-        if (window){
-            window->OnResize(INIT_WINDOW_WIDTH, INIT_WINDOW_HEIGHT);
-            mainFrame->SetWindow(window);
-        }else{
-            mainFrame->SetWindow(new MainWindow());
-        }
-    }
+    mainFrame->SetWindow(new MainWindow());
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 

@@ -19,4 +19,5 @@ BEGIN
                        "任意图片格式(*.*)\0*.*\0"
     IDS_EXIT_CONFIRM "确认要退出程序？"
     IDS_EXIT_CONFIRM_CAPTION "退出确认"
+    IDS_WORKSPACE_FILTER "JSON对象文件(*.json)\0*.json\0"
 END

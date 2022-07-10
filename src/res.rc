@@ -69,6 +69,9 @@ BEGIN
         MENUITEM "载入\tCtrl+L",                    IDM_LOAD
         MENUITEM "打印\tCtrl+P",                    IDM_PRINT
         MENUITEM SEPARATOR
+        MENUITEM "保存工作区\tCtrl+Alt+S",          IDM_SAVE_WORKSPACE
+        MENUITEM "载入工作区\tCtrl+Alt+L",          IDM_LOAD_WORKSPACE
+        MENUITEM SEPARATOR
         MENUITEM "退出\tESC",                       IDM_EXIT
     END
     POPUP "网格体(&M)"
@@ -113,6 +116,8 @@ BEGIN
     "^L",           IDM_LOAD,               ASCII, NOINVERT
     "^P",           IDM_PRINT,              ASCII, NOINVERT
     VK_ESCAPE,      IDM_EXIT,               VIRTKEY, NOINVERT
+    "^S",           IDM_SAVE_WORKSPACE,     ASCII, ALT, NOINVERT
+    "^L",           IDM_LOAD_WORKSPACE,     ASCII, ALT, NOINVERT
 
     VK_LEFT,        IDM_LEFT,               VIRTKEY, NOINVERT
     VK_RIGHT,       IDM_RIGHT,              VIRTKEY, NOINVERT
