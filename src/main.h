@@ -152,8 +152,8 @@ public:
 
 class Main final : public Object {
 public:
-    static constexpr uint INIT_WINDOW_WIDTH = 600;
-    static constexpr uint INIT_WINDOW_HEIGHT = 600;
+    static uint INIT_WINDOW_WIDTH;
+    static uint INIT_WINDOW_HEIGHT;
 
     static GlobalData* data;
 

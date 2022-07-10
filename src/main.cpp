@@ -336,6 +336,10 @@ void GlobalData::ApplySettings(){
         Menu::CORNER_PIXELS = sub.value("corner", 10.0f);
         Menu::LINE_PIXELS = sub.value("line height", 30.0f);
     }
+    if (settings.contains("main window") && (sub = settings["main window"]).is_object()){
+        Main::INIT_WINDOW_WIDTH = sub.value("width", 600);
+        Main::INIT_WINDOW_HEIGHT = sub.value("height", 600);
+    }
 }
 
 void GlobalData::SaveSettings(const char* path){
@@ -347,6 +351,9 @@ void GlobalData::SaveSettings(const char* path){
         DebugError("Exception [%s] At %s %s", e.what(), __FILE__, __LINE__);
     }
 }
+
+uint Main::INIT_WINDOW_WIDTH = 600;
+uint Main::INIT_WINDOW_HEIGHT = 600;
 
 #ifdef PLATFORM_WINDOWS
 void Main::SetCursor(int id){
