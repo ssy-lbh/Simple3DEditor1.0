@@ -4,6 +4,7 @@
 #include <define.h>
 
 #include <util/HashMap.h>
+#include <util/RBTree.h>
 #include <util/List.h>
 #include <util/os/AppFrame.h>
 #include <util/math3d/LinearAlgebra.h>
@@ -82,6 +83,7 @@ enum class SelectionType {
 
 struct WindowInfo {
     std::function<AWindow*()> factory;
+    String id;
     WString displayName;
 };
 
@@ -119,7 +121,7 @@ public:
 
     void OnAnimationFrame(float frame);
 
-    HashMapA<WindowInfo*> windowReg;
+    List<WindowInfo*> windowReg;
 
     // id用于标记文件等数据中的类型信息，对于每一类的类应唯一
     // 注册的窗口类有以下要求
@@ -131,8 +133,9 @@ public:
     void RegisterWindow(){
         WindowInfo* info = new WindowInfo;
         info->factory = []{ return new T(); };
+        info->id = T::WINDOW_ID;
         info->displayName = T::WINDOW_DISPLAY_NAME;
-        windowReg.Set(T::WINDOW_ID, info);
+        windowReg.Add(info);
     }
 
     AWindow* ConstructWindow(const char* id);

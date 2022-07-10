@@ -222,15 +222,15 @@ GlobalData::GlobalData(){
     RegisterWindow<UDContainer>();
     RegisterWindow<SelectionWindow>();
 
+    RegisterWindow<MainWindow>();
+    RegisterWindow<TreeWindow>();
     RegisterWindow<AnimationWindow>();
     RegisterWindow<AttributeWindow>();
-    RegisterWindow<AudioCaptureWindow>();
     RegisterWindow<AudioPlayerWindow>();
-    RegisterWindow<MainWindow>();
+    RegisterWindow<AudioCaptureWindow>();
     RegisterWindow<NodeMapWindow>();
     RegisterWindow<PaintWindow>();
     RegisterWindow<RenderWindow>();
-    RegisterWindow<TreeWindow>();
     RegisterWindow<UVEditWindow>();
 
     physicsCommon = new reactphysics3d::PhysicsCommon();
@@ -300,7 +300,11 @@ void GlobalData::OnAnimationFrame(float frame){
 }
 
 AWindow* GlobalData::ConstructWindow(const char* id){
-    WindowInfo* info = windowReg.Get(id);
+    WindowInfo* info = NULL;
+    windowReg.Foreach([&](WindowInfo* item){
+        if (!info && item->id == id)
+            info = item;
+    });
     if (!info){
         DebugError("GlobalData::ParseWindow Unrecognized Window ID %s", id);
         return NULL;

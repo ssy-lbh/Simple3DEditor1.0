@@ -3,6 +3,8 @@
 
 #include <define.h>
 
+#include <functional>
+
 namespace simple3deditor {
 
 // 红黑树节点
@@ -24,8 +26,15 @@ public:
         this->black = black;
     }
 
+    ~RBTreeNode<K, V>(){
+        if (son[0])
+            delete son[0];
+        if (son[1])
+            delete son[1];
+    }
+
     // 还是查找最简单，直接比较然后找左右子节点
-    RBTreeNode<K, V>* Query(K key){
+    RBTreeNode<K, V>* Query(const K& key){
         if (this->key == key)
             return this;
         RBTreeNode<K, V>* next = son[this->key < key];
@@ -105,7 +114,7 @@ public:
         }
     }
 
-    RBTreeNode<K, V>* Insert(RBTreeNode<K, V>*& root, K key, V val){
+    RBTreeNode<K, V>* Insert(RBTreeNode<K, V>*& root, const K& key, V val){
         if (this->key == key){
             this->val = val;
             return this;
@@ -118,31 +127,21 @@ public:
         }
         return node->Insert(root, key, val);
     }
+
+    RBTreeNode<K, V>& Foreach(std::function<void(const K&, V)>& f){
+        if (son[0])
+            son[0]->Foreach(f);
+        f(key, val);
+        if (son[1])
+            son[1]->Foreach(f);
+        return *this;
+    }
 };
 
 // 红黑树
 template <typename K, typename V>
 class RBTree {
-public:
-    RBTreeNode<K, V>* root;
-
-    RBTree(){}
-    ~RBTree(){}
-
-    RBTreeNode<K, V>* Query(K key){
-        return root->Query(key);
-    }
-
-    RBTreeNode<K, V>* Insert(K key, V val){
-        if(!root)
-            return (root = RBTreeNode<K, V>(key, val, NULL, true));
-        RBTreeNode<K, V>* ret = root->Insert(root, key, val);
-        while (root->father)
-            root = root->father;
-        root->black = true;
-        return ret;
-    }
-
+private:
     void Replace(RBTreeNode<K, V>* target, RBTreeNode<K, V>*& src){
         target->key = src->key;
         target->val = src->val;
@@ -150,7 +149,31 @@ public:
         src = NULL;
     }
 
-    void Delete(K key){
+public:
+    RBTreeNode<K, V>* root = NULL;
+
+    RBTree(){}
+
+    ~RBTree(){
+        if (root)
+            delete root;
+    }
+
+    RBTreeNode<K, V>* Query(const K& key){
+        return root->Query(key);
+    }
+
+    RBTreeNode<K, V>* Insert(const K& key, V val){
+        if(!root)
+            return (root = new RBTreeNode<K, V>(key, val, NULL, true));
+        RBTreeNode<K, V>* ret = root->Insert(root, key, val);
+        while (root->father)
+            root = root->father;
+        root->black = true;
+        return ret;
+    }
+
+    void Delete(const K& key){
         if (!root)
             return;
         RBTreeNode<K, V>* target = root->Query(key);
@@ -177,7 +200,25 @@ public:
             delete target;
         }
     }
+
+    RBTree<K, V>& Foreach(std::function<void(const K&, V)> f){
+        if (root)
+            root->Foreach(f);
+        return *this;
+    }
+
+    void Free(){
+        if (root){
+            delete root;
+            root = NULL;
+        }
+    }
 };
+
+template <typename K, typename V>
+void Free(RBTree<K, V>& tree){
+    tree.Free();
+}
 
 }
 

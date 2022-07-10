@@ -567,7 +567,7 @@ void SelectionWindow::InitMenu(){
     selMenu = new Menu();
 
     // 直接无序注册所有窗口
-    Main::data->windowReg.Foreach([=](const WString& id, WindowInfo* info){
+    Main::data->windowReg.Foreach([=](WindowInfo* info){
         if (info->displayName.GetLength() == 0)
             return;
         // 这里复制了name和factory存入lambda函数对象中
