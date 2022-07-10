@@ -135,6 +135,8 @@ void LocalData::OnMenuAccel(int id, bool accel){
             json o;
             std::ofstream f(file.GetString());
             AppFrame::GetLocalInst()->GetMainFrame()->Serialize(o);
+            // json文件的缩进大小
+            f.width(2);
             f << o;
             f.close();
         }catch(std::exception e){
@@ -151,13 +153,15 @@ void LocalData::OnMenuAccel(int id, bool accel){
         }
         try {
             std::ifstream f(file.GetString());
-            json o = json::parse(f, nullptr, true, true);
-            AWindow* window = Main::data->ConstructWindow(o);
-            if (window){
-                dynamic_cast<SelectionWindow*>(AppFrame::GetLocalInst()->GetMainFrame())
-                    ->SetWindow(window);
-            } else {
-                DebugError("Workspace File Is Broken");
+            json o = json::parse(f, nullptr, false, true);
+            if (!o.is_discarded()){
+                AWindow* window = Main::data->ConstructWindow(o);
+                if (window){
+                    dynamic_cast<SelectionWindow*>(AppFrame::GetLocalInst()->GetMainFrame())
+                        ->SetWindow(window);
+                } else {
+                    DebugError("Workspace File Is Broken");
+                }
             }
             f.close();
         }catch(std::exception e){
@@ -322,7 +326,9 @@ AWindow* GlobalData::ConstructWindow(json& o){
 void GlobalData::LoadSettings(const char* path){
     try {
         std::ifstream f(path);
-        settings = json::parse(f, nullptr, true, true);
+        settings = json::parse(f, nullptr, false, true);
+        if (settings.is_discarded())
+            settings = json::object({});
         f.close();
     }catch(std::exception e){
         DebugError("Exception [%s] At %s %s", e.what(), __FILE__, __LINE__);
@@ -345,6 +351,8 @@ void GlobalData::ApplySettings(){
 void GlobalData::SaveSettings(const char* path){
     try {
         std::ofstream f(path);
+        // json文件的缩进大小
+        f.width(2);
         f << settings;
         f.close();
     }catch(std::exception e){
