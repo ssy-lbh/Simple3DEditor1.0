@@ -150,6 +150,7 @@ void TreeWindow::OnChar(char c){}
 void TreeWindow::OnUnichar(wchar_t c){}
 
 void TreeWindow::OnResize(int x, int y){
+    AWindow::OnResize(x, y);
     UpdateWindowSize(x, y);
 }
 
@@ -157,9 +158,7 @@ void TreeWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);
 }
 
-void TreeWindow::UpdateWindowSize(int x, int y){
-    AWindow::UpdateWindowSize(x, y);
-}
+void TreeWindow::UpdateWindowSize(int x, int y){}
 
 void TreeWindow::OnMouseMove(int x, int y){
     UpdateCursor(x, y);

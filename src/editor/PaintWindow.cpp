@@ -220,6 +220,7 @@ void PaintWindow::OnRender(){
 }
 
 void PaintWindow::OnResize(int x, int y){
+    AWindow::OnResize(x, y);
     UpdateWindowSize(x, y);
 }
 
@@ -328,9 +329,7 @@ void PaintWindow::UpdateCursor(int x, int y){
         brush->OnMove();
 }
 
-void PaintWindow::UpdateWindowSize(int x, int y){
-    AWindow::UpdateWindowSize(x, y);
-}
+void PaintWindow::UpdateWindowSize(int x, int y){}
 
 void PaintWindow::SetOperation(IOperation* op){
     if (curOp){

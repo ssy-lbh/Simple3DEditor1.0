@@ -290,6 +290,7 @@ void NodeMapWindow::OnUnichar(wchar_t c){
 }
 
 void NodeMapWindow::OnResize(int x, int y){
+    AWindow::OnResize(x, y);
     UpdateWindowSize(x, y);
 }
 
@@ -299,9 +300,7 @@ void NodeMapWindow::UpdateCursor(int x, int y){
     nodeMgr->OnMouseMove2D(cursorPos + viewPos);
 }
 
-void NodeMapWindow::UpdateWindowSize(int x, int y){
-    AWindow::UpdateWindowSize(x, y);
-}
+void NodeMapWindow::UpdateWindowSize(int x, int y){}
 
 void NodeMapWindow::AddNode(){
     Node* node = new Node(cursorPos, this);

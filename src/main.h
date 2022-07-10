@@ -141,6 +141,9 @@ public:
 
 class Main final : public Object {
 public:
+    static constexpr uint INIT_WINDOW_WIDTH = 600;
+    static constexpr uint INIT_WINDOW_HEIGHT = 600;
+
     static GlobalData* data;
 
     static void SetCursor(int id);

@@ -244,7 +244,7 @@ void AnimationWindow::OnRender(){
 }
 
 void AnimationWindow::OnResize(int x, int y){
-    UpdateWindowSize(x, y);
+    AWindow::OnResize(x, y);
 }
 
 void AnimationWindow::OnMouseMove(int x, int y){
@@ -293,9 +293,7 @@ void AnimationWindow::UpdateCursor(int x, int y){
     uiMgr->CursorMove(cursorPos);
 }
 
-void AnimationWindow::UpdateWindowSize(int x, int y){
-    AWindow::UpdateWindowSize(x, y);
-}
+void AnimationWindow::UpdateWindowSize(int x, int y){}
 
 void AnimationWindow::SetCurve(AnimationCurve* curve){
     if (this->curve)

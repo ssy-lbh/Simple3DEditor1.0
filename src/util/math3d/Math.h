@@ -136,13 +136,8 @@ template <typename T>
 constexpr T Square(T x){ return x * x; }
 
 template <typename T>
-constexpr T GetRate(T x, T a, T b){
-    return (x - a) / (b - a);
-}
-
-template <typename T>
 constexpr T Saturate(T x){
-    return (x <= 0 ? 0 : (x >= 0 ? 0 : x));
+    return (x <= 0 ? 0 : (x >= 1 ? 1 : x));
 }
 
 template <typename T>
@@ -158,6 +153,16 @@ constexpr T Lerp(T a, T b, float t){
 template <typename T>
 constexpr T LerpClamped(T a, T b, float t){
     return (b - a) * Saturate(t) + a;
+}
+
+template <typename T>
+constexpr T GetRate(T x, T a, T b){
+    return (x - a) / (b - a);
+}
+
+template <typename T>
+constexpr T GetRateClamped(T x, T a, T b){
+    return Saturate((x - a) / (b - a));
 }
 
 // 排序为前小后大

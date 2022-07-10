@@ -27,15 +27,15 @@ AContainer::AContainer(){}
 AContainer::AContainer(SelectionWindow* selWindow) : selWindow(selWindow) {}
 
 LRContainer::LRContainer() : lWindow(nullptr), rWindow(nullptr) {
-    cliSize = Vector2(2.0f, 0.0f);
+    cliSize = INIT_SIZE;
 }
 
 LRContainer::LRContainer(AWindow* lWindow, AWindow* rWindow) : lWindow(lWindow), rWindow(rWindow) {
-    cliSize = Vector2(2.0f, 0.0f);
+    cliSize = INIT_SIZE;
 }
 
 LRContainer::LRContainer(AWindow* lWindow, AWindow* rWindow, SelectionWindow* selWindow) : AContainer(selWindow) {
-    cliSize = Vector2(2.0f, 0.0f);
+    cliSize = INIT_SIZE;
     this->lWindow = new SelectionWindow(lWindow);
     this->rWindow = new SelectionWindow(rWindow);
     InitMenu();
@@ -118,6 +118,8 @@ void LRContainer::OnUnichar(wchar_t c){
 }
 
 void LRContainer::OnResize(int x, int y){
+    if (x == 0 || y == 0)
+        return;
     dis = Round(Clamp(dis * x / cliSize.x, 0.0f, (float)x));
     AWindow::OnResize(x, y);
     if (lWindow) lWindow->OnResize(dis, y);
@@ -216,7 +218,7 @@ void LRContainer::OnDropFileW(const wchar_t* path, uint len){
 
 void LRContainer::Serialize(json& o){
     o["id"] = WINDOW_ID;
-    o["div rate"] = GetRate((float)dis, 0.0f, cliSize.x);
+    o["div rate"] = GetRateClamped((float)dis, 0.0f, cliSize.x);
     if (lWindow)
         lWindow->Serialize(o["left window"]);
     if (rWindow)
@@ -224,11 +226,9 @@ void LRContainer::Serialize(json& o){
 }
 
 void LRContainer::Deserialize(json& o){
-    dis = Lerp(0.0f, cliSize.x, Saturate(o.value("div rate", 0.5f)));
-    if (o.contains("left window"))
-        lWindow = Main::data->ConstructWindow(o["left window"]);
-    if (o.contains("right window"))
-        rWindow = Main::data->ConstructWindow(o["right window"]);
+    dis = LerpClamped(0.0f, cliSize.x, o.value("div rate", 0.5f));
+    lWindow = o.contains("left window") ? Main::data->ConstructWindow(o["left window"]) : NULL;
+    rWindow = o.contains("right window") ? Main::data->ConstructWindow(o["right window"]) : NULL;
 }
 
 void LRContainer::UpdateFocus(){
@@ -288,15 +288,15 @@ bool LRContainer::DragEnabled(){
 }
 
 UDContainer::UDContainer() : uWindow(nullptr), dWindow(nullptr) {
-    cliSize = Vector2(0.0f, 2.0f);
+    cliSize = INIT_SIZE;
 } 
 
 UDContainer::UDContainer(AWindow* uWindow, AWindow* dWindow) : uWindow(uWindow), dWindow(dWindow) {
-    cliSize = Vector2(0.0f, 2.0f);
+    cliSize = INIT_SIZE;
 }
 
 UDContainer::UDContainer(AWindow* uWindow, AWindow* dWindow, SelectionWindow* selWindow) : AContainer(selWindow) {
-    cliSize = Vector2(0.0f, 2.0f);
+    cliSize = INIT_SIZE;
     this->uWindow = new SelectionWindow(uWindow);
     this->dWindow = new SelectionWindow(dWindow);
     InitMenu();
@@ -379,6 +379,8 @@ void UDContainer::OnUnichar(wchar_t c){
 }
 
 void UDContainer::OnResize(int x, int y){
+    if (x == 0 || y == 0)
+        return;
     dis = Round(Clamp(dis * y / cliSize.y, 0.0f, (float)y));
     AWindow::OnResize(x, y);
     if (uWindow) uWindow->OnResize(x, y - dis);
@@ -476,7 +478,7 @@ void UDContainer::OnDropFileW(const wchar_t* path, uint len){
 
 void UDContainer::Serialize(json& o){
     o["id"] = WINDOW_ID;
-    o["div rate"] = GetRate((float)dis, 0.0f, cliSize.y);
+    o["div rate"] = GetRateClamped((float)dis, 0.0f, cliSize.y);
     if (uWindow)
         uWindow->Serialize(o["up window"]);
     if (dWindow)
@@ -484,11 +486,9 @@ void UDContainer::Serialize(json& o){
 }
 
 void UDContainer::Deserialize(json& o){
-    dis = Lerp(0.0f, cliSize.y, Saturate(o.value("div rate", 0.5f)));
-    if (o.contains("up window"))
-        uWindow = Main::data->ConstructWindow(o["up window"]);
-    if (o.contains("down window"))
-        dWindow = Main::data->ConstructWindow(o["down window"]);
+    dis = LerpClamped(0.0f, cliSize.y, o.value("div rate", 0.5f));
+    uWindow = o.contains("up window") ? Main::data->ConstructWindow(o["up window"]) : NULL;
+    dWindow = o.contains("down window") ? Main::data->ConstructWindow(o["down window"]) : NULL;
 }
 
 void UDContainer::UpdateFocus(){
@@ -705,6 +705,8 @@ void SelectionWindow::Deserialize(json& o){
         curWindow = Main::data->ConstructWindow(o["window"]);
         if (InstanceOf<AContainer>(curWindow))
             ((AContainer*)curWindow)->selWindow = this;
+    } else {
+        curWindow = NULL;
     }
 }
 

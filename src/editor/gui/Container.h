@@ -20,10 +20,17 @@ protected:
 
 //TODO 容器期望集成选择夹、属性窗口等容器
 class LRContainer : public AContainer {
+public:
+    static constexpr const char* WINDOW_ID = "lbh.cont.lr";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+
+    static constexpr int INIT_DIS = 50;
+    static constexpr Vector2 INIT_SIZE = Vector2(2.0f * INIT_DIS, 0.0f);
+
 private:
     AWindow* lWindow;
     AWindow* rWindow;
-    int dis = 1;
+    int dis = INIT_DIS;
     AWindow* focusWindow = NULL;
     bool right = false;
     bool adjustPos = false;
@@ -34,9 +41,6 @@ private:
     void InitMenu();
 
 public:
-    static constexpr const char* WINDOW_ID = "lbh.cont.lr";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
-
     LRContainer();
     LRContainer(AWindow* lWindow, AWindow* rWindow);
     LRContainer(AWindow* lWindow, AWindow* rWindow, SelectionWindow* selWindow);
@@ -73,10 +77,17 @@ public:
 };
 
 class UDContainer : public AContainer {
+public:
+    static constexpr const char* WINDOW_ID = "lbh.cont.ud";
+    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+
+    static constexpr int INIT_DIS = 50;
+    static constexpr Vector2 INIT_SIZE = Vector2(0.0f, 2.0f * INIT_DIS);
+
 private:
     AWindow* uWindow;
     AWindow* dWindow;
-    int dis = 1;
+    int dis = INIT_DIS;
     AWindow* focusWindow = NULL;
     bool up = false;
     bool adjustPos = false;
@@ -87,9 +98,6 @@ private:
     void InitMenu();
 
 public:
-    static constexpr const char* WINDOW_ID = "lbh.cont.ud";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
-
     UDContainer();
     UDContainer(AWindow* uWindow, AWindow* dWindow);
     UDContainer(AWindow* uWindow, AWindow* dWindow, SelectionWindow* selWindow);

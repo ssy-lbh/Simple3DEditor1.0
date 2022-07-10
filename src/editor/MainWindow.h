@@ -81,6 +81,7 @@ public:
     virtual void OnRender() override;
     virtual void OnChar(char c) override;
     virtual void OnUnichar(wchar_t c) override;
+    virtual void OnResize(int x, int y) override;
     virtual void OnMouseMove(int x, int y) override;
     virtual void OnLeftDown(int x, int y) override;
     virtual void OnLeftUp(int x, int y) override;

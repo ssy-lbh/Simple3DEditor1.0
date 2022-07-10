@@ -1246,6 +1246,10 @@ void MainWindow::OnUnichar(wchar_t c){
     guiMgr->OnUnichar(c);
 }
 
+void MainWindow::OnResize(int x, int y){
+    AWindow::OnResize(x, y);
+}
+
 void MainWindow::OnMouseWheel(int delta){
     SetDistance(camDis * Pow(0.999f, delta));
 }

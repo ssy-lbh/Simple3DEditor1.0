@@ -214,6 +214,7 @@ void UVEditWindow::OnRender(){
 }
 
 void UVEditWindow::OnResize(int x, int y){
+    AWindow::OnResize(x, y);
     UpdateWindowSize(x, y);
 }
 
@@ -306,9 +307,7 @@ void UVEditWindow::UpdateCursor(int x, int y){
         curTool->OnMove();
 }
 
-void UVEditWindow::UpdateWindowSize(int x, int y){
-    AWindow::UpdateWindowSize(x, y);
-}
+void UVEditWindow::UpdateWindowSize(int x, int y){}
 
 void UVEditWindow::Serialize(json& o){
     o["id"] = WINDOW_ID;

@@ -269,7 +269,8 @@ AWindow* GlobalData::ConstructWindow(const char* id){
 
 AWindow* GlobalData::ConstructWindow(json& o){
     AWindow* window = ConstructWindow(o.value("id", std::string()).c_str());
-    window->Deserialize(o);
+    if (window)
+        window->Deserialize(o);
     return window;
 }
 
@@ -426,7 +427,7 @@ int Main::MainEntry(int argc, char** argv){
 
     SelectionWindow* mainFrame = new SelectionWindow();
 
-    AppFrame* appFrame = new AppFrame("ModelView", mainFrame, 600, 600);
+    AppFrame* appFrame = new AppFrame("ModelView", mainFrame, INIT_WINDOW_HEIGHT, INIT_WINDOW_WIDTH);
 
     LocalData* localData = LocalData::GetLocalInst();
 
@@ -450,12 +451,21 @@ int Main::MainEntry(int argc, char** argv){
     // 不知道为什么，arial.ttf最大值字符为0x6FF
     glFontSize(12);
 
-    mainFrame->SetWindow(new MainWindow());
     {
         json o;
-        ifstream f("workspace.json");
-        f >> o;
-        mainFrame->SetWindow(data->ConstructWindow(o));
+        AWindow* window = NULL;
+        try {
+            std::ifstream f("workspace.json");
+            o = json::parse(f, nullptr, true, true);
+            f.close();
+            window = data->ConstructWindow(o);
+        } catch (std::exception e){}
+        if (window){
+            window->OnResize(INIT_WINDOW_WIDTH, INIT_WINDOW_HEIGHT);
+            mainFrame->SetWindow(window);
+        }else{
+            mainFrame->SetWindow(new MainWindow());
+        }
     }
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");

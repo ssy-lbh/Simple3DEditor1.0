@@ -34,6 +34,7 @@ public:
     virtual void OnTimer(int id);
     virtual void OnChar(char c);
     virtual void OnUnichar(wchar_t c);
+    // 传入 (0, 0) 则无效
     virtual void OnResize(int x, int y);
     virtual void OnMouseMove(int x, int y);
     virtual void OnLeftDown(int x, int y);

@@ -105,6 +105,7 @@ void RenderWindow::OnChar(char c){}
 void RenderWindow::OnUnichar(wchar_t c){}
 
 void RenderWindow::OnResize(int x, int y){
+    AWindow::OnResize(x, y);
     UpdateWindowSize(x, y);
 }
 
@@ -171,9 +172,7 @@ void RenderWindow::OnInsSave(){
     Main::SaveImage(file, rect);
 }
 
-void RenderWindow::UpdateWindowSize(int x, int y){
-    AWindow::UpdateWindowSize(x, y);
-}
+void RenderWindow::UpdateWindowSize(int x, int y){}
 
 void RenderWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);

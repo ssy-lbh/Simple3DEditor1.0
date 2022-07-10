@@ -119,9 +119,7 @@ void AudioCaptureWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);
 }
 
-void AudioCaptureWindow::UpdateWindowSize(int x, int y){
-    AWindow::UpdateWindowSize(x, y);
-}
+void AudioCaptureWindow::UpdateWindowSize(int x, int y){}
 
 void AudioCaptureWindow::ProcessInput(){
     ALint cnt;
@@ -275,6 +273,7 @@ void AudioCaptureWindow::OnUnichar(wchar_t c){
 }
 
 void AudioCaptureWindow::OnResize(int x, int y){
+    AWindow::OnResize(x, y);
     UpdateWindowSize(x, y);
 }
 

@@ -47,6 +47,7 @@ void AttributeWindow::OnRender(){
 }
 
 void AttributeWindow::OnResize(int x, int y){
+    AWindow::OnResize(x, y);
     UpdateWindowSize(x, y);
 }
 
@@ -85,9 +86,7 @@ void AttributeWindow::Serialize(json& o){
 
 void AttributeWindow::Deserialize(json& o){}
 
-void AttributeWindow::UpdateWindowSize(int x, int y){
-    AWindow::UpdateWindowSize(x, y);
-}
+void AttributeWindow::UpdateWindowSize(int x, int y){}
 
 void AttributeWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);

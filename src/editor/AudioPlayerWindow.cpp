@@ -288,6 +288,10 @@ void AudioPlayerWindow::OnUnichar(wchar_t c){
     guiMgr->OnUnichar(c);
 }
 
+void AudioPlayerWindow::OnResize(int x, int y){
+    AWindow::OnResize(x, y);
+}
+
 void AudioPlayerWindow::OnMouseMove(int x, int y){
     UpdateCursor(x, y);
     guiMgr->OnMouseMove2D(cursorPos);
