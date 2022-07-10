@@ -35,9 +35,9 @@ public:
 // 可以继承以实现多种样式的菜单
 class Menu : public Object {
 protected:
-    static constexpr float WIDTH_PIXELS = 250.0f;
-    static constexpr float CORNER_PIXELS = 10.0f;
-    static constexpr float LINE_PIXELS = 30.0f;
+    static float WIDTH_PIXELS;
+    static float CORNER_PIXELS;
+    static float LINE_PIXELS;
 
     List<MenuItem*> items;
 
@@ -53,6 +53,8 @@ protected:
     Vector2 menuPos;
     bool openMenu = false;
     bool rightPressed = false;
+
+    friend class GlobalData;
 
     void SetMenu(Menu* m, size_t pos);
     

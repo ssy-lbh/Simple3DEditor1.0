@@ -320,11 +320,32 @@ AWindow* GlobalData::ConstructWindow(json& o){
 }
 
 void GlobalData::LoadSettings(const char* path){
+    try {
+        std::ifstream f(path);
+        settings = json::parse(f, nullptr, true, true);
+        f.close();
+    }catch(std::exception e){
+        DebugError("Exception [%s] At %s %s", e.what(), __FILE__, __LINE__);
+    }
+}
 
+void GlobalData::ApplySettings(){
+    json sub;
+    if (settings.contains("menu") && (sub = settings["menu"]).is_object()){
+        Menu::WIDTH_PIXELS = sub.value("width", 250.0f);
+        Menu::CORNER_PIXELS = sub.value("corner", 10.0f);
+        Menu::LINE_PIXELS = sub.value("line height", 30.0f);
+    }
 }
 
 void GlobalData::SaveSettings(const char* path){
-    
+    try {
+        std::ofstream f(path);
+        f << settings;
+        f.close();
+    }catch(std::exception e){
+        DebugError("Exception [%s] At %s %s", e.what(), __FILE__, __LINE__);
+    }
 }
 
 #ifdef PLATFORM_WINDOWS
@@ -478,6 +499,10 @@ int Main::MainEntry(int argc, char** argv){
     Init();
     AudioUtils::InitOpenAL();
 
+    DebugLog("Load Settings");
+    data->LoadSettings("settings.json");
+    data->ApplySettings();
+
     SelectionWindow* mainFrame = new SelectionWindow();
 
     AppFrame* appFrame = new AppFrame("ModelView", mainFrame, INIT_WINDOW_HEIGHT, INIT_WINDOW_WIDTH);
@@ -527,14 +552,6 @@ int Main::MainEntry(int argc, char** argv){
             // 不知道为什么，我的电脑开不了垂直同步，只能出此下策了
             Time::Sleep(0.0167f - localData->deltaTime);
         }
-    }
-
-    {
-        json o;
-        mainFrame->GetWindow()->Serialize(o);
-        std::ofstream f("workspace.json");
-        f << o;
-        f.close();
     }
 
     int code = appFrame->GetExitCode();

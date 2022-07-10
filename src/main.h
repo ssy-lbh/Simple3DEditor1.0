@@ -146,6 +146,7 @@ public:
     nlohmann::json settings;
 
     void LoadSettings(const char* path);
+    void ApplySettings();
     void SaveSettings(const char* path);
 };
 

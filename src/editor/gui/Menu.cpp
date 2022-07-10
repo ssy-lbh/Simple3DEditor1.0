@@ -27,6 +27,10 @@ MenuItem::~MenuItem(){
     onDestory(this);
 }
 
+float Menu::WIDTH_PIXELS = 250.0f;
+float Menu::CORNER_PIXELS = 10.0f;
+float Menu::LINE_PIXELS = 30.0f;
+
 Menu::Menu(){}
 
 Menu::~Menu(){
