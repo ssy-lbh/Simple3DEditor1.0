@@ -48,6 +48,8 @@ private:
     IAudioSourceLoader* loader = NULL;
 
 public:
+    OBJECT_INFO_DEF();
+
     // 输入的数据内部引用，自动回收，不能调用后释放data所在内存
     AudioSourceObject(uenum format, char* data, int size, int freq);
     virtual ~AudioSourceObject() override;

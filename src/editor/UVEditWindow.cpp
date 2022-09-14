@@ -15,6 +15,8 @@
 #include <editor/main/Operation.h>
 #include <editor/gui/Menu.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
 
 class UVEditWindow::MoveOperation : public IOperation {
@@ -140,6 +142,8 @@ public:
         }
     }
 };
+
+WINDOW_INFO_DECL(simple3deditor::UVEditWindow, L"UV编辑器");
 
 UVEditWindow::UVEditWindow(){
     DebugLog("UVEditWindow Launched");
@@ -309,11 +313,11 @@ void UVEditWindow::UpdateCursor(int x, int y){
 
 void UVEditWindow::UpdateWindowSize(int x, int y){}
 
-void UVEditWindow::Serialize(json& o){
+void UVEditWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 
-void UVEditWindow::Deserialize(json& o){}
+void UVEditWindow::Deserialize(nlohmann::json& o){}
 
 void UVEditWindow::SetOperation(IOperation* op){
     if (curOp){

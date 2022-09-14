@@ -39,8 +39,7 @@ protected:
     void UpdateWindowSize(int x, int y);
 
 public:
-    static constexpr const char* WINDOW_ID = "lbh.anim";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"动画控制器";
+    WINDOW_INFO_DEF();
 
     AnimationWindow();
     virtual ~AnimationWindow() override;
@@ -55,8 +54,8 @@ public:
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
 
-    virtual void Serialize(json& o) override;
-    virtual void Deserialize(json& o) override;
+    virtual void Serialize(nlohmann::json& o) override;
+    virtual void Deserialize(nlohmann::json& o) override;
     
     void SetCurve(AnimationCurve* curve);
     void SetProperty(Property* prop);

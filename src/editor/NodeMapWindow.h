@@ -35,8 +35,7 @@ protected:
     void UpdateWindowSize(int x, int y);
 
 public:
-    static constexpr const char* WINDOW_ID = "lbh.nodemap";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"节点图编辑器";
+    WINDOW_INFO_DEF();
 
     NodeMapWindow();
     virtual ~NodeMapWindow() override;
@@ -53,8 +52,8 @@ public:
     virtual void OnMouseWheel(int delta) override;
     virtual void OnMenuAccel(int id, bool accel) override;
 
-    virtual void Serialize(json& o) override;
-    virtual void Deserialize(json& o) override;
+    virtual void Serialize(nlohmann::json& o) override;
+    virtual void Deserialize(nlohmann::json& o) override;
 
     void AddNode();
 };

@@ -65,8 +65,8 @@ class DefaultTestTreeAllocator : public MemoryAllocator {
         /// Destructor
         virtual ~DefaultTestTreeAllocator() override = default;
 
-        /// Assignment operator
-        DefaultTestTreeAllocator& operator=(DefaultTestTreeAllocator& allocator) = default;
+        /// Assignment operator (default is deleted)
+        //DefaultTestTreeAllocator& operator=(DefaultTestTreeAllocator& allocator) = default;
 
         /// Allocate memory of a given size (in bytes) and return a pointer to the
         /// allocated memory.

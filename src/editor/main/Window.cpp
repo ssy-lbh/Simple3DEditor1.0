@@ -2,7 +2,11 @@
 
 #include <editor/object/GUIManagerObject.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
+
+WINDOW_INFO_DECL(simple3deditor::AWindow, L"");
 
 AWindow::AWindow(){}
 AWindow::~AWindow(){}
@@ -26,7 +30,9 @@ bool AWindow::IsFocus(){
     return focus;
 }
 
+void AWindow::OnForwardRender(){}
 void AWindow::OnRender(){}
+void AWindow::OnPostRender(){}
 void AWindow::OnTimer(int id){}
 void AWindow::OnChar(char c){}
 void AWindow::OnUnichar(wchar_t c){}
@@ -71,11 +77,14 @@ void AWindow::OnMenuAccel(int id, bool accel){}
 void AWindow::OnDropFileA(const char* path, uint len){}
 void AWindow::OnDropFileW(const wchar_t* path, uint len){}
 
-void AWindow::Serialize(json& o){
+void AWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 
-void AWindow::Deserialize(json& o){}
+void AWindow::Deserialize(nlohmann::json& o){}
+
+const char* AGUIWindow::WINDOW_ID = "lbh.base.guiwnd";
+const wchar_t* AGUIWindow::WINDOW_DISPLAY_NAME = L"";
 
 AGUIWindow::AGUIWindow(){
     guiMgr = new GUIManagerObject();
@@ -122,7 +131,7 @@ void AGUIWindow::OnRightUp(int x, int y){
     guiMgr->OnRightUp2D(cursorPos);
 }
 
-void AGUIWindow::Serialize(json& o){
+void AGUIWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 

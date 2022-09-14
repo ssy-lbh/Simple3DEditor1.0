@@ -14,6 +14,8 @@ private:
     uenum light;
 
 public:
+    OBJECT_INFO_DEF();
+
     PointLightObject();
     virtual ~PointLightObject() override;
 

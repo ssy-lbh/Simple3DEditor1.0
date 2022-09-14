@@ -10,6 +10,8 @@
 
 namespace simple3deditor {
 
+OBJECT_INFO_DECL(simple3deditor::AudioListenerObject, L"音频收听器");
+
 AudioListenerObject::AudioListenerObject() : AViewObject(L"AudioListener", ViewObjectType::OBJECT_AUDIO_LISTENER) {
     recPos = Point3::zero;
 }

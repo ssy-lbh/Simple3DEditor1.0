@@ -14,6 +14,8 @@
 #include <util/gl/GLLights.h>
 #include <util/gl/GLUtils.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
 
 SelectInfo::SelectInfo(){}
@@ -25,6 +27,8 @@ bool SelectInfo::Inside(Vector3 pos) const{
         return false;
     return rect.Inside(Vector2(lookPos.x, lookPos.z) / lookPos.y);
 }
+
+OBJECT_INFO_DECL(simple3deditor::AViewObject, L"");
 
 AViewObject::AViewObject() : name(L"Object") {}
 AViewObject::AViewObject(ViewObjectType type) : name(L"Object"), type(type) {}
@@ -282,5 +286,11 @@ void AViewObject::OnAnimationFrame(float frame){
     for (size_t i = 0; i < len; i++)
         children[i]->OnAnimationFrame(frame);
 }
+
+void AViewObject::Serialize(nlohmann::json& o){
+    o["id"] = OBJECT_ID;
+}
+
+void AViewObject::Deserialize(nlohmann::json& o){}
 
 }

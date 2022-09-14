@@ -20,6 +20,8 @@ protected:
     void UpdateCursor(Vector2 pos);
 
 public:
+    OBJECT_INFO_DEF();
+
     GUIMeshObject();
     virtual ~GUIMeshObject() override;
 

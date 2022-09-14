@@ -12,6 +12,7 @@ const float EPSILON = __FLT_EPSILON__;
 constexpr float PI = 3.14159265F;
 constexpr float PI_TIMES_2 = 6.28318530F;
 
+#if COMPILER_MINGW
 constexpr float Sqrt(float x){ return __builtin_sqrtf(x); }
 constexpr double Sqrt(double x){ return __builtin_sqrt(x); }
 constexpr long double Sqrt(long double x){ return __builtin_sqrtl(x); }
@@ -61,9 +62,6 @@ constexpr long double Ceil(long double x){ return __builtin_ceill(x); }
 constexpr float Round(float x){ return __builtin_roundf(x); }
 constexpr double Round(double x){ return __builtin_round(x); }
 constexpr long double Round(long double x){ return __builtin_roundl(x); }
-inline void SinCos(float x, float* vsin, float* vcos){ return __builtin_sincosf(x, vsin, vcos); }
-inline void SinCos(double x, double* vsin, double* vcos){ return __builtin_sincos(x, vsin, vcos); }
-inline void SinCos(long double x, long double* vsin, long double* vcos){ return __builtin_sincosl(x, vsin, vcos); }
 constexpr float Asin(float x){ return __builtin_asinf(x); }
 constexpr double Asin(double x){ return __builtin_asin(x); }
 constexpr long double Asin(long double x){ return __builtin_asinl(x); }
@@ -117,12 +115,130 @@ constexpr bool IsNormal(long double x){ return __builtin_isnormal(x); }
 constexpr float Error(float x){  return __builtin_erff(x); }
 constexpr double Error(double x){  return __builtin_erf(x); }
 constexpr long double Error(long double x){  return __builtin_erfl(x); }
+#else
+// clang把宏替换为关键字时可能报错
+inline float Sqrt(float x){ return __builtin_sqrtf(x); }
+inline double Sqrt(double x){ return __builtin_sqrt(x); }
+inline long double Sqrt(long double x){ return __builtin_sqrtl(x); }
+inline float Cbrt(float x){ return __builtin_cbrtf(x); }
+inline double Cbrt(double x){ return __builtin_cbrt(x); }
+inline long double Cbrt(long double x){ return __builtin_cbrtl(x); }
+inline float Sin(float x){ return __builtin_sinf(x); }
+inline double Sin(double x){ return __builtin_sin(x); }
+inline long double Sin(long double x){ return __builtin_sinl(x); }
+inline float Cos(float x){ return __builtin_cosf(x); }
+inline double Cos(double x){ return __builtin_cos(x); }
+inline long double Cos(long double x){ return __builtin_cosl(x); }
+inline float Exp(float x){ return __builtin_expf(x); }
+inline double Exp(double x){ return __builtin_exp(x); }
+inline long double Exp(long double x){ return __builtin_expl(x); }
+inline float Log(float x){ return __builtin_logf(x); }
+inline double Log(double x){ return __builtin_log(x); }
+inline long double Log(long double x){ return __builtin_logl(x); }
+inline float Log2(float x){ return __builtin_log2f(x); }
+inline double Log2(double x){ return __builtin_log2(x); }
+inline long double Log2(long double x){ return __builtin_log2l(x); }
+inline float Log10(float x){ return __builtin_log10f(x); }
+inline double Log10(double x){ return __builtin_log10(x); }
+inline long double Log10(long double x){ return __builtin_log10l(x); }
+inline float Pow(float x, float y){ return __builtin_powf(x, y); }
+inline double Pow(double x, double y){ return __builtin_pow(x, y); }
+inline long double Pow(long double x, long double y){ return __builtin_powl(x, y); }
+inline int Abs(int x){ return __builtin_abs(x); }
+inline float Abs(float x){ return __builtin_fabsf(x); }
+inline double Abs(double x){ return __builtin_fabs(x); }
+inline long double Abs(long double x){ return __builtin_fabsl(x); }
+inline float Mod(float x, float y){ return __builtin_fmodf(x, y); }
+inline double Mod(double x, double y){ return __builtin_fmod(x, y); }
+inline long double Mod(long double x, long double y){ return __builtin_fmodl(x, y); }
+inline float Max(float x, float y){ return __builtin_fmaxf(x, y); }
+inline double Max(double x, double y){ return __builtin_fmax(x, y); }
+inline long double Max(long double x, long double y){ return __builtin_fmaxl(x, y); }
+inline float Min(float x, float y){ return __builtin_fminf(x, y); }
+inline double Min(double x, double y){ return __builtin_fmin(x, y); }
+inline long double Min(long double x, long double y){ return __builtin_fminl(x, y); }
+inline float Floor(float x){ return __builtin_floorf(x); }
+inline double Floor(double x){ return __builtin_floor(x); }
+inline long double Floor(long double x){ return __builtin_floorl(x); }
+inline float Ceil(float x){ return __builtin_ceilf(x); }
+inline double Ceil(double x){ return __builtin_ceil(x); }
+inline long double Ceil(long double x){ return __builtin_ceill(x); }
+inline float Round(float x){ return __builtin_roundf(x); }
+inline double Round(double x){ return __builtin_round(x); }
+inline long double Round(long double x){ return __builtin_roundl(x); }
+inline float Asin(float x){ return __builtin_asinf(x); }
+inline double Asin(double x){ return __builtin_asin(x); }
+inline long double Asin(long double x){ return __builtin_asinl(x); }
+inline float Acos(float x){ return __builtin_acosf(x); }
+inline double Acos(double x){ return __builtin_acos(x); }
+inline long double Acos(long double x){ return __builtin_acosl(x); }
+inline float Atan(float x){ return __builtin_atanf(x); }
+inline double Atan(double x){ return __builtin_atan(x); }
+inline long double Atan(long double x){ return __builtin_atanl(x); }
+// (1, 0)=>0 (0, 1)=>+90 (-1, 0)=>+180 (0, -1)=>-90 范围(-180, +180]
+inline float Atan2(float x, float y){ return __builtin_atan2f(x, y); }
+inline double Atan2(double x, double y){ return __builtin_atan2(x, y); }
+inline long double Atan2(long double x, long double y){ return __builtin_atan2l(x, y); }
+inline float Sinh(float x){ return __builtin_sinhf(x); }
+inline double Sinh(double x){ return __builtin_sinh(x); }
+inline long double Sinh(long double x){ return __builtin_sinhl(x); }
+inline float Cosh(float x){ return __builtin_coshf(x); }
+inline double Cosh(double x){ return __builtin_cosh(x); }
+inline long double Cosh(long double x){ return __builtin_coshl(x); }
+inline float Tanh(float x){ return __builtin_tanhf(x); }
+inline double Tanh(double x){ return __builtin_tanh(x); }
+inline long double Tanh(long double x){ return __builtin_tanhl(x); }
+inline float Asinh(float x){ return __builtin_asinhf(x); }
+inline double Asinh(double x){ return __builtin_asinh(x); }
+inline long double Asinh(long double x){ return __builtin_asinhl(x); }
+inline float Acosh(float x){ return __builtin_acoshf(x); }
+inline double Acosh(double x){ return __builtin_acosh(x); }
+inline long double Acosh(long double x){ return __builtin_acoshl(x); }
+inline float Atanh(float x){ return __builtin_atanhf(x); }
+inline double Atanh(double x){ return __builtin_atanh(x); }
+inline long double Atanh(long double x){ return __builtin_atanhl(x); }
+inline float Copysign(float x, float sign){ return __builtin_copysignf(x, sign); }
+inline double Copysign(double x, double sign){ return __builtin_copysign(x, sign); }
+inline long double Copysign(long double x, long double sign){ return __builtin_copysignl(x, sign); }
+inline float InfinityF(){ return __builtin_huge_valf(); }
+inline double InfinityD(){ return __builtin_huge_val(); }
+inline long double InfinityLD(){ return __builtin_huge_vall(); }
+inline bool IsNaN(float x){ return __builtin_isnan(x); }
+inline bool IsNaN(double x){ return __builtin_isnan(x); }
+inline bool IsNaN(long double x){ return __builtin_isnan(x); }
+inline bool IsInf(float x){ return __builtin_isinf(x); }
+inline bool IsInf(double x){ return __builtin_isinf(x); }
+inline bool IsInf(long double x){ return __builtin_isinf(x); }
+inline bool IsFinite(float x){ return __builtin_isfinite(x); }
+inline bool IsFinite(double x){ return __builtin_isfinite(x); }
+inline bool IsFinite(long double x){ return __builtin_isfinite(x); }
+inline bool IsNormal(float x){ return __builtin_isnormal(x); }
+inline bool IsNormal(double x){ return __builtin_isnormal(x); }
+inline bool IsNormal(long double x){ return __builtin_isnormal(x); }
+// 正态分布曲线积分，2/Sqrt(PI)*积分(0-x){exp(-x^2)}
+inline float Error(float x){  return __builtin_erff(x); }
+inline double Error(double x){  return __builtin_erf(x); }
+inline long double Error(long double x){  return __builtin_erfl(x); }
+#endif
+
+#if COMPILER_MINGW
 // Gamma函数，可视作(x-1)!
 // x->(0,1) gamma(x)*gamma(1-x)=PI/sin(PI*x)
 // gamma(0.5)=Sqrt(PI)
 constexpr float Gamma(float x){  return __builtin_gammaf(x); }
 constexpr double Gamma(double x){  return __builtin_gamma(x); }
 constexpr long double Gamma(long double x){  return __builtin_gammal(x); }
+#endif
+
+#if COMPILER_MINGW
+inline void SinCos(float x, float* vsin, float* vcos){ __builtin_sincosf(x, vsin, vcos); }
+inline void SinCos(double x, double* vsin, double* vcos){ __builtin_sincos(x, vsin, vcos); }
+inline void SinCos(long double x, long double* vsin, long double* vcos){ __builtin_sincosl(x, vsin, vcos); }
+#else
+inline void SinCos(float x, float* vsin, float* vcos){ *vsin = __builtin_sinf(x); *vcos = __builtin_cosf(x); }
+inline void SinCos(double x, double* vsin, double* vcos){ *vsin = __builtin_sin(x); *vcos = __builtin_cos(x); }
+inline void SinCos(long double x, long double* vsin, long double* vcos){ *vsin = __builtin_sinl(x); *vcos = __builtin_cosl(x); }
+#endif
 
 constexpr float ToRadian(float x){ return x * 0.017453292519F; }
 constexpr float ToRadianHalf(float x){ return x * 0.008726646259971F; }

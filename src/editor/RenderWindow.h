@@ -28,8 +28,7 @@ protected:
     void InitCamera();
 
 public:
-    static constexpr const char* WINDOW_ID = "lbh.render";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"渲染窗口";
+    WINDOW_INFO_DEF();
 
     RenderWindow();
     virtual ~RenderWindow() override;
@@ -49,8 +48,8 @@ public:
     virtual void OnDropFileA(const char* path, uint len) override;
     virtual void OnDropFileW(const wchar_t* path, uint len) override;
 
-    virtual void Serialize(json& o) override;
-    virtual void Deserialize(json& o) override;
+    virtual void Serialize(nlohmann::json& o) override;
+    virtual void Deserialize(nlohmann::json& o) override;
 
     void OnInsSave();
 

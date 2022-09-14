@@ -36,6 +36,9 @@ void CAudioSourceLoader::AudioSourceLoad(AudioSourceObject* o){
     }
 }
 
+// 不会在菜单显示，需要通过载入音频文件的方式创建
+OBJECT_INFO_DECL(simple3deditor::AudioSourceObject, L"");
+
 static const int REPLAY_ERROR = 4000;
 
 AudioSourceObject::AudioSourceObject(uenum format, char* data, int size, int freq) : AViewObject(L"AudioSource", ViewObjectType::OBJECT_AUDIO_SOURCE) {

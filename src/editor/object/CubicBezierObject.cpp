@@ -7,6 +7,8 @@
 
 namespace simple3deditor {
 
+OBJECT_INFO_DECL(simple3deditor::CubicBezierObject, L"三次贝塞尔曲线");
+
 CubicBezierObject::CubicBezierObject() : AViewObject(L"CubicBezier", ViewObjectType::OBJECT_CUBIC_BEZIER_CURVE) {
     v[0].pos = Vector3(-5.0f, 0.0f, 0.0f);
     v[1].pos = Vector3(0.0f, 0.0f, 0.0f);

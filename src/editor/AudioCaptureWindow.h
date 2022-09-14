@@ -49,8 +49,7 @@ protected:
     void UpdateWindowSize(int x, int y);
 
 public:
-    static constexpr const char* WINDOW_ID = "lbh.audiocap";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"变声器";
+    WINDOW_INFO_DEF();
 
     AudioCaptureWindow();
     virtual ~AudioCaptureWindow() override;
@@ -72,8 +71,8 @@ public:
     virtual void OnDropFileA(const char* path, uint len) override;
     virtual void OnDropFileW(const wchar_t* path, uint len) override;
 
-    virtual void Serialize(json& o) override;
-    virtual void Deserialize(json& o) override;
+    virtual void Serialize(nlohmann::json& o) override;
+    virtual void Deserialize(nlohmann::json& o) override;
 
     void Launch();
     void Stop();

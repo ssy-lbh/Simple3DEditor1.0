@@ -14,6 +14,8 @@
 
 namespace simple3deditor {
 
+OBJECT_INFO_DECL(simple3deditor::TreeWindowObject, L"树形图窗口对象");
+
 TreeWindowObject::TreeWindowObject() : AWindowObject(L"TreeWindow") {
     DebugLog("TreeWindowObject Launched");
 

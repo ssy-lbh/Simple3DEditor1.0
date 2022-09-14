@@ -2,6 +2,8 @@
 
 namespace simple3deditor {
 
+OBJECT_INFO_DECL(simple3deditor::AWindowObject, L"");
+
 AWindowObject::AWindowObject() : AGUIObject(L"Window", ViewObjectType::OBJECT_WINDOW) {}
 AWindowObject::AWindowObject(const wchar_t* name) : AGUIObject(name, ViewObjectType::OBJECT_WINDOW) {}
 AWindowObject::~AWindowObject(){}

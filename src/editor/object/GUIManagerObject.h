@@ -24,6 +24,8 @@ protected:
     void UpdateCursor(Vector2 pos);
 
 public:
+    OBJECT_INFO_DEF();
+
     GUIManagerObject();
     virtual ~GUIManagerObject() override;
 

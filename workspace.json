@@ -1,0 +1,32 @@
+{
+  "id": "lbh.cont.sel",
+  "window": {
+    "div rate": 0.5,
+    "id": "lbh.cont.lr",
+    "left window": {
+      "id": "lbh.cont.sel",
+      "window": {
+        "id": "lbh.main"
+      }
+    },
+    "right window": {
+      "id": "lbh.cont.sel",
+      "window": {
+        "div rate": 0.5006935000419617,
+        "down window": {
+          "id": "lbh.cont.sel",
+          "window": {
+            "id": "lbh.tree"
+          }
+        },
+        "id": "lbh.cont.ud",
+        "up window": {
+          "id": "lbh.cont.sel",
+          "window": {
+            "id": "lbh.audioplay"
+          }
+        }
+      }
+    }
+  }
+}

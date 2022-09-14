@@ -21,8 +21,7 @@ protected:
 //TODO 容器期望集成选择夹、属性窗口等容器
 class LRContainer : public AContainer {
 public:
-    static constexpr const char* WINDOW_ID = "lbh.cont.lr";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+    WINDOW_INFO_DEF();
 
     static constexpr int INIT_DIS = 50;
     static constexpr Vector2 INIT_SIZE = Vector2(2.0f * INIT_DIS, 0.0f);
@@ -64,8 +63,8 @@ public:
     virtual void OnDropFileA(const char* path, uint len) override;
     virtual void OnDropFileW(const wchar_t* path, uint len) override;
 
-    virtual void Serialize(json& o) override;
-    virtual void Deserialize(json& o) override;
+    virtual void Serialize(nlohmann::json& o) override;
+    virtual void Deserialize(nlohmann::json& o) override;
 
     void UpdateFocus();
     void FreeWindow();
@@ -78,8 +77,7 @@ public:
 
 class UDContainer : public AContainer {
 public:
-    static constexpr const char* WINDOW_ID = "lbh.cont.ud";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+    WINDOW_INFO_DEF();
 
     static constexpr int INIT_DIS = 50;
     static constexpr Vector2 INIT_SIZE = Vector2(0.0f, 2.0f * INIT_DIS);
@@ -121,8 +119,8 @@ public:
     virtual void OnDropFileA(const char* path, uint len) override;
     virtual void OnDropFileW(const wchar_t* path, uint len) override;
 
-    virtual void Serialize(json& o) override;
-    virtual void Deserialize(json& o) override;
+    virtual void Serialize(nlohmann::json& o) override;
+    virtual void Deserialize(nlohmann::json& o) override;
 
     void UpdateFocus();
     void FreeWindow();
@@ -141,8 +139,7 @@ private:
     void InitMenu();
 
 public:
-    static constexpr const char* WINDOW_ID = "lbh.cont.sel";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+    WINDOW_INFO_DEF();
 
     SelectionWindow();
     SelectionWindow(AWindow* initialWnd);
@@ -166,8 +163,8 @@ public:
     virtual void OnDropFileA(const char* path, uint len) override;
     virtual void OnDropFileW(const wchar_t* path, uint len) override;
 
-    virtual void Serialize(json& o) override;
-    virtual void Deserialize(json& o) override;
+    virtual void Serialize(nlohmann::json& o) override;
+    virtual void Deserialize(nlohmann::json& o) override;
 
     AWindow* GetWindow();
     void SetWindow(AWindow* window, bool del = true);

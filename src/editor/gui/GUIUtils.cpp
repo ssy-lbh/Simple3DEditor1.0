@@ -2,8 +2,6 @@
 
 #include <lib/glew/gl/glew.h>
 
-#include <exception>
-
 #include <main.h>
 #include <util/gl/GLSimplified.h>
 #include <util/gl/GLUtils.h>

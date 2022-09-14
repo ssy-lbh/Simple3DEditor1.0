@@ -21,6 +21,8 @@ protected:
     void UpdateWindowSize(Vector2 size);
 
 public:
+    OBJECT_INFO_DEF();
+
     AWindowObject();
     virtual ~AWindowObject() override;
 

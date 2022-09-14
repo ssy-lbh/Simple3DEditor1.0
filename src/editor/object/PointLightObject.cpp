@@ -6,6 +6,8 @@
 
 namespace simple3deditor {
 
+OBJECT_INFO_DECL(simple3deditor::PointLightObject, L"点光源");
+
 PointLightObject::PointLightObject() : AViewObject(L"PointLight", ViewObjectType::OBJECT_POINT_LIGHT) {
     light = GLLights::Create();
     UpdateLight();

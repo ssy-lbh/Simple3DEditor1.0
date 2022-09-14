@@ -134,8 +134,8 @@ typedef unsigned short wchar_t;
 
 #endif  /* _WIN32 */
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <lib/opengl/gl/gl.h>
+#include <lib/opengl/gl/glu.h>
 
 #ifdef __cplusplus
 extern "C" {

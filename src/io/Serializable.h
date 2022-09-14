@@ -5,20 +5,18 @@
 
 #include <io/IOStream.h>
 
-#include <lib/json/nlohmann/json.hpp>
+#include <lib/json/nlohmann/json_fwd.hpp>
 
 namespace simple3deditor {
 
-using nlohmann::json;
-
 class ISerializable {
 public:
-    virtual void Serialize(json& o) = 0;
+    virtual void Serialize(nlohmann::json& o) = 0;
 };
 
 class IDeserializable {
 public:
-    virtual void Deserialize(json& o) = 0;
+    virtual void Deserialize(nlohmann::json& o) = 0;
 };
 
 // 多继承中只含有接口，期望数据不会有不确定性

@@ -77,8 +77,8 @@ struct Islands {
         /// Destructor
         ~Islands() = default;
 
-        /// Assignment operator
-        Islands& operator=(const Islands& island) = default;
+        /// Assignment operator (default is deleted)
+        //Islands& operator=(const Islands& island) = default;
 
         /// Copy-constructor
         Islands(const Islands& island) = default;

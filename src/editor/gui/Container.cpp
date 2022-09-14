@@ -21,10 +21,15 @@
 #include <util/os/Log.h>
 #include <util/os/AppFrame.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
 
 AContainer::AContainer(){}
 AContainer::AContainer(SelectionWindow* selWindow) : selWindow(selWindow) {}
+
+const char* LRContainer::WINDOW_ID = "lbh.cont.lr";
+const wchar_t* LRContainer::WINDOW_DISPLAY_NAME = L"";
 
 LRContainer::LRContainer() : lWindow(nullptr), rWindow(nullptr) {
     cliSize = INIT_SIZE;
@@ -216,7 +221,7 @@ void LRContainer::OnDropFileW(const wchar_t* path, uint len){
         focusWindow->OnDropFileW(path, len);
 }
 
-void LRContainer::Serialize(json& o){
+void LRContainer::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
     o["div rate"] = GetRateClamped((float)dis, 0.0f, cliSize.x);
     if (lWindow)
@@ -225,7 +230,7 @@ void LRContainer::Serialize(json& o){
         rWindow->Serialize(o["right window"]);
 }
 
-void LRContainer::Deserialize(json& o){
+void LRContainer::Deserialize(nlohmann::json& o){
     dis = LerpClamped(0.0f, cliSize.x, o.value("div rate", 0.5f));
     lWindow = o.contains("left window") ? Main::data->ConstructWindow(o["left window"]) : NULL;
     rWindow = o.contains("right window") ? Main::data->ConstructWindow(o["right window"]) : NULL;
@@ -286,6 +291,9 @@ void LRContainer::DisableDrag(){
 bool LRContainer::DragEnabled(){
     return dragEnable;
 }
+
+const char* UDContainer::WINDOW_ID = "lbh.cont.ud";
+const wchar_t* UDContainer::WINDOW_DISPLAY_NAME = L"";
 
 UDContainer::UDContainer() : uWindow(nullptr), dWindow(nullptr) {
     cliSize = INIT_SIZE;
@@ -476,7 +484,7 @@ void UDContainer::OnDropFileW(const wchar_t* path, uint len){
         focusWindow->OnDropFileW(path, len);
 }
 
-void UDContainer::Serialize(json& o){
+void UDContainer::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
     o["div rate"] = GetRateClamped((float)dis, 0.0f, cliSize.y);
     if (uWindow)
@@ -485,7 +493,7 @@ void UDContainer::Serialize(json& o){
         dWindow->Serialize(o["down window"]);
 }
 
-void UDContainer::Deserialize(json& o){
+void UDContainer::Deserialize(nlohmann::json& o){
     dis = LerpClamped(0.0f, cliSize.y, o.value("div rate", 0.5f));
     uWindow = o.contains("up window") ? Main::data->ConstructWindow(o["up window"]) : NULL;
     dWindow = o.contains("down window") ? Main::data->ConstructWindow(o["down window"]) : NULL;
@@ -546,6 +554,9 @@ void UDContainer::DisableDrag(){
 bool UDContainer::DragEnabled(){
     return dragEnable;
 }
+
+const char* SelectionWindow::WINDOW_ID = "lbh.cont.sel";
+const wchar_t* SelectionWindow::WINDOW_DISPLAY_NAME = L"";
 
 SelectionWindow::SelectionWindow() : curWindow(nullptr) {
     DebugLog("SelectionWindow %p Created", this);
@@ -694,13 +705,13 @@ void SelectionWindow::OnDropFileW(const wchar_t* path, uint len){
         curWindow->OnDropFileW(path, len);
 }
 
-void SelectionWindow::Serialize(json& o){
+void SelectionWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
     if (curWindow)
         curWindow->Serialize(o["window"]);
 }
 
-void SelectionWindow::Deserialize(json& o){
+void SelectionWindow::Deserialize(nlohmann::json& o){
     if (o.contains("window")){
         curWindow = Main::data->ConstructWindow(o["window"]);
         if (InstanceOf<AContainer>(curWindow))

@@ -25,8 +25,7 @@ protected:
     void UpdateWindowSize(int x, int y);
 
 public:
-    static constexpr const char* WINDOW_ID = "lbh.uvedit";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"UV编辑器";
+    WINDOW_INFO_DEF();
 
     UVEditWindow();
     ~UVEditWindow();
@@ -41,8 +40,8 @@ public:
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileW(const wchar_t* path, uint len) override;
 
-    virtual void Serialize(json& o) override;
-    virtual void Deserialize(json& o) override;
+    virtual void Serialize(nlohmann::json& o) override;
+    virtual void Deserialize(nlohmann::json& o) override;
 
     void SetOperation(IOperation* op);
     void SetTool(ITool* tool);

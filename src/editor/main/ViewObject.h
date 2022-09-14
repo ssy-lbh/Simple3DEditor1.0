@@ -48,7 +48,16 @@ enum class ViewObjectType {
     OBJECT_VERTICAL_PROGRESSBAR
 };
 
-class AViewObject : public Object {
+#define OBJECT_INFO_DEF()\
+    static const char* OBJECT_ID;\
+    static const wchar_t* OBJECT_DISPLAY_NAME
+
+//! 注意:暂定clazz必须是[所有namespace用'::'隔开]+[类名]严格区分，ID与符号表同步唯一
+#define OBJECT_INFO_DECL(clazz, displayName)\
+    const char* clazz::OBJECT_ID = #clazz;\
+    const wchar_t* clazz::OBJECT_DISPLAY_NAME = displayName
+
+class AViewObject : public Object, public IMemorable {
 public:
     Transform transform;
     WString name;
@@ -68,6 +77,8 @@ protected:
     AViewObject(WString name, ViewObjectType type);
 
 public:
+    OBJECT_INFO_DEF();
+
     // 被销毁时，子对象全部已销毁
     Delegate<AViewObject*> onDestroy;
 
@@ -142,6 +153,11 @@ public:
     virtual void OnDropFileW(const wchar_t* path, uint len);
 
     virtual void OnAnimationFrame(float frame);
+
+    // 窗口序列化时应先o["id"] = OBJECT_ID，这样才能在反序列化时识别窗口
+    virtual void Serialize(nlohmann::json& o) override;
+    // 除了OBJECT_ID，其他数据按顺序依次读取就行
+    virtual void Deserialize(nlohmann::json& o) override;
 };
 
 }

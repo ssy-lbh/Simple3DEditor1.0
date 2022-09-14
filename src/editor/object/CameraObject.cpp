@@ -5,6 +5,8 @@
 
 namespace simple3deditor {
 
+OBJECT_INFO_DECL(simple3deditor::CameraObject, L"摄像机");
+
 static const float SCALE = 0.3f;
 
 CameraObject::CameraObject() : AViewObject(L"Camera", ViewObjectType::OBJECT_CAMERA) {

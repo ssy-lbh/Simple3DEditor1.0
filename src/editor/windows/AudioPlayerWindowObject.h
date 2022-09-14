@@ -34,6 +34,8 @@ private:
     bool displayWave = false;
 
 public:
+    OBJECT_INFO_DEF();
+
     AudioPlayerWindowObject();
     virtual ~AudioPlayerWindowObject() override;
 

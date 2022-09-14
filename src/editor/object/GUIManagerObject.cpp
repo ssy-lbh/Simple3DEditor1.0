@@ -2,8 +2,6 @@
 
 #include <lib/glew/gl/glew.h>
 
-#include <exception>
-
 #include <main.h>
 #include <util/gl/GLSimplified.h>
 #include <util/gl/GLUtils.h>
@@ -14,6 +12,8 @@
 #include <editor/object/GUIObject.h>
 
 namespace simple3deditor {
+
+OBJECT_INFO_DECL(simple3deditor::GUIManagerObject, L"GUI管理器");
 
 GUIManagerObject::GUIManagerObject() : AGUIObject(L"GUIManager", ViewObjectType::OBJECT_GUI_MANAGER) {}
 

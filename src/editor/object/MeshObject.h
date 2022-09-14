@@ -19,6 +19,8 @@ protected:
     MeshObject(const wchar_t* name, ViewObjectType type);
 
 public:
+    OBJECT_INFO_DEF();
+
     MeshObject();
     virtual ~MeshObject() override;
 

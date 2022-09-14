@@ -10,7 +10,7 @@
 #include <util/math3d/LinearAlgebra.h>
 #include <util/physics3d/engine/PhysicsCommon.h>
 
-#include <lib/json/nlohmann/json.hpp>
+#include <lib/json/nlohmann/json_fwd.hpp>
 
 namespace simple3deditor {
 
@@ -87,6 +87,12 @@ struct WindowInfo {
     WString displayName;
 };
 
+struct ObjectInfo {
+    std::function<AViewObject*()> factory;
+    String id;
+    WString displayName;
+};
+
 //TODO 可加入全局拖拽功能，在窗口之间传送数据
 class GlobalData final : public Object {
 public:
@@ -123,6 +129,7 @@ public:
     void OnAnimationFrame(float frame);
 
     List<WindowInfo*> windowReg;
+    List<ObjectInfo*> objectReg;
 
     // id用于标记文件等数据中的类型信息，对于每一类的类应唯一
     // 注册的窗口类有以下要求
@@ -139,11 +146,22 @@ public:
         windowReg.Add(info);
     }
 
+    template <typename T>
+    void RegisterObject(){
+        ObjectInfo* info = new ObjectInfo;
+        info->factory = []{ return new T(); };
+        info->id = T::OBJECT_ID;
+        info->displayName = T::OBJECT_DISPLAY_NAME;
+        objectReg.Add(info);
+    }
+
+    void RegisterWindow(std::function<AWindow*()> factory, const char* id, const wchar_t* displayName);
+
     AWindow* ConstructWindow(const char* id);
     AWindow* ConstructWindow(nlohmann::json& o);
 
-    // 设置信息
-    nlohmann::json settings;
+    AViewObject* ConstructObject(const char* id);
+    AViewObject* ConstructObject(nlohmann::json& o);
 
     void LoadSettings(const char* path);
     void ApplySettings();

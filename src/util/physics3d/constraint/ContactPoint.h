@@ -109,8 +109,8 @@ class ContactPoint {
         /// Copy-constructor
         ContactPoint(const ContactPoint& contact) = default;
 
-        /// Assignment operator
-        ContactPoint& operator=(const ContactPoint& contact) = default;
+        /// Assignment operator (default is deleted)
+        //ContactPoint& operator=(const ContactPoint& contact) = default;
 
         /// Return the normal vector of the contact
         const Vector3& getNormal() const;

@@ -9,6 +9,8 @@
 #include <editor/gui/Menu.h>
 #include <editor/object/GUIManagerObject.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
 
 class NodeMapWindow::MoveButton : public AGUIObject {
@@ -185,6 +187,8 @@ public:
     }
 };
 
+WINDOW_INFO_DECL(simple3deditor::NodeMapWindow, L"节点图编辑器");
+
 NodeMapWindow::NodeMapWindow(){
     DebugLog("NodeMapWindow Launched");
     guiMgr = new GUIManagerObject();
@@ -355,10 +359,10 @@ void NodeMapWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void NodeMapWindow::Serialize(json& o){
+void NodeMapWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 
-void NodeMapWindow::Deserialize(json& o){}
+void NodeMapWindow::Deserialize(nlohmann::json& o){}
 
 }

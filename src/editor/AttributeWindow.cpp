@@ -6,7 +6,11 @@
 #include <editor/gui/GUIUtils.h>
 #include <editor/object/GUIManagerObject.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
+
+WINDOW_INFO_DECL(simple3deditor::AttributeWindow, L"属性窗口(未完成)");
 
 AttributeWindow::AttributeWindow(){
     DebugLog("AttributeWindow Launched");
@@ -80,11 +84,11 @@ void AttributeWindow::OnMouseWheel(int delta){}
 
 void AttributeWindow::OnMenuAccel(int id, bool accel){}
 
-void AttributeWindow::Serialize(json& o){
+void AttributeWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 
-void AttributeWindow::Deserialize(json& o){}
+void AttributeWindow::Deserialize(nlohmann::json& o){}
 
 void AttributeWindow::UpdateWindowSize(int x, int y){}
 

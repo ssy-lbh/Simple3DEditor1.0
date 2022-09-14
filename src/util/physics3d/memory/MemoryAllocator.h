@@ -46,8 +46,8 @@ class MemoryAllocator {
         /// Destructor
         virtual ~MemoryAllocator() = default;
 
-        /// Assignment operator
-        MemoryAllocator& operator=(MemoryAllocator& allocator) = default;
+        /// Assignment operator (default is deleted)
+        //MemoryAllocator& operator=(MemoryAllocator& allocator) = default;
 
         /// Allocate memory of a given size (in bytes) and return a pointer to the
         /// allocated memory.

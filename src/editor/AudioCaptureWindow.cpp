@@ -19,7 +19,11 @@
 // 应在一切windows相关类型定义之后
 #include <lib/soundtouch/SoundTouch.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
+
+WINDOW_INFO_DECL(simple3deditor::AudioCaptureWindow, L"变声器");
 
 AudioCaptureWindow::AudioCaptureWindow(){
     DebugLog("AudioCaptureWindow Launched");
@@ -317,11 +321,11 @@ void AudioCaptureWindow::OnDropFileA(const char* path, uint len){}
 
 void AudioCaptureWindow::OnDropFileW(const wchar_t* path, uint len){}
 
-void AudioCaptureWindow::Serialize(json& o){
+void AudioCaptureWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 
-void AudioCaptureWindow::Deserialize(json& o){}
+void AudioCaptureWindow::Deserialize(nlohmann::json& o){}
 
 void AudioCaptureWindow::Launch(){
     if (capture){

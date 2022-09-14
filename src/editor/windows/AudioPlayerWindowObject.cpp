@@ -24,6 +24,8 @@
 
 namespace simple3deditor {
 
+OBJECT_INFO_DECL(simple3deditor::AudioPlayerWindowObject, L"音频播放器窗口对象");
+
 AudioPlayerWindowObject::AudioPlayerWindowObject() : AWindowObject(L"AudioPlayerWindow"), CAudioSourceLoader(source) {
     DebugLog("AudioPlayerWindowObject Launched");
 

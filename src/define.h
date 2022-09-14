@@ -13,6 +13,20 @@ typedef unsigned long long size_t;
 #define ARCH_64BITS
 #endif
 
+#if __clang__
+#define COMPILER_LLVM 1
+#elif __MINGW32__ || __MINGW64__
+#define COMPILER_MINGW 1
+#elif __CUDACC__
+#define COMPILER_CUDA 1
+#elif __MSVCRT__
+#define COMPILER_MSVC 1
+#elif __INTEL_COMPILER
+#define COMPILER_INTEL 1
+#else
+#define COMPILER_UNKNOWN 1
+#endif
+
 #define ARCH_LITTLE_ENDIAN
 
 #if defined(_WIN64)

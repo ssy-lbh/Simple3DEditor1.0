@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/src/**"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/src"
+                ]
+            },
+            "compilerPath": "E:\\Program Files\\C++\\gcc-v11.1.0-mingw-v8.0.0-x86_64\\bin\\g++",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "defines": []
+        }
+    ],
+    "version": 4
+}

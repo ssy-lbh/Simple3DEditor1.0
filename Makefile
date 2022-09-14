@@ -1,18 +1,18 @@
 # Simple3DEditor Makefile
 # Author: lin-boheng@gitee.com
 
-# ä¾èµ–åº“:
+# ÒÀÀµ¿â:
 # OpenGL OpenAL stb_image SoundTouch FFmpeg
-# å¯èƒ½åŠ å…¥çš„ä¾èµ–åº“:
+# ¿ÉÄÜ¼ÓÈëµÄÒÀÀµ¿â:
 # glfw glm glew FreeType "FBX SDK" OpenRL json-cpp ShaderConductor ReactPhysics3D
-# ä»¥ååˆ›å»ºå‘è¡Œç‰ˆå¸¦ä¸Šglew32å’ŒOpenAL32çš„åŠ¨æ€åº“
+# ÒÔºó´´½¨·¢ĞĞ°æ´øÉÏglew32ºÍOpenAL32µÄ¶¯Ì¬¿â
 
-# è¯´æ˜ä¸€ä¸‹ï¼Œæˆ‘å†™è¿‡Vulkanï¼Œä½†æ˜¯å› ä¸ºä¸å¤Ÿç†Ÿç»ƒæ‰æ²¡ä½¿ç”¨
-# ä»Šåæˆ‘ä¼šæŒ‘æˆ˜ä¸€ä¸‹
+# ËµÃ÷Ò»ÏÂ£¬ÎÒĞ´¹ıVulkan£¬µ«ÊÇÒòÎª²»¹»ÊìÁ·²ÅÃ»Ê¹ÓÃ
+# ½ñºóÎÒ»áÌôÕ½Ò»ÏÂ
 
-# ä»¥åSoundTouchå’ŒReactPhysics3Dç‰©ç†å¼•æ“æˆ‘æ‰“ç®—å•ç‹¬ç¼–è¯‘æˆä¸€ä¸ªåŠ¨æ€åº“
+# ÒÔºóSoundTouchºÍReactPhysics3DÎïÀíÒıÇæÎÒ´òËãµ¥¶À±àÒë³ÉÒ»¸ö¶¯Ì¬¿â
 
-# è¿™ä»“åº“é‡Œé¢çš„ç±»æˆ‘ä¼šåœ¨ä»¥åå¤ç”¨
+# Õâ²Ö¿âÀïÃæµÄÀàÎÒ»áÔÚÒÔºó¸´ÓÃ
 
 RM			:= bin/linux/rm
 TR 			:= bin/linux/tr
@@ -70,11 +70,11 @@ LIB_PATH 	:= $(SOURCE_PATH)/lib
 toupper		= $(shell $(ECHO) $1 | $(TR) a-z A-Z)
 tolower		= $(shell $(ECHO) $1 | $(TR) A-Z a-z)
 
-# é€’å½’çš„wildcard
+# µİ¹éµÄwildcard
 rwildcard	= $(foreach D, $(wildcard $(1:=/*)), $(call rwildcard, $D, $2) $(filter $(subst *, %, $2), $D))
 src2obj		= $(1:$(SOURCE_PATH)/%.cpp=$(BUILD_PATH)/%.o)
 
-CC			:= g++
+CC			:= g++#clang --target=x86_64-w64-windows-gnu
 DLLTOOL		:= dlltool
 CFLAGS 		:= -I"$(SOURCE_PATH)" -m64 -O3 -std=c++11 -finput-charset=UTF-8 -fexec-charset=UTF-8\
 				-DPLATFORM_$(call toupper, $(PLATFORM)) -DARCH_$(call toupper, $(ARCH))
@@ -83,21 +83,22 @@ LFLAGS		:= -m64 -shared
 LIB_FILES	:= openal/OpenAL32 glew/glew32 freetype/freetype\
 				glut/glut64 ftgl/ftgl_D
 LIB			:= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 -lws2_32\
-				$(foreach FILE, $(LIB_FILES), $(LIB_PATH)/$(FILE).lib)
+				$(foreach FILE, $(LIB_FILES),$(LIB_PATH)/$(FILE).lib)
+#				-lstdc++ -lmingw32 -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -lshell32 -luser32
 RES  		:= windres
 GIT  		:= git
 
-# æ­£å¸¸çš„å«æœ‰.hå’Œ.cppçš„ä»£ç 
+# Õı³£µÄº¬ÓĞ.hºÍ.cppµÄ´úÂë
 PROGOBJ 	:= lib/soundtouch util editor manager base io
 PROGOBJ 	:= $(addprefix $(SOURCE_PATH)/, $(PROGOBJ))
 PROGOBJ 	:= $(basename $(call rwildcard, $(PROGOBJ), *.cpp))
 PROGOBJ 	:= $(PROGOBJ:$(SOURCE_PATH)/%=%)
 PROGOBJ 	+= main
-# ä¸éœ€è¦çš„ä»£ç 
+# ²»ĞèÒªµÄ´úÂë
 REMOVEOBJ 	:= lib/soundtouch/soundtouch_wapper
-# åªæœ‰.cppçš„ä»£ç 
+# Ö»ÓĞ.cppµÄ´úÂë
 EXTRAOBJ	:= lib/soundtouch/mmx_optimized lib/soundtouch/sse_optimized lib/soundtouch/cpu_detect_x86
-# å¹³å°ç›¸å…³ä»£ç 
+# Æ½Ì¨Ïà¹Ø´úÂë
 PLATOBJ 	:= platform/$(PLATFORM)
 PLATOBJ 	:= $(addprefix $(SOURCE_PATH)/, $(PLATOBJ))
 PLATOBJ 	:= $(basename $(call rwildcard, $(PLATOBJ), *.cpp))
@@ -111,7 +112,7 @@ RESOBJ 		:= $(basename $(call rwildcard, $(RESOBJ), *.rc))
 RESOBJ 		:= $(RESOBJ:$(SOURCE_PATH)/%=%)
 
 OUTPUT 		:= main.exe
-# åŠ¨æ€åº“
+# ¶¯Ì¬¿â
 OUTPUTDLIB	:= main.dll
 
 SIGNTOOL	:= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe"
@@ -138,7 +139,7 @@ ALLOBJ		:= $(CPPOBJ) $(RESOBJ)
 
 .PHONY: all mkdir build lib cleanall cleandep clean run rebuild reexec sign commit merge
 
-# buildä¹‹å‰åº”è¯¥mkdir
+# buildÖ®Ç°Ó¦¸Ãmkdir
 all: mkdir build lib
 
 run: build
@@ -158,58 +159,58 @@ $(OUTPUTDLIB): $(ALLOBJ)
 $(OUTPUT): $(ALLOBJ)
 	$(CC) $(ALLOBJ) -o $@ $(LIB) $(OFLAGS)
 
-# ä¾èµ–é¡¹æ–‡ä»¶
+# ÒÀÀµÏîÎÄ¼ş
 DEPFILES	:= $(CPPOBJ:%.o=%.d)
 
-# ä¸ä½¿ç”¨æ—¶ç”¨'#'æ³¨é‡Šæ‰
-# ä¸€èˆ¬è€Œè¨€æœ‰äº†å¤§æ‰¹é‡å®šä¹‰æ”¹åŠ¨åæ‰éœ€è¦ä½¿ç”¨
-#! å¦‚æœä½¿ç”¨ï¼Œè¯·ä¸è¦è½»æ˜“æ”¹åŠ¨å¤´æ–‡ä»¶ï¼ï¼ï¼
+# ²»Ê¹ÓÃÊ±ÓÃ'#'×¢ÊÍµô
+# Ò»°ã¶øÑÔÓĞÁË´óÅúÁ¿¶¨Òå¸Ä¶¯ºó²ÅĞèÒªÊ¹ÓÃ
+#! Èç¹ûÊ¹ÓÃ£¬Çë²»ÒªÇáÒ×¸Ä¶¯Í·ÎÄ¼ş£¡£¡£¡
 -include $(DEPFILES)
 
 $(DEPFILES): $(BUILD_PATH)/%.d: $(SOURCE_PATH)/%.cpp
 	$(CC) -MM $(CFLAGS) $< -MT $(call src2obj, $<) > $@
 	$(ECHO) "	$(CC) -c $< -o $(call src2obj, $<) $(CFLAGS)" >> $@
 
-# æ³¨:ä¸ä½¿ç”¨ä¾èµ–é¡¹æ–‡ä»¶æ—¶ä½¿ç”¨å¦‚ä¸‹ç¼–è¯‘æµç¨‹
-# å¸¸è§„çš„æºä»£ç 
+# ×¢:²»Ê¹ÓÃÒÀÀµÏîÎÄ¼şÊ±Ê¹ÓÃÈçÏÂ±àÒëÁ÷³Ì
+# ³£¹æµÄÔ´´úÂë
 #$(PROGOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp $(SOURCE_PATH)/%.h
 #	$(CC) -c $< -o $@ $(CFLAGS)
 
-# è¿™ä¸€ç±»ä¸ºå¹³å°ç›¸å…³ä»£ç æºæ–‡ä»¶
+# ÕâÒ»ÀàÎªÆ½Ì¨Ïà¹Ø´úÂëÔ´ÎÄ¼ş
 #$(PLATOBJ): $(BUILD_PATH)/platform/$(PLATFORM)/%.o: $(SOURCE_PATH)/platform/$(PLATFORM)/%.cpp $(SOURCE_PATH)/%.h
 #	$(CC) -c $< -o $@ $(CFLAGS)
 
-# è¿™ä¸€ç±»æºæ–‡ä»¶æ²¡æœ‰å¤´æ–‡ä»¶ï¼Œç›´æ¥ç¼–è¯‘
+# ÕâÒ»ÀàÔ´ÎÄ¼şÃ»ÓĞÍ·ÎÄ¼ş£¬Ö±½Ó±àÒë
 #$(EXTRAOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp
 #	$(CC) -c $< -o $@ $(CFLAGS)
 
-# å…¶å®æˆ‘ä¸ªäººè§‰å¾—ï¼ŒæŠŠnasmçš„å†…ç½®æŒ‡ä»¤incbinç”¨å¥½äº†å½“èµ„æºè¡¨ç”¨æ˜¯ç›¸å½“å¯è¡Œçš„ï¼Œç†è®ºä¸Šåªè¦ä¸ä¹±åŠ æ±‡ç¼–ä»£ç è·¨å¹³å°æ˜¯æ²¡é—®é¢˜çš„
-# é‡‡ç”¨nasmçš„è¯ï¼Œres.hé‡Œé¢å°±ä¸æ˜¯å„ç§idäº†ï¼Œè€Œæ˜¯ä¸€å †extern char[0]ï¼ŒæŒ‡å‘èµ„æºæ•°æ®çš„æŒ‡é’ˆï¼Œå€ŸåŠ©äº†ç¬¦å·é“¾æ¥çš„åŠŸèƒ½
+# ÆäÊµÎÒ¸öÈË¾õµÃ£¬°ÑnasmµÄÄÚÖÃÖ¸ÁîincbinÓÃºÃÁËµ±×ÊÔ´±íÓÃÊÇÏàµ±¿ÉĞĞµÄ£¬ÀíÂÛÉÏÖ»Òª²»ÂÒ¼Ó»ã±à´úÂë¿çÆ½Ì¨ÊÇÃ»ÎÊÌâµÄ
+# ²ÉÓÃnasmµÄ»°£¬res.hÀïÃæ¾Í²»ÊÇ¸÷ÖÖidÁË£¬¶øÊÇÒ»¶Ñextern char[0]£¬Ö¸Ïò×ÊÔ´Êı¾İµÄÖ¸Õë£¬½èÖúÁË·ûºÅÁ´½ÓµÄ¹¦ÄÜ
 $(RESOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.rc
 	$(RES) -i $< -o $@
 
 OBJDIRS		:= $(sort $(shell $(DIRNAME) $(ALLOBJ)))
-# æœ‰ä¸€äº›ç›®å½•ä¼šå¥—å¤šå±‚ï¼Œå…¶ä¸­é—´æ²¡æœ‰æ–‡ä»¶
+# ÓĞÒ»Ğ©Ä¿Â¼»áÌ×¶à²ã£¬ÆäÖĞ¼äÃ»ÓĞÎÄ¼ş
 OBJDIRS 	:= $(sort $(OBJDIRS) $(shell $(DIRNAME) $(OBJDIRS)))
 OBJDIRS 	:= $(sort $(OBJDIRS) $(shell $(DIRNAME) $(OBJDIRS)))
 
 mkdir:
 	-$(MKDIR) $(OBJDIRS)
 
-# å½“å‰åˆ†æ”¯
+# µ±Ç°·ÖÖ§
 BRANCH		= master-2.0
-# æäº¤ä¿¡æ¯
+# Ìá½»ĞÅÏ¢
 COMMITMSG	= "update"
-# åˆå¹¶åˆ†æ”¯æ—¶çš„ç›®æ ‡åˆ†æ”¯
+# ºÏ²¢·ÖÖ§Ê±µÄÄ¿±ê·ÖÖ§
 MERGE 		= master-2.0
 
-# ä¸€é”®æäº¤ä»£ç 
+# Ò»¼üÌá½»´úÂë
 commit:
 	$(GIT) checkout $(BRANCH)
 	$(GIT) commit -a -m $(COMMITMSG)
 	$(GIT) push -u origin $(BRANCH)
 
-# ä¸€é”®åˆå¹¶åˆ†æ”¯
+# Ò»¼üºÏ²¢·ÖÖ§
 merge:
 	$(GIT) checkout $(MERGE)
 	$(GIT) pull origin $(MERGE)
@@ -218,15 +219,15 @@ merge:
 	$(GIT) push origin $(MERGE)
 	$(GIT) checkout $(BRANCH)
 
-# git log æ—¥å¿— ('q'é€€å‡º)
-# git reflog å†å²æ“ä½œæ—¥å¿— (åŒ…å«å›é€€æ“ä½œ)('q'é€€å‡º)
-# git reset --hard HEAD^ å›é€€åˆ°ä¸Šä¸€ç‰ˆæœ¬
-# git reset --hard id (id åœ¨ git reflog é‡Œï¼Œç”¨äºæ’¤é”€)
+# git log ÈÕÖ¾ ('q'ÍË³ö)
+# git reflog ÀúÊ·²Ù×÷ÈÕÖ¾ (°üº¬»ØÍË²Ù×÷)('q'ÍË³ö)
+# git reset --hard HEAD^ »ØÍËµ½ÉÏÒ»°æ±¾
+# git reset --hard id (id ÔÚ git reflog Àï£¬ÓÃÓÚ³·Ïú)
 
-# åˆ é™¤æŸä¸ªæ–‡ä»¶çš„æ‰€æœ‰å†å²
+# É¾³ıÄ³¸öÎÄ¼şµÄËùÓĞÀúÊ·
 # git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch ${file}' --prune-empty --tag-name-filter cat -- --all
 
-# åˆ é™¤ä»“åº“ç¼“å†²
+# É¾³ı²Ö¿â»º³å
 # rm -rf .git/refs/original/
 # git reflog expire --expire=now --all
 # git gc --prune=now
@@ -239,7 +240,7 @@ sign: $(OUTPUT)
 
 cleanall: clean cleandep
 
-# ä¸å†åŠ¨çš„éƒ¨åˆ†
+# ²»ÔÙ¶¯µÄ²¿·Ö
 FIXED_OBJ 	:= util/physics3d
 FIXED_OBJ 	:= $(addprefix $(SOURCE_PATH)/, $(FIXED_OBJ))
 FIXED_OBJ 	:= $(call rwildcard, $(FIXED_OBJ), *.cpp)
@@ -251,18 +252,18 @@ clean:
 cleandep:
 	-$(RM) $(DEPFILES)
 
-# glslc <file> --target-spv=spv1.0 [-x glsl/hlsl] -o <out> ç¼–è¯‘GLSL/HLSLä¸ºSPIR-V
+# glslc <file> --target-spv=spv1.0 [-x glsl/hlsl] -o <out> ±àÒëGLSL/HLSLÎªSPIR-V
 # dxc -T {stage}[[ps/vs/gs/hs/ds/cs/lib/ms]_6_[0-7]] <file> -E <entry> -I <include> [-spirv]
 # spirv-as <file> -o <out> --target-env [spv1.[0-5]|vulkan1.[0-2]|opencl[1.2/2.[0-2]][embedded]|opengl4.[0,1,2,3,5]|vulkan1.1spv1.4]
-# spirv-dis <file> -o <out> åæ±‡ç¼–SPIR-V
-# spirv-cross SPIR-V <file> [--es/--hlsl/--msl/--vulkan-semantics(-V)/--reflect/--cpp] --output <out> äº¤å‰ç¼–è¯‘SPIR-Vä¸ºGLSL/ESSL/HLSL/MSL/JSONåå°„/C++
+# spirv-dis <file> -o <out> ·´»ã±àSPIR-V
+# spirv-cross SPIR-V <file> [--es/--hlsl/--msl/--vulkan-semantics(-V)/--reflect/--cpp] --output <out> ½»²æ±àÒëSPIR-VÎªGLSL/ESSL/HLSL/MSL/JSON·´Éä/C++
 
-# æµ‹è¯•
+# ²âÊÔ
 .PHONY: dllboot plugin physics
 
-# åé¢çš„æµ‹è¯•å¦‚æœåªé“¾æ¥ä¸€ä¸ªç±»çš„.oæ–‡ä»¶ï¼Œincludeå¯¹åº”çš„.hï¼ŒåŠ ä¸Šå¯åŠ¨æµ‹è¯•ä»£ç ï¼Œä¸å°±æ˜¯å•å…ƒæµ‹è¯•äº†ä¹ˆ
+# ºóÃæµÄ²âÊÔÈç¹ûÖ»Á´½ÓÒ»¸öÀàµÄ.oÎÄ¼ş£¬include¶ÔÓ¦µÄ.h£¬¼ÓÉÏÆô¶¯²âÊÔ´úÂë£¬²»¾ÍÊÇµ¥Ôª²âÊÔÁËÃ´
 
-# ç¬¬ä¸€ä¸ªæµ‹è¯•ï¼Œå°†æ•´ä¸ªç¨‹åºå½“æˆåº“ä½¿ç”¨å¹¶å¯åŠ¨
+# µÚÒ»¸ö²âÊÔ£¬½«Õû¸ö³ÌĞòµ±³É¿âÊ¹ÓÃ²¢Æô¶¯
 dllboot: $(OUTPUTDLIB)
 	$(CC) $(TEST_PATH)/$@/boot.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)/$@/boot.exe
 	$(TEST_PATH)/$@/boot.exe

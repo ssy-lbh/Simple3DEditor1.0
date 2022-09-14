@@ -2,8 +2,6 @@
 
 #include <lib/glew/gl/glew.h>
 
-#include <exception>
-
 #include <main.h>
 #include <util/gl/GLSimplified.h>
 #include <util/gl/GLUtils.h>
@@ -17,6 +15,8 @@
 #include <editor/object/GUIObject.h>
 
 namespace simple3deditor {
+
+OBJECT_INFO_DECL(simple3deditor::GUIMeshObject, L"GUI网格体");
 
 GUIMeshObject::GUIMeshObject() : GUIManagerObject(L"GUIMesh", ViewObjectType::OBJECT_GUI_MESH) {
     mesh = new Mesh(this);
@@ -57,6 +57,8 @@ void GUIMeshObject::OnSelect(Point3 ori, Vector3 dir){
     case SelectionType::SELECT_EDGES:
         mesh->OnSelectEdge(ori, dir, Main::data->selEdges);
         break;
+    default:
+        break;
     }
 }
 
@@ -64,6 +66,8 @@ void GUIMeshObject::OnSelect(const SelectInfo* info){
     switch (Main::data->selType){
     case SelectionType::SELECT_VERTICES:
         mesh->FindScreenRect(info, transform.chainMat, Main::data->selPoints);
+        break;
+    default:
         break;
     }
 }

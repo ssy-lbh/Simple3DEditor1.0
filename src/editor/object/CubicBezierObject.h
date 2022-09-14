@@ -13,6 +13,8 @@ private:
     Vertex v[4];
 
 public:
+    OBJECT_INFO_DEF();
+
     CubicBezierObject();
     virtual ~CubicBezierObject() override;
 

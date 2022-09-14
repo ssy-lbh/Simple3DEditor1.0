@@ -16,6 +16,8 @@ protected:
     AGUIObject(WString name, ViewObjectType type);
 
 public:
+    OBJECT_INFO_DEF();
+
     AGUIObject();
     AGUIObject(const wchar_t* name);
     AGUIObject(WString name);

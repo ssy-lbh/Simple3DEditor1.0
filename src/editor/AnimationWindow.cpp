@@ -12,6 +12,8 @@
 #include <editor/main/ViewObject.h>
 #include <editor/gui/AnimationCurve.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
 
 class AnimationWindow::FrameIndicator : public IButton {
@@ -123,6 +125,8 @@ public:
         }
     }
 };
+
+WINDOW_INFO_DECL(simple3deditor::AnimationWindow, L"动画控制器");
 
 AnimationWindow::AnimationWindow(){
     DebugLog("AnimationWindow Launched");
@@ -282,11 +286,11 @@ void AnimationWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void AnimationWindow::Serialize(json& o){
+void AnimationWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 
-void AnimationWindow::Deserialize(json& o){}
+void AnimationWindow::Deserialize(nlohmann::json& o){}
 
 void AnimationWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);

@@ -45,8 +45,8 @@ class DefaultAllocator : public MemoryAllocator {
         /// Destructor
         virtual ~DefaultAllocator() override = default;
 
-        /// Assignment operator
-        DefaultAllocator& operator=(DefaultAllocator& allocator) = default;
+        /// Assignment operator (default is deleted)
+        //DefaultAllocator& operator=(DefaultAllocator& allocator) = default;
 
         /// Allocate memory of a given size (in bytes) and return a pointer to the
         /// allocated memory.

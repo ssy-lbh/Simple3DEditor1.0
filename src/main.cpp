@@ -30,6 +30,8 @@
 
 #include <fstream>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
 
 LocalData::LocalData(){
@@ -43,7 +45,7 @@ LocalData* LocalData::GetLocalInst(){
 }
 
 void LocalData::UpdateCursor(int x, int y){
-    // ÂùêÊ†áÂèçËΩ¨
+    // ◊¯±Í∑¥◊™
     cursorPos.x = 2.0f * x / cliSize.x - 1.0f;
     cursorPos.y = 1.0f - 2.0f * y / cliSize.y;
     if (menu)
@@ -132,10 +134,12 @@ void LocalData::OnMenuAccel(int id, bool accel){
             break;
         }
         try {
-            json o;
+            nlohmann::json o;
             std::ofstream f(file.GetString());
-            AppFrame::GetLocalInst()->GetMainFrame()->Serialize(o);
-            // jsonÊñá‰ª∂ÁöÑÁº©ËøõÂ§ßÂ∞è
+            AppFrame::GetLocalInst()->GetMainFrame()->Serialize(o["windows"]);
+            Main::data->scene->Serialize(o["objects"]["scene"]);
+            Main::data->screen->Serialize(o["objects"]["screen"]);
+            // jsonŒƒº˛µƒÀıΩ¯¥Û–°
             f.width(2);
             f << o;
             f.close();
@@ -153,14 +157,27 @@ void LocalData::OnMenuAccel(int id, bool accel){
         }
         try {
             std::ifstream f(file.GetString());
-            json o = json::parse(f, nullptr, false, true);
+            nlohmann::json o = nlohmann::json::parse(f, nullptr, false, true);
+            nlohmann::json sub;
             if (!o.is_discarded()){
-                AWindow* window = Main::data->ConstructWindow(o);
-                if (window){
-                    dynamic_cast<SelectionWindow*>(AppFrame::GetLocalInst()->GetMainFrame())
-                        ->SetWindow(window);
-                } else {
-                    DebugError("Workspace File Is Broken");
+                if ((sub = o["windows"]).is_object()){
+                    AWindow* window = Main::data->ConstructWindow(sub);
+                    if (window){
+                        dynamic_cast<SelectionWindow*>(AppFrame::GetLocalInst()->GetMainFrame())
+                            ->SetWindow(window);
+                    } else {
+                        DebugError("Workspace File [windows] Is Broken");
+                    }
+                }
+                if ((sub = o["objects"]).is_object()){
+                    AViewObject* scene = Main::data->ConstructObject(sub["scene"]);
+                    AViewObject* screen = Main::data->ConstructObject(sub["screen"]);
+                    if (scene == NULL || screen == NULL){
+                        DebugError("Workspace File [objects] Is Broken");
+                    }else{
+                        Main::data->scene = scene;
+                        Main::data->screen = screen;
+                    }
                 }
             }
             f.close();
@@ -216,10 +233,11 @@ void LocalData::DestoryCamera(){
     camera = NULL;
 }
 
-GlobalData::GlobalData(){
-    scene = new AViewObject(L"Scene");
-    screen = new AViewObject(L"Screen");
+// …Ë÷√–≈œ¢
+static nlohmann::json settings;
 
+GlobalData::GlobalData(){
+    // register windows
     RegisterWindow<AWindow>();
 
     RegisterWindow<LRContainer>();
@@ -237,6 +255,13 @@ GlobalData::GlobalData(){
     RegisterWindow<RenderWindow>();
     RegisterWindow<UVEditWindow>();
 
+    // register objects
+    //RegisterObject<AViewObject>();
+
+    scene = new AViewObject(L"Scene");
+    screen = new AViewObject(L"Screen");
+
+    // enable physics
     physicsCommon = new reactphysics3d::PhysicsCommon();
     physicsWorld = physicsCommon->createPhysicsWorld();
 }
@@ -245,6 +270,7 @@ GlobalData::~GlobalData(){
     if (scene) delete scene;
     if (screen) delete screen;
     Free(windowReg);
+    Free(objectReg);
 
     physicsCommon->destroyPhysicsWorld(physicsWorld);
     delete physicsCommon;
@@ -303,6 +329,14 @@ void GlobalData::OnAnimationFrame(float frame){
     screen->OnAnimationFrame(frame);
 }
 
+void GlobalData::RegisterWindow(std::function<AWindow*()> factory, const char* id, const wchar_t* displayName){
+    WindowInfo* info = new WindowInfo;
+    info->factory = factory;
+    info->id = id;
+    info->displayName = displayName;
+    windowReg.Add(info);
+}
+
 AWindow* GlobalData::ConstructWindow(const char* id){
     WindowInfo* info = NULL;
     windowReg.Foreach([&](WindowInfo* item){
@@ -310,25 +344,45 @@ AWindow* GlobalData::ConstructWindow(const char* id){
             info = item;
     });
     if (!info){
-        DebugError("GlobalData::ParseWindow Unrecognized Window ID %s", id);
+        DebugError("GlobalData::ConstructWindow Unrecognized Window ID %s", id);
         return NULL;
     }
     return info->factory();
 }
 
-AWindow* GlobalData::ConstructWindow(json& o){
+AWindow* GlobalData::ConstructWindow(nlohmann::json& o){
     AWindow* window = ConstructWindow(o.value("id", std::string()).c_str());
     if (window)
         window->Deserialize(o);
     return window;
 }
 
+AViewObject* GlobalData::ConstructObject(const char* id){
+    ObjectInfo* info = NULL;
+    objectReg.Foreach([&](ObjectInfo* item){
+        if (!info && item->id == id)
+            info = item;
+    });
+    if (!info){
+        DebugError("GlobalData::ConstructObject Unrecognized Object ID %s", id);
+        return NULL;
+    }
+    return info->factory();
+}
+
+AViewObject* GlobalData::ConstructObject(nlohmann::json& o){
+    AViewObject* object = ConstructObject(o.value("id", std::string()).c_str());
+    if (object)
+        object->Deserialize(o);
+    return object;
+}
+
 void GlobalData::LoadSettings(const char* path){
     try {
         std::ifstream f(path);
-        settings = json::parse(f, nullptr, false, true);
+        settings = nlohmann::json::parse(f, nullptr, false, true);
         if (settings.is_discarded())
-            settings = json::object({});
+            settings = nlohmann::json::object({});
         f.close();
     }catch(std::exception e){
         DebugError("Exception [%s] At %s %s", e.what(), __FILE__, __LINE__);
@@ -336,7 +390,7 @@ void GlobalData::LoadSettings(const char* path){
 }
 
 void GlobalData::ApplySettings(){
-    json sub;
+    nlohmann::json sub;
     if (settings.contains("menu") && (sub = settings["menu"]).is_object()){
         Menu::WIDTH_PIXELS = sub.value("width", 250.0f);
         Menu::CORNER_PIXELS = sub.value("corner", 10.0f);
@@ -351,7 +405,7 @@ void GlobalData::ApplySettings(){
 void GlobalData::SaveSettings(const char* path){
     try {
         std::ofstream f(path);
-        // jsonÊñá‰ª∂ÁöÑÁº©ËøõÂ§ßÂ∞è
+        // jsonŒƒº˛µƒÀıΩ¯¥Û??
         f.width(2);
         f << settings;
         f.close();
@@ -541,7 +595,7 @@ int Main::MainEntry(int argc, char** argv){
 
     glEnableClientState(GL_VERTEX_ARRAY);
 
-    // ‰∏çÁü•ÈÅì‰∏∫‰ªÄ‰πàÔºåarial.ttfÊúÄÂ§ßÂÄºÂ≠óÁ¨¶‰∏∫0x6FF
+    // ≤ª÷™µ¿Œ™ ≤√¥£¨arial.ttf◊Ó¥Û÷µ◊÷∑˚Œ™0x6FF
     glFontSize(12);
 
     mainFrame->SetWindow(new MainWindow());
@@ -551,7 +605,7 @@ int Main::MainEntry(int argc, char** argv){
     appFrame->Show();
 
     localData->recTime = Time::GetTime();
-    localData->deltaTime = 0.0167f; // ‰∏Ä‰∏™60FPSÂ§ßÊ¶ÇÁöÑ‰º∞ÊµãÂÄºÔºå‰Ωú‰∏∫ÂêØÂä®Êó∂Èó¥Âç≥ÂèØ
+    localData->deltaTime = 0.0167f; // “ª??60FPS¥Û???µƒπ¿≤‚÷µ£¨◊˜Œ™??∂Ø ±º‰º¥??
 
     while (appFrame->WaitHandleEvent()){
         appFrame->Render();
@@ -561,10 +615,10 @@ int Main::MainEntry(int argc, char** argv){
         localData->deltaTime = time - localData->recTime;
         localData->recTime = time;
 
-        // Ëé´ÂêçÂÖ∂Â¶ôÁöÑÈóÆÈ¢ò
+        // ??√˚∆‰√Óµƒ????
         if (localData->deltaTime > 0.0f){
             data->physicsWorld->update(localData->deltaTime);
-            // ‰∏çÁü•ÈÅì‰∏∫‰ªÄ‰πàÔºåÊàëÁöÑÁîµËÑëÂºÄ‰∏ç‰∫ÜÂûÇÁõ¥ÂêåÊ≠•ÔºåÂè™ËÉΩÂá∫Ê≠§‰∏ãÁ≠ñ‰∫Ü
+            // ≤ª÷™µ¿Œ™ ≤√¥£¨Œ“µƒµÁƒ‘ø™≤ª¡À¥π÷±Õ¨???£¨??ƒ‹≥ˆ¥Àœ¬≤ﬂ¡À
             Time::Sleep(0.0167f - localData->deltaTime);
         }
     }

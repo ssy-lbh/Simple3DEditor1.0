@@ -134,8 +134,8 @@ class HeapAllocator : public MemoryAllocator {
         /// Destructor
         virtual ~HeapAllocator() override;
 
-        /// Assignment operator
-        HeapAllocator& operator=(HeapAllocator& allocator) = delete;
+        /// Assignment operator (default is deleted)
+        //HeapAllocator& operator=(HeapAllocator& allocator) = delete;
 
         /// Allocate memory of a given size (in bytes) and return a pointer to the
         /// allocated memory.

@@ -26,6 +26,8 @@
 #include <editor/main/ViewObject.h>
 #include <editor/object/AllObjects.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
 
 class MainWindow::MoveOperation : public IOperation {
@@ -666,6 +668,8 @@ public:
     }
 };
 
+WINDOW_INFO_DECL(simple3deditor::MainWindow, L"主窗口");
+
 MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Vector3::up, 5.0f) {
     DebugLog("MainWindow Launched");
 
@@ -725,7 +729,7 @@ MainWindow::MainWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f,
     objGUIMenu->AddItem(new MenuItem(L"竖进度条", [=]{ Main::AddObject(new VerticalProgressBar()); }));
     objectMenu->AddItem(new MenuItem(L"GUI", objGUIMenu));
 
-    objectMenu->AddItem(new MenuItem(L"音频收听者", [=]{ LocalData::GetLocalInst()->CreateAudioListener(); }));
+    objectMenu->AddItem(new MenuItem(L"音频收听器", [=]{ LocalData::GetLocalInst()->CreateAudioListener(); }));
     objectMenu->AddItem(new MenuItem(L"摄像机", [=]{ LocalData::GetLocalInst()->CreateCamera(); }));
     basicMenu->AddItem(new MenuItem(L"添加对象", objectMenu));
 
@@ -1136,23 +1140,23 @@ bool MainWindow::LoadMesh(AViewObject* obj, WString path){
             fileData[i] = '\0';
             if (fileData[filePtr] == '#'){
                 DebugLog("Object Annotation %s", fileData + filePtr + 1);
-            }else if (__builtin_sscanf(fileData + filePtr, "v %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
+            }else if (sscanf(fileData + filePtr, "v %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
                 vert.Add(mesh->AddVertex(vec));
-            }else if (__builtin_sscanf(fileData + filePtr, "vt %f %f", &vec.x, &vec.y) == 2){
+            }else if (sscanf(fileData + filePtr, "vt %f %f", &vec.x, &vec.y) == 2){
                 vertUV.Add(Vector2(vec.x, vec.y));
-            }else if (__builtin_sscanf(fileData + filePtr, "vn %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
+            }else if (sscanf(fileData + filePtr, "vn %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
                 vertNormal.Add(vec);
-            }else if (__builtin_sscanf(fileData + filePtr, "f %d/%d %d/%d %d/%d", &v1, &vt1, &v2, &vt2, &v3, &vt3) == 6){
+            }else if (sscanf(fileData + filePtr, "f %d/%d %d/%d %d/%d", &v1, &vt1, &v2, &vt2, &v3, &vt3) == 6){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
                 vert[v1 - 1]->uv = vertUV[vt1 - 1];
                 vert[v2 - 1]->uv = vertUV[vt2 - 1];
                 vert[v3 - 1]->uv = vertUV[vt3 - 1];
-            }else if (__builtin_sscanf(fileData + filePtr, "f %d//%d %d//%d %d//%d", &v1, &vn1, &v2, &vn2, &v3, &vn3) == 6){
+            }else if (sscanf(fileData + filePtr, "f %d//%d %d//%d %d//%d", &v1, &vn1, &v2, &vn2, &v3, &vn3) == 6){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
                 vert[v1 - 1]->normal = vertNormal[vn1 - 1];
                 vert[v2 - 1]->normal = vertNormal[vn2 - 1];
                 vert[v3 - 1]->normal = vertNormal[vn3 - 1];
-            }else if (__builtin_sscanf(fileData + filePtr, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3) == 9){
+            }else if (sscanf(fileData + filePtr, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3) == 9){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
                 vert[v1 - 1]->uv = vertUV[vt1 - 1];
                 vert[v2 - 1]->uv = vertUV[vt2 - 1];
@@ -1160,7 +1164,7 @@ bool MainWindow::LoadMesh(AViewObject* obj, WString path){
                 vert[v1 - 1]->normal = vertNormal[vn1 - 1];
                 vert[v2 - 1]->normal = vertNormal[vn2 - 1];
                 vert[v3 - 1]->normal = vertNormal[vn3 - 1];
-            }else if (__builtin_sscanf(fileData + filePtr, "f %d %d %d", &v1, &v2, &v3) == 3){
+            }else if (sscanf(fileData + filePtr, "f %d %d %d", &v1, &v2, &v3) == 3){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
             }else{
                 DebugError("Object File Unknown Line %s", fileData + filePtr);
@@ -1532,11 +1536,11 @@ void MainWindow::OnDropFileW(const wchar_t* path, uint len){
     LoadMesh(Main::data->curObject, path);
 }
 
-void MainWindow::Serialize(json& o){
+void MainWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 
-void MainWindow::Deserialize(json& o){}
+void MainWindow::Deserialize(nlohmann::json& o){}
 
 Point2 MainWindow::GetScreenPosition(Point3 pos){
     return CCamera::GetScreenPosition(pos, aspect);

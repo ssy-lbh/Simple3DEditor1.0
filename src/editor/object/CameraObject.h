@@ -14,6 +14,8 @@ private:
     Vertex lookAt;
 
 public:
+    OBJECT_INFO_DEF();
+
     CameraObject();
     virtual ~CameraObject() override;
 

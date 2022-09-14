@@ -8,6 +8,15 @@
 
 namespace simple3deditor {
 
+#define WINDOW_INFO_DEF()\
+    static const char* WINDOW_ID;\
+    static const wchar_t* WINDOW_DISPLAY_NAME
+
+//! 注意:暂定clazz必须是[所有namespace用'::'隔开]+[类名]严格区分，ID与符号表同步唯一
+#define WINDOW_INFO_DECL(clazz, displayName)\
+    const char* clazz::WINDOW_ID = #clazz;\
+    const wchar_t* clazz::WINDOW_DISPLAY_NAME = displayName
+
 class AWindow : public Object, public IMemorable {
 protected:
     bool focus = false;
@@ -22,15 +31,18 @@ protected:
     void UpdateWindowSize(int x, int y);
 
 public:
-    static constexpr const char* WINDOW_ID = "lbh.base.wnd";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+    WINDOW_INFO_DEF();
 
     AWindow();
     virtual ~AWindow();
 
     virtual bool IsFocus();
+    // 目前计划，实现一套可提交摄像机位置和帧缓存的全场渲染，实现阴影深度的采集
+    virtual void OnForwardRender();
     // 基于OpenGL的渲染，如果渲染全过程已做好抽象可换用API
     virtual void OnRender();
+    // 计划用于后期处理，例如MC的特殊特效
+    virtual void OnPostRender();
     virtual void OnTimer(int id);
     virtual void OnChar(char c);
     virtual void OnUnichar(wchar_t c);
@@ -48,10 +60,10 @@ public:
     virtual void OnDropFileA(const char* path, uint len);
     virtual void OnDropFileW(const wchar_t* path, uint len);
 
-    // 窗口序列化时应先os.WriteWithLen(WINDOW_ID)，这样才能在反序列化时识别窗口
-    virtual void Serialize(json& o) override;
+    // 窗口序列化时应先o["id"] = WINDOW_ID，这样才能在反序列化时识别窗口
+    virtual void Serialize(nlohmann::json& o) override;
     // 除了WINDOW_ID，其他数据按顺序依次读取就行
-    virtual void Deserialize(json& o) override;
+    virtual void Deserialize(nlohmann::json& o) override;
 };
 
 class AGUIWindow : public AWindow {
@@ -59,8 +71,7 @@ protected:
     GUIManagerObject* guiMgr;
 
 public:
-    static constexpr const char* WINDOW_ID = "lbh.base.guiwnd";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"";
+    WINDOW_INFO_DEF();
 
     AGUIWindow();
     virtual ~AGUIWindow() override;
@@ -74,7 +85,7 @@ public:
     virtual void OnRightDown(int x, int y) override;
     virtual void OnRightUp(int x, int y) override;
 
-    virtual void Serialize(json& o) override;
+    virtual void Serialize(nlohmann::json& o) override;
     using AWindow::Deserialize;
 };
 

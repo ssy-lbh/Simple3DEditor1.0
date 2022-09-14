@@ -23,7 +23,11 @@
 #include <editor/object/AudioSourceObject.h>
 #include <editor/object/GUIManagerObject.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
+
+WINDOW_INFO_DECL(simple3deditor::AudioPlayerWindow, L"音频播放器");
 
 AudioPlayerWindow::AudioPlayerWindow() : CAudioSourceLoader(source) {
     DebugLog("AudioPlayerWindow Launched");
@@ -340,11 +344,11 @@ void AudioPlayerWindow::OnDropFileW(const wchar_t* path, uint len){
     PreloadFile(file);
 }
 
-void AudioPlayerWindow::Serialize(json& o){
+void AudioPlayerWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 
-void AudioPlayerWindow::Deserialize(json& o){}
+void AudioPlayerWindow::Deserialize(nlohmann::json& o){}
 
 void AudioPlayerWindow::OnInsLoad(){
     // 暂不使用 L"PCM音频文件(*.wav)\0*.wav\0所有音频类型(.*)\0*.*\0"，此状态下发现Shell时可能的环境错误

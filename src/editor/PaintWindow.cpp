@@ -13,6 +13,8 @@
 #include <util/gl/GLFrameBuffer.h>
 #include <util/gl/GLComputeProgram.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
 
 class PaintWindow::ClearBrush : public ITool {
@@ -168,6 +170,8 @@ public:
     }
 };
 
+WINDOW_INFO_DECL(simple3deditor::PaintWindow, L"绘画窗口");
+
 PaintWindow::PaintWindow(){
     DebugLog("PaintWindow Launched");
     basicMenu = new Menu();
@@ -314,11 +318,11 @@ void PaintWindow::OnMenuAccel(int id, bool accel){
         brush->OnCommand(id);
 }
 
-void PaintWindow::Serialize(json& o){
+void PaintWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 
-void PaintWindow::Deserialize(json& o){}
+void PaintWindow::Deserialize(nlohmann::json& o){}
 
 void PaintWindow::UpdateCursor(int x, int y){
     AWindow::UpdateCursor(x, y);

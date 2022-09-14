@@ -17,7 +17,11 @@
 #include <editor/main/ViewObject.h>
 #include <editor/object/GUIManagerObject.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
+
+WINDOW_INFO_DECL(simple3deditor::RenderWindow, L"渲染窗口");
 
 RenderWindow::RenderWindow() : CCamera(Point3(0.0f, -5.0f, 1.0f), Point3(0.0f, 0.0f, 1.0f), Vector3::up, 5.0f) {
     DebugLog("RenderWindow Launched");
@@ -156,11 +160,11 @@ void RenderWindow::OnDropFileA(const char* path, uint len){}
 
 void RenderWindow::OnDropFileW(const wchar_t* path, uint len){}
 
-void RenderWindow::Serialize(json& o){
+void RenderWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 
-void RenderWindow::Deserialize(json& o){}
+void RenderWindow::Deserialize(nlohmann::json& o){}
 
 void RenderWindow::OnInsSave(){
     static const WString filter = Resource::GetWString(IDS_PICFILE_FILTER);

@@ -68,8 +68,7 @@ protected:
     void InitCamera();
 
 public:
-    static constexpr const char* WINDOW_ID = "lbh.main";
-    static constexpr const wchar_t* WINDOW_DISPLAY_NAME = L"主窗口";
+    WINDOW_INFO_DEF();
 
     MainWindow();
     virtual ~MainWindow() override;
@@ -91,8 +90,8 @@ public:
     virtual void OnMenuAccel(int id, bool accel) override;
     virtual void OnDropFileW(const wchar_t* path, uint len) override;
 
-    virtual void Serialize(json& o) override;
-    virtual void Deserialize(json& o) override;
+    virtual void Serialize(nlohmann::json& o) override;
+    virtual void Deserialize(nlohmann::json& o) override;
 
     void OnInsSave();
     void OnInsLoad();

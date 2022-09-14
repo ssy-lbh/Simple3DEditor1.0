@@ -86,8 +86,8 @@ class SingleFrameAllocator : public MemoryAllocator {
         /// Destructor
         virtual ~SingleFrameAllocator() override;
 
-        /// Assignment operator
-        SingleFrameAllocator& operator=(SingleFrameAllocator& allocator) = delete;
+        /// Assignment operator (default is deleted)
+        //SingleFrameAllocator& operator=(SingleFrameAllocator& allocator) = delete;
 
         /// Allocate memory of a given size (in bytes)
         virtual void* allocate(size_t size) override;

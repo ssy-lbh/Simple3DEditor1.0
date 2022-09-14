@@ -13,7 +13,11 @@
 #include <editor/object/AllObjects.h>
 #include <editor/windows/AllWindows.h>
 
+#include <lib/json/nlohmann/json.hpp>
+
 namespace simple3deditor {
+
+WINDOW_INFO_DECL(simple3deditor::TreeWindow, L"树形图");
 
 TreeWindow::TreeWindow(){
     DebugLog("TreeWindow Launched");
@@ -41,7 +45,7 @@ TreeWindow::TreeWindow(){
     windowsMenu->AddItem(new MenuItem(L"树形图", [=]{ this->AddObject(new TreeWindowObject()); }));
     objectMenu->AddItem(new MenuItem(L"窗口", windowsMenu));
 
-    objectMenu->AddItem(new MenuItem(L"音频收听者", [=]{ LocalData::GetLocalInst()->CreateAudioListener(); }));
+    objectMenu->AddItem(new MenuItem(L"音频收听器", [=]{ LocalData::GetLocalInst()->CreateAudioListener(); }));
     objectMenu->AddItem(new MenuItem(L"摄像机", [=]{ LocalData::GetLocalInst()->CreateCamera(); }));
     basicMenu->AddItem(new MenuItem(L"添加对象", objectMenu));
 
@@ -235,10 +239,10 @@ void TreeWindow::OnMenuAccel(int id, bool accel){
     }
 }
 
-void TreeWindow::Serialize(json& o){
+void TreeWindow::Serialize(nlohmann::json& o){
     o["id"] = WINDOW_ID;
 }
 
-void TreeWindow::Deserialize(json& o){}
+void TreeWindow::Deserialize(nlohmann::json& o){}
 
 }

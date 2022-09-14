@@ -14,6 +14,8 @@ private:
     bool dopplerEffect = true;
 
 public:
+    OBJECT_INFO_DEF();
+
     AudioListenerObject();
     virtual ~AudioListenerObject() override;
 

@@ -112,11 +112,11 @@ class ContactManifold {
         /// Destructor
         ~ContactManifold();
 
-        /// Copy-constructor
-        ContactManifold(const ContactManifold& contactManifold) = default;
+        /// Copy-constructor (default is deleted)
+        //ContactManifold(const ContactManifold& contactManifold) = default;
 
-        /// Assignment operator
-        ContactManifold& operator=(const ContactManifold& contactManifold) = default;
+        /// Assignment operator (default is deleted)
+        //ContactManifold& operator=(const ContactManifold& contactManifold) = default;
 
         // -------------------- Friendship -------------------- //
 
