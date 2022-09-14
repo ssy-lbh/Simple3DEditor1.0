@@ -21,7 +21,7 @@ private:
 
     bool lightEnabled = false;
     bool audioControl = true;
-    bool dopplerEffect = true;
+    bool dopplerEffect = false;
 
     float camRange = 100.0f;
 

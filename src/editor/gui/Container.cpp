@@ -28,8 +28,7 @@ namespace simple3deditor {
 AContainer::AContainer(){}
 AContainer::AContainer(SelectionWindow* selWindow) : selWindow(selWindow) {}
 
-const char* LRContainer::WINDOW_ID = "lbh.cont.lr";
-const wchar_t* LRContainer::WINDOW_DISPLAY_NAME = L"";
+WINDOW_INFO_DECL(simple3deditor::LRContainer, L"");
 
 LRContainer::LRContainer() : lWindow(nullptr), rWindow(nullptr) {
     cliSize = INIT_SIZE;
@@ -292,8 +291,7 @@ bool LRContainer::DragEnabled(){
     return dragEnable;
 }
 
-const char* UDContainer::WINDOW_ID = "lbh.cont.ud";
-const wchar_t* UDContainer::WINDOW_DISPLAY_NAME = L"";
+WINDOW_INFO_DECL(simple3deditor::UDContainer, L"");
 
 UDContainer::UDContainer() : uWindow(nullptr), dWindow(nullptr) {
     cliSize = INIT_SIZE;
@@ -555,8 +553,7 @@ bool UDContainer::DragEnabled(){
     return dragEnable;
 }
 
-const char* SelectionWindow::WINDOW_ID = "lbh.cont.sel";
-const wchar_t* SelectionWindow::WINDOW_DISPLAY_NAME = L"";
+WINDOW_INFO_DECL(simple3deditor::SelectionWindow, L"");
 
 SelectionWindow::SelectionWindow() : curWindow(nullptr) {
     DebugLog("SelectionWindow %p Created", this);

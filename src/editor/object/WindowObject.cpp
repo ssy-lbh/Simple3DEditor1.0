@@ -2,6 +2,7 @@
 
 namespace simple3deditor {
 
+// 主要用于继承
 OBJECT_INFO_DECL(simple3deditor::AWindowObject, L"");
 
 AWindowObject::AWindowObject() : AGUIObject(L"Window", ViewObjectType::OBJECT_WINDOW) {}

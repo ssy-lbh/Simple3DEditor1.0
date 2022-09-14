@@ -41,6 +41,25 @@ OBJECT_INFO_DECL(simple3deditor::AudioSourceObject, L"");
 
 static const int REPLAY_ERROR = 4000;
 
+AudioSourceObject::AudioSourceObject() {
+    alGenSources(1, &alSrc);
+    alGenBuffers(1, &alBuf);
+
+    alSourcef(alSrc, AL_REFERENCE_DISTANCE, 1.0f);
+    alSourcef(alSrc, AL_ROLLOFF_FACTOR, 2.0f);
+    alSourcef(alSrc, AL_MAX_DISTANCE, 100.0f);
+
+    alSampleSize = 0;
+    alChannels = 0;
+    alAudioData = 0;
+    alAudioSize = 0;
+    alAudioLen = 0;
+    alAudioFreq = 0;
+    alAudioOffset = 0;
+
+    recPos = Point3::zero;
+}
+
 AudioSourceObject::AudioSourceObject(uenum format, char* data, int size, int freq) : AViewObject(L"AudioSource", ViewObjectType::OBJECT_AUDIO_SOURCE) {
     alGenSources(1, &alSrc);
     alGenBuffers(1, &alBuf);

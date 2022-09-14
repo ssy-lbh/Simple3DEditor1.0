@@ -1,32 +1,16 @@
 {
-  "id": "lbh.cont.sel",
-  "window": {
-    "div rate": 0.5,
-    "id": "lbh.cont.lr",
-    "left window": {
-      "id": "lbh.cont.sel",
-      "window": {
-        "id": "lbh.main"
-      }
+  "objects": {
+    "scene": {
+      "id": "simple3deditor::AViewObject"
     },
-    "right window": {
-      "id": "lbh.cont.sel",
-      "window": {
-        "div rate": 0.5006935000419617,
-        "down window": {
-          "id": "lbh.cont.sel",
-          "window": {
-            "id": "lbh.tree"
-          }
-        },
-        "id": "lbh.cont.ud",
-        "up window": {
-          "id": "lbh.cont.sel",
-          "window": {
-            "id": "lbh.audioplay"
-          }
-        }
-      }
+    "screen": {
+      "id": "simple3deditor::AViewObject"
+    }
+  },
+  "windows": {
+    "id": "simple3deditor::SelectionWindow",
+    "window": {
+      "id": "simple3deditor::MainWindow"
     }
   }
 }

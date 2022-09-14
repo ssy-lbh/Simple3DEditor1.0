@@ -289,8 +289,24 @@ void AViewObject::OnAnimationFrame(float frame){
 
 void AViewObject::Serialize(nlohmann::json& o){
     o["id"] = OBJECT_ID;
+    o["name"] = String(name).GetString();
+    nlohmann::json ch = nlohmann::json::array();
+    size_t len = children.Size();
+    for (size_t i = 0; i < len; i++){
+        nlohmann::json o;
+        children[i]->Serialize(o);
+        ch.push_back(o);
+    }
+    o["children"] = ch;
 }
 
-void AViewObject::Deserialize(nlohmann::json& o){}
+void AViewObject::Deserialize(nlohmann::json& o){
+    name = String(o.value("name", "object").c_str());
+    nlohmann::json ch = o["children"];
+    if (ch.is_array()){
+        for (int i = 0; ch[i].is_null() == false; i++)
+            AddChild(Main::data->ConstructObject(ch[i]));
+    }
+}
 
 }

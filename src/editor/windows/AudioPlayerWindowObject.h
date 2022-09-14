@@ -5,17 +5,9 @@
 
 #include <editor/object/WindowObject.h>
 #include <editor/object/AudioSourceObject.h>
+#include <editor/AudioPlayerWindow.h>
 
 namespace simple3deditor {
-
-struct AudioWaveFormat {
-    short wFormatTag;
-    short nChannels;
-    int nSamplesPerSec;
-    int nAvgBytesPerSec;
-    short nBlockAlign;
-    short wBitsPerSample;
-};
 
 class AudioPlayerWindowObject final : public AWindowObject, public CAudioSourceLoader {
 private:

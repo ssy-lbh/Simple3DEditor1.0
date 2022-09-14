@@ -18,11 +18,8 @@
 #include <editor/gui/Container.h>
 #include <editor/gui/Menu.h>
 #include <editor/dialog/Tips.h>
-#include <editor/main/ViewObject.h>
-#include <editor/object/MeshObject.h>
-#include <editor/object/GUIMeshObject.h>
-#include <editor/object/CameraObject.h>
-#include <editor/object/AudioListenerObject.h>
+#include <editor/object/AllObjects.h>
+#include <editor/windows/AllWindows.h>
 
 #ifdef PLATFORM_WINDOWS
 #include <util/os/System.h>
@@ -239,6 +236,7 @@ static nlohmann::json settings;
 GlobalData::GlobalData(){
     // register windows
     RegisterWindow<AWindow>();
+    RegisterWindow<AGUIWindow>();
 
     RegisterWindow<LRContainer>();
     RegisterWindow<UDContainer>();
@@ -256,7 +254,22 @@ GlobalData::GlobalData(){
     RegisterWindow<UVEditWindow>();
 
     // register objects
-    //RegisterObject<AViewObject>();
+    RegisterObject<AViewObject>();
+    RegisterObject<AGUIObject>();
+    RegisterObject<AWindowObject>();
+
+    RegisterObject<AudioListenerObject>();
+    RegisterObject<AudioSourceObject>();
+    RegisterObject<CameraObject>();
+    RegisterObject<CubicBezierObject>();
+    RegisterObject<GUIManagerObject>();
+    RegisterObject<GUIMeshObject>();
+    RegisterObject<MeshObject>();
+    RegisterObject<PointLightObject>();
+    RegisterObject<SquareBezierObject>();
+
+    RegisterObject<AudioPlayerWindowObject>();
+    RegisterObject<TreeWindowObject>();
 
     scene = new AViewObject(L"Scene");
     screen = new AViewObject(L"Screen");
