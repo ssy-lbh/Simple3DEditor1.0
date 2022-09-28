@@ -1,0 +1,40 @@
+#include <metal_stdlib>
+#include <simd/simd.h>
+
+using namespace metal;
+
+struct type_Globals
+{
+    float4 vClr;
+    float4x4 mWld1;
+    float4x4 mWld2;
+    float4x4 mWld3;
+    float4x4 mWld4;
+    float Len;
+    float4 vLight;
+    float4x4 mTot;
+};
+
+struct vert_main_out
+{
+    float4 out_var_POSITION [[user(locn0)]];
+    float4 out_var_COLOR [[user(locn1)]];
+    float4 gl_Position [[position]];
+};
+
+struct vert_main_in
+{
+    float4 in_var_POSITION [[attribute(0)]];
+    float3 in_var_NORMAL [[attribute(1)]];
+    float4 in_var_BLENDWEIGHT [[attribute(2)]];
+};
+
+vertex vert_main_out vert_main(vert_main_in in [[stage_in]], constant type_Globals& _Globals [[buffer(0)]])
+{
+    vert_main_out out = {};
+    float3 _110 = ((((float3x3(float4(_Globals.mWld1[0][0], _Globals.mWld1[1][0], _Globals.mWld1[2][0], _Globals.mWld1[3][0]).xyz, float4(_Globals.mWld1[0][1], _Globals.mWld1[1][1], _Globals.mWld1[2][1], _Globals.mWld1[3][1]).xyz, float4(_Globals.mWld1[0][2], _Globals.mWld1[1][2], _Globals.mWld1[2][2], _Globals.mWld1[3][2]).xyz) * in.in_var_NORMAL) * in.in_var_BLENDWEIGHT.x) + ((float3x3(float4(_Globals.mWld2[0][0], _Globals.mWld2[1][0], _Globals.mWld2[2][0], _Globals.mWld2[3][0]).xyz, float4(_Globals.mWld2[0][1], _Globals.mWld2[1][1], _Globals.mWld2[2][1], _Globals.mWld2[3][1]).xyz, float4(_Globals.mWld2[0][2], _Globals.mWld2[1][2], _Globals.mWld2[2][2], _Globals.mWld2[3][2]).xyz) * in.in_var_NORMAL) * in.in_var_BLENDWEIGHT.y)) + ((float3x3(float4(_Globals.mWld3[0][0], _Globals.mWld3[1][0], _Globals.mWld3[2][0], _Globals.mWld3[3][0]).xyz, float4(_Globals.mWld3[0][1], _Globals.mWld3[1][1], _Globals.mWld3[2][1], _Globals.mWld3[3][1]).xyz, float4(_Globals.mWld3[0][2], _Globals.mWld3[1][2], _Globals.mWld3[2][2], _Globals.mWld3[3][2]).xyz) * in.in_var_NORMAL) * in.in_var_BLENDWEIGHT.z)) + ((float3x3(float4(_Globals.mWld4[0][0], _Globals.mWld4[1][0], _Globals.mWld4[2][0], _Globals.mWld4[3][0]).xyz, float4(_Globals.mWld4[0][1], _Globals.mWld4[1][1], _Globals.mWld4[2][1], _Globals.mWld4[3][1]).xyz, float4(_Globals.mWld4[0][2], _Globals.mWld4[1][2], _Globals.mWld4[2][2], _Globals.mWld4[3][2]).xyz) * in.in_var_NORMAL) * in.in_var_BLENDWEIGHT.w);
+    out.out_var_POSITION = float4((((((float4x3(float4(_Globals.mWld1[0][0], _Globals.mWld1[1][0], _Globals.mWld1[2][0], _Globals.mWld1[3][0]).xyz, float4(_Globals.mWld1[0][1], _Globals.mWld1[1][1], _Globals.mWld1[2][1], _Globals.mWld1[3][1]).xyz, float4(_Globals.mWld1[0][2], _Globals.mWld1[1][2], _Globals.mWld1[2][2], _Globals.mWld1[3][2]).xyz, float4(_Globals.mWld1[0][3], _Globals.mWld1[1][3], _Globals.mWld1[2][3], _Globals.mWld1[3][3]).xyz) * in.in_var_POSITION) * in.in_var_BLENDWEIGHT.x) + ((float4x3(float4(_Globals.mWld2[0][0], _Globals.mWld2[1][0], _Globals.mWld2[2][0], _Globals.mWld2[3][0]).xyz, float4(_Globals.mWld2[0][1], _Globals.mWld2[1][1], _Globals.mWld2[2][1], _Globals.mWld2[3][1]).xyz, float4(_Globals.mWld2[0][2], _Globals.mWld2[1][2], _Globals.mWld2[2][2], _Globals.mWld2[3][2]).xyz, float4(_Globals.mWld2[0][3], _Globals.mWld2[1][3], _Globals.mWld2[2][3], _Globals.mWld2[3][3]).xyz) * in.in_var_POSITION) * in.in_var_BLENDWEIGHT.y)) + ((float4x3(float4(_Globals.mWld3[0][0], _Globals.mWld3[1][0], _Globals.mWld3[2][0], _Globals.mWld3[3][0]).xyz, float4(_Globals.mWld3[0][1], _Globals.mWld3[1][1], _Globals.mWld3[2][1], _Globals.mWld3[3][1]).xyz, float4(_Globals.mWld3[0][2], _Globals.mWld3[1][2], _Globals.mWld3[2][2], _Globals.mWld3[3][2]).xyz, float4(_Globals.mWld3[0][3], _Globals.mWld3[1][3], _Globals.mWld3[2][3], _Globals.mWld3[3][3]).xyz) * in.in_var_POSITION) * in.in_var_BLENDWEIGHT.z)) + ((float4x3(float4(_Globals.mWld4[0][0], _Globals.mWld4[1][0], _Globals.mWld4[2][0], _Globals.mWld4[3][0]).xyz, float4(_Globals.mWld4[0][1], _Globals.mWld4[1][1], _Globals.mWld4[2][1], _Globals.mWld4[3][1]).xyz, float4(_Globals.mWld4[0][2], _Globals.mWld4[1][2], _Globals.mWld4[2][2], _Globals.mWld4[3][2]).xyz, float4(_Globals.mWld4[0][3], _Globals.mWld4[1][3], _Globals.mWld4[2][3], _Globals.mWld4[3][3]).xyz) * in.in_var_POSITION) * in.in_var_BLENDWEIGHT.w)) + (_110 * _Globals.Len), 1.0) * _Globals.mTot;
+    out.out_var_COLOR = float4(dot(_Globals.vLight.xyz, _110));
+    return out;
+}
+

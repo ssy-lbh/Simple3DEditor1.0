@@ -1,76 +1,146 @@
 # Simple3DEditor Makefile
 # Author: lin-boheng@gitee.com
 
-# ä¾èµ–åº“:
+# ÒÀÀµ¿â:
 # OpenGL OpenAL stb_image SoundTouch FFmpeg
-# å¯èƒ½åŠ å…¥çš„ä¾èµ–åº“:
-# glfw glm glew FreeType "FBX SDK" OpenRL json-cpp ShaderConductor
-# ä»¥ååˆ›å»ºå‘è¡Œç‰ˆå¸¦ä¸Šglew32å’ŒOpenAL32çš„åŠ¨æ€åº“
+# ¿ÉÄÜ¼ÓÈëµÄÒÀÀµ¿â:
+# glfw glm glew FreeType "FBX SDK" OpenRL json-cpp ShaderConductor ReactPhysics3D
+# ÒÔºó´´½¨·¢ĞĞ°æ´øÉÏglew32ºÍOpenAL32µÄ¶¯Ì¬¿â
 
-# å¤§å°å†™å¹³å°åç§°
-PLATFORM 	= windows
-PLATFORM_U	= WINDOWS
+# ËµÃ÷Ò»ÏÂ£¬ÎÒĞ´¹ıVulkan£¬µ«ÊÇÒòÎª²»¹»ÊìÁ·²ÅÃ»Ê¹ÓÃ
+# ½ñºóÎÒ»áÌôÕ½Ò»ÏÂ
 
-GCC			= g++.exe
-DLLTOOL		= dlltool.exe
-RM			= del
-CFLAGS 		= -I"." -I".\\lib\\freetype" -m64 -O3 -std=c++11
-OFLAGS		= -m64 -s
-LFLAGS		= -m64 -shared
-LIB			= -lopengl32 -lglu32 -lgdi32 -lcomdlg32\
-				"lib\openal\OpenAL32.lib" "lib\glew\glew32.lib" "lib\freetype\freetype.lib"
-RES  		= windres.exe
-MKDIR   	= mkdir
-GIT  		= git
+# ÒÔºóSoundTouchºÍReactPhysics3DÎïÀíÒıÇæÎÒ´òËãµ¥¶À±àÒë³ÉÒ»¸ö¶¯Ì¬¿â
 
-BUILD_PATH	= build
-TEST_PATH	= test
-PROGOBJ		= main\
-				lib\soundtouch\SoundTouch lib\soundtouch\TDStretch lib\soundtouch\RateTransposer\
-				lib\soundtouch\AAFilter lib\soundtouch\FIRFilter lib\soundtouch\FIFOSampleBuffer\
-				lib\soundtouch\PeakFinder lib\soundtouch\BPMDetect\
-				utils\String utils\StringBuilder utils\DataBuffer utils\AudioUtils\
-				utils\math3d\Math utils\math3d\LinearAlgebra utils\math3d\Mesh\
-				utils\math3d\ViewObject utils\math3d\Geometry utils\math3d\Property\
-				utils\gl\GLFrameBuffer utils\gl\GLIndexBuffer utils\gl\GLSkyBox\
-				utils\gl\GLLights utils\gl\GLProgram utils\gl\GLShader utils\gl\GLEW\
-				utils\gl\GLUtils utils\gl\GLVertexArray utils\gl\GLVertexBuffer\
-				utils\gl\GLTexture2D utils\gl\GLRenderTexture2D utils\gl\GLComputeProgram\
-				editor\AnimationWindow editor\AudioPlayerWindow editor\AudioCaptureWindow\
-				editor\NodeMapWindow editor\TreeWindow editor\UVEditWindow editor\PaintWindow\
-				editor\MainWindow editor\RenderWindow editor\gui\Container editor\gui\Menu\
-				editor\gui\UIManager editor\gui\AnimationCurve editor\gui\ViewManager
-PLATOBJ		=  utils\File utils\os\Shell utils\os\Log utils\os\Thread utils\os\System\
-				utils\os\Time utils\os\Font utils\os\Appframe utils\os\Resource\
-				editor\dialog\ColorBoard editor\dialog\Tips
-EXTRAOBJ	= lib\soundtouch\mmx_optimized lib\soundtouch\sse_optimized lib\soundtouch\cpu_detect_x86
-RESOBJ		= res string
-OUTPUT 		= main.exe
-# åŠ¨æ€åº“
-OUTPUTDLIB	= main.dll
+# Õâ²Ö¿âÀïÃæµÄÀàÎÒ»áÔÚÒÔºó¸´ÓÃ
 
-SIGNTOOL	= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe"
-CERT 		= "D:\code\.Certificate\lin-boheng.pfx"
-#TIMESTAMP 	= "http://timestamp.wosign.com/timestamp"
-#TIMESTAMP	= "http://timestamp.verisign.com/scripts/timstamp.dll"
-TIMESTAMP 	= "http://timestamp.digicert.com"
-#TIMESTAMP 	= "http://timestamp.entrust.net/TSS/RFC3161sha2TS"
-#TIMESTAMP 	= "http://timestamp.globalsign.com"
-#TIMESTAMP 	= "http://rfc3161timestamp.globalsign.com/advanced"
-#TIMESTAMP 	= "http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-#TIMESTAMP 	= "http://timestamp.comodoca.com/rfc3161"
-#TIMESTAMP 	= "http://timestamp.wosign.com/rfc3161"
-#TIMESTAMP 	= "http://tsa.starfieldtech.com"
-#TIMESTAMP 	= "http://tsa.swisssign.net"
+RM			:= bin/linux/rm
+TR 			:= bin/linux/tr
+DIRNAME 	:= bin/linux/dirname
+INCLIST 	:= bin/tools/inclist
+MKDIR   	:= bin/linux/mkdir
+ECHO 		:= echo
 
-PROGOBJ 	:= $(addprefix $(BUILD_PATH)\, $(addsuffix .o, $(PROGOBJ)))
-PLATOBJ 	:= $(addprefix $(BUILD_PATH)\, $(addsuffix .o, $(PLATOBJ)))
-EXTRAOBJ 	:= $(addprefix $(BUILD_PATH)\, $(addsuffix .o, $(EXTRAOBJ)))
-RESOBJ		:= $(addprefix $(BUILD_PATH)\, $(addsuffix .o, $(RESOBJ)))
+ifeq ($(OS), Windows_NT)
+    ifeq ($(PROCESSOR_ARCHITEW6432), AMD64)
+        ARCH := amd64
+    else
+        ifeq ($(PROCESSOR_ARCHITECTURE), AMD64)
+            ARCH := amd64
+        endif
+        ifeq ($(PROCESSOR_ARCHITECTURE), x86)
+            ARCH := ia32
+        endif
+    endif
+else
+	UNAME_P := $(shell uname -p)
+    ifeq ($(UNAME_P), x86_64)
+        ARCH := amd64
+    endif
+    ifneq ($(filter %86, $(UNAME_P)),)
+        ARCH := ia32
+    endif
+    ifneq ($(filter arm%, $(UNAME_P)),)
+        ARCH := arm
+    endif
+endif
 
-.PHONY:all build clean run rebuild reexec commit merge sign lib
+ifeq ($(OS), Windows_NT)
+    PLATFORM := windows
+else
+	ifneq ($(findstring /cygdrive/, $(PATH)),)
+		PLATFORM := cygwin
+	else
+		UNAME := $(shell uname || echo unknown)
+		ifeq ($(UNAME), Linux)
+			PLATFORM := linux
+		endif
+		ifeq ($(UNAME), Solaris)
+			PLATFORM := solaris
+		endif
+	endif
+endif
 
-all: build lib
+BUILD_PATH	:= build
+TEST_PATH	:= test
+PLUGIN_PATH := plugins
+SOURCE_PATH := src
+LIB_PATH 	:= $(SOURCE_PATH)/lib
+
+toupper		= $(shell $(ECHO) $1 | $(TR) a-z A-Z)
+tolower		= $(shell $(ECHO) $1 | $(TR) A-Z a-z)
+
+# µİ¹éµÄwildcard
+rwildcard	= $(foreach D, $(wildcard $(1:=/*)), $(call rwildcard, $D, $2) $(filter $(subst *, %, $2), $D))
+src2obj		= $(1:$(SOURCE_PATH)/%.cpp=$(BUILD_PATH)/%.o)
+
+CC			:= g++#clang --target=x86_64-w64-windows-gnu
+DLLTOOL		:= dlltool
+CFLAGS 		:= -I"$(SOURCE_PATH)" -m64 -O3 -std=c++11 -finput-charset=UTF-8 -fexec-charset=UTF-8\
+				-DPLATFORM_$(call toupper, $(PLATFORM)) -DARCH_$(call toupper, $(ARCH))
+OFLAGS		:= -m64 -s
+LFLAGS		:= -m64 -shared
+LIB_FILES	:= openal/OpenAL32 glew/glew32 freetype/freetype\
+				glut/glut64 ftgl/ftgl_D
+LIB			:= -lopengl32 -lglu32 -lgdi32 -lcomdlg32 -lws2_32\
+				$(foreach FILE, $(LIB_FILES),$(LIB_PATH)/$(FILE).lib)
+#				-lstdc++ -lmingw32 -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -lshell32 -luser32
+RES  		:= windres
+GIT  		:= git
+
+# Õı³£µÄº¬ÓĞ.hºÍ.cppµÄ´úÂë
+PROGOBJ 	:= lib/soundtouch util editor manager base io
+PROGOBJ 	:= $(addprefix $(SOURCE_PATH)/, $(PROGOBJ))
+PROGOBJ 	:= $(basename $(call rwildcard, $(PROGOBJ), *.cpp))
+PROGOBJ 	:= $(PROGOBJ:$(SOURCE_PATH)/%=%)
+PROGOBJ 	+= main
+# ²»ĞèÒªµÄ´úÂë
+REMOVEOBJ 	:= lib/soundtouch/soundtouch_wapper
+# Ö»ÓĞ.cppµÄ´úÂë
+EXTRAOBJ	:= lib/soundtouch/mmx_optimized lib/soundtouch/sse_optimized lib/soundtouch/cpu_detect_x86
+# Æ½Ì¨Ïà¹Ø´úÂë
+PLATOBJ 	:= platform/$(PLATFORM)
+PLATOBJ 	:= $(addprefix $(SOURCE_PATH)/, $(PLATOBJ))
+PLATOBJ 	:= $(basename $(call rwildcard, $(PLATOBJ), *.cpp))
+PLATOBJ 	:= $(PLATOBJ:$(SOURCE_PATH)/%=%)
+
+PROGOBJ 	:= $(filter-out $(EXTRAOBJ) $(REMOVEOBJ), $(PROGOBJ))
+
+RESOBJ 		:= .
+RESOBJ 		:= $(addprefix $(SOURCE_PATH)/, $(RESOBJ))
+RESOBJ 		:= $(basename $(call rwildcard, $(RESOBJ), *.rc))
+RESOBJ 		:= $(RESOBJ:$(SOURCE_PATH)/%=%)
+
+OUTPUT 		:= main.exe
+# ¶¯Ì¬¿â
+OUTPUTDLIB	:= main.dll
+
+SIGNTOOL	:= "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe"
+CERT 		:= "D:\code\.Certificate\lin-boheng.pfx"
+#TIMESTAMP 	:= "http://timestamp.wosign.com/timestamp"
+#TIMESTAMP	:= "http://timestamp.verisign.com/scripts/timstamp.dll"
+TIMESTAMP 	:= "http://timestamp.digicert.com"
+#TIMESTAMP 	:= "http://timestamp.entrust.net/TSS/RFC3161sha2TS"
+#TIMESTAMP 	:= "http://timestamp.globalsign.com"
+#TIMESTAMP 	:= "http://rfc3161timestamp.globalsign.com/advanced"
+#TIMESTAMP 	:= "http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+#TIMESTAMP 	:= "http://timestamp.comodoca.com/rfc3161"
+#TIMESTAMP 	:= "http://timestamp.wosign.com/rfc3161"
+#TIMESTAMP 	:= "http://tsa.starfieldtech.com"
+#TIMESTAMP 	:= "http://tsa.swisssign.net"
+
+PROGOBJ 	:= $(addprefix $(BUILD_PATH)/, $(addsuffix .o, $(PROGOBJ)))
+PLATOBJ 	:= $(addprefix $(BUILD_PATH)/, $(addsuffix .o, $(PLATOBJ)))
+EXTRAOBJ 	:= $(addprefix $(BUILD_PATH)/, $(addsuffix .o, $(EXTRAOBJ)))
+RESOBJ		:= $(addprefix $(BUILD_PATH)/, $(addsuffix .o, $(RESOBJ)))
+
+CPPOBJ 		:= $(PROGOBJ) $(PLATOBJ) $(EXTRAOBJ)
+ALLOBJ		:= $(CPPOBJ) $(RESOBJ)
+
+.PHONY: all mkdir build lib cleanall cleandep clean run rebuild reexec sign commit merge
+
+# buildÖ®Ç°Ó¦¸Ãmkdir
+all: mkdir build lib
 
 run: build
 	$(OUTPUT)
@@ -83,44 +153,64 @@ rebuild: clean build
 
 reexec: clean run
 
-$(OUTPUTDLIB): $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
-	$(GCC) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ) -o $@ $(LIB) $(LFLAGS)
+$(OUTPUTDLIB): $(ALLOBJ)
+	$(CC) $(ALLOBJ) -o $@ $(LIB) $(LFLAGS)
 
-$(OUTPUT): $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
-	$(GCC) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ) -o $@ $(LIB) $(OFLAGS)
+$(OUTPUT): $(ALLOBJ)
+	$(CC) $(ALLOBJ) -o $@ $(LIB) $(OFLAGS)
 
-# å¸¸è§„çš„æºä»£ç 
-$(PROGOBJ): $(BUILD_PATH)\\%.o: %.cpp %.h
-	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
+# ÒÀÀµÏîÎÄ¼ş
+DEPFILES	:= $(CPPOBJ:%.o=%.d)
 
-# è¿™ä¸€ç±»ä¸ºå¹³å°ç›¸å…³ä»£ç æºæ–‡ä»¶
-$(PLATOBJ): $(BUILD_PATH)\\%.o: platform\$(PLATFORM)\\%.cpp %.h
-	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
+# ²»Ê¹ÓÃÊ±ÓÃ'#'×¢ÊÍµô
+# Ò»°ã¶øÑÔÓĞÁË´óÅúÁ¿¶¨Òå¸Ä¶¯ºó²ÅĞèÒªÊ¹ÓÃ
+#! Èç¹ûÊ¹ÓÃ£¬Çë²»ÒªÇáÒ×¸Ä¶¯Í·ÎÄ¼ş£¡£¡£¡
+-include $(DEPFILES)
 
-# è¿™ä¸€ç±»æºæ–‡ä»¶æ²¡æœ‰å¤´æ–‡ä»¶ï¼Œç›´æ¥ç¼–è¯‘
-$(EXTRAOBJ): $(BUILD_PATH)\\%.o: %.cpp
-	$(GCC) -c $< -o $@ $(CFLAGS) -D$(addprefix PLATFORM_, $(PLATFORM_U))
+$(DEPFILES): $(BUILD_PATH)/%.d: $(SOURCE_PATH)/%.cpp
+	$(CC) -MM $(CFLAGS) $< -MT $(call src2obj, $<) > $@
+	$(ECHO) "	$(CC) -c $< -o $(call src2obj, $<) $(CFLAGS)" >> $@
 
-# å…¶å®æˆ‘ä¸ªäººè§‰å¾—ï¼ŒæŠŠnasmçš„å†…ç½®æŒ‡ä»¤incbinç”¨å¥½äº†å½“èµ„æºè¡¨ç”¨æ˜¯ç›¸å½“å¯è¡Œçš„ï¼Œç†è®ºä¸Šåªè¦ä¸ä¹±åŠ æ±‡ç¼–ä»£ç è·¨å¹³å°æ˜¯æ²¡é—®é¢˜çš„
-# é‡‡ç”¨nasmçš„è¯ï¼Œres.hé‡Œé¢å°±ä¸æ˜¯å„ç§idäº†ï¼Œè€Œæ˜¯ä¸€å †extern char[0]ï¼ŒæŒ‡å‘èµ„æºæ•°æ®çš„æŒ‡é’ˆï¼Œå€ŸåŠ©äº†ç¬¦å·é“¾æ¥çš„åŠŸèƒ½
-$(RESOBJ): $(BUILD_PATH)\\%.o: %.rc
+# ×¢:²»Ê¹ÓÃÒÀÀµÏîÎÄ¼şÊ±Ê¹ÓÃÈçÏÂ±àÒëÁ÷³Ì
+# ³£¹æµÄÔ´´úÂë
+#$(PROGOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp $(SOURCE_PATH)/%.h
+#	$(CC) -c $< -o $@ $(CFLAGS)
+
+# ÕâÒ»ÀàÎªÆ½Ì¨Ïà¹Ø´úÂëÔ´ÎÄ¼ş
+#$(PLATOBJ): $(BUILD_PATH)/platform/$(PLATFORM)/%.o: $(SOURCE_PATH)/platform/$(PLATFORM)/%.cpp $(SOURCE_PATH)/%.h
+#	$(CC) -c $< -o $@ $(CFLAGS)
+
+# ÕâÒ»ÀàÔ´ÎÄ¼şÃ»ÓĞÍ·ÎÄ¼ş£¬Ö±½Ó±àÒë
+#$(EXTRAOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.cpp
+#	$(CC) -c $< -o $@ $(CFLAGS)
+
+# ÆäÊµÎÒ¸öÈË¾õµÃ£¬°ÑnasmµÄÄÚÖÃÖ¸ÁîincbinÓÃºÃÁËµ±×ÊÔ´±íÓÃÊÇÏàµ±¿ÉĞĞµÄ£¬ÀíÂÛÉÏÖ»Òª²»ÂÒ¼Ó»ã±à´úÂë¿çÆ½Ì¨ÊÇÃ»ÎÊÌâµÄ
+# ²ÉÓÃnasmµÄ»°£¬res.hÀïÃæ¾Í²»ÊÇ¸÷ÖÖidÁË£¬¶øÊÇÒ»¶Ñextern char[0]£¬Ö¸Ïò×ÊÔ´Êı¾İµÄÖ¸Õë£¬½èÖúÁË·ûºÅÁ´½ÓµÄ¹¦ÄÜ
+$(RESOBJ): $(BUILD_PATH)/%.o: $(SOURCE_PATH)/%.rc
 	$(RES) -i $< -o $@
 
-# å½“å‰åˆ†æ”¯
-BRANCH		= AVdevelop
-# æäº¤ä¿¡æ¯
-COMMITMSG	= "bugfix"
-# åˆå¹¶åˆ†æ”¯æ—¶çš„ç›®æ ‡åˆ†æ”¯
-MERGE 		= AVDevelop
+OBJDIRS		:= $(sort $(shell $(DIRNAME) $(ALLOBJ)))
+# ÓĞÒ»Ğ©Ä¿Â¼»áÌ×¶à²ã£¬ÆäÖĞ¼äÃ»ÓĞÎÄ¼ş
+OBJDIRS 	:= $(sort $(OBJDIRS) $(shell $(DIRNAME) $(OBJDIRS)))
+OBJDIRS 	:= $(sort $(OBJDIRS) $(shell $(DIRNAME) $(OBJDIRS)))
 
-# ä¸€é”®æäº¤ä»£ç 
+mkdir:
+	-$(MKDIR) $(OBJDIRS)
+
+# µ±Ç°·ÖÖ§
+BRANCH		= master-2.0
+# Ìá½»ĞÅÏ¢
+COMMITMSG	= "update"
+# ºÏ²¢·ÖÖ§Ê±µÄÄ¿±ê·ÖÖ§
+MERGE 		= master-2.0
+
+# Ò»¼üÌá½»´úÂë
 commit:
 	$(GIT) checkout $(BRANCH)
-	$(GIT) add *
-	$(GIT) commit -m $(COMMITMSG)
+	$(GIT) commit -a -m $(COMMITMSG)
 	$(GIT) push -u origin $(BRANCH)
 
-# ä¸€é”®åˆå¹¶åˆ†æ”¯
+# Ò»¼üºÏ²¢·ÖÖ§
 merge:
 	$(GIT) checkout $(MERGE)
 	$(GIT) pull origin $(MERGE)
@@ -129,15 +219,15 @@ merge:
 	$(GIT) push origin $(MERGE)
 	$(GIT) checkout $(BRANCH)
 
-# git log æ—¥å¿— ('q'é€€å‡º)
-# git reflog å†å²æ“ä½œæ—¥å¿— (åŒ…å«å›é€€æ“ä½œ)('q'é€€å‡º)
-# git reset --hard HEAD^ å›é€€åˆ°ä¸Šä¸€ç‰ˆæœ¬
-# git reset --hard id (id åœ¨ git reflog é‡Œï¼Œç”¨äºæ’¤é”€)
+# git log ÈÕÖ¾ ('q'ÍË³ö)
+# git reflog ÀúÊ·²Ù×÷ÈÕÖ¾ (°üº¬»ØÍË²Ù×÷)('q'ÍË³ö)
+# git reset --hard HEAD^ »ØÍËµ½ÉÏÒ»°æ±¾
+# git reset --hard id (id ÔÚ git reflog Àï£¬ÓÃÓÚ³·Ïú)
 
-# åˆ é™¤æŸä¸ªæ–‡ä»¶çš„æ‰€æœ‰å†å²
+# É¾³ıÄ³¸öÎÄ¼şµÄËùÓĞÀúÊ·
 # git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch ${file}' --prune-empty --tag-name-filter cat -- --all
 
-# åˆ é™¤ä»“åº“ç¼“å†²
+# É¾³ı²Ö¿â»º³å
 # rm -rf .git/refs/original/
 # git reflog expire --expire=now --all
 # git gc --prune=now
@@ -148,15 +238,48 @@ merge:
 sign: $(OUTPUT)
 	$(SIGNTOOL) timestamp /t $(TIMESTAMP) $(OUTPUT)
 
+cleanall: clean cleandep
+
+# ²»ÔÙ¶¯µÄ²¿·Ö
+FIXED_OBJ 	:= util/physics3d
+FIXED_OBJ 	:= $(addprefix $(SOURCE_PATH)/, $(FIXED_OBJ))
+FIXED_OBJ 	:= $(call rwildcard, $(FIXED_OBJ), *.cpp)
+FIXED_OBJ 	:= $(FIXED_OBJ:$(SOURCE_PATH)/%.cpp=$(BUILD_PATH)/%.o)
+
 clean:
-	-$(RM) $(OUTPUT) $(OUTPUTDLIB) $(PROGOBJ) $(PLATOBJ) $(RESOBJ) $(EXTRAOBJ)
+	-$(RM) $(filter-out $(FIXED_OBJ), $(OUTPUT) $(OUTPUTDLIB) $(ALLOBJ))
 
-# æµ‹è¯•
-.PHONY: dllboot freetype
+cleandep:
+	-$(RM) $(DEPFILES)
 
-# åé¢çš„æµ‹è¯•å¦‚æœåªé“¾æ¥ä¸€ä¸ªç±»çš„.oæ–‡ä»¶ï¼Œincludeå¯¹åº”çš„.hï¼ŒåŠ ä¸Šå¯åŠ¨æµ‹è¯•ä»£ç ï¼Œä¸å°±æ˜¯å•å…ƒæµ‹è¯•äº†ä¹ˆ
+# glslc <file> --target-spv=spv1.0 [-x glsl/hlsl] -o <out> ±àÒëGLSL/HLSLÎªSPIR-V
+# dxc -T {stage}[[ps/vs/gs/hs/ds/cs/lib/ms]_6_[0-7]] <file> -E <entry> -I <include> [-spirv]
+# spirv-as <file> -o <out> --target-env [spv1.[0-5]|vulkan1.[0-2]|opencl[1.2/2.[0-2]][embedded]|opengl4.[0,1,2,3,5]|vulkan1.1spv1.4]
+# spirv-dis <file> -o <out> ·´»ã±àSPIR-V
+# spirv-cross SPIR-V <file> [--es/--hlsl/--msl/--vulkan-semantics(-V)/--reflect/--cpp] --output <out> ½»²æ±àÒëSPIR-VÎªGLSL/ESSL/HLSL/MSL/JSON·´Éä/C++
 
-# ç¬¬ä¸€ä¸ªæµ‹è¯•ï¼Œå°†æ•´ä¸ªç¨‹åºå½“æˆåº“ä½¿ç”¨å¹¶å¯åŠ¨
+# ²âÊÔ
+.PHONY: dllboot plugin physics
+
+# ºóÃæµÄ²âÊÔÈç¹ûÖ»Á´½ÓÒ»¸öÀàµÄ.oÎÄ¼ş£¬include¶ÔÓ¦µÄ.h£¬¼ÓÉÏÆô¶¯²âÊÔ´úÂë£¬²»¾ÍÊÇµ¥Ôª²âÊÔÁËÃ´
+
+# µÚÒ»¸ö²âÊÔ£¬½«Õû¸ö³ÌĞòµ±³É¿âÊ¹ÓÃ²¢Æô¶¯
 dllboot: $(OUTPUTDLIB)
-	$(GCC) $(TEST_PATH)\$@\boot.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)\$@\boot.exe
-	$(TEST_PATH)\$@\boot.exe
+	$(CC) $(TEST_PATH)/$@/boot.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)/$@/boot.exe
+	$(TEST_PATH)/$@/boot.exe
+	$(RM) $(TEST_PATH)/$@/boot.exe
+
+plugin: $(OUTPUTDLIB)
+	$(CC) $(TEST_PATH)/$@/main.cpp $(OUTPUTDLIB) -I"." -o $(TEST_PATH)/$@/main.exe
+	$(CC) $(TEST_PATH)/$@/plugin.cpp $(OUTPUTDLIB) -I"." -shared -o $(PLUGIN_PATH)/plugin.dll
+	$(TEST_PATH)/$@/main.exe
+	$(RM) $(TEST_PATH)/$@/main.exe
+	$(RM) $(PLUGIN_PATH)/plugin.dll
+
+physics: $(OUTPUTDLIB)
+	$(CC) -c $(TEST_PATH)/$@/main.cpp -I"." -o $(TEST_PATH)/$@/main.o
+	$(CC) -c $(TEST_PATH)/$@/Test.cpp -I"." -o $(TEST_PATH)/$@/Test.o
+	$(CC) -c $(TEST_PATH)/$@/TestSuite.cpp -I"." -o $(TEST_PATH)/$@/TestSuite.o
+	$(CC) $(addprefix $(TEST_PATH)/$@/, main.o Test.o TestSuite.o) $(OUTPUTDLIB) -o $(TEST_PATH)/$@/main.exe
+	$(TEST_PATH)/$@/main.exe
+	$(RM) $(TEST_PATH)/$@/main.exe $(addprefix $(TEST_PATH)/$@/, main.o Test.o TestSuite.o)

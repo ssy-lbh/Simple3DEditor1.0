@@ -1,0 +1,43 @@
+{
+    "menu": {
+        "width": 250.0,
+        "corner": 10.0,
+        "line height": 30.0
+    },
+    "main window": {
+        "height": 600,
+        "width": 600
+    },
+    "windows": {
+        "lbh.main": {
+            "name": "主窗口"
+        },
+        "lbh.tree": {
+            "name": "树形图"
+        },
+        "lbh.anim": {
+            "name": "动画控制器"
+        },
+        "lbh.attr": {
+            "name": "属性窗口(未完成)"
+        },
+        "lbh.audioplay": {
+            "name": "音频播放器"
+        },
+        "lbh.audiocap": {
+            "name": "变声器"
+        },
+        "lbh.nodemap": {
+            "name": "节点图编辑器"
+        },
+        "lbh.paint": {
+            "name": "绘画窗口"
+        },
+        "lbh.render": {
+            "name": "渲染窗口"
+        },
+        "lbh.uvedit": {
+            "name": "UV编辑器"
+        }
+    }
+}

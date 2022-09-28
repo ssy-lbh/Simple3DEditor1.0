@@ -1,0 +1,16 @@
+{
+  "objects": {
+    "scene": {
+      "id": "simple3deditor::AViewObject"
+    },
+    "screen": {
+      "id": "simple3deditor::AViewObject"
+    }
+  },
+  "windows": {
+    "id": "simple3deditor::SelectionWindow",
+    "window": {
+      "id": "simple3deditor::MainWindow"
+    }
+  }
+}
