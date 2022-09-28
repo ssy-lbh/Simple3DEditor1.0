@@ -27,13 +27,13 @@ $RECYCLE.BIN/
 *.o
 
 # Dynamic Libraries
-*.dll
+#*.dll
 
 # Static Libraries
-*.lib
+#*.lib
 
 # Portable Executable Files
-*.exe
+#*.exe
 
 # Dependency Files
 *.d
