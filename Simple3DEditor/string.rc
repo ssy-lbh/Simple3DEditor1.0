@@ -1,0 +1,23 @@
+#include "res.h"
+
+STRINGTABLE
+BEGIN
+    IDS_OBJFILE_FORM_WARNING "未识别的3D对象文件格式，是否继续导入？"
+    IDS_OBJFILE_FORM_WARNING_CAPTION "文件格式错误"
+    IDS_WAVFILE_FORM_WARNING "未识别的音频文件格式，是否转换格式，或者取消导入？"
+    IDS_WAVFILE_FORM_WARNING_CAPTION "文件格式错误"
+    IDS_OBJFILE_FILTER "3D对象(*.obj)\0*.obj\0"
+    IDS_WAVFILE_FILTER "PCM音频文件(*.wav)\0*.wav\0\
+                       Oracle GlodenGate(*.ogg)\0*.ogg\0\
+                       移动帧专业音频三代(*.mp3)\0*.mp3\0\
+                       任意音频格式(*.*)\0*.*\0"
+    IDS_PICFILE_FILTER "位图文件(*.bmp)\0*.bmp\0\
+                       便携式网络图形(*.png)\0*.png\0\
+                       专业联合图片(*.jpg, *.jpeg)\0*.jpg;*.jpeg\0\
+                       无失真标记图形(*.tga)\0*.tga\0\
+                       高动态范围图像(*.hdr)\0*.hdr\0\
+                       任意图片格式(*.*)\0*.*\0"
+    IDS_EXIT_CONFIRM "确认要退出程序？"
+    IDS_EXIT_CONFIRM_CAPTION "退出确认"
+    IDS_WORKSPACE_FILTER "JSON对象文件(*.json)\0*.json\0"
+END
