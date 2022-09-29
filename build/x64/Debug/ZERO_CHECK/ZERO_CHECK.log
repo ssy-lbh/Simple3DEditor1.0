@@ -1,0 +1,10 @@
+﻿  Checking File Globs
+  Checking Build System
+  CMake is re-running because D:/Code/C++/Simple3DEditor1.0/build/CMakeFiles/generate.stamp is out-of-date.
+    the file 'D:/Code/C++/Simple3DEditor1.0/build/CMakeFiles/cmake.verify_globs'
+    is newer than 'D:/Code/C++/Simple3DEditor1.0/build/CMakeFiles/generate.stamp.depend'
+    result='-1'
+  -- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.22000.
+  -- Configuring done
+  -- Generating done
+  -- Build files have been written to: D:/Code/C++/Simple3DEditor1.0/build

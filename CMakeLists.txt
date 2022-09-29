@@ -3,7 +3,10 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-project ("Simple3DEditor" VERSION 1.0.0)
+project("Simple3DEditor" VERSION 1.0.0)
+
+# 主项目
+add_subdirectory(src)
 
 # 包含子项目。
-add_subdirectory ("Simple3DEditor")
+add_subdirectory(imgui)

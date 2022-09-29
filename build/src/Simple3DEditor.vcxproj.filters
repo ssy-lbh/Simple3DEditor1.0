@@ -1,0 +1,659 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Appendable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Closeable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Flushable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Readable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Writable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AnimationWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AttributeWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AudioCaptureWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AudioPlayerWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\MainWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\NodeMapWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\PaintWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\RenderWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\TreeWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\UVEditWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\AnimationCurve.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\Container.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\GUIUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\Menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\UIManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Operation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Tool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\ViewManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\ViewObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\AudioListenerObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\AudioSourceObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\CameraObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\CubicBezierObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIManagerObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIMeshObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\MeshObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\PointLightObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\SquareBezierObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\WindowObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\windows\AudioPlayerWindowObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\windows\TreeWindowObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\io\IOBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\io\IOStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\io\ReadWrite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\AAFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\BPMDetect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIFOSampleBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIRFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\PeakFinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\RateTransposer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\SoundTouch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\TDStretch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\cpu_detect_x86.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\mmx_optimized.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\sse_optimized.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\manager\WindowManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\editor\dialog\ColorBoard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\editor\dialog\Tips.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\io\File.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\manager\PluginManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\AppFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Resource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Shell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\System.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\AudioUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\DataBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\String.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\StringBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLComputeProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLEW.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLFrameBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLIndexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLLights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLRenderTexture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLSkyBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLTexture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexFormat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\LinearAlgebra.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Property.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\BufferBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\VertexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Appendable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Closeable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Factory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Flushable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Readable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Writable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AllWindows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AnimationWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AttributeWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AudioCaptureWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AudioPlayerWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\MainWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\NodeMapWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\PaintWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\RenderWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\TreeWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\UVEditWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\dialog\ColorBoard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\dialog\Tips.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\AnimationCurve.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\Container.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\GUIUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\Menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\UIManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Operation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Tool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\ViewManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\ViewObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\AllObjects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\AudioListenerObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\AudioSourceObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\CameraObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\CubicBezierObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIManagerObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIMeshObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\MeshObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\PointLightObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\SquareBezierObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\WindowObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\windows\AllWindows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\windows\AudioPlayerWindowObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\windows\TreeWindowObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\File.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\IOBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\IOStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\ReadWrite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\Serializable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\AAFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\BPMDetect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIFOSampleBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIFOSamplePipe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIRFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\PeakFinder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\RateTransposer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\STTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\SoundTouch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\TDStretch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\cpu_detect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\soundtouch_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\manager\PluginManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\manager\WindowManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\res.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\AudioUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Collection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\DataBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Delegate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Deque.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\HashMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Iterable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Iterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\List.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\RBTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\StringBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Task.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\ThreadPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Trie.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Value.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLComputeProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLEW.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLFrameBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLIndexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLLights.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLRenderTexture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLSimplified.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLSkyBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLTexture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexFormat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Geometry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Hash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\LinearAlgebra.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Property.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\AppFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Shell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\System.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\BufferBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\VertexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Code\C++\Simple3DEditor1.0\src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="D:\Code\C++\Simple3DEditor1.0\src\res.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="D:\Code\C++\Simple3DEditor1.0\src\string.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{DE3AB59C-FB60-3F23-9C7C-B32EE6779871}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{CD213012-C6E0-3D93-86A8-0C4398F1D415}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,545 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A4FBE9BF-6162-3766-829F-66AE932702BF}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>Simple3DEditor</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Code\C++\Simple3DEditor1.0\build\Simple3DEditor\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Simple3DEditor.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Simple3DEditor</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Code\C++\Simple3DEditor1.0\build\Simple3DEditor\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Simple3DEditor.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Simple3DEditor</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Code\C++\Simple3DEditor1.0\build\Simple3DEditor\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Simple3DEditor.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Simple3DEditor</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Code\C++\Simple3DEditor1.0\build\Simple3DEditor\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Simple3DEditor.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Simple3DEditor</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/../lib;D:/Code/C++/Simple3DEditor1.0/src/../lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Code/C++/Simple3DEditor1.0/build/Simple3DEditor/Debug/Simple3DEditor.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Code/C++/Simple3DEditor1.0/build/Simple3DEditor/Debug/Simple3DEditor.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/../lib;D:/Code/C++/Simple3DEditor1.0/src/../lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Code/C++/Simple3DEditor1.0/build/Simple3DEditor/Release/Simple3DEditor.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Code/C++/Simple3DEditor1.0/build/Simple3DEditor/Release/Simple3DEditor.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/../lib;D:/Code/C++/Simple3DEditor1.0/src/../lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Code/C++/Simple3DEditor1.0/build/Simple3DEditor/MinSizeRel/Simple3DEditor.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Code/C++/Simple3DEditor1.0/build/Simple3DEditor/MinSizeRel/Simple3DEditor.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/../lib;D:/Code/C++/Simple3DEditor1.0/src/../lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>D:/Code/C++/Simple3DEditor1.0/build/Simple3DEditor/RelWithDebInfo/Simple3DEditor.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Code/C++/Simple3DEditor1.0/build/Simple3DEditor/RelWithDebInfo/Simple3DEditor.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Code\C++\Simple3DEditor1.0\src\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Code/C++/Simple3DEditor1.0/src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"E:\Program Files\CMake\bin\cmake.exe" -SD:/Code/C++/Simple3DEditor1.0 -BD:/Code/C++/Simple3DEditor1.0/build --check-stamp-file D:/Code/C++/Simple3DEditor1.0/build/src/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Code\C++\Simple3DEditor1.0\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Code\C++\Simple3DEditor1.0\build\src\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Code/C++/Simple3DEditor1.0/src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"E:\Program Files\CMake\bin\cmake.exe" -SD:/Code/C++/Simple3DEditor1.0 -BD:/Code/C++/Simple3DEditor1.0/build --check-stamp-file D:/Code/C++/Simple3DEditor1.0/build/src/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Code\C++\Simple3DEditor1.0\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Code\C++\Simple3DEditor1.0\build\src\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Code/C++/Simple3DEditor1.0/src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"E:\Program Files\CMake\bin\cmake.exe" -SD:/Code/C++/Simple3DEditor1.0 -BD:/Code/C++/Simple3DEditor1.0/build --check-stamp-file D:/Code/C++/Simple3DEditor1.0/build/src/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Code\C++\Simple3DEditor1.0\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Code\C++\Simple3DEditor1.0\build\src\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Code/C++/Simple3DEditor1.0/src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"E:\Program Files\CMake\bin\cmake.exe" -SD:/Code/C++/Simple3DEditor1.0 -BD:/Code/C++/Simple3DEditor1.0/build --check-stamp-file D:/Code/C++/Simple3DEditor1.0/build/src/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Code\C++\Simple3DEditor1.0\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Code\C++\Simple3DEditor1.0\build\src\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Appendable.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Closeable.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Factory.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Flushable.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Object.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Readable.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Writable.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\define.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AllWindows.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AnimationWindow.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AttributeWindow.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AudioCaptureWindow.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AudioPlayerWindow.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\MainWindow.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\NodeMapWindow.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\PaintWindow.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\RenderWindow.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\TreeWindow.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\UVEditWindow.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\dialog\ColorBoard.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\dialog\Tips.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\AnimationCurve.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\Container.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\GUIUtils.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\Menu.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\UIManager.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Operation.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Tool.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Transform.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\ViewManager.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\ViewObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Window.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\AllObjects.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\AudioListenerObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\AudioSourceObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\CameraObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\CubicBezierObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIManagerObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIMeshObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\MeshObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\PointLightObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\SquareBezierObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\WindowObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\windows\AllWindows.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\windows\AudioPlayerWindowObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\editor\windows\TreeWindowObject.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\File.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\IOBuffer.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\IOStream.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\ReadWrite.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\Serializable.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\AAFilter.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\BPMDetect.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIFOSampleBuffer.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIFOSamplePipe.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIRFilter.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\PeakFinder.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\RateTransposer.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\STTypes.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\SoundTouch.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\TDStretch.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\cpu_detect.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\soundtouch_config.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\main.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\manager\PluginManager.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\manager\WindowManager.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\res.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\AudioUtils.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Collection.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\DataBuffer.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Delegate.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Deque.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\HashMap.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Iterable.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Iterator.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\List.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Queue.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\RBTree.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\String.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\StringBuilder.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Task.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\ThreadPool.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Trie.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Utils.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\Value.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLComputeProgram.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLEW.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLFrameBuffer.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLIndexBuffer.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLLights.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLProgram.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLRenderTexture2D.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLShader.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLSimplified.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLSkyBox.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLTexture2D.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLUtils.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexArray.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexBuffer.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexFormat.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Camera.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Geometry.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Hash.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\LinearAlgebra.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Math.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Mesh.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Property.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\AppFrame.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Font.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Log.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Resource.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Shell.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\System.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Thread.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Time.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\BufferBuilder.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\VertexBuffer.h" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Appendable.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Closeable.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Flushable.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Object.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Readable.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Writable.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AnimationWindow.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AttributeWindow.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AudioCaptureWindow.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\AudioPlayerWindow.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\MainWindow.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\NodeMapWindow.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\PaintWindow.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\RenderWindow.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\TreeWindow.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\UVEditWindow.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\AnimationCurve.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\Container.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\GUIUtils.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\Menu.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\gui\UIManager.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Operation.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Tool.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Transform.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\ViewManager.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\ViewObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\main\Window.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\AudioListenerObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\AudioSourceObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\CameraObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\CubicBezierObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIManagerObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIMeshObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\GUIObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\MeshObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\PointLightObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\SquareBezierObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\object\WindowObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\windows\AudioPlayerWindowObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\editor\windows\TreeWindowObject.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\io\IOBuffer.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\io\IOStream.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\io\ReadWrite.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\AAFilter.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\BPMDetect.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIFOSampleBuffer.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIRFilter.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\PeakFinder.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\RateTransposer.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\SoundTouch.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\TDStretch.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\cpu_detect_x86.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\mmx_optimized.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\sse_optimized.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\main.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\manager\WindowManager.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\editor\dialog\ColorBoard.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\editor\dialog\Tips.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\io\File.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\manager\PluginManager.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\AppFrame.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Font.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Log.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Resource.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Shell.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\System.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Thread.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Time.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\AudioUtils.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\DataBuffer.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\String.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\StringBuilder.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLComputeProgram.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLEW.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLFrameBuffer.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLIndexBuffer.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLLights.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLProgram.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLRenderTexture2D.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLShader.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLSkyBox.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLTexture2D.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLUtils.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexArray.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexBuffer.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\gl\GLVertexFormat.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Camera.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Geometry.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\LinearAlgebra.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Mesh.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Property.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\BufferBuilder.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\VertexBuffer.cpp" />
+    <ResourceCompile Include="D:\Code\C++\Simple3DEditor1.0\src\res.rc" />
+    <ResourceCompile Include="D:\Code\C++\Simple3DEditor1.0\src\string.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\Code\C++\Simple3DEditor1.0\build\ZERO_CHECK.vcxproj">
+      <Project>{D675590B-1133-353E-A29C-EE8974ABE9E7}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
