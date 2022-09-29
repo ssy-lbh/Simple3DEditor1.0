@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Code\C++\Simple3DEditor1.0\build\CMakeFiles\ab4dc2c22a81d342b9da2089e5fcae27\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{85F87593-2413-378A-8AA5-2D86781EFBA5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
