@@ -6,7 +6,6 @@
 #include <util/String.h>
 #include <util/os/Log.h>
 #include <util/os/AppFrame.h>
-#include <util/os/Thread.h>
 #include <util/math3d/Math.h>
 #include <util/math3d/LinearAlgebra.h>
 

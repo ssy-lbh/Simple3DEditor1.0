@@ -86,7 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -104,10 +104,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -115,8 +115,8 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/../lib;D:/Code/C++/Simple3DEditor1.0/src/../lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;glfw/glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/lib;D:/Code/C++/Simple3DEditor1.0/src/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -130,7 +130,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -148,10 +148,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -159,8 +159,8 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/../lib;D:/Code/C++/Simple3DEditor1.0/src/../lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;glfw/glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/lib;D:/Code/C++/Simple3DEditor1.0/src/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -174,7 +174,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -192,10 +192,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -203,8 +203,8 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/../lib;D:/Code/C++/Simple3DEditor1.0/src/../lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;glfw/glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/lib;D:/Code/C++/Simple3DEditor1.0/src/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -218,7 +218,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -235,10 +235,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\C++\Simple3DEditor1.0\src;D:\Code\C++\Simple3DEditor1.0\src\lib;D:\Code\C++\Simple3DEditor1.0\src\..\lib;D:\Code\C++\Simple3DEditor1.0\src\..\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -246,8 +246,8 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/../lib;D:/Code/C++/Simple3DEditor1.0/src/../lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glut/glut64.lib;glew/glew32.lib;openal/OpenAL32.lib;glfw/glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:/Code/C++/Simple3DEditor1.0/src/lib;D:/Code/C++/Simple3DEditor1.0/src/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -369,6 +369,209 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\IOStream.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\ReadWrite.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\io\Serializable.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\ac3_parser.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\adts_parser.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\avcodec.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\avdct.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\avfft.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\bsf.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\codec.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\codec_desc.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\codec_id.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\codec_par.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\d3d11va.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\defs.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\dirac.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\dv_profile.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\dxva2.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\jni.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\mediacodec.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\packet.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\qsv.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\vdpau.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\version.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\videotoolbox.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\vorbis_parser.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavcodec\xvmc.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavdevice\avdevice.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavdevice\version.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavfilter\avfilter.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavfilter\buffersink.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavfilter\buffersrc.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavfilter\version.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavformat\avformat.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavformat\avio.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavformat\version.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\adler32.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\aes.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\aes_ctr.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\attributes.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\audio_fifo.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\avassert.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\avconfig.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\avstring.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\avutil.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\base64.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\blowfish.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\bprint.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\bswap.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\buffer.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\camellia.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\cast5.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\channel_layout.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\common.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\cpu.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\crc.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\des.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\detection_bbox.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\dict.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\display.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\dovi_meta.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\downmix_info.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\encryption_info.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\error.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\eval.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\ffversion.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\fifo.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\file.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\film_grain_params.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\frame.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hash.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hdr_dynamic_metadata.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hmac.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext_cuda.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext_d3d11va.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext_drm.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext_dxva2.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext_mediacodec.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext_opencl.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext_qsv.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext_vaapi.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext_vdpau.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext_videotoolbox.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\hwcontext_vulkan.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\imgutils.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\intfloat.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\intreadwrite.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\lfg.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\log.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\lzo.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\macros.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\mastering_display_metadata.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\mathematics.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\md5.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\mem.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\motion_vector.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\murmur3.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\opt.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\parseutils.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\pixdesc.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\pixelutils.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\pixfmt.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\random_seed.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\rational.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\rc4.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\replaygain.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\ripemd.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\samplefmt.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\sha.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\sha512.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\spherical.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\stereo3d.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\tea.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\threadmessage.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\time.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\timecode.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\timestamp.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\tree.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\twofish.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\tx.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\version.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\video_enc_params.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libavutil\xtea.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libpostproc\postprocess.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libpostproc\version.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libswresample\swresample.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libswresample\version.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libswscale\swscale.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\ffmpeg\libswscale\version.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\config\ftconfig.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\config\ftheader.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\config\ftmodule.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\config\ftoption.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\config\ftstdlib.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\config\integer-types.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\config\mac-support.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\config\public-macros.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\freetype.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftadvanc.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftbbox.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftbdf.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftbitmap.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftbzip2.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftcache.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftchapters.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftcid.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftcolor.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftdriver.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\fterrdef.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\fterrors.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftfntfmt.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftgasp.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftglyph.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftgxval.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftgzip.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftimage.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftincrem.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftlcdfil.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftlist.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftlogging.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftlzw.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftmac.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftmm.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftmodapi.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftmoderr.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftotval.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftoutln.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftparams.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftpfr.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftrender.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftsizes.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftsnames.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftstroke.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftsynth.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftsystem.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\fttrigon.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\fttypes.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ftwinfnt.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\t1tables.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\ttnameid.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\tttables.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\freetype\tttags.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\freetype\ft2build.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\glew\gl\eglew.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\glew\gl\glew.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\glew\gl\glxew.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\glew\gl\wglew.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\glfw\GLFW\glfw3.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\glfw\GLFW\glfw3native.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\glut\glut.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imconfig.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui_internal.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imstb_rectpack.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imstb_textedit.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imstb_truetype.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\openal\EFX-Util.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\openal\al.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\openal\alc.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\openal\efx-creative.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\openal\efx.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\openal\xram.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\AAFilter.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\BPMDetect.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIFOSampleBuffer.h" />
@@ -381,6 +584,26 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\TDStretch.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\cpu_detect.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\soundtouch_config.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_c_lexer.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_connected_components.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_divide.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_ds.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_dxt.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_easy_font.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_herringbone_wang_tile.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_hexwave.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_image.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_image_resize.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_image_write.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_include.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_leakcheck.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_perlin.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_rect_pack.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_sprintf.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_textedit.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_tilemap_editor.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_truetype.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_voxel_render.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\main.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\manager\PluginManager.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\manager\WindowManager.h" />
@@ -431,7 +654,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Resource.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Shell.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\System.h" />
-    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Thread.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Time.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\BufferBuilder.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\VertexBuffer.h" />
@@ -478,6 +700,13 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\io\IOBuffer.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\io\IOStream.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\io\ReadWrite.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui_demo.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui_draw.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui_tables.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\imgui\imgui_widgets.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\AAFilter.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\BPMDetect.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\FIFOSampleBuffer.cpp" />
@@ -495,14 +724,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\editor\dialog\Tips.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\io\File.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\manager\PluginManager.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\AppFrame.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Font.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Log.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Resource.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Shell.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\System.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Thread.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Time.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\AudioUtils.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\DataBuffer.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\String.cpp" />
@@ -526,6 +752,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\LinearAlgebra.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Mesh.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Property.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\AppFrame.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Time.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\BufferBuilder.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\VertexBuffer.cpp" />
     <ResourceCompile Include="D:\Code\C++\Simple3DEditor1.0\src\res.rc" />

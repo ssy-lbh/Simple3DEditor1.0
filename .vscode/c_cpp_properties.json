@@ -3,13 +3,11 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/src",
-                "${workspaceFolder}/lib"
+                "${workspaceFolder}/src"
             ],
             "browse": {
                 "path": [
-                    "${workspaceFolder}/src",
-                    "${workspaceFolder}/lib"
+                    "${workspaceFolder}/src"
                 ]
             },
             "defines": [

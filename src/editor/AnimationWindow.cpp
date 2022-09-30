@@ -13,6 +13,7 @@
 
 #include <json/nlohmann/json.hpp>
 
+#include <windows.h>
 #include <gl/gl.h>
 
 namespace simple3deditor {

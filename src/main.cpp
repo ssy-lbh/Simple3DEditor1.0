@@ -7,7 +7,6 @@
 #include <util/os/Log.h>
 #include <util/os/Font.h>
 #include <util/os/Time.h>
-#include <util/os/Thread.h>
 #include <util/os/Shell.h>
 #include <util/os/Resource.h>
 #include <util/gl/GLUtils.h>
@@ -22,23 +21,21 @@
 
 #include <fstream>
 
-#include <windows.h>
-#include <gl/gl.h>
-#define GLUT_NO_LIB_PRAGMA
-#include <glut/glut.h>
-
 #include <json/nlohmann/json.hpp>
 
 namespace simple3deditor {
 
+thread_local LocalData* localData;
+
 LocalData::LocalData(){
     renderOptions.objOp = ObjectOperation::MOVE;
+    localData = this;
 }
 
 LocalData::~LocalData(){}
 
 LocalData* LocalData::GetLocalInst(){
-    return static_cast<LocalData*>(ThreadLocal::Get(THREAD_LOCAL_LOCALDATA));
+    return localData;
 }
 
 void LocalData::UpdateCursor(int x, int y){
@@ -426,16 +423,12 @@ uint Main::INIT_WINDOW_HEIGHT = 600;
 
 void Main::SetCursor(int id){
     AppFrame* frame = AppFrame::GetLocalInst();
-    ::SetCursor(LoadCursorA(GetModule(), MAKEINTRESOURCEA(id)));
-    if (frame)
-        frame->cursorSelected = true;
+    frame->SetCursor(id);
 }
 
 void Main::SetCursor(const char* res){
     AppFrame* frame = AppFrame::GetLocalInst();
-    ::SetCursor(LoadCursorA(NULL, res));
-    if (frame)
-        frame->cursorSelected = true;
+    frame->SetCursor(res);
 }
 
 void Main::SetMenu(Menu* m){
@@ -488,19 +481,8 @@ void Main::OnAnimationFrame(float frame){
 }
 
 void Main::SaveImage(String file, Rect rect){
-    size_t width = (size_t)rect.GetWidth();
-    size_t height = (size_t)rect.GetHeight();
-    size_t size = (width * height) << 2;
-    char* buffer = new char[size];
-
-    DebugLog("SaveImage %s", file.GetString());
-
-    glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glReadPixels(rect.left, rect.bottom, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-
-    Resource::StoreImage(file, buffer, width, height, 4);
-
-    delete[] buffer;
+    AppFrame* frame = AppFrame::GetLocalInst();
+    frame->SaveImage(file, rect);
 }
 
 void Main::RenderAnimation(String dir, size_t start, size_t end, Rect rect){
@@ -571,67 +553,36 @@ Mesh* Main::GetMesh(AViewObject* o){
 
 int Main::MainEntry(int argc, char** argv){
     Init();
-    AudioUtils::InitOpenAL();
-
-    DebugLog("Load Settings");
-    data->LoadSettings("settings.json");
-    data->ApplySettings();
 
     SelectionWindow* mainFrame = new SelectionWindow();
 
+    AppFrame::Initialize();
     AppFrame* appFrame = new AppFrame("ModelView", mainFrame, INIT_WINDOW_HEIGHT, INIT_WINDOW_WIDTH);
-
-    LocalData* localData = LocalData::GetLocalInst();
 
     DebugLog("Main Window Created");
 
-    appFrame->EnableOpenGL();
-    glutInit(&argc, argv);
-
-    DebugLog("OpenGL Enabled");
-    DebugLog("OpenGL Version %s", glGetString(GL_VERSION));
-    DebugLog("OpenGL Renderer %s", glGetString(GL_RENDERER));
-    DebugLog("OpenGL Vendor %s", glGetString(GL_VENDOR));
-    //DebugLog("OpenGL Extensions %s", glGetString(GL_EXTENSIONS));
-
-    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-
-    // 不知道为什么，arial.ttf最大值字符为0x6FF
-    glFontSize(12);
+    //glutInit(&argc, argv);
 
     mainFrame->SetWindow(new MainWindow());
 
     DebugLog("OpenGL Use Encoding %s", "GB2312");
 
     appFrame->Show();
-
-    localData->recTime = Time::GetTime();
-    localData->deltaTime = 0.0167f; // 一??60FPS大???的估测值，作为??动时间即??
-
-    while (appFrame->WaitHandleEvent()){
-        appFrame->Render();
-        appFrame->SwapBuffer();
-
-        float time = Time::GetTime();
-        localData->deltaTime = time - localData->recTime;
-        localData->recTime = time;
-    }
+    appFrame->MainLoop();
 
     int code = appFrame->GetExitCode();
 
     delete appFrame;
 
-    AudioUtils::UninitOpenAL();
     Uninit();
 
     return code;
 }
 
 void Main::Init(){
+    AppFrame::Initialize();
+    AudioUtils::InitOpenAL();
+
     MeshObject* mesh;
 
     data = new GlobalData();
@@ -639,10 +590,16 @@ void Main::Init(){
     
     AddObject(mesh);
     SelectObject(mesh);
+
+    DebugLog("Load Settings");
+    data->LoadSettings("settings.json");
+    data->ApplySettings();
 }
 
 void Main::Uninit(){
     if (data) delete data;
+    AudioUtils::UninitOpenAL();
+    AppFrame::Uninitialize();
 }
 
 GlobalData* Main::data = NULL;

@@ -9,4 +9,3 @@ project("Simple3DEditor" VERSION 1.0.0)
 add_subdirectory(src)
 
 # 包含子项目。
-add_subdirectory(imgui)

@@ -595,8 +595,8 @@ void SelectionWindow::InitMenu(){
     selMenu->AddItem(new MenuItem(L"上下分割至上侧", [=]{ this->SetWindow(new UDContainer(this->curWindow, NULL, this), false); }));
     selMenu->AddItem(new MenuItem(L"上下分割至下侧", [=]{ this->SetWindow(new UDContainer(NULL, this->curWindow, this), false); }));
     
-    selMenu->AddItem(new MenuItem());
-    selMenu->AddItem(new MenuItem(L"新窗口", [=]{ new AppFrame("ModelView New", new SelectionWindow(), 400, 400, true); }));
+    //selMenu->AddItem(new MenuItem());
+    //selMenu->AddItem(new MenuItem(L"新窗口", [=]{ new AppFrame("ModelView New", new SelectionWindow(), 400, 400, true); }));
 }
 
 bool SelectionWindow::IsFocus(){

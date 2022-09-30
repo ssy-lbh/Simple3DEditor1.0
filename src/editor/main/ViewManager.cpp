@@ -1,6 +1,5 @@
 #include <editor/main/ViewManager.h>
 
-#include <util/os/Thread.h>
 #include <util/os/AppFrame.h>
 
 #include <windows.h>
@@ -8,11 +7,16 @@
 
 namespace simple3deditor {
 
-ViewManager::ViewManager(AppFrame* frame) : frame(frame) {}
+thread_local ViewManager* viewMgr;
+
+ViewManager::ViewManager(AppFrame* frame) : frame(frame) {
+    viewMgr = this;
+}
+
 ViewManager::~ViewManager(){}
 
 ViewManager* ViewManager::GetLocalInst(){
-    return static_cast<ViewManager*>(ThreadLocal::Get(THREAD_LOCAL_VIEWMGR));
+    return viewMgr;
 }
 
 void ViewManager::Reset(){

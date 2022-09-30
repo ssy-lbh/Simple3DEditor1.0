@@ -170,10 +170,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="D:\Code\C++\Simple3DEditor1.0\build\imgui\ImGui.vcxproj">
-      <Project>{71960878-2E49-31A8-B6FC-65A86007C106}</Project>
-      <Name>ImGui</Name>
-    </ProjectReference>
     <ProjectReference Include="D:\Code\C++\Simple3DEditor1.0\build\src\Simple3DEditor.vcxproj">
       <Project>{A4FBE9BF-6162-3766-829F-66AE932702BF}</Project>
       <Name>Simple3DEditor</Name>

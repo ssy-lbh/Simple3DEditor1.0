@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "*.cu": "cpp",
+        "*.prefab": "yaml",
+        "*.unity": "yaml",
+        "*.meta": "yaml",
+        "*.def": "cpp",
+        "*.s": "nasm",
+        "*.make": "makefile",
+        "chrono": "cpp",
+        "algorithm": "cpp",
+        "thread": "cpp"
+    }
+}

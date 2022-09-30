@@ -6,31 +6,22 @@
 #include <util/String.h>
 #include <util/os/Font.h>
 
-#include <windows.h>
+typedef struct GLFWwindow GLFWwindow;
+struct ImGuiContext;
 
 namespace simple3deditor {
 
 // 应保证单个线程内为单例
 class AppFrame final : public Object {
-private:
-    static bool init;
-
 public:
-    HINSTANCE hInst;
-    HWND hWnd;
-    HACCEL hAccel;
-    HDC hDC;
-    HGLRC hRC;
-    MSG Msg;
-    HANDLE hThread = INVALID_HANDLE_VALUE;
-
-    static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT CALLBACK LocalWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    void FireEvent(AWindow* window, HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     void InitWindow();
 
 private:
     String name;
+
+    ::ImGuiContext* imguiCtx;
+    ::GLFWwindow* window;
+
     AWindow* mainFrame;
     size_t width;
     size_t height;
@@ -38,19 +29,8 @@ private:
     LocalData* data;
     ViewManager* viewMgr;
 
-    static void Initialize();
-
 public:
-    enum MessageType {
-        MESSAGE_TIMER,
-        MESSAGE_LEFTDOWN,
-        MESSAGE_LEFTUP,
-        MESSAGE_RIGHTDOWN,
-        MESSAGE_RIGHTUP,
-        MESSAGE_OTHERS
-    };
-
-    bool cursorSelected = false;
+    static const char* GLSL_VERSION;
 
     // 这些字体List由wglDeleteContext回收
     uint fontASCII = 0;
@@ -59,6 +39,8 @@ public:
     AppFrame(String name, AWindow* mainFrame, size_t height, size_t width, bool async = false);
     ~AppFrame();
 
+    static bool Initialize();
+    static void Uninitialize();
     static AppFrame* GetLocalInst();
 
     String GetCaption();
@@ -69,11 +51,10 @@ public:
     AWindow* GetMainFrame();
     LocalData* GetLocalData();
     ViewManager* GetViewManager();
+    inline ::GLFWwindow* GetWindow(){ return window; }
 
     void Show();
     void Hide();
-    void EnableOpenGL();
-    void DisableOpenGL();
     // 返回否为退出
     bool WaitHandleEvent();
     bool HandleEvents();
@@ -85,10 +66,12 @@ public:
     // 我这电脑貌似没有开垂直同步，我还得自己找方法开启
 
     int MainLoop();
-    bool WaitQuit();
-
-    MessageType GetLastMessageType();
     int GetExitCode();
+
+    void SetCursor(int id);
+    void SetCursor(const char* res);
+
+    void SaveImage(const String& file, Rect rect);
 };
 
 }

@@ -6,6 +6,8 @@
 
 #include <util/os/Font.h>
 
+#include <lib/imgui/imgui.h>
+
 namespace simple3deditor {
 
 int DebugLog(const char* format, ...){

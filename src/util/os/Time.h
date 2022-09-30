@@ -15,13 +15,6 @@ public:
     static void Sleep(float time);
 };
 
-//TODO Œ¥ µœ÷
-class TimerManager {
-public:
-    static void CreateTimer(int id, int elapseMillis);
-    static void DestroyTimer(int id);
-};
-
 }
 
 #endif

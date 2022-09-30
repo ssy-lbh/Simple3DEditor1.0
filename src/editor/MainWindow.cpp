@@ -27,7 +27,9 @@
 #include <editor/main/ViewObject.h>
 #include <editor/object/AllObjects.h>
 
-#include <json/nlohmann/json.hpp>
+#include <lib/json/nlohmann/json.hpp>
+
+#include <lib/imgui/imgui.h>
 
 namespace simple3deditor {
 
@@ -958,48 +960,52 @@ void MainWindow::RenderModelView(){
 }
 
 void MainWindow::OnRender(){
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClearDepth(1.0);
+    // glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    // glClearDepth(1.0);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
-    options->editor = true;
-    options->vertex = true;
-    options->edge = true;
-    options->face = true;
-    options->light = lightEnabled;
-    options->objOp = objOp;
+    // RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
+    // options->editor = true;
+    // options->vertex = true;
+    // options->edge = true;
+    // options->face = true;
+    // options->light = lightEnabled;
+    // options->objOp = objOp;
 
-    RenderModelView();
+    // RenderModelView();
 
-    glEnable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glEnable(GL_ALPHA_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    GLUtils::ResetProjection();
-    GLUtils::ResetModelView();
+    // glEnable(GL_BLEND);
+    // glEnable(GL_DEPTH_TEST);
+    // glDisable(GL_LIGHTING);
+    // glEnable(GL_ALPHA_TEST);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // GLUtils::ResetProjection();
+    // GLUtils::ResetModelView();
     
-    // 屏幕绘制
-    Main::RenderScreen();
+    // // 屏幕绘制
+    // Main::RenderScreen();
 
-    glDisable(GL_DEPTH_TEST);
-    // 工具绘制
-    if (curTool)
-        curTool->OnRender();
+    // glDisable(GL_DEPTH_TEST);
+    // // 工具绘制
+    // if (curTool)
+    //     curTool->OnRender();
 
-    // UI绘制
-    // 在之前进行3D渲染使用投影变换后，需要参数aspect
-    guiMgr->OnChainRender();
+    // // UI绘制
+    // // 在之前进行3D渲染使用投影变换后，需要参数aspect
+    // guiMgr->OnChainRender();
 
-    if (audioControl){
-        if (dopplerEffect){
-            alListenerPosAutoVelv3(camPos);
-        }else{
-            alListenerPosv3(camPos);
-        }
-    }
+    // if (audioControl){
+    //     if (dopplerEffect){
+    //         alListenerPosAutoVelv3(camPos);
+    //     }else{
+    //         alListenerPosv3(camPos);
+    //     }
+    // }
+
+    ImGui::Begin("MainWindow");
+    ImGui::Text("Hello ImGui!");
+    ImGui::End();
 }
 
 void MainWindow::SetOperation(IOperation* op){
@@ -1143,23 +1149,23 @@ bool MainWindow::LoadMesh(AViewObject* obj, WString path){
             fileData[i] = '\0';
             if (fileData[filePtr] == '#'){
                 DebugLog("Object Annotation %s", fileData + filePtr + 1);
-            }else if (sscanf(fileData + filePtr, "v %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
+            }else if (sscanf_s(fileData + filePtr, "v %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
                 vert.Add(mesh->AddVertex(vec));
-            }else if (sscanf(fileData + filePtr, "vt %f %f", &vec.x, &vec.y) == 2){
+            }else if (sscanf_s(fileData + filePtr, "vt %f %f", &vec.x, &vec.y) == 2){
                 vertUV.Add(Vector2(vec.x, vec.y));
-            }else if (sscanf(fileData + filePtr, "vn %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
+            }else if (sscanf_s(fileData + filePtr, "vn %f %f %f", &vec.x, &vec.y, &vec.z) == 3){
                 vertNormal.Add(vec);
-            }else if (sscanf(fileData + filePtr, "f %d/%d %d/%d %d/%d", &v1, &vt1, &v2, &vt2, &v3, &vt3) == 6){
+            }else if (sscanf_s(fileData + filePtr, "f %d/%d %d/%d %d/%d", &v1, &vt1, &v2, &vt2, &v3, &vt3) == 6){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
                 vert[v1 - 1]->uv = vertUV[vt1 - 1];
                 vert[v2 - 1]->uv = vertUV[vt2 - 1];
                 vert[v3 - 1]->uv = vertUV[vt3 - 1];
-            }else if (sscanf(fileData + filePtr, "f %d//%d %d//%d %d//%d", &v1, &vn1, &v2, &vn2, &v3, &vn3) == 6){
+            }else if (sscanf_s(fileData + filePtr, "f %d//%d %d//%d %d//%d", &v1, &vn1, &v2, &vn2, &v3, &vn3) == 6){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
                 vert[v1 - 1]->normal = vertNormal[vn1 - 1];
                 vert[v2 - 1]->normal = vertNormal[vn2 - 1];
                 vert[v3 - 1]->normal = vertNormal[vn3 - 1];
-            }else if (sscanf(fileData + filePtr, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3) == 9){
+            }else if (sscanf_s(fileData + filePtr, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v1, &vt1, &vn1, &v2, &vt2, &vn2, &v3, &vt3, &vn3) == 9){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
                 vert[v1 - 1]->uv = vertUV[vt1 - 1];
                 vert[v2 - 1]->uv = vertUV[vt2 - 1];
@@ -1167,7 +1173,7 @@ bool MainWindow::LoadMesh(AViewObject* obj, WString path){
                 vert[v1 - 1]->normal = vertNormal[vn1 - 1];
                 vert[v2 - 1]->normal = vertNormal[vn2 - 1];
                 vert[v3 - 1]->normal = vertNormal[vn3 - 1];
-            }else if (sscanf(fileData + filePtr, "f %d %d %d", &v1, &v2, &v3) == 3){
+            }else if (sscanf_s(fileData + filePtr, "f %d %d %d", &v1, &v2, &v3) == 3){
                 mesh->AddTriFace(vert[v1 - 1], vert[v2 - 1], vert[v3 - 1]);
             }else{
                 DebugError("Object File Unknown Line %s", fileData + filePtr);

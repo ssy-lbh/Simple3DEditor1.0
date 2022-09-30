@@ -7,6 +7,10 @@
 
 #include <windows.h>
 
+#include <glfw/GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <glfw/GLFW/glfw3native.h>
+
 namespace simple3deditor {
 
 String ShellFileSelectWindow(const String filter, int flags, bool save){
@@ -18,7 +22,7 @@ String ShellFileSelectWindow(const String filter, int flags, bool save){
 
     RtlZeroMemory(&ofn, sizeof(OPENFILENAMEA));
     ofn.lStructSize = sizeof(OPENFILENAMEA);
-    ofn.hwndOwner = (frame == NULL ? NULL : frame->hWnd);
+    ofn.hwndOwner = (frame == NULL ? NULL : glfwGetWin32Window(frame->GetWindow()));
     // 结尾为两个'\0'，每两个字符串构成描述、过滤对，增加过滤模板可用';'分隔多个模板
     ofn.lpstrFilter = filter.GetString();
     ofn.lpstrInitialDir = "./";
@@ -70,7 +74,7 @@ WString ShellFileSelectWindow(const WString filter, int flags, bool save){
 
     RtlZeroMemory(&ofn, sizeof(OPENFILENAMEW));
     ofn.lStructSize = sizeof(OPENFILENAMEW);
-    ofn.hwndOwner = (frame == NULL ? NULL : frame->hWnd);
+    ofn.hwndOwner = (frame == NULL ? NULL : glfwGetWin32Window(frame->GetWindow()));
     // 结尾为两个'\0'，每两个字符串构成描述、过滤对，增加过滤模板可用';'分隔多个模板
     ofn.lpstrFilter = filter.GetString();
     ofn.lpstrInitialDir = L"./";
@@ -287,12 +291,12 @@ bool ShellBinaryToShader(const WString src, const WString dst, ShaderType type){
 
 int ShellMsgBox(const String caption, const String text){
     AppFrame* frame = AppFrame::GetLocalInst();
-    return MessageBoxA((frame == NULL ? NULL : frame->hWnd), text.GetString(), caption.GetString(), MB_YESNOCANCEL | MB_ICONINFORMATION);
+    return MessageBoxA((frame == NULL ? NULL : glfwGetWin32Window(frame->GetWindow())), text.GetString(), caption.GetString(), MB_YESNOCANCEL | MB_ICONINFORMATION);
 }
 
 int ShellMsgBox(const WString caption, const WString text){
     AppFrame* frame = AppFrame::GetLocalInst();
-    return MessageBoxW((frame == NULL ? NULL : frame->hWnd), text.GetString(), caption.GetString(), MB_YESNOCANCEL | MB_ICONINFORMATION);
+    return MessageBoxW((frame == NULL ? NULL : glfwGetWin32Window(frame->GetWindow())), text.GetString(), caption.GetString(), MB_YESNOCANCEL | MB_ICONINFORMATION);
 }
 
 bool ShellPrint(const String file){
