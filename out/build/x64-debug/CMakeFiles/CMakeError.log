@@ -1,0 +1,111 @@
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: E:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+2
+用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.29.30146 版
+版权所有(C) Microsoft Corporation。保留所有权利。
+
+CMakeCCompilerId.c
+Microsoft (R) Incremental Linker Version 14.29.30146.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCCompilerId.exe 
+CMakeCCompilerId.obj 
+LINK : fatal error LNK1104: 无法打开文件“LIBCMT.lib”
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: E:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+2
+用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.29.30146 版
+版权所有(C) Microsoft Corporation。保留所有权利。
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30146.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: 无法打开文件“LIBCMT.lib”
+
+
+Detecting C compiler ABI info failed to compile with the following output:
+Change Dir: D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):E:/Program Files/C++/gcc-v11.1.0-mingw-v8.0.0-x86_64/bin/make.exe -f Makefile cmTC_6f4d4/fast && E:/Program Files/C++/gcc-v11.1.0-mingw-v8.0.0-x86_64/bin/make.exe  -f CMakeFiles/cmTC_6f4d4.dir/build.make CMakeFiles/cmTC_6f4d4.dir/build
+make.exe[1]: Entering directory 'D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_6f4d4.dir/CMakeCCompilerABI.c.obj
+"E:/Program Files/CMake/bin/cmake.exe" -E cmake_cl_compile_depends --dep-file=CMakeFiles/cmTC_6f4d4.dir/CMakeCCompilerABI.c.obj.d --working-dir=D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp --filter-prefix="娉ㄦ剰: 鍖呭惈鏂囦欢:  " -- "E:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/cl.exe"  /nologo   /DWIN32 /D_WINDOWS /W3  /MDd /Zi /Ob0 /Od /RTC1 /showIncludes /FoCMakeFiles/cmTC_6f4d4.dir/CMakeCCompilerABI.c.obj /FdCMakeFiles/cmTC_6f4d4.dir/ /FS -c "E:/Program Files/CMake/share/cmake-3.22/Modules/CMakeCCompilerABI.c"
+鐢ㄤ簬 x64 鐨?Microsoft (R) C/C++ 浼樺寲缂栬瘧鍣?19.29.30146 鐗?鐗堟潈鎵€鏈?C) Microsoft Corporation銆備繚鐣欐墍鏈夋潈鍒┿€?
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/nologo鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/nologo鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/DWIN32鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/DWIN32鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/D_WINDOWS鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/D_WINDOWS鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/W3鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/W3鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/MDd鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/MDd鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/Zi鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/Zi鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/Ob0鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/Ob0鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/Od鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/Od鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/RTC1鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/RTC1鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/showIncludes鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/showIncludes鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/FoCMakeFiles/cmTC_6f4d4.dir/CMakeCCompilerABI.c.obj鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/FdCMakeFiles/cmTC_6f4d4.dir/鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/FdCMakeFiles/cmTC_6f4d4.dir/鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/FS鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/FS鈥濊蹇界暐
+CMakeCCompilerABI.c
+Linking C executable cmTC_6f4d4.exe
+"E:/Program Files/CMake/bin/cmake.exe" -E vs_link_exe --intdir=CMakeFiles/cmTC_6f4d4.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests -- "E:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/link.exe" /nologo @CMakeFiles/cmTC_6f4d4.dir/objects1.rsp  /out:cmTC_6f4d4.exe /implib:cmTC_6f4d4.lib /pdb:D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp/cmTC_6f4d4.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib 
+LINK: command "E:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/link.exe E:/Program Files/Git/nologo @CMakeFiles/cmTC_6f4d4.dir/objects1.rsp /out:cmTC_6f4d4.exe /implib:cmTC_6f4d4.lib /pdb:D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp/cmTC_6f4d4.pdb /version:0.0 /machine:x64 E:/Program Files/Git/debug E:/Program Files/Git/INCREMENTAL /subsystem:console kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:cmTC_6f4d4.exe.manifest" failed (exit code 1181) with the following output:
+Microsoft (R) Incremental Linker Version 14.29.30146.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+CMakeFiles/cmTC_6f4d4.dir/CMakeCCompilerABI.c.obj 
+LINK : fatal error LNK1181: 无法打开输入文件“E:\Program Files\Git\nologo.obj”
+make.exe[1]: *** [CMakeFiles/cmTC_6f4d4.dir/build.make:100: cmTC_6f4d4.exe] Error 127
+make.exe[1]: Leaving directory 'D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp'
+make.exe: *** [Makefile:127: cmTC_6f4d4/fast] Error 2
+
+
+
+
+Determining if the C compiler works failed with the following output:
+Change Dir: D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):E:/Program Files/C++/gcc-v11.1.0-mingw-v8.0.0-x86_64/bin/make.exe -f Makefile cmTC_b4564/fast && E:/Program Files/C++/gcc-v11.1.0-mingw-v8.0.0-x86_64/bin/make.exe  -f CMakeFiles/cmTC_b4564.dir/build.make CMakeFiles/cmTC_b4564.dir/build
+make.exe[1]: Entering directory 'D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_b4564.dir/testCCompiler.c.obj
+"E:/Program Files/CMake/bin/cmake.exe" -E cmake_cl_compile_depends --dep-file=CMakeFiles/cmTC_b4564.dir/testCCompiler.c.obj.d --working-dir=D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp --filter-prefix="娉ㄦ剰: 鍖呭惈鏂囦欢:  " -- "E:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/cl.exe"  /nologo   /DWIN32 /D_WINDOWS /W3  /MDd /Zi /Ob0 /Od /RTC1 /showIncludes /FoCMakeFiles/cmTC_b4564.dir/testCCompiler.c.obj /FdCMakeFiles/cmTC_b4564.dir/ /FS -c D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp/testCCompiler.c
+鐢ㄤ簬 x64 鐨?Microsoft (R) C/C++ 浼樺寲缂栬瘧鍣?19.29.30146 鐗?鐗堟潈鎵€鏈?C) Microsoft Corporation銆備繚鐣欐墍鏈夋潈鍒┿€?
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/nologo鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/nologo鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/DWIN32鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/DWIN32鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/D_WINDOWS鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/D_WINDOWS鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/W3鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/W3鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/MDd鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/MDd鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/Zi鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/Zi鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/Ob0鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/Ob0鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/Od鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/Od鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/RTC1鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/RTC1鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/showIncludes鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/showIncludes鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/FoCMakeFiles/cmTC_b4564.dir/testCCompiler.c.obj鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/FdCMakeFiles/cmTC_b4564.dir/鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/FdCMakeFiles/cmTC_b4564.dir/鈥濊蹇界暐
+cl: 鍛戒护琛?warning D9024 :鏃犳硶璇嗗埆鐨勬簮鏂囦欢绫诲瀷鈥淓:/Program Files/Git/FS鈥濓紝鍋囧畾涓哄璞℃枃浠?cl: 鍛戒护琛?warning D9027 :婧愭枃浠垛€淓:/Program Files/Git/FS鈥濊蹇界暐
+testCCompiler.c
+Linking C executable cmTC_b4564.exe
+"E:/Program Files/CMake/bin/cmake.exe" -E vs_link_exe --intdir=CMakeFiles/cmTC_b4564.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests -- "E:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/link.exe" /nologo @CMakeFiles/cmTC_b4564.dir/objects1.rsp  /out:cmTC_b4564.exe /implib:cmTC_b4564.lib /pdb:D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp/cmTC_b4564.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib 
+LINK: command "E:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x64/link.exe E:/Program Files/Git/nologo @CMakeFiles/cmTC_b4564.dir/objects1.rsp /out:cmTC_b4564.exe /implib:cmTC_b4564.lib /pdb:D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp/cmTC_b4564.pdb /version:0.0 /machine:x64 E:/Program Files/Git/debug E:/Program Files/Git/INCREMENTAL /subsystem:console kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:cmTC_b4564.exe.manifest" failed (exit code 1181) with the following output:
+Microsoft (R) Incremental Linker Version 14.29.30146.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+CMakeFiles/cmTC_b4564.dir/testCCompiler.c.obj 
+LINK : fatal error LNK1181: 无法打开输入文件“E:\Program Files\Git\nologo.obj”
+make.exe[1]: *** [CMakeFiles/cmTC_b4564.dir/build.make:100: cmTC_b4564.exe] Error 127
+make.exe[1]: Leaving directory 'D:/Code/C++/Simple3DEditor1.0/out/build/x64-debug/CMakeFiles/CMakeTmp'
+make.exe: *** [Makefile:127: cmTC_b4564/fast] Error 2
+
+
+

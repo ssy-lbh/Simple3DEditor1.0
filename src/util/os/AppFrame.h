@@ -6,9 +6,6 @@
 #include <util/String.h>
 #include <util/os/Font.h>
 
-typedef struct GLFWwindow GLFWwindow;
-struct ImGuiContext;
-
 namespace simple3deditor {
 
 // 应保证单个线程内为单例

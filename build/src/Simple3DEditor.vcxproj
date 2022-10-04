@@ -655,8 +655,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Shell.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\System.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Time.h" />
-    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\BufferBuilder.h" />
-    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\VertexBuffer.h" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Appendable.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Closeable.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Flushable.cpp" />
@@ -754,8 +752,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Property.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\AppFrame.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Time.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\BufferBuilder.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\VertexBuffer.cpp" />
     <ResourceCompile Include="D:\Code\C++\Simple3DEditor1.0\src\res.rc" />
     <ResourceCompile Include="D:\Code\C++\Simple3DEditor1.0\src\string.rc" />
   </ItemGroup>

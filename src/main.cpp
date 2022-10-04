@@ -188,8 +188,9 @@ void LocalData::OnMenuAccel(int id, bool accel){
 }
 
 void LocalData::Render(){
-    if (menu)
-        menu->Render(menuPos);
+    if (menu){
+        menu->Render();
+    }
 }
 
 void LocalData::CreateAudioListener(){

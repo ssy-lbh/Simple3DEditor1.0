@@ -7,6 +7,8 @@
 #include <util/os/Log.h>
 #include <util/gl/GLUtils.h>
 
+#include <lib/imgui/imgui.h>
+
 namespace simple3deditor {
 
 MenuItem::MenuItem() : type(MenuItemType::SEPERATOR) {}
@@ -149,7 +151,14 @@ void Menu::RenderItem(MenuItem* item){
     drawCounter++;
 }
 
-void Menu::Render(Vector2 pos){
+void Menu::Render(){
+    bool sel;
+    ImGui::BeginMenu("MainMenu");
+    ImGui::MenuItem("Hello", nullptr, &sel);
+    ImGui::EndMenu();
+}
+
+void Menu::Render(Vector2 pos){    
     Vector2 cornWidth = cliInvSize * CORNER_PIXELS;
 
     float width = cornWidth.x * 2.0f + WIDTH_PIXELS * cliInvSize.x;

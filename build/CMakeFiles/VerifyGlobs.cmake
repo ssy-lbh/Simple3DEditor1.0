@@ -102,8 +102,6 @@ set(OLD_GLOB
   "D:/Code/C++/Simple3DEditor1.0/src/util/math3d/Property.cpp"
   "D:/Code/C++/Simple3DEditor1.0/src/util/os/AppFrame.cpp"
   "D:/Code/C++/Simple3DEditor1.0/src/util/os/Time.cpp"
-  "D:/Code/C++/Simple3DEditor1.0/src/util/render/BufferBuilder.cpp"
-  "D:/Code/C++/Simple3DEditor1.0/src/util/render/VertexBuffer.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
@@ -451,8 +449,6 @@ set(OLD_GLOB
   "D:/Code/C++/Simple3DEditor1.0/src/util/os/Shell.h"
   "D:/Code/C++/Simple3DEditor1.0/src/util/os/System.h"
   "D:/Code/C++/Simple3DEditor1.0/src/util/os/Time.h"
-  "D:/Code/C++/Simple3DEditor1.0/src/util/render/BufferBuilder.h"
-  "D:/Code/C++/Simple3DEditor1.0/src/util/render/VertexBuffer.h"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")

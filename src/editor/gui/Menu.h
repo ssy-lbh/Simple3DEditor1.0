@@ -32,7 +32,7 @@ public:
     Delegate<MenuItem*> onDestory;
 };
 
-// 可以继承以实现多种样式的菜单
+// �?以继承以实现多�?�样式的菜单
 class Menu : public Object {
 protected:
     static float WIDTH_PIXELS;
@@ -70,6 +70,7 @@ public:
     void Click();
     void RenderItem(MenuItem* item);
     void Render(Vector2 pos);
+    void Render();
     void ResetSelect();
 
     void PressUp();

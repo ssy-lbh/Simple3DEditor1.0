@@ -326,7 +326,7 @@ public:
                 this->rotateInfo.Add(info);
                 this->center += info.pos;
             });
-            center /= Main::data->selPoints.Size();
+            center /= (float)Main::data->selPoints.Size();
             screenCenter = main->GetScreenPosition(center);
             break;
         case SelectionType::SELECT_EDGES:
@@ -484,7 +484,7 @@ public:
                 this->sizeInfo.Add(info);
                 this->center += info.vec;
             });
-            center /= Main::data->selPoints.Size();
+            center /= (float)Main::data->selPoints.Size();
             screenCenter = main->GetScreenPosition(center);
             break;
         case SelectionType::SELECT_EDGES:
@@ -613,7 +613,7 @@ public:
             SelectInfo info;
             info.camPos = window->camPos;
             info.camDir = window->camDir;
-            info.zBound = Vector2(window->camDis * 0.02, window->camDis * 20.0);
+            info.zBound = Vector2(window->camDis * 0.02f, window->camDis * 20.0f);
             info.rect = Rect(Vector2(start.x * window->aspect, start.y), Vector2(end.x * window->aspect, end.y));
             
             Main::data->curObject->OnSelect(&info);
@@ -959,52 +959,81 @@ void MainWindow::RenderModelView(){
     glDisable(GL_LINE_SMOOTH);
 }
 
-void MainWindow::OnRender(){
-    // glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    // glClearDepth(1.0);
+void MainWindow::OnGraphicsRenderCallback(const ImDrawList* list, const ImDrawCmd* cmd){
+    static_cast<MainWindow*>(cmd->UserCallbackData)->OnGraphicsRender(list, cmd);
+}
 
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void MainWindow::OnGraphicsRender(const ImDrawList* list, const ImDrawCmd* cmd){
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearDepth(1.0);
 
-    // RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
-    // options->editor = true;
-    // options->vertex = true;
-    // options->edge = true;
-    // options->face = true;
-    // options->light = lightEnabled;
-    // options->objOp = objOp;
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // RenderModelView();
+    RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
+    options->editor = true;
+    options->vertex = true;
+    options->edge = true;
+    options->face = true;
+    options->light = lightEnabled;
+    options->objOp = objOp;
 
-    // glEnable(GL_BLEND);
-    // glEnable(GL_DEPTH_TEST);
-    // glDisable(GL_LIGHTING);
-    // glEnable(GL_ALPHA_TEST);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // GLUtils::ResetProjection();
-    // GLUtils::ResetModelView();
+    RenderModelView();
+
+    glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glEnable(GL_ALPHA_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    GLUtils::ResetProjection();
+    GLUtils::ResetModelView();
     
-    // // 屏幕绘制
-    // Main::RenderScreen();
+    // 屏幕绘制
+    Main::RenderScreen();
 
-    // glDisable(GL_DEPTH_TEST);
-    // // 工具绘制
-    // if (curTool)
-    //     curTool->OnRender();
+    glDisable(GL_DEPTH_TEST);
+    // 工具绘制
+    if (curTool)
+        curTool->OnRender();
 
-    // // UI绘制
-    // // 在之前进行3D渲染使用投影变换后，需要参数aspect
-    // guiMgr->OnChainRender();
+    // UI绘制
+    // 在之前进行3D渲染使用投影变换后，需要参数aspect
+    guiMgr->OnChainRender();
 
-    // if (audioControl){
-    //     if (dopplerEffect){
-    //         alListenerPosAutoVelv3(camPos);
-    //     }else{
-    //         alListenerPosv3(camPos);
-    //     }
-    // }
+    if (audioControl){
+        if (dopplerEffect){
+            alListenerPosAutoVelv3(camPos);
+        }else{
+            alListenerPosv3(camPos);
+        }
+    }
+}
 
-    ImGui::Begin("MainWindow");
-    ImGui::Text("Hello ImGui!");
+void MainWindow::OnRender(){
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (!ImGui::Begin("MainWindow", &window_open, ImGuiWindowFlags_MenuBar)){
+        ImGui::End();
+        return;
+    }
+
+    ImDrawList* list = ImGui::GetWindowDrawList();
+
+    if (ImGui::BeginMenuBar()){
+        if (ImGui::BeginMenu("Tools")){
+            if (ImGui::MenuItem("Tap Click", "Alt+1"))
+                SetTool(new EmptyTool(this));
+            if (ImGui::MenuItem("Box Select", "Alt+2"))
+                SetTool(new SelectTool(this));
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+    }
+
+    list->AddCallback(OnGraphicsRenderCallback, this);
+
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Right)){
+        Main::SetMenu(basicMenu);
+    }
     ImGui::End();
 }
 
@@ -1264,7 +1293,7 @@ void MainWindow::OnResize(int x, int y){
 }
 
 void MainWindow::OnMouseWheel(int delta){
-    SetDistance(camDis * Pow(0.999f, delta));
+    SetDistance(camDis * Pow(0.999f, (float)delta));
 }
 
 void MainWindow::OnMenuAccel(int id, bool accel){

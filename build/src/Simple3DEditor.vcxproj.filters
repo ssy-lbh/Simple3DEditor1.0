@@ -292,12 +292,6 @@
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Time.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\BufferBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\VertexBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Appendable.h">
@@ -1312,12 +1306,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\BufferBuilder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\render\VertexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

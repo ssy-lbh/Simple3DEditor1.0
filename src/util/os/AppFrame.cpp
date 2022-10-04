@@ -21,7 +21,7 @@ namespace simple3deditor {
 
 thread_local AppFrame* appFrame;
 
-const char* AppFrame::GLSL_VERSION = "#version 130";
+const char* AppFrame::GLSL_VERSION = "#version 430";
 
 static void ThreadStart(AppFrame* frame){
     appFrame = frame;
@@ -70,9 +70,6 @@ bool AppFrame::Initialize(){
     glfwSetErrorCallback(glfwErrorCallback);
     if (!glfwInit())
         return false;
-    
-    glfwWindowHint(GLFW_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_VERSION_MINOR, 0);
 
     return true;
 }
@@ -148,7 +145,33 @@ bool AppFrame::HandleEvents(){
     return true;
 }
 
+static void RenderMainMenu(){
+    if (ImGui::BeginMainMenuBar()){
+        if (ImGui::BeginMenu("File")){
+            if (ImGui::MenuItem("Save Model", "Ctrl+S"));
+            if (ImGui::MenuItem("Load Model", "Ctrl+L"));
+            ImGui::Separator();
+            if (ImGui::MenuItem("Save Workspace", "Ctrl+Alt+S"));
+            if (ImGui::MenuItem("Load Workspace", "Ctrl+Alt+L"));
+            ImGui::Separator();
+            if (ImGui::MenuItem("Exit", "ESC"));
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Mesh")){
+            if (ImGui::MenuItem("Plane"));
+            if (ImGui::MenuItem("Box"));
+            if (ImGui::MenuItem("Sphere"));
+            if (ImGui::MenuItem("Cylinder"));
+            if (ImGui::MenuItem("Capsule"));
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+}
+
 void AppFrame::Render(){
+    RenderMainMenu();
+
     //viewMgr->Reset();
     //viewMgr->EnableScissor();
 
@@ -169,9 +192,10 @@ int AppFrame::GetExitCode(){
 
 int AppFrame::MainLoop(){
     LocalData* localData = LocalData::GetLocalInst();
+    ImGuiIO& io = ImGui::GetIO();
 
-    localData->recTime = Time::GetTime();
-    localData->deltaTime = 0.0f;
+    localData->recTime = glfwGetTime();
+    io.DeltaTime = localData->deltaTime = 1.0f / 60.0f;
 
     while (!glfwWindowShouldClose(window)){
         glfwPollEvents();
@@ -194,9 +218,9 @@ int AppFrame::MainLoop(){
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
 
-        float time = Time::GetTime();
-        localData->deltaTime = time - localData->recTime;
-        localData->recTime = time;
+        float time = (float)glfwGetTime();
+        io.DeltaTime = localData->deltaTime = time - localData->recTime;
+		localData->recTime = time;
     }
 
     return 0;
@@ -211,22 +235,59 @@ void AppFrame::InitWindow(){
     imguiCtx = ImGui::CreateContext();
     ImGui::SetCurrentContext(imguiCtx);
     ImGui::StyleColorsDark();
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+
+    // TEMP
+    // io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
+    // io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
+    // io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
+    // io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
+    // io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
+    // io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
+    // io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
+    // io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
+    // io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
+    // io.KeyMap[ImGuiKey_Insert] = GLFW_KEY_INSERT;
+    // io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
+    // io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
+    // io.KeyMap[ImGuiKey_Space] = GLFW_KEY_SPACE;
+    // io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
+    // io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
+    // io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
+    // io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
+    // io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
+    // io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
+    // io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
+    // io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
     
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(GLSL_VERSION);
 
-    //DebugLog("OpenGL Enabled");
-    //DebugLog("OpenGL Version %s", glGetString(GL_VERSION));
-    //DebugLog("OpenGL Renderer %s", glGetString(GL_RENDERER));
-    //DebugLog("OpenGL Vendor %s", glGetString(GL_VENDOR));
+    // glfwSetCharCallback();
+    // glfwSetCursorPosCallback();
+    // glfwSetDropCallback();
+    // glfwSetMouseButtonCallback();
+    // glfwSetWindowFocusCallback();
+    // glfwSetWindowSizeCallback();
+
+    DebugLog("OpenGL Enabled");
+    DebugLog("OpenGL Version %s", glGetString(GL_VERSION));
+    DebugLog("OpenGL Renderer %s", glGetString(GL_RENDERER));
+    DebugLog("OpenGL Vendor %s", glGetString(GL_VENDOR));
     //DebugLog("OpenGL Extensions %s", glGetString(GL_EXTENSIONS));
 
-    //glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-    //glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    //glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 }
 
 void AppFrame::SetCursor(int id){}

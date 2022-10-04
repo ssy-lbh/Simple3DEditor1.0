@@ -17,6 +17,9 @@ enum class ObjectOperation {
 
 class MainWindow final : public AWindow, public CCamera {
 private:
+    bool window_open = true;
+
+private:
     Vector3 cursorDir;
 
     bool lightEnabled = false;
@@ -66,6 +69,9 @@ protected:
     void SetDistance(float dis);
     Point2 GetScreenPosition(Point3 pos);
     void InitCamera();
+
+    static void OnGraphicsRenderCallback(const ImDrawList* list, const ImDrawCmd* cmd);
+    void OnGraphicsRender(const ImDrawList* list, const ImDrawCmd* cmd);
 
 public:
     WINDOW_INFO_DEF();

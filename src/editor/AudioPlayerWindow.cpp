@@ -208,25 +208,25 @@ void AudioPlayerWindow::RenderGraph(){
     Complex samples[SAMPLE_SIZE];
     float height[GRAPH_SIZE];
 
-    if (offset + SAMPLE_SIZE >= source->GetSize()){
+    if ((uint)offset + SAMPLE_SIZE >= (uint)source->GetSize()){
         return;
     }
 
     if (sampleSize == 4 && channels == 2){
         for (int i = 0; i < SAMPLE_SIZE; i++){
-            samples[i] = Complex(((short*)data)[(i + offset) << 1]);
+            samples[i] = Complex((float)((short*)data)[(i + offset) << 1]);
         }
     }else if (sampleSize == 2 && channels == 1){
         for (int i = 0; i < SAMPLE_SIZE; i++){
-            samples[i] = Complex(((short*)data)[i + offset]);
+            samples[i] = Complex((float)((short*)data)[i + offset]);
         }
     }else if (sampleSize == 2 && channels == 2){
         for (int i = 0; i < SAMPLE_SIZE; i++){
-            samples[i] = Complex(((short)(((char*)data)[(i + offset) << 1] - 0x80) << 8));
+            samples[i] = Complex((float)((short)(((char*)data)[(i + offset) << 1] - 0x80) << 8));
         }
     }else if (sampleSize == 1 && channels == 1){
         for (int i = 0; i < SAMPLE_SIZE; i++){
-            samples[i] = Complex(((short)(((char*)data)[i + offset] - 0x80) << 8));
+            samples[i] = Complex((float)((short)(((char*)data)[i + offset] - 0x80) << 8));
         }
     }
 
@@ -402,7 +402,7 @@ void AudioPlayerWindow::LoadFile(WString file){
 
     // ½âÎöPCMÊý¾Ý
     int specNum;
-    int readLen;
+    size_t readLen;
     int dataLen;
     AudioWaveFormat wav;
     bool fmtRead = false;

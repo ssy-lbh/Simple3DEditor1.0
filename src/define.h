@@ -244,16 +244,19 @@ class IOutputStream;
 class AReader;
 class AWriter;
 
-// net
-class ASocket;
-class TCPSocket;
-class UDPSocket;
-
 }
 
 // soundtouch
 namespace soundtouch {
     class SoundTouch;
 };
+
+// glfw
+typedef struct GLFWwindow GLFWwindow;
+
+// imgui
+struct ImGuiContext;
+struct ImDrawList;
+struct ImDrawCmd;
 
 #endif
