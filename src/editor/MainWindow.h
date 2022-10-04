@@ -7,6 +7,8 @@
 #include <util/math3d/Camera.h>
 #include <editor/main/Window.h>
 
+#include <lib/imgui/imgui.h>
+
 namespace simple3deditor {
 
 enum class ObjectOperation {
@@ -40,6 +42,10 @@ private:
     GLSkyBox* skyBox = NULL;
 
     ObjectOperation objOp = ObjectOperation::MOVE;
+
+
+    ImVec2 viewMin;
+    ImVec2 viewSize;
 
     class MoveOperation;
     class ExcludeOperation;

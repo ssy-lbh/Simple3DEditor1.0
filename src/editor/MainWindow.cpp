@@ -29,7 +29,6 @@
 
 #include <lib/json/nlohmann/json.hpp>
 
-#include <lib/imgui/imgui.h>
 #include <util/math3d/ImVec.h>
 
 namespace simple3deditor {
@@ -1141,10 +1140,10 @@ void MainWindow::OnGraphicsRenderCallback(const ImDrawList* list, const ImDrawCm
 }
 
 void MainWindow::OnGraphicsRender(const ImDrawList* list, const ImDrawCmd* cmd){
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClearDepth(1.0);
+    // glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    // glClearDepth(1.0);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
     // options->editor = true;
@@ -1193,14 +1192,6 @@ void MainWindow::OnRender(){
         return;
     }
 
-    ImDrawList* list = ImGui::GetWindowDrawList();
-    list->PushClipRect(
-        ImGui::GetCursorScreenPos(),
-        ImGui::GetCursorScreenPos() + ImGui::GetContentRegionAvail()
-    );
-    list->AddCallback(OnGraphicsRenderCallback, this);
-    list->PopClipRect();
-
     if (ImGui::BeginMenuBar()){
         if (ImGui::BeginMenu("Tools")){
             if (ImGui::MenuItem("Tap Click", "Alt+1"))
@@ -1225,9 +1216,21 @@ void MainWindow::OnRender(){
         ImGui::EndMenuBar();
     }
 
+    {
+        const ImVec4 col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+        const ImU32 col32 = ImColor(col);
+
+        ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImVec2 avl = ImGui::GetContentRegionAvail();
+
+        ImDrawList* list = ImGui::GetWindowDrawList();
+        list->AddLine(pos, pos + avl, col32);
+    }
+
     if (ImGui::IsMouseDown(ImGuiMouseButton_Right)){
         Main::SetMenu(basicMenu);
     }
+
     ImGui::End();
 }
 
