@@ -4,11 +4,13 @@
 #include <res.h>
 #include <util/os/Font.h>
 #include <util/os/Time.h>
+#include <util/math3d/Mesh.h>
 #include <util/os/Resource.h>
 #include <editor/main/ViewManager.h>
 #include <editor/main/ViewObject.h>
 #include <editor/gui/UIManager.h>
 
+#include <cstdio>
 #include <thread>
 
 #include <lib/imgui/imgui.h>
@@ -95,7 +97,7 @@ Rect AppFrame::GetClientRect(){
 
     glfwGetWindowFrameSize(window, &left, &top, &right, &bottom);
 
-    return Rect(left, right, bottom, top);
+    return Rect((float)left, (float)right, (float)bottom, (float)top);
 }
 
 size_t AppFrame::GetHeight(){
@@ -145,7 +147,9 @@ bool AppFrame::HandleEvents(){
     return true;
 }
 
-static void RenderMainMenu(){
+void AppFrame::RenderMainMenu(){
+    LocalData* data = LocalData::GetLocalInst();
+
     if (ImGui::BeginMainMenuBar()){
         if (ImGui::BeginMenu("File")){
             if (ImGui::MenuItem("Save Model", "Ctrl+S"));
@@ -154,15 +158,11 @@ static void RenderMainMenu(){
             if (ImGui::MenuItem("Save Workspace", "Ctrl+Alt+S"));
             if (ImGui::MenuItem("Load Workspace", "Ctrl+Alt+L"));
             ImGui::Separator();
-            if (ImGui::MenuItem("Exit", "ESC"));
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Mesh")){
-            if (ImGui::MenuItem("Plane"));
-            if (ImGui::MenuItem("Box"));
-            if (ImGui::MenuItem("Sphere"));
-            if (ImGui::MenuItem("Cylinder"));
-            if (ImGui::MenuItem("Capsule"));
+            if (ImGui::MenuItem("Save Settings"));
+            if (ImGui::MenuItem("Load Settings"));
+            ImGui::Separator();
+            if (ImGui::MenuItem("Exit", "ESC"))
+                glfwSetWindowShouldClose(window, true);
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
@@ -230,7 +230,7 @@ void AppFrame::InitWindow(){
     data = new LocalData();
     viewMgr = new ViewManager(this);
 
-    window = glfwCreateWindow(width, height, name.GetString(), nullptr, nullptr);
+    window = glfwCreateWindow((int)width, (int)height, name.GetString(), nullptr, nullptr);
 
     imguiCtx = ImGui::CreateContext();
     ImGui::SetCurrentContext(imguiCtx);
@@ -303,7 +303,7 @@ void AppFrame::SaveImage(const String& file, Rect rect){
     DebugLog("SaveImage %s", file.GetString());
 
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glReadPixels(rect.left, rect.bottom, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+    glReadPixels((GLint)rect.left, (GLint)rect.bottom, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
     Resource::StoreImage(file, buffer, width, height, 4);
 

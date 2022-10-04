@@ -26,6 +26,8 @@ private:
     LocalData* data;
     ViewManager* viewMgr;
 
+    void RenderMainMenu();
+
 public:
     static const char* GLSL_VERSION;
 

@@ -1,6 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\editor\dialog\ColorBoard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\editor\dialog\Tips.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\io\File.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\manager\PluginManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\util\os\Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\util\os\Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\util\os\Resource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\util\os\Shell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\util\os\System.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_vorbis.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Appendable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -188,33 +218,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\manager\WindowManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\editor\dialog\ColorBoard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\editor\dialog\Tips.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\io\File.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\manager\PluginManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Font.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Resource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Shell.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\System.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\AudioUtils.cpp">

@@ -19,8 +19,8 @@ void AWindow::UpdateCursor(int x, int y){
 }
 
 void AWindow::UpdateWindowSize(int x, int y){
-    cliSize.x = x;
-    cliSize.y = y;
+    cliSize.x = (float)x;
+    cliSize.y = (float)y;
     cliInvSize.x = 1.0f / cliSize.x;
     cliInvSize.y = 1.0f / cliSize.y;
     aspect = (float)cliSize.x / cliSize.y;

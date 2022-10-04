@@ -73,6 +73,12 @@ protected:
     static void OnGraphicsRenderCallback(const ImDrawList* list, const ImDrawCmd* cmd);
     void OnGraphicsRender(const ImDrawList* list, const ImDrawCmd* cmd);
 
+    void AddMeshPlane();
+    void AddMeshBox();
+    void AddMeshSphere(int loops, int round);
+    void AddMeshCylinder(int loops, int round);
+    void AddMeshCapsule(int ballLoops, int cylinderLoops, int round);
+
 public:
     WINDOW_INFO_DEF();
 

@@ -1008,6 +1008,182 @@ void MainWindow::OnGraphicsRender(const ImDrawList* list, const ImDrawCmd* cmd){
     }
 }
 
+void MainWindow::AddMeshPlane(){
+    Mesh* mesh = Main::GetMesh();
+    if (!mesh)
+        return;
+    Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, 0.0f) + camLookat);
+    Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, 0.0f) + camLookat);
+    Vertex* v3 = new Vertex(Vector3(-1.0f,  1.0f, 0.0f) + camLookat);
+    Vertex* v4 = new Vertex(Vector3( 1.0f,  1.0f, 0.0f) + camLookat);
+    v1->uv = Vector2(0.0f, 0.0f);
+    v2->uv = Vector2(1.0f, 0.0f);
+    v3->uv = Vector2(0.0f, 1.0f);
+    v4->uv = Vector2(1.0f, 1.0f);
+    mesh->AddVertex(v1);
+    mesh->AddVertex(v2);
+    mesh->AddVertex(v3);
+    mesh->AddVertex(v4);
+    mesh->AddTriFace(v1, v2, v4);
+    mesh->AddTriFace(v1, v3, v4);
+}
+
+void MainWindow::AddMeshBox(){
+    Mesh* mesh = Main::GetMesh();
+    if (!mesh)
+        return;
+    Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, -1.0f) + camLookat);
+    Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, -1.0f) + camLookat);
+    Vertex* v3 = new Vertex(Vector3(-1.0f,  1.0f, -1.0f) + camLookat);
+    Vertex* v4 = new Vertex(Vector3( 1.0f,  1.0f, -1.0f) + camLookat);
+    Vertex* v5 = new Vertex(Vector3(-1.0f, -1.0f,  1.0f) + camLookat);
+    Vertex* v6 = new Vertex(Vector3( 1.0f, -1.0f,  1.0f) + camLookat);
+    Vertex* v7 = new Vertex(Vector3(-1.0f,  1.0f,  1.0f) + camLookat);
+    Vertex* v8 = new Vertex(Vector3( 1.0f,  1.0f,  1.0f) + camLookat);
+    mesh->AddVertex(v1);
+    mesh->AddVertex(v2);
+    mesh->AddVertex(v3);
+    mesh->AddVertex(v4);
+    mesh->AddVertex(v5);
+    mesh->AddVertex(v6);
+    mesh->AddVertex(v7);
+    mesh->AddVertex(v8);
+    // XY对角
+    mesh->AddTriFace(v1, v2, v4);
+    mesh->AddTriFace(v1, v3, v4);
+    mesh->AddTriFace(v5, v6, v8);
+    mesh->AddTriFace(v5, v7, v8);
+    // XZ对角
+    mesh->AddTriFace(v1, v2, v6);
+    mesh->AddTriFace(v1, v5, v6);
+    mesh->AddTriFace(v3, v4, v8);
+    mesh->AddTriFace(v3, v7, v8);
+    // YZ对角
+    mesh->AddTriFace(v1, v3, v7);
+    mesh->AddTriFace(v1, v5, v7);
+    mesh->AddTriFace(v2, v4, v8);
+    mesh->AddTriFace(v2, v6, v8);
+}
+
+void MainWindow::AddMeshSphere(int loops, int round){
+    Mesh* mesh = Main::GetMesh();
+    if (!mesh)
+        return;
+    Vertex** vert = new Vertex*[loops * round];
+    Vertex* ceil;
+    Vertex* floor;
+    float angle = (2.0f * PI / round);
+    ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 1.0f) + camLookat);
+    floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -1.0f) + camLookat);
+    for (int i = 0; i < loops; i++){
+        int off = i * round;
+        for (int j = 0; j < round; j++){
+            float height, radius;
+            float vsin, vcos;
+            SinCos(PI * (i + 1) / (loops + 1) - 0.5f * PI, &height, &radius);
+            SinCos(j * angle, &vsin, &vcos);
+            vert[off + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height) + camLookat);
+        }
+    }
+    for (int i = 0; i < loops - 1; i++){
+        for (int j = 0; j < round; j++){
+            int k = (j == round - 1 ? 0 : j + 1);
+            mesh->AddTriFace(vert[i * round + j], vert[i * round + k], vert[(i + 1) * round + k]);
+            mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
+        }
+    }
+    for (int i = 0, off = (loops - 1) * round; i < round; i++){
+        int j = (i == round - 1 ? 0 : i + 1);
+        mesh->AddTriFace(floor, vert[i], vert[j]);
+        mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
+    }
+    delete[] vert;
+}
+
+void MainWindow::AddMeshCylinder(int loops, int round){
+    Mesh* mesh = Main::GetMesh();
+    if (!mesh)
+        return;
+    Vertex** vert = new Vertex*[loops * round];
+    Vertex* ceil;
+    Vertex* floor;
+    float angle = (2.0f * PI / round);
+    ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 1.0f) + camLookat);
+    floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -1.0f) + camLookat);
+    for (int i = 0; i < loops; i++){
+        for (int j = 0; j < round; j++){
+            float vsin, vcos;
+            SinCos(j * angle, &vsin, &vcos);
+            vert[i * round + j] = mesh->AddVertex(Vector3(vcos, vsin, 2.0f * i / (loops - 1) - 1.0f) + camLookat);
+        }
+    }
+    for (int i = 0; i < loops - 1; i++){
+        for (int j = 0; j < round; j++){
+            int k = (j == round - 1 ? 0 : j + 1);
+            mesh->AddTriFace(vert[i * round + j], vert[i * round + k], vert[(i + 1) * round + k]);
+            mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
+        }
+    }
+    for (int i = 0, off = (loops - 1) * round; i < round; i++){
+        int j = (i == round - 1 ? 0 : i + 1);
+        mesh->AddTriFace(floor, vert[i], vert[j]);
+        mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
+    }
+    delete[] vert;
+}
+
+void MainWindow::AddMeshCapsule(int ballLoops, int cylinderLoops, int round){
+    Mesh* mesh = Main::GetMesh();
+    if (!mesh)
+        return;
+    const int loops = 2 * ballLoops + cylinderLoops;
+    Vertex** vert = new Vertex*[loops * round];
+    Vertex* ceil;
+    Vertex* floor;
+    float angle = (2.0f * PI / round);
+    ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 2.0f) + camLookat);
+    floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -2.0f) + camLookat);
+    for (int i = 0; i < loops; i++){
+        if (i >= ballLoops && i < loops - ballLoops){
+            int loopCnt = i - ballLoops;
+            for (int j = 0; j < round; j++){
+                float vsin, vcos;
+                SinCos(j * angle, &vsin, &vcos);
+                vert[i * round + j] = mesh->AddVertex(Vector3(vcos, vsin, 2.0f * loopCnt / (cylinderLoops - 1) - 1.0f) + camLookat);
+            }
+        }else if (i < ballLoops){
+            for (int j = 0; j < round; j++){
+                float height, radius;
+                float vsin, vcos;
+                SinCos(-0.5f * PI * (ballLoops - i - 1) / ballLoops, &height, &radius);
+                SinCos(2.0f * PI * j / round, &vsin, &vcos);
+                vert[i * round + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height - 1.0f) + camLookat);
+            }
+        }else{
+            for (int j = 0; j < round; j++){
+                float height, radius;
+                float vsin, vcos;
+                SinCos(0.5f * PI * (i - ballLoops - cylinderLoops) / ballLoops, &height, &radius);
+                SinCos(j * angle, &vsin, &vcos);
+                vert[i * round + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height + 1.0f) + camLookat);
+            }
+        }
+    }
+    for (int i = 0; i < loops - 1; i++){
+        for (int j = 0; j < round; j++){
+            int k = (j == round - 1 ? 0 : j + 1);
+            mesh->AddTriFace(vert[i * round + j], vert[i * round + k], vert[(i + 1) * round + k]);
+            mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
+        }
+    }
+    for (int i = 0, off = (loops - 1) * round; i < round; i++){
+        int j = (i == round - 1 ? 0 : i + 1);
+        mesh->AddTriFace(floor, vert[i], vert[j]);
+        mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
+    }
+    delete[] vert;
+}
+
 void MainWindow::OnRender(){
     ImGuiIO& io = ImGui::GetIO();
 
@@ -1026,10 +1202,23 @@ void MainWindow::OnRender(){
                 SetTool(new SelectTool(this));
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Mesh")){
+            if (ImGui::MenuItem("Plane"))
+                AddMeshPlane();
+            if (ImGui::MenuItem("Box"))
+                AddMeshBox();
+            if (ImGui::MenuItem("Sphere"))
+                AddMeshSphere(10, 10);
+            if (ImGui::MenuItem("Cylinder"))
+                AddMeshCylinder(2, 30);
+            if (ImGui::MenuItem("Capsule"))
+                AddMeshCapsule(5, 10, 10);
+            ImGui::EndMenu();
+        }
         ImGui::EndMenuBar();
     }
 
-    list->AddCallback(OnGraphicsRenderCallback, this);
+    //list->AddCallback(OnGraphicsRenderCallback, this);
 
     if (ImGui::IsMouseDown(ImGuiMouseButton_Right)){
         Main::SetMenu(basicMenu);
@@ -1328,189 +1517,6 @@ void MainWindow::OnMenuAccel(int id, bool accel){
         break;
     case IDM_EXCLUDE:
         SetOperation(new ExcludeOperation(this));
-        break;
-    case IDM_MESH_BASIC_PLANE:{
-        Mesh* mesh = Main::GetMesh();
-        if (!mesh)
-            break;
-        Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, 0.0f) + camLookat);
-        Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, 0.0f) + camLookat);
-        Vertex* v3 = new Vertex(Vector3(-1.0f,  1.0f, 0.0f) + camLookat);
-        Vertex* v4 = new Vertex(Vector3( 1.0f,  1.0f, 0.0f) + camLookat);
-        v1->uv = Vector2(0.0f, 0.0f);
-        v2->uv = Vector2(1.0f, 0.0f);
-        v3->uv = Vector2(0.0f, 1.0f);
-        v4->uv = Vector2(1.0f, 1.0f);
-        mesh->AddVertex(v1);
-        mesh->AddVertex(v2);
-        mesh->AddVertex(v3);
-        mesh->AddVertex(v4);
-        mesh->AddTriFace(v1, v2, v4);
-        mesh->AddTriFace(v1, v3, v4);
-    }
-        break;
-    case IDM_MESH_BASIC_BLOCK:{
-        Mesh* mesh = Main::GetMesh();
-        if (!mesh)
-            break;
-        Vertex* v1 = new Vertex(Vector3(-1.0f, -1.0f, -1.0f) + camLookat);
-        Vertex* v2 = new Vertex(Vector3( 1.0f, -1.0f, -1.0f) + camLookat);
-        Vertex* v3 = new Vertex(Vector3(-1.0f,  1.0f, -1.0f) + camLookat);
-        Vertex* v4 = new Vertex(Vector3( 1.0f,  1.0f, -1.0f) + camLookat);
-        Vertex* v5 = new Vertex(Vector3(-1.0f, -1.0f,  1.0f) + camLookat);
-        Vertex* v6 = new Vertex(Vector3( 1.0f, -1.0f,  1.0f) + camLookat);
-        Vertex* v7 = new Vertex(Vector3(-1.0f,  1.0f,  1.0f) + camLookat);
-        Vertex* v8 = new Vertex(Vector3( 1.0f,  1.0f,  1.0f) + camLookat);
-        mesh->AddVertex(v1);
-        mesh->AddVertex(v2);
-        mesh->AddVertex(v3);
-        mesh->AddVertex(v4);
-        mesh->AddVertex(v5);
-        mesh->AddVertex(v6);
-        mesh->AddVertex(v7);
-        mesh->AddVertex(v8);
-        // XY对角
-        mesh->AddTriFace(v1, v2, v4);
-        mesh->AddTriFace(v1, v3, v4);
-        mesh->AddTriFace(v5, v6, v8);
-        mesh->AddTriFace(v5, v7, v8);
-        // XZ对角
-        mesh->AddTriFace(v1, v2, v6);
-        mesh->AddTriFace(v1, v5, v6);
-        mesh->AddTriFace(v3, v4, v8);
-        mesh->AddTriFace(v3, v7, v8);
-        // YZ对角
-        mesh->AddTriFace(v1, v3, v7);
-        mesh->AddTriFace(v1, v5, v7);
-        mesh->AddTriFace(v2, v4, v8);
-        mesh->AddTriFace(v2, v6, v8);
-    }
-        break;
-    case IDM_MESH_BASIC_CYLINDER:{
-        Mesh* mesh = Main::GetMesh();
-        if (!mesh)
-            break;
-        const int loops = 2;
-        const int round = 30;
-        Vertex** vert = new Vertex*[loops * round];
-        Vertex* ceil;
-        Vertex* floor;
-        float angle = (2.0f * PI / round);
-        ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 1.0f) + camLookat);
-        floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -1.0f) + camLookat);
-        for (int i = 0; i < loops; i++){
-            for (int j = 0; j < round; j++){
-                float vsin, vcos;
-                SinCos(j * angle, &vsin, &vcos);
-                vert[i * round + j] = mesh->AddVertex(Vector3(vcos, vsin, 2.0f * i / (loops - 1) - 1.0f) + camLookat);
-            }
-        }
-        for (int i = 0; i < loops - 1; i++){
-            for (int j = 0; j < round; j++){
-                int k = (j == round - 1 ? 0 : j + 1);
-                mesh->AddTriFace(vert[i * round + j], vert[i * round + k], vert[(i + 1) * round + k]);
-                mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
-            }
-        }
-        for (int i = 0, off = (loops - 1) * round; i < round; i++){
-            int j = (i == round - 1 ? 0 : i + 1);
-            mesh->AddTriFace(floor, vert[i], vert[j]);
-            mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
-        }
-        delete[] vert;
-    }
-        break;
-    case IDM_MESH_BASIC_SPHERE:{
-        Mesh* mesh = Main::GetMesh();
-        if (!mesh)
-            break;
-        const int loops = 10;
-        const int round = 10;
-        Vertex** vert = new Vertex*[loops * round];
-        Vertex* ceil;
-        Vertex* floor;
-        float angle = (2.0f * PI / round);
-        ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 1.0f) + camLookat);
-        floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -1.0f) + camLookat);
-        for (int i = 0; i < loops; i++){
-            int off = i * round;
-            for (int j = 0; j < round; j++){
-                float height, radius;
-                float vsin, vcos;
-                SinCos(PI * (i + 1) / (loops + 1) - 0.5f * PI, &height, &radius);
-                SinCos(j * angle, &vsin, &vcos);
-                vert[off + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height) + camLookat);
-            }
-        }
-        for (int i = 0; i < loops - 1; i++){
-            for (int j = 0; j < round; j++){
-                int k = (j == round - 1 ? 0 : j + 1);
-                mesh->AddTriFace(vert[i * round + j], vert[i * round + k], vert[(i + 1) * round + k]);
-                mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
-            }
-        }
-        for (int i = 0, off = (loops - 1) * round; i < round; i++){
-            int j = (i == round - 1 ? 0 : i + 1);
-            mesh->AddTriFace(floor, vert[i], vert[j]);
-            mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
-        }
-        delete[] vert;
-    }
-        break;
-    case IDM_MESH_BASIC_CAPSULE:{
-        Mesh* mesh = Main::GetMesh();
-        if (!mesh)
-            break;
-        const int ballLoops = 5;
-        const int cylinderLoops = 10;
-        const int loops = 2 * ballLoops + cylinderLoops;
-        const int round = 10;
-        Vertex** vert = new Vertex*[loops * round];
-        Vertex* ceil;
-        Vertex* floor;
-        float angle = (2.0f * PI / round);
-        ceil = mesh->AddVertex(Vector3(0.0f, 0.0f, 2.0f) + camLookat);
-        floor = mesh->AddVertex(Vector3(0.0f, 0.0f, -2.0f) + camLookat);
-        for (int i = 0; i < loops; i++){
-            if (i >= ballLoops && i < loops - ballLoops){
-                int loopCnt = i - ballLoops;
-                for (int j = 0; j < round; j++){
-                    float vsin, vcos;
-                    SinCos(j * angle, &vsin, &vcos);
-                    vert[i * round + j] = mesh->AddVertex(Vector3(vcos, vsin, 2.0f * loopCnt / (cylinderLoops - 1) - 1.0f) + camLookat);
-                }
-            }else if (i < ballLoops){
-                for (int j = 0; j < round; j++){
-                    float height, radius;
-                    float vsin, vcos;
-                    SinCos(-0.5f * PI * (ballLoops - i - 1) / ballLoops, &height, &radius);
-                    SinCos(2.0f * PI * j / round, &vsin, &vcos);
-                    vert[i * round + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height - 1.0f) + camLookat);
-                }
-            }else{
-                for (int j = 0; j < round; j++){
-                    float height, radius;
-                    float vsin, vcos;
-                    SinCos(0.5f * PI * (i - ballLoops - cylinderLoops) / ballLoops, &height, &radius);
-                    SinCos(j * angle, &vsin, &vcos);
-                    vert[i * round + j] = mesh->AddVertex(Vector3(vcos * radius, vsin * radius, height + 1.0f) + camLookat);
-                }
-            }
-        }
-        for (int i = 0; i < loops - 1; i++){
-            for (int j = 0; j < round; j++){
-                int k = (j == round - 1 ? 0 : j + 1);
-                mesh->AddTriFace(vert[i * round + j], vert[i * round + k], vert[(i + 1) * round + k]);
-                mesh->AddTriFace(vert[i * round + j], vert[(i + 1) * round + j], vert[(i + 1) * round + k]);
-            }
-        }
-        for (int i = 0, off = (loops - 1) * round; i < round; i++){
-            int j = (i == round - 1 ? 0 : i + 1);
-            mesh->AddTriFace(floor, vert[i], vert[j]);
-            mesh->AddTriFace(ceil, vert[off + i], vert[off + j]);
-        }
-        delete[] vert;
-    }
         break;
     case IDM_MENU_BASIC:
         Main::SetMenu(basicMenu);

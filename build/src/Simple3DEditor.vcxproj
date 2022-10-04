@@ -317,6 +317,15 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\editor\dialog\ColorBoard.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\editor\dialog\Tips.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\io\File.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\manager\PluginManager.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\util\os\Font.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\util\os\Log.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\util\os\Resource.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\util\os\Shell.cpp" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\platform\windows\util\os\System.cpp" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Appendable.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Closeable.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\base\Factory.h" />
@@ -655,6 +664,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Shell.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\System.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\os\Time.h" />
+    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\stb_image\stb_vorbis.c" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Appendable.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Closeable.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\base\Flushable.cpp" />
@@ -718,15 +728,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\lib\soundtouch\sse_optimized.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\main.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\manager\WindowManager.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\editor\dialog\ColorBoard.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\editor\dialog\Tips.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\io\File.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\manager\PluginManager.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Font.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Log.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Resource.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\Shell.cpp" />
-    <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\platform\windows\util\os\System.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\AudioUtils.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\DataBuffer.cpp" />
     <ClCompile Include="D:\Code\C++\Simple3DEditor1.0\src\util\String.cpp" />

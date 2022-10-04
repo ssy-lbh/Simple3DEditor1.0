@@ -32,3 +32,15 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for each subdirectory.
+  include("D:/Code/C++/Simple3DEditor1.0/build/src/base/cmake_install.cmake")
+  include("D:/Code/C++/Simple3DEditor1.0/build/src/editor/cmake_install.cmake")
+  include("D:/Code/C++/Simple3DEditor1.0/build/src/io/cmake_install.cmake")
+  include("D:/Code/C++/Simple3DEditor1.0/build/src/lib/cmake_install.cmake")
+  include("D:/Code/C++/Simple3DEditor1.0/build/src/manager/cmake_install.cmake")
+  include("D:/Code/C++/Simple3DEditor1.0/build/src/res/cmake_install.cmake")
+  include("D:/Code/C++/Simple3DEditor1.0/build/src/util/cmake_install.cmake")
+
+endif()
+

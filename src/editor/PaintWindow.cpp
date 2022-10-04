@@ -153,8 +153,8 @@ public:
 
         prog->BindTexture(0, window->paintTex, GL_READ_WRITE, GL_RGBA32F);
 
-        position[0] = window->GetWidth() * (window->cursorPos.x + 1.0f) * 0.5f;
-        position[1] = window->GetHeight() * (window->cursorPos.y + 1.0f) * 0.5f;
+        position[0] = (GLint)(window->GetWidth() * (window->cursorPos.x + 1.0f) * 0.5f);
+        position[1] = (GLint)(window->GetHeight() * (window->cursorPos.y + 1.0f) * 0.5f);
         offset[0] = position[0] - 12;
         offset[1] = position[1] - 12;
 
