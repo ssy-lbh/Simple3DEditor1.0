@@ -653,6 +653,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Camera.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Geometry.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Hash.h" />
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\ImVec.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\LinearAlgebra.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Math.h" />
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Mesh.h" />

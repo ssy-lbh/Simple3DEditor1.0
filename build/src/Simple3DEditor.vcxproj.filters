@@ -1278,6 +1278,9 @@
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\Hash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\ImVec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Code\C++\Simple3DEditor1.0\src\util\math3d\LinearAlgebra.h">
       <Filter>Header Files</Filter>
     </ClInclude>

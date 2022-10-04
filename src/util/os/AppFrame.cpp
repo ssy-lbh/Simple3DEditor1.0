@@ -158,10 +158,14 @@ void AppFrame::RenderMainMenu(){
             if (ImGui::MenuItem("Save Workspace", "Ctrl+Alt+S"));
             if (ImGui::MenuItem("Load Workspace", "Ctrl+Alt+L"));
             ImGui::Separator();
-            if (ImGui::MenuItem("Save Settings"));
-            if (ImGui::MenuItem("Load Settings"));
+            if (ImGui::MenuItem("Save Settings"))
+                Main::data->SaveSettings("settings.json");
+            if (ImGui::MenuItem("Load Settings")){
+                Main::data->LoadSettings("settings.json");
+                Main::data->ApplySettings();
+            }
             ImGui::Separator();
-            if (ImGui::MenuItem("Exit", "ESC"))
+            if (ImGui::MenuItem("Exit", "Alt+F4"))
                 glfwSetWindowShouldClose(window, true);
             ImGui::EndMenu();
         }

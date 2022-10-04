@@ -410,7 +410,7 @@ void GlobalData::ApplySettings(){
 void GlobalData::SaveSettings(const char* path){
     try {
         std::ofstream f(path);
-        // json文件的缩进大??
+        // json文件的缩进大小
         f.width(2);
         f << settings;
         f.close();

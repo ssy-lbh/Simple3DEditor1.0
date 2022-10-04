@@ -457,6 +457,7 @@ set(OLD_GLOB
   "D:/Code/C++/Simple3DEditor1.0/src/util/math3d/Camera.h"
   "D:/Code/C++/Simple3DEditor1.0/src/util/math3d/Geometry.h"
   "D:/Code/C++/Simple3DEditor1.0/src/util/math3d/Hash.h"
+  "D:/Code/C++/Simple3DEditor1.0/src/util/math3d/ImVec.h"
   "D:/Code/C++/Simple3DEditor1.0/src/util/math3d/LinearAlgebra.h"
   "D:/Code/C++/Simple3DEditor1.0/src/util/math3d/Math.h"
   "D:/Code/C++/Simple3DEditor1.0/src/util/math3d/Mesh.h"

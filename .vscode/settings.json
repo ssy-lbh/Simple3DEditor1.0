@@ -9,6 +9,8 @@
         "*.make": "makefile",
         "chrono": "cpp",
         "algorithm": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "math.h": "c",
+        "define.h": "c"
     }
 }

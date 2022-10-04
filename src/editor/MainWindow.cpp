@@ -30,6 +30,7 @@
 #include <lib/json/nlohmann/json.hpp>
 
 #include <lib/imgui/imgui.h>
+#include <util/math3d/ImVec.h>
 
 namespace simple3deditor {
 
@@ -959,55 +960,6 @@ void MainWindow::RenderModelView(){
     glDisable(GL_LINE_SMOOTH);
 }
 
-void MainWindow::OnGraphicsRenderCallback(const ImDrawList* list, const ImDrawCmd* cmd){
-    static_cast<MainWindow*>(cmd->UserCallbackData)->OnGraphicsRender(list, cmd);
-}
-
-void MainWindow::OnGraphicsRender(const ImDrawList* list, const ImDrawCmd* cmd){
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClearDepth(1.0);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
-    options->editor = true;
-    options->vertex = true;
-    options->edge = true;
-    options->face = true;
-    options->light = lightEnabled;
-    options->objOp = objOp;
-
-    RenderModelView();
-
-    glEnable(GL_BLEND);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_LIGHTING);
-    glEnable(GL_ALPHA_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    GLUtils::ResetProjection();
-    GLUtils::ResetModelView();
-    
-    // 屏幕绘制
-    Main::RenderScreen();
-
-    glDisable(GL_DEPTH_TEST);
-    // 工具绘制
-    if (curTool)
-        curTool->OnRender();
-
-    // UI绘制
-    // 在之前进行3D渲染使用投影变换后，需要参数aspect
-    guiMgr->OnChainRender();
-
-    if (audioControl){
-        if (dopplerEffect){
-            alListenerPosAutoVelv3(camPos);
-        }else{
-            alListenerPosv3(camPos);
-        }
-    }
-}
-
 void MainWindow::AddMeshPlane(){
     Mesh* mesh = Main::GetMesh();
     if (!mesh)
@@ -1184,6 +1136,55 @@ void MainWindow::AddMeshCapsule(int ballLoops, int cylinderLoops, int round){
     delete[] vert;
 }
 
+void MainWindow::OnGraphicsRenderCallback(const ImDrawList* list, const ImDrawCmd* cmd){
+    static_cast<MainWindow*>(cmd->UserCallbackData)->OnGraphicsRender(list, cmd);
+}
+
+void MainWindow::OnGraphicsRender(const ImDrawList* list, const ImDrawCmd* cmd){
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearDepth(1.0);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // RenderOptions* options = &LocalData::GetLocalInst()->renderOptions;
+    // options->editor = true;
+    // options->vertex = true;
+    // options->edge = true;
+    // options->face = true;
+    // options->light = lightEnabled;
+    // options->objOp = objOp;
+
+    // RenderModelView();
+
+    // glEnable(GL_BLEND);
+    // glEnable(GL_DEPTH_TEST);
+    // glDisable(GL_LIGHTING);
+    // glEnable(GL_ALPHA_TEST);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // GLUtils::ResetProjection();
+    // GLUtils::ResetModelView();
+    
+    // // 屏幕绘制
+    // Main::RenderScreen();
+
+    // glDisable(GL_DEPTH_TEST);
+    // // 工具绘制
+    // if (curTool)
+    //     curTool->OnRender();
+
+    // // UI绘制
+    // // 在之前进行3D渲染使用投影变换后，需要参数aspect
+    // guiMgr->OnChainRender();
+
+    // if (audioControl){
+    //     if (dopplerEffect){
+    //         alListenerPosAutoVelv3(camPos);
+    //     }else{
+    //         alListenerPosv3(camPos);
+    //     }
+    // }
+}
+
 void MainWindow::OnRender(){
     ImGuiIO& io = ImGui::GetIO();
 
@@ -1193,6 +1194,12 @@ void MainWindow::OnRender(){
     }
 
     ImDrawList* list = ImGui::GetWindowDrawList();
+    list->PushClipRect(
+        ImGui::GetCursorScreenPos(),
+        ImGui::GetCursorScreenPos() + ImGui::GetContentRegionAvail()
+    );
+    list->AddCallback(OnGraphicsRenderCallback, this);
+    list->PopClipRect();
 
     if (ImGui::BeginMenuBar()){
         if (ImGui::BeginMenu("Tools")){
@@ -1217,8 +1224,6 @@ void MainWindow::OnRender(){
         }
         ImGui::EndMenuBar();
     }
-
-    //list->AddCallback(OnGraphicsRenderCallback, this);
 
     if (ImGui::IsMouseDown(ImGuiMouseButton_Right)){
         Main::SetMenu(basicMenu);

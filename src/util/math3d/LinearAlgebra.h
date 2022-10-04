@@ -59,6 +59,7 @@ public:
     T SqrMagnitude() const;
     TVector2<T> Reflect(TVector2<T>) const;
     TVector2<T> Refract(TVector2<T>, T) const;
+    // Counter Clockwise
     TVector2<T> Rotate(T) const;
 };
 
