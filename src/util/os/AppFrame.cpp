@@ -179,39 +179,39 @@ void AppFrame::RenderMainMenu(){
 }
 
 // 极其重要，全屏UI分割管理的利器
-static void DockingTest(){
-    ImGuiID main_docking_id = ImGui::GetID("Main Docking");
-    if (ImGui::DockBuilderGetNode(main_docking_id) == nullptr)
-    {
-        ImGui::DockBuilderRemoveNode(main_docking_id);
+// static void DockingTest(){
+//     ImGuiID main_docking_id = ImGui::GetID("Main Docking");
+//     if (ImGui::DockBuilderGetNode(main_docking_id) == nullptr)
+//     {
+//         ImGui::DockBuilderRemoveNode(main_docking_id);
 
-        ImGui::DockBuilderAddNode(main_docking_id, dock_flags);
-        ImGui::DockBuilderSetNodePos(main_docking_id,
-                                        ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y + 18.0f));
-        ImGui::DockBuilderSetNodeSize(main_docking_id,
-                                        ImVec2((float)window_size[0], (float)window_size[1] - 18.0f));
+//         ImGui::DockBuilderAddNode(main_docking_id, dock_flags);
+//         ImGui::DockBuilderSetNodePos(main_docking_id,
+//                                         ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y + 18.0f));
+//         ImGui::DockBuilderSetNodeSize(main_docking_id,
+//                                         ImVec2((float)window_size[0], (float)window_size[1] - 18.0f));
 
-        ImGuiID center = main_docking_id;
-        ImGuiID left;
-        ImGuiID right = ImGui::DockBuilderSplitNode(center, ImGuiDir_Right, 0.25f, nullptr, &left);
+//         ImGuiID center = main_docking_id;
+//         ImGuiID left;
+//         ImGuiID right = ImGui::DockBuilderSplitNode(center, ImGuiDir_Right, 0.25f, nullptr, &left);
 
-        ImGuiID left_other;
-        ImGuiID left_file_content = ImGui::DockBuilderSplitNode(left, ImGuiDir_Down, 0.30f, nullptr, &left_other);
+//         ImGuiID left_other;
+//         ImGuiID left_file_content = ImGui::DockBuilderSplitNode(left, ImGuiDir_Down, 0.30f, nullptr, &left_other);
 
-        ImGuiID left_game_engine;
-        ImGuiID left_asset =
-            ImGui::DockBuilderSplitNode(left_other, ImGuiDir_Left, 0.30f, nullptr, &left_game_engine);
+//         ImGuiID left_game_engine;
+//         ImGuiID left_asset =
+//             ImGui::DockBuilderSplitNode(left_other, ImGuiDir_Left, 0.30f, nullptr, &left_game_engine);
 
-        ImGui::DockBuilderDockWindow("World Objects", left_asset);
-        ImGui::DockBuilderDockWindow("Components Details", right);
-        ImGui::DockBuilderDockWindow("File Content", left_file_content);
-        ImGui::DockBuilderDockWindow("Game Engine", left_game_engine);
+//         ImGui::DockBuilderDockWindow("World Objects", left_asset);
+//         ImGui::DockBuilderDockWindow("Components Details", right);
+//         ImGui::DockBuilderDockWindow("File Content", left_file_content);
+//         ImGui::DockBuilderDockWindow("Game Engine", left_game_engine);
 
-        ImGui::DockBuilderFinish(main_docking_id);
-    }
+//         ImGui::DockBuilderFinish(main_docking_id);
+//     }
 
-    ImGui::DockSpace(main_docking_id);
-}
+//     ImGui::DockSpace(main_docking_id);
+// }
 
 void AppFrame::Render(){
     RenderMainMenu();
